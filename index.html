@@ -10,7 +10,40 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"} .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}</style>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+    <link rel="shortcut icon" href="/images/favicon.png">
+    <style>
+        body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
+        .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top: 3px solid #4f46e5;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .tools-animation {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
 <!-- Header -->
@@ -155,7 +188,11 @@
             </div>
 
             <div class="mt-6">
-                <button type="button" id="estimateBtn" class="rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold">Get instant estimate</button>
+                <button type="button" id="estimateBtn" class="rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold flex items-center gap-2 disabled:opacity-50">
+                    <span id="estimate-spinner" class="spinner hidden"></span>
+                    <span id="estimate-icon" class="tools-animation">🔧</span>
+                    <span id="estimate-text">Get instant estimate</span>
+                </button>
                 <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold ml-2 hidden">Reserve with card</button>
             </div>
         </form>
@@ -187,10 +224,10 @@
 
 <!-- Payment Modal -->
 <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold">Complete Payment</h3>
-            <button id="closePayment" class="text-slate-400 hover:text-slate-600">&times;</button>
+            <button id="closePayment" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
 
         <div class="mb-4 p-3 bg-slate-50 rounded-lg">
@@ -203,7 +240,8 @@
                 <!-- Stripe Elements will create form elements here -->
             </div>
 
-            <button id="submit-payment" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50">
+            <button id="submit-payment" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50 flex items-center justify-center gap-2">
+                <span id="payment-spinner" class="spinner hidden"></span>
                 <span id="payment-button-text">Complete Payment</span>
             </button>
 
@@ -212,13 +250,47 @@
     </div>
 </div>
 
-<!-- Success Modal -->
-<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+<!-- Address Details Modal -->
+<div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="text-6xl mb-4 text-center">✅</div>
+        <h3 class="text-xl font-bold mb-2 text-center">Payment Confirmed!</h3>
+        <p class="text-slate-600 mb-4 text-center">Please provide your complete address and any additional details.</p>
+
+        <form id="addressForm">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-semibold">Complete Address</label>
+                    <textarea id="fullAddress" rows="3" placeholder="123 Main St, Apt 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold">Additional Task Details</label>
+                    <textarea id="taskDetails" rows="3" placeholder="TV is 65 inch Samsung, wall is drywall, no studs found yet..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold">Best contact number</label>
+                    <input type="tel" id="contactPhone" placeholder="(555) 123-4567" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                </div>
+                <div>
+                    <label class="text-sm font-semibold">Special instructions (access codes, parking, etc.)</label>
+                    <textarea id="specialInstructions" rows="2" placeholder="Gate code 1234, park in visitor spot..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-3">
+                <button type="submit" class="flex-1 rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Complete Booking</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Final Success Modal -->
+<div id="finalSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
-        <div class="text-6xl mb-4">✅</div>
-        <h3 class="text-xl font-bold mb-2">Booking Confirmed!</h3>
-        <p class="text-slate-600 mb-4">Your handyman has been dispatched. You'll receive a text with updates.</p>
-        <button id="closeSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Close</button>
+        <div class="text-6xl mb-4">🚀</div>
+        <h3 class="text-xl font-bold mb-2">Handyman Dispatched!</h3>
+        <p class="text-slate-600 mb-4">Your job details have been sent to our team. You'll receive a text with your technician's details shortly.</p>
+        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Close</button>
     </div>
 </div>
 
