@@ -187,13 +187,16 @@
                 <label for="rush" class="text-sm">Optional rush (+10%)</label>
             </div>
 
-            <div class="mt-6">
+            <div class="mt-6 flex items-center gap-2">
                 <button type="button" id="estimateBtn" class="rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold flex items-center gap-2 disabled:opacity-50">
-                    <span id="estimate-spinner" class="spinner hidden"></span>
-                    <span id="estimate-icon" class="tools-animation">🔧</span>
-                    <span id="estimate-text">Get instant estimate</span>
+                    <div id="estimate-progress" class="hidden">
+                        <div class="w-24 bg-slate-600 rounded-full h-2">
+                            <div id="progress-bar" class="bg-white h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <span id="estimate-text">🔧 Get instant estimate</span>
                 </button>
-                <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold ml-2 hidden">Reserve with card</button>
+                <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hidden">💳 Reserve with card</button>
             </div>
         </form>
 
