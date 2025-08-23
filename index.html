@@ -6,6 +6,7 @@
     <title>SendAHandyman — Same-Day / Next-Day Handyman Dispatch</title>
     <meta name="description" content="Book a vetted handyman today or tomorrow. Upload photos, get an instant AI estimate, and reserve with your card. Serving Palm Beach, Broward & Miami-Dade." />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -93,10 +94,10 @@
             <input type="hidden" name="ai_scope_json" id="ai_scope_json" />
             <input type="hidden" name="estimated_price_usd" id="estimated_price_usd" />
             <input type="hidden" name="estimated_duration_hours" id="estimated_duration_hours" />
-            <p class="hidden"><label>Don’t fill this out: <input name="bot-field"></label></p>
+            <p class="hidden"><label>Don't fill this out: <input name="bot-field"></label></p>
 
             <h3 class="text-xl font-bold">Start your request</h3>
-            <p class="text-sm text-slate-600 mt-1">We’ll analyze your photos and show an instant estimate before you pay.</p>
+            <p class="text-sm text-slate-600 mt-1">We'll analyze your photos and show an instant estimate before you pay.</p>
 
             <div class="mt-4 grid md:grid-cols-2 gap-4">
                 <div><label class="text-sm font-semibold">Full name</label><input name="name" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
@@ -155,7 +156,7 @@
 
             <div class="mt-6">
                 <button type="button" id="estimateBtn" class="rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold">Get instant estimate</button>
-                <button type="submit" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold ml-2 hidden">Reserve with card</button>
+                <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold ml-2 hidden">Reserve with card</button>
             </div>
         </form>
 
@@ -184,6 +185,43 @@
     </div>
 </section>
 
+<!-- Payment Modal -->
+<div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Complete Payment</h3>
+            <button id="closePayment" class="text-slate-400 hover:text-slate-600">&times;</button>
+        </div>
+
+        <div class="mb-4 p-3 bg-slate-50 rounded-lg">
+            <div class="text-sm text-slate-600">Total amount</div>
+            <div id="paymentAmount" class="text-2xl font-bold">$0</div>
+        </div>
+
+        <form id="payment-form">
+            <div id="payment-element" class="mb-4">
+                <!-- Stripe Elements will create form elements here -->
+            </div>
+
+            <button id="submit-payment" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50">
+                <span id="payment-button-text">Complete Payment</span>
+            </button>
+
+            <div id="payment-message" class="mt-4 text-sm hidden"></div>
+        </form>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
+        <div class="text-6xl mb-4">✅</div>
+        <h3 class="text-xl font-bold mb-2">Booking Confirmed!</h3>
+        <p class="text-slate-600 mb-4">Your handyman has been dispatched. You'll receive a text with updates.</p>
+        <button id="closeSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Close</button>
+    </div>
+</div>
+
 <!-- Coverage -->
 <section id="coverage" class="py-12 bg-white border-t border-b border-slate-100">
     <div class="max-w-6xl mx-auto px-4">
@@ -195,9 +233,9 @@
 <!-- FAQ -->
 <section id="faq" class="py-12">
     <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-8">
-        <div><h3 class="text-xl font-bold">Is this a marketplace?</h3><p class="text-slate-600 mt-1">We’re a vetted dispatch service. We send a qualified pro and back the work with standardized checklists and guidance.</p></div>
-        <div><h3 class="text-xl font-bold">How do premiums work?</h3><p class="text-slate-600 mt-1">Like airline pricing, same-day and evening windows include a clear premium. It’s shown before you pay.</p></div>
-        <div><h3 class="text-xl font-bold">Do you charge before the job?</h3><p class="text-slate-600 mt-1">We place an authorization to secure your time. You’re only charged after the tech confirms scope on site.</p></div>
+        <div><h3 class="text-xl font-bold">Is this a marketplace?</h3><p class="text-slate-600 mt-1">We're a vetted dispatch service. We send a qualified pro and back the work with standardized checklists and guidance.</p></div>
+        <div><h3 class="text-xl font-bold">How do premiums work?</h3><p class="text-slate-600 mt-1">Like airline pricing, same-day and evening windows include a clear premium. It's shown before you pay.</p></div>
+        <div><h3 class="text-xl font-bold">Do you charge before the job?</h3><p class="text-slate-600 mt-1">We place an authorization to secure your time. You're only charged after the tech confirms scope on site.</p></div>
         <div><h3 class="text-xl font-bold">Are pros background-checked?</h3><p class="text-slate-600 mt-1">Yes. We verify ID, experience, and insurance where applicable.</p></div>
     </div>
 </section>
@@ -226,6 +264,12 @@
     const PREMIUM_EVENING = 0.10
     const PREMIUM_RUSH = 0.10
 
+    // Stripe configuration
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91'; // Replace with your actual key
+    let stripe, elements, paymentElement;
+    let currentAmount = 0;
+    let currentEstimate = null;
+
     const TASKS = {
       tv_mount: {hours: 1.5, label: "TV Wall Mount (32–65\")"},
       ceiling_fan: {hours: 2.0, label: "Ceiling Fan Install/Replace"},
@@ -238,6 +282,11 @@
       furniture_assembly: {hours: 1.5, label: "Furniture Assembly (S–M)"},
       closet_organizer: {hours: 2.0, label: "Closet Organizer Install"},
       minor_repairs: {hours: 1.5, label: "Minor repairs"}
+    }
+
+    // Initialize Stripe
+    function initializeStripe() {
+        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
     }
 
     document.querySelectorAll('[data-task]').forEach(btn=>{
@@ -292,6 +341,84 @@
       return await res.json()
     }
 
+    // Payment functions
+    async function createPaymentIntent(amount, customerInfo, jobDetails) {
+        const response = await fetch('/.netlify/functions/create-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: amount,
+                customer_info: customerInfo,
+                job_details: jobDetails
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Payment setup failed');
+        }
+
+        return await response.json();
+    }
+
+    function showPaymentModal(amount, estimate) {
+        currentAmount = amount;
+        currentEstimate = estimate;
+
+        document.getElementById('paymentAmount').textContent = `$${amount.toFixed(0)}`;
+        document.getElementById('paymentModal').classList.remove('hidden');
+
+        if (!stripe) {
+            initializeStripe();
+        }
+
+        setupStripeElements();
+    }
+
+    async function setupStripeElements() {
+        try {
+            const customerInfo = {
+                name: document.querySelector('input[name="name"]').value,
+                email: document.querySelector('input[name="email"]').value,
+                phone: document.querySelector('input[name="phone"]').value
+            };
+
+            const jobDetails = {
+                category: document.getElementById('category').value,
+                window: document.getElementById('window').value,
+                hours: currentEstimate?.estimated_duration_hours
+            };
+
+            const { client_secret } = await createPaymentIntent(currentAmount, customerInfo, jobDetails);
+
+            elements = stripe.elements({ clientSecret: client_secret });
+            paymentElement = elements.create('payment');
+            paymentElement.mount('#payment-element');
+
+        } catch (error) {
+            console.error('Error setting up payment:', error);
+            showPaymentMessage('Failed to setup payment. Please try again.', 'error');
+        }
+    }
+
+    function hidePaymentModal() {
+        document.getElementById('paymentModal').classList.add('hidden');
+        if (paymentElement) {
+            paymentElement.unmount();
+        }
+    }
+
+    function showSuccessModal() {
+        document.getElementById('successModal').classList.remove('hidden');
+    }
+
+    function showPaymentMessage(message, type = 'info') {
+        const messageEl = document.getElementById('payment-message');
+        messageEl.textContent = message;
+        messageEl.className = `mt-4 text-sm ${type === 'error' ? 'text-red-600' : 'text-green-600'}`;
+        messageEl.classList.remove('hidden');
+    }
+
+    // Event listeners
     document.getElementById('estimateBtn').addEventListener('click', async ()=>{
       const cat = document.getElementById('category').value
       if(!cat){ alert('Please choose a task.'); return }
@@ -299,6 +426,10 @@
       const rush = document.getElementById('rush').checked
       const desc = document.querySelector('textarea[name="description"]').value || ''
       const hours = (TASKS[cat] || {hours:1.5}).hours
+      const name = document.querySelector('input[name="name"]').value
+      const phone = document.querySelector('input[name="phone"]').value
+      const email = document.querySelector('input[name="email"]').value
+      const address = document.querySelector('input[name="address"]').value
 
       const bd = priceBreakdown(hours, windowVal, rush)
       document.getElementById('estHours').textContent = hours.toFixed(1) + ' hrs'
@@ -306,9 +437,22 @@
       document.getElementById('fareBreakdown').innerHTML = renderFareBreakdown(bd)
 
       try{
-        const aiPayload = { category: cat, description: desc, base_rate_hr: RATE, hours_base: hours, window: windowVal, rush }
+        const aiPayload = {
+          category: cat,
+          description: desc,
+          base_rate_hr: RATE,
+          hours_base: hours,
+          window: windowVal,
+          rush,
+          name,
+          phone,
+          email,
+          address
+        }
         const ai = await callAIScope(aiPayload)
-        document.getElementById('scopeList').innerHTML = (ai.step_scope || ai.scope || []).map(s=>`<li>${s}</li>`).join('')
+        currentEstimate = ai;
+
+        document.getElementById('scopeList').innerHTML = (ai.step_scope || []).map(s=>`<li>${s}</li>`).join('')
         document.getElementById('riskList').innerHTML = (ai.risk_flags || []).map(s=>`<li>${s}</li>`).join('')
         document.getElementById('estimated_price_usd').value = Math.round(bd.total)
         document.getElementById('estimated_duration_hours').value = hours.toFixed(1)
@@ -322,7 +466,62 @@
       }
     })
 
+    document.getElementById('reserveBtn').addEventListener('click', () => {
+        const windowVal = document.getElementById('window').value
+        const rush = document.getElementById('rush').checked
+        const cat = document.getElementById('category').value
+        const hours = (TASKS[cat] || {hours:1.5}).hours
+        const bd = priceBreakdown(hours, windowVal, rush)
+
+        showPaymentModal(bd.total, currentEstimate);
+    });
+
+    document.getElementById('closePayment').addEventListener('click', hidePaymentModal);
+
+    document.getElementById('payment-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitButton = document.getElementById('submit-payment');
+        const buttonText = document.getElementById('payment-button-text');
+
+        submitButton.disabled = true;
+        buttonText.textContent = 'Processing...';
+
+        try {
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: window.location.origin + '/success.html'
+                },
+                redirect: 'if_required'
+            });
+
+            if (error) {
+                showPaymentMessage(error.message, 'error');
+                submitButton.disabled = false;
+                buttonText.textContent = 'Complete Payment';
+            } else {
+                hidePaymentModal();
+                showSuccessModal();
+            }
+        } catch (err) {
+            console.error('Payment error:', err);
+            showPaymentMessage('Payment failed. Please try again.', 'error');
+            submitButton.disabled = false;
+            buttonText.textContent = 'Complete Payment';
+        }
+    });
+
+    document.getElementById('closeSuccess').addEventListener('click', () => {
+        document.getElementById('successModal').classList.add('hidden');
+        // Optionally redirect or refresh the page
+        window.location.reload();
+    });
+
     document.getElementById('year').textContent = new Date().getFullYear()
+
+    // Initialize Stripe when page loads
+    window.addEventListener('load', initializeStripe);
 </script>
 </body>
 </html>
