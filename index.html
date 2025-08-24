@@ -244,6 +244,7 @@
             <div class="bg-slate-50 rounded-lg p-4 mb-6">
                 <h4 class="font-semibold mb-3">Job Summary (from your request)</h4>
                 <div class="text-sm space-y-1">
+                    <div><strong>Task ID:</strong> <span id="summaryTaskId" class="font-mono text-indigo-600">—</span></div>
                     <div><strong>Customer:</strong> <span id="summaryName">—</span></div>
                     <div><strong>Phone:</strong> <span id="summaryPhone">—</span></div>
                     <div><strong>Email:</strong> <span id="summaryEmail">—</span></div>
@@ -300,7 +301,11 @@
                 <strong>✅ Job details sent to our team</strong><br>
                 <strong>✅ Notification sent to handyman dispatch</strong>
             </p>
-            <p class="text-sm text-slate-600">
+            <div class="mt-3 p-2 bg-white rounded border">
+                <div class="text-xs text-slate-500">Your Task ID</div>
+                <div id="finalTaskId" class="font-mono text-sm font-semibold text-indigo-600">—</div>
+            </div>
+            <p class="text-sm text-slate-600 mt-2">
                 You'll receive a text message with your technician's details and estimated arrival time within the next 15 minutes.
             </p>
         </div>
@@ -693,7 +698,12 @@
 
     // STEP 5: Show Task Information modal with pre-populated data
     function showTaskInfoModal() {
+        // Generate and store task ID
+        const taskId = generateTaskId();
+        window.currentTaskId = taskId; // Store for later use
+
         // Pre-populate summary from Step 2 data
+        document.getElementById('summaryTaskId').textContent = taskId;
         document.getElementById('summaryName').textContent = formData.name;
         document.getElementById('summaryPhone').textContent = formData.phone;
         document.getElementById('summaryEmail').textContent = formData.email;
@@ -707,6 +717,13 @@
         document.getElementById('taskInfoModal').classList.remove('hidden');
     }
 
+    // Generate unique task ID
+    function generateTaskId() {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substring(2, 8);
+        return `TASK-${timestamp}-${random}`.toUpperCase();
+    }
+
     // STEP 6: Send notification and complete flow
     async function submitTaskInfo(event) {
         event.preventDefault();
@@ -715,19 +732,33 @@
         submitBtn.disabled = true;
         submitBtn.textContent = '📤 Sending notification...';
 
-        // Collect all data for notification
+        // Use the task ID generated when modal was shown
+        const taskId = window.currentTaskId;
+
+        // Collect all data for notification with proper structure
         const completeJobData = {
+            task_id: taskId,
             payment_intent_id: paymentIntentId,
-            customer: formData,
-            task_info: {
-                property_address: document.getElementById('propertyAddress').value,
-                contact_phone: document.getElementById('contactPhone').value,
-                access_details: document.getElementById('accessDetails').value,
-                pets_and_special: document.getElementById('petsAndSpecial').value,
-                additional_details: document.getElementById('additionalDetails').value
-            },
-            estimate: estimateData,
-            amount: estimateData.pricing.total
+            category: formData.category,
+            window: formData.window,
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            zip: formData.zip,
+            address: formData.address,
+            description: formData.description,
+            rush: formData.rush,
+            property_address: document.getElementById('propertyAddress').value,
+            contact_phone: document.getElementById('contactPhone').value,
+            access_details: document.getElementById('accessDetails').value,
+            pets_and_special: document.getElementById('petsAndSpecial').value,
+            additional_details: document.getElementById('additionalDetails').value,
+            estimated_hours: estimateData.hours,
+            total_amount: estimateData.pricing.total,
+            base_amount: estimateData.pricing.base,
+            premiums: estimateData.pricing.premiums,
+            step_scope: estimateData.step_scope || [],
+            risk_flags: estimateData.risk_flags || []
         };
 
         console.log('📋 Complete job data for notification:', completeJobData);
@@ -751,6 +782,7 @@
         }
 
         // Show final success regardless of notification status
+        document.getElementById('finalTaskId').textContent = taskId;
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
