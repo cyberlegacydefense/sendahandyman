@@ -466,9 +466,7 @@
 
             const response = await fetch(ZAPIER_CONFIG.WEBHOOK_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                // Remove Content-Type header to avoid CORS preflight request
                 body: JSON.stringify(zapierData)
             });
 
