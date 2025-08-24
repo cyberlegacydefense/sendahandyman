@@ -171,12 +171,21 @@
                 <label for="rush" class="text-sm">Optional rush (+10%)</label>
             </div>
 
-            <div class="mt-6 flex items-center gap-3">
-                <button type="button" id="estimateBtn" class="relative overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-50">
-                    <div id="estimate-progress-bg" class="absolute inset-0 bg-indigo-600 transform -translate-x-full transition-transform duration-1000 ease-out"></div>
-                    <span id="estimate-text" class="relative z-10">🔧 Get instant estimate</span>
-                </button>
-                <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hidden">💳 Reserve with card</button>
+            <div class="mt-6">
+                <div class="flex items-center gap-3">
+                    <button type="button" id="estimateBtn" class="relative overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-50">
+                        <div id="estimate-progress-bg" class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 transform -translate-x-full transition-transform duration-2000 ease-out"></div>
+                        <span id="estimate-text" class="relative z-10">🔧 Get instant estimate</span>
+                    </button>
+                    <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hidden">💳 Reserve with card</button>
+                </div>
+                <!-- Progress bar below button -->
+                <div id="progress-bar-container" class="mt-3 hidden">
+                    <div class="w-full bg-slate-200 rounded-full h-2">
+                        <div id="progress-bar-fill" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div id="progress-text" class="text-sm text-slate-600 mt-1">Starting analysis...</div>
+                </div>
             </div>
         </form>
 
@@ -232,35 +241,55 @@
     </div>
 </div>
 
+<!-- Payment Success Notification -->
+<div id="paymentSuccessNotification" class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden">
+    <div class="flex items-center gap-2">
+        <span class="text-xl">✅</span>
+        <div>
+            <div class="font-semibold">Payment Successful!</div>
+            <div class="text-sm">Please provide your address details...</div>
+        </div>
+    </div>
+</div>
+
 <!-- Address Details Modal -->
 <div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="text-6xl mb-4 text-center">✅</div>
-        <h3 class="text-xl font-bold mb-2 text-center">Payment Confirmed!</h3>
-        <p class="text-slate-600 mb-4 text-center">Please provide your complete address and any additional details.</p>
+        <div class="text-center mb-4">
+            <div class="text-6xl mb-2">🎉</div>
+            <h3 class="text-xl font-bold mb-2 text-green-600">Payment Confirmed!</h3>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                <div class="text-sm text-green-700">
+                    <strong>✅ Payment processed successfully</strong><br>
+                    Your handyman will be dispatched after you provide the details below.
+                </div>
+            </div>
+        </div>
 
         <form id="addressForm">
             <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-semibold">Complete Address</label>
-                    <textarea id="fullAddress" rows="3" placeholder="123 Main St, Apt 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Complete Address *</label>
+                    <textarea id="fullAddress" rows="3" placeholder="123 Main St, Apt 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
                 <div>
-                    <label class="text-sm font-semibold">Additional Task Details</label>
-                    <textarea id="taskDetails" rows="3" placeholder="TV is 65 inch Samsung, wall is drywall, no studs found yet..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Best Contact Phone *</label>
+                    <input type="tel" id="contactPhone" placeholder="(555) 123-4567" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500" />
                 </div>
                 <div>
-                    <label class="text-sm font-semibold">Best contact number</label>
-                    <input type="tel" id="contactPhone" placeholder="(555) 123-4567" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                    <label class="text-sm font-semibold text-gray-700">Additional Task Details</label>
+                    <textarea id="taskDetails" rows="3" placeholder="TV is 65 inch Samsung, wall is drywall, outlet nearby..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
                 <div>
-                    <label class="text-sm font-semibold">Special instructions (access codes, parking, etc.)</label>
-                    <textarea id="specialInstructions" rows="2" placeholder="Gate code 1234, park in visitor spot..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Special Instructions</label>
+                    <textarea id="specialInstructions" rows="2" placeholder="Gate code 1234, park in visitor spot, call when you arrive..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
             </div>
 
-            <div class="mt-6 flex gap-3">
-                <button type="submit" class="flex-1 rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Complete Booking</button>
+            <div class="mt-6">
+                <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+                    🚀 Dispatch Handyman
+                </button>
             </div>
         </form>
     </div>
@@ -270,9 +299,18 @@
 <div id="finalSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
         <div class="text-6xl mb-4">🚀</div>
-        <h3 class="text-xl font-bold mb-2">Handyman Dispatched!</h3>
-        <p class="text-slate-600 mb-4">Your job details have been sent to our team. You'll receive a text with your technician's details shortly.</p>
-        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Close</button>
+        <h3 class="text-xl font-bold mb-2 text-green-600">Handyman Dispatched!</h3>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+            <p class="text-sm text-green-700 mb-2">
+                <strong>✅ Payment processed</strong><br>
+                <strong>✅ Job details sent to our team</strong><br>
+                <strong>✅ Handyman being dispatched</strong>
+            </p>
+            <p class="text-sm text-slate-600">
+                You'll receive a text message with your technician's details and estimated arrival time within the next few minutes.
+            </p>
+        </div>
+        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">Got it!</button>
     </div>
 </div>
 
