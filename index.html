@@ -752,17 +752,21 @@
         console.log('✅ Task selection buttons initialized');
 
         // Photo upload preview
-        document.getElementById('taskPhotos').addEventListener('change', (e) => {
-            const thumbs = document.getElementById('photoThumbs');
-            thumbs.innerHTML = '';
-            [...e.target.files].slice(0, 5).forEach(file => {
-                const url = URL.createObjectURL(file);
-                const img = document.createElement('img');
-                img.src = url;
-                img.className = 'h-16 w-16 object-cover rounded-lg border';
-                thumbs.appendChild(img);
+        const photoInput = document.getElementById('taskPhotos');
+        if (photoInput) {
+            photoInput.addEventListener('change', (e) => {
+                const thumbs = document.getElementById('photoThumbs');
+                thumbs.innerHTML = '';
+                [...e.target.files].slice(0, 5).forEach(file => {
+                    const url = URL.createObjectURL(file);
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.className = 'h-16 w-16 object-cover rounded-lg border';
+                    thumbs.appendChild(img);
+                });
             });
-        });
+            console.log('✅ Photo upload initialized');
+        }
 
         // STEP 3: Get Estimate Button
         const estimateBtn = document.getElementById('getEstimateBtn');
@@ -781,24 +785,42 @@
         }
 
         // STEP 4: Reserve Button
-        document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+        const reserveBtn = document.getElementById('reserveBtn');
+        if (reserveBtn) {
+            reserveBtn.addEventListener('click', showPaymentModal);
+            console.log('✅ Reserve button initialized');
+        }
 
         // Payment form
-        document.getElementById('paymentForm').addEventListener('submit', processPayment);
+        const paymentForm = document.getElementById('paymentForm');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', processPayment);
+            console.log('✅ Payment form initialized');
+        }
 
         // Close payment modal
-        document.getElementById('closePayment').addEventListener('click', () => {
-            document.getElementById('paymentModal').classList.add('hidden');
-        });
+        const closePayment = document.getElementById('closePayment');
+        if (closePayment) {
+            closePayment.addEventListener('click', () => {
+                document.getElementById('paymentModal').classList.add('hidden');
+            });
+        }
 
         // STEP 5: Task Info Form
-        document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+        const taskInfoForm = document.getElementById('taskInfoForm');
+        if (taskInfoForm) {
+            taskInfoForm.addEventListener('submit', submitTaskInfo);
+            console.log('✅ Task info form initialized');
+        }
 
         // Final success close
-        document.getElementById('closeFinalSuccess').addEventListener('click', () => {
-            document.getElementById('finalSuccessModal').classList.add('hidden');
-            location.reload(); // Reset for new booking
-        });
+        const closeFinalSuccess = document.getElementById('closeFinalSuccess');
+        if (closeFinalSuccess) {
+            closeFinalSuccess.addEventListener('click', () => {
+                document.getElementById('finalSuccessModal').classList.add('hidden');
+                location.reload(); // Reset for new booking
+            });
+        }
 
         // Set current year
         document.getElementById('year').textContent = new Date().getFullYear();
@@ -813,6 +835,8 @@
             waitForStripe();
         }
     });
+
+    console.log('📜 JavaScript finished loading');
 </script>
 </body>
 </html> + estimateData.pricing.total.toFixed(0);
