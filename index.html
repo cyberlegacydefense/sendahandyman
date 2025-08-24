@@ -10,10 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
-    <link rel="shortcut icon" href="/images/favicon.png">
     <style>
         body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
         .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
@@ -21,11 +19,6 @@
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
-        }
-
-        .estimate-progress-btn {
-            position: relative;
-            overflow: hidden;
         }
     </style>
 </head>
@@ -69,7 +62,7 @@
     </div>
 </section>
 
-<!-- Curated Tasks -->
+<!-- Task Selection -->
 <section class="py-10 border-t border-slate-100 bg-white" id="tasks">
     <div class="max-w-6xl mx-auto px-4">
         <h2 class="text-2xl md:text-3xl font-bold">Popular fixed-price tasks</h2>
@@ -103,32 +96,26 @@
     </div>
 </section>
 
-<!-- Booking form & AI estimate -->
+<!-- STEP 2: Start Your Request Form -->
 <section id="book" class="py-12">
     <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-start">
-        <form id="jobForm" name="job" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100">
-            <input type="hidden" name="form-name" value="job" />
-            <input type="hidden" name="ai_scope_json" id="ai_scope_json" />
-            <input type="hidden" name="estimated_price_usd" id="estimated_price_usd" />
-            <input type="hidden" name="estimated_duration_hours" id="estimated_duration_hours" />
-            <p class="hidden"><label>Don't fill this out: <input name="bot-field"></label></p>
-
+        <div class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100">
             <h3 class="text-xl font-bold">Start your request</h3>
             <p class="text-sm text-slate-600 mt-1">We'll analyze your photos and show an instant estimate before you pay.</p>
 
             <div class="mt-4 grid md:grid-cols-2 gap-4">
-                <div><label class="text-sm font-semibold">Full name</label><input name="name" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-                <div><label class="text-sm font-semibold">Mobile phone</label><input name="phone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-                <div><label class="text-sm font-semibold">Email</label><input type="email" name="email" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-                <div><label class="text-sm font-semibold">ZIP code</label><input name="zip" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">Full name</label><input id="customerName" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">Mobile phone</label><input id="customerPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">Email</label><input type="email" id="customerEmail" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">ZIP code</label><input id="customerZip" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
             </div>
 
-            <div class="mt-4"><label class="text-sm font-semibold">Address (optional)</label><input name="address" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+            <div class="mt-4"><label class="text-sm font-semibold">Address (optional)</label><input id="customerAddress" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
 
             <div class="mt-4 grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="text-sm font-semibold">Task</label>
-                    <select name="category" id="category" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+                    <select id="taskCategory" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
                         <option value="">Select a task…</option>
                         <option value="tv_mount">TV mounting</option>
                         <option value="ceiling_fan">Ceiling fan install</option>
@@ -145,7 +132,7 @@
                 </div>
                 <div>
                     <label class="text-sm font-semibold">When?</label>
-                    <select name="window" id="window" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+                    <select id="taskWindow" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
                         <option value="today_am">Today (8–12)</option>
                         <option value="today_pm">Today (12–4)</option>
                         <option value="today_eve">Today (4–8)</option>
@@ -157,64 +144,66 @@
 
             <div class="mt-4">
                 <label class="text-sm font-semibold">Describe the job</label>
-                <textarea name="description" rows="3" placeholder="Product link/model, wall/ceiling type, special notes…" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+                <textarea id="taskDescription" rows="3" placeholder="Product link/model, wall/ceiling type, special notes…" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
             </div>
 
             <div class="mt-4">
                 <label class="text-sm font-semibold">Upload photos (2–5)</label>
-                <input id="photos" name="photos" type="file" accept="image/*" multiple class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
-                <div id="thumbs" class="mt-2 flex flex-wrap gap-2"></div>
+                <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                <div id="photoThumbs" class="mt-2 flex flex-wrap gap-2"></div>
             </div>
 
             <div class="mt-6 flex items-center gap-2">
-                <input id="rush" name="rush" type="checkbox" class="h-4 w-4" />
-                <label for="rush" class="text-sm">Optional rush (+10%)</label>
+                <input id="rushOption" type="checkbox" class="h-4 w-4" />
+                <label for="rushOption" class="text-sm">Optional rush (+10%)</label>
             </div>
 
+            <!-- STEP 3: Get Instant Estimate Button with Progress -->
             <div class="mt-6">
-                <div class="flex items-center gap-3">
-                    <button type="button" id="estimateBtn" class="relative overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-50">
-                        <div id="estimate-progress-bg" class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 transform -translate-x-full transition-transform duration-2000 ease-out"></div>
-                        <span id="estimate-text" class="relative z-10">🔧 Get instant estimate</span>
-                    </button>
-                    <button type="button" id="reserveBtn" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hidden">💳 Reserve with card</button>
-                </div>
-                <!-- Progress bar below button -->
-                <div id="progress-bar-container" class="mt-3 hidden">
+                <button type="button" id="getEstimateBtn" class="relative w-full overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-75">
+                    <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
+                    <span id="estimateText" class="relative z-10">🔧 Get instant estimate</span>
+                </button>
+
+                <!-- Progress Bar Below Button -->
+                <div id="progressContainer" class="mt-3 hidden">
                     <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div id="progress-bar-fill" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <div id="progress-text" class="text-sm text-slate-600 mt-1">Starting analysis...</div>
+                    <div id="progressMessage" class="text-sm text-slate-600 mt-1 text-center">Starting analysis...</div>
                 </div>
             </div>
-        </form>
+        </div>
 
-        <!-- Estimate Panel -->
+        <!-- AI Estimate Panel (Shows after Step 3 completes) -->
         <aside id="estimatePanel" class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 hidden">
             <h3 class="text-xl font-bold">AI Estimate</h3>
-            <p class="text-sm text-slate-600">Transparent fare like airlines: base + time-window premiums clearly shown.</p>
+            <p class="text-sm text-slate-600">Transparent pricing with same-day premiums shown upfront.</p>
             <div class="mt-4 grid gap-3">
-                <div class="flex items-baseline justify-between"><span class="text-slate-600">Estimated duration</span><strong id="estHours">—</strong></div>
-                <div class="flex items-baseline justify-between"><span class="text-slate-600">Price (all-in)</span><strong id="estPrice" class="text-2xl">—</strong></div>
+                <div class="flex items-baseline justify-between"><span class="text-slate-600">Estimated duration</span><strong id="estimatedHours">—</strong></div>
+                <div class="flex items-baseline justify-between"><span class="text-slate-600">Price (all-in)</span><strong id="estimatedPrice" class="text-2xl">—</strong></div>
                 <div class="rounded-lg bg-slate-50 border p-3 text-sm">
                     <div class="font-semibold mb-1">Fare breakdown</div>
                     <div id="fareBreakdown" class="space-y-1"></div>
                 </div>
             </div>
             <div class="mt-4">
-                <h4 class="font-semibold">Scope</h4>
-                <ul id="scopeList" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
+                <h4 class="font-semibold">What we'll do</h4>
+                <ul id="estimateScope" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
             </div>
             <div class="mt-4">
-                <h4 class="font-semibold">Risk flags</h4>
-                <ul id="riskList" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
+                <h4 class="font-semibold">Things to note</h4>
+                <ul id="estimateRisks" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
             </div>
-            <p class="mt-5 text-xs text-slate-500">If site conditions differ, your tech will confirm any changes before work begins.</p>
+            <div class="mt-6">
+                <button id="reserveBtn" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold shadow-soft">💳 Reserve with card</button>
+            </div>
+            <p class="mt-3 text-xs text-slate-500">If site conditions differ, your tech will confirm any changes before work begins.</p>
         </aside>
     </div>
 </section>
 
-<!-- Payment Modal -->
+<!-- STEP 4: Payment Modal -->
 <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
@@ -227,62 +216,67 @@
             <div id="paymentAmount" class="text-2xl font-bold">$0</div>
         </div>
 
-        <form id="payment-form">
-            <div id="payment-element" class="mb-4">
-                <!-- Stripe Elements will create form elements here -->
-            </div>
+        <form id="paymentForm">
+            <div id="stripe-payment-element" class="mb-4"></div>
 
-            <button id="submit-payment" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50 transition-all">
-                <span id="payment-button-text">Complete Payment</span>
+            <button id="submitPayment" type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50 transition-all">
+                <span id="paymentButtonText">Complete Payment</span>
             </button>
 
-            <div id="payment-message" class="mt-4 text-sm hidden"></div>
+            <div id="paymentMessage" class="mt-4 text-sm hidden"></div>
         </form>
     </div>
 </div>
 
-<!-- Payment Success Notification -->
-<div id="paymentSuccessNotification" class="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 hidden">
-    <div class="flex items-center gap-2">
-        <span class="text-xl">✅</span>
-        <div>
-            <div class="font-semibold">Payment Successful!</div>
-            <div class="text-sm">Please provide your address details...</div>
-        </div>
-    </div>
-</div>
-
-<!-- Address Details Modal -->
-<div id="addressModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+<!-- STEP 5: Task Information Modal (Shows after payment approved) -->
+<div id="taskInfoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div class="text-center mb-4">
-            <div class="text-6xl mb-2">🎉</div>
-            <h3 class="text-xl font-bold mb-2 text-green-600">Payment Confirmed!</h3>
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-2">✅</div>
+            <h3 class="text-xl font-bold mb-2 text-green-600">Payment Approved!</h3>
             <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
-                <div class="text-sm text-green-700">
-                    <strong>✅ Payment processed successfully</strong><br>
-                    Your handyman will be dispatched after you provide the details below.
-                </div>
+                <p class="text-sm text-green-700">Your payment was processed successfully. Please provide additional details below to dispatch your handyman.</p>
             </div>
         </div>
 
-        <form id="addressForm">
+        <form id="taskInfoForm">
+            <!-- Pre-populated fields from Step 2 -->
+            <div class="bg-slate-50 rounded-lg p-4 mb-6">
+                <h4 class="font-semibold mb-3">Job Summary (from your request)</h4>
+                <div class="text-sm space-y-1">
+                    <div><strong>Customer:</strong> <span id="summaryName">—</span></div>
+                    <div><strong>Phone:</strong> <span id="summaryPhone">—</span></div>
+                    <div><strong>Email:</strong> <span id="summaryEmail">—</span></div>
+                    <div><strong>Task:</strong> <span id="summaryTask">—</span></div>
+                    <div><strong>Window:</strong> <span id="summaryWindow">—</span></div>
+                    <div><strong>Description:</strong> <span id="summaryDescription">—</span></div>
+                </div>
+            </div>
+
             <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-semibold text-gray-700">Complete Address *</label>
-                    <textarea id="fullAddress" rows="3" placeholder="123 Main St, Apt 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Complete Property Address *</label>
+                    <textarea id="propertyAddress" rows="3" placeholder="123 Main St, Unit 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
+
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Best Contact Phone *</label>
-                    <input type="tel" id="contactPhone" placeholder="(555) 123-4567" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500" />
+                    <input type="tel" id="contactPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500" />
                 </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-gray-700">Property Access Details</label>
+                    <textarea id="accessDetails" rows="3" placeholder="Gate code: 1234, Park in visitor spots, Ring doorbell..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-gray-700">Pets & Special Considerations</label>
+                    <textarea id="petsAndSpecial" rows="2" placeholder="2 friendly dogs, alarm system code needed, delicate antiques nearby..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Additional Task Details</label>
-                    <textarea id="taskDetails" rows="3" placeholder="TV is 65 inch Samsung, wall is drywall, outlet nearby..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
-                </div>
-                <div>
-                    <label class="text-sm font-semibold text-gray-700">Special Instructions</label>
-                    <textarea id="specialInstructions" rows="2" placeholder="Gate code 1234, park in visitor spot, call when you arrive..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <textarea id="additionalDetails" rows="3" placeholder="TV model: Samsung 65", wall type: drywall, tools available on site..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
             </div>
 
@@ -295,7 +289,7 @@
     </div>
 </div>
 
-<!-- Final Success Modal -->
+<!-- STEP 6: Final Success Modal -->
 <div id="finalSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
         <div class="text-6xl mb-4">🚀</div>
@@ -304,13 +298,13 @@
             <p class="text-sm text-green-700 mb-2">
                 <strong>✅ Payment processed</strong><br>
                 <strong>✅ Job details sent to our team</strong><br>
-                <strong>✅ Handyman being dispatched</strong>
+                <strong>✅ Notification sent to handyman dispatch</strong>
             </p>
             <p class="text-sm text-slate-600">
-                You'll receive a text message with your technician's details and estimated arrival time within the next few minutes.
+                You'll receive a text message with your technician's details and estimated arrival time within the next 15 minutes.
             </p>
         </div>
-        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">Got it!</button>
+        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">Perfect!</button>
     </div>
 </div>
 
@@ -347,273 +341,627 @@
     </div>
 </footer>
 
-<!-- Client JS -->
 <script>
-    const $ = (id)=>document.getElementById(id)
-    const thumbs = $('thumbs')
-    const RATE = 80
-    const PREMIUM_SAMEDAY = 0.15
-    const PREMIUM_EVENING = 0.10
-    const PREMIUM_RUSH = 0.10
+    // GLOBAL STATE - Persisted in memory
+    let formData = {};
+    let estimateData = {};
+    let paymentIntentId = null;
 
-    // Stripe configuration
-    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91'; // Replace with your actual key
+    // Stripe Configuration - ⚠️ REPLACE WITH YOUR ACTUAL STRIPE TEST KEY ⚠️
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
     let stripe, elements, paymentElement;
-    let currentAmount = 0;
-    let currentEstimate = null;
+
+    const RATE = 80;
+    const PREMIUM_SAMEDAY = 0.15;
+    const PREMIUM_EVENING = 0.10;
+    const PREMIUM_RUSH = 0.10;
 
     const TASKS = {
-      tv_mount: {hours: 1.5, label: "TV Wall Mount (32–65\")"},
-      ceiling_fan: {hours: 2.0, label: "Ceiling Fan Install/Replace"},
-      light_fixture: {hours: 1.0, label: "Light Fixture / Chandelier Swap"},
-      faucet_showerhead: {hours: 1.0, label: "Faucet / Showerhead Replace"},
-      smart_doorbell: {hours: 0.75, label: "Smart Doorbell Install"},
-      curtains_blinds: {hours: 1.0, label: "Curtain Rods / Blinds"},
-      floating_shelf: {hours: 1.0, label: "Floating Shelf Install"},
-      appliance_hookup: {hours: 1.5, label: "Appliance Hookup (W/D/DW)"},
-      furniture_assembly: {hours: 1.5, label: "Furniture Assembly (S–M)"},
-      closet_organizer: {hours: 2.0, label: "Closet Organizer Install"},
-      minor_repairs: {hours: 1.5, label: "Minor repairs"}
-    }
+        tv_mount: { hours: 1.5, label: "TV Wall Mount (32–65\")" },
+        ceiling_fan: { hours: 2.0, label: "Ceiling Fan Install/Replace" },
+        light_fixture: { hours: 1.0, label: "Light Fixture / Chandelier Swap" },
+        faucet_showerhead: { hours: 1.0, label: "Faucet / Showerhead Replace" },
+        smart_doorbell: { hours: 0.75, label: "Smart Doorbell Install" },
+        curtains_blinds: { hours: 1.0, label: "Curtain Rods / Blinds" },
+        floating_shelf: { hours: 1.0, label: "Floating Shelf Install" },
+        appliance_hookup: { hours: 1.5, label: "Appliance Hookup (W/D/DW)" },
+        furniture_assembly: { hours: 1.5, label: "Furniture Assembly (S–M)" },
+        closet_organizer: { hours: 2.0, label: "Closet Organizer Install" },
+        minor_repairs: { hours: 1.5, label: "Minor repairs" }
+    };
 
-    // Initialize Stripe
+    // Initialize Stripe with error handling
     function initializeStripe() {
-        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-    }
+        if (typeof Stripe !== 'undefined') {
+            // Check if publishable key is set properly
+            if (STRIPE_PUBLISHABLE_KEY.includes('YOUR_ACTUAL_STRIPE_KEY_HERE')) {
+                console.error('❌ Please set your actual Stripe publishable key!');
+                console.error('Update STRIPE_PUBLISHABLE_KEY with your pk_test_... key');
+                return;
+            }
 
-    document.querySelectorAll('[data-task]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const key = btn.getAttribute('data-task')
-        const select = document.getElementById('category')
-        select.value = key
-        select.dispatchEvent(new Event('change'))
-        window.scrollTo({top: document.getElementById('book').offsetTop - 60, behavior:'smooth'})
-      })
-    })
-
-    document.getElementById('photos').addEventListener('change', (e)=>{
-      thumbs.innerHTML = ''
-      ;[...e.target.files].slice(0,5).forEach(file=>{
-        const url = URL.createObjectURL(file)
-        const img = document.createElement('img')
-        img.src = url; img.className='h-16 w-16 object-cover rounded-lg border'
-        thumbs.appendChild(img)
-      })
-    })
-
-    function priceBreakdown(hours, windowVal, rushChecked){
-      const base = hours * RATE
-      let premiums = []
-      const sameDay = windowVal.startsWith('today')
-      const evening = windowVal.includes('eve')
-      let total = base
-      if (sameDay){ const p = base * PREMIUM_SAMEDAY; premiums.push({label:'Same-day premium (15%)', amt:p}); total+=p }
-      if (evening){ const p = base * PREMIUM_EVENING; premiums.push({label:'Evening window premium (10%)', amt:p}); total+=p }
-      if (rushChecked){ const p = base * PREMIUM_RUSH; premiums.push({label:'Optional rush (10%)', amt:p}); total+=p }
-      return {base, premiums, total}
-    }
-
-    function renderFareBreakdown(bd){
-      const lines = [
-        `<div class="flex justify-between"><span>Base ($${RATE}/hr)</span><span>$${bd.base.toFixed(0)}</span></div>`
-      ]
-      bd.premiums.forEach(x=>lines.push(`<div class="flex justify-between"><span>${x.label}</span><span>$${x.amt.toFixed(0)}</span></div>`))
-      lines.push(`<hr class="my-2 border-slate-200">`)
-      lines.push(`<div class="flex justify-between font-semibold"><span>Total</span><span>$${bd.total.toFixed(0)}</span></div>`)
-      return lines.join('')
-    }
-
-    async function callAIScope(payload){
-      const res = await fetch('/.netlify/functions/scope', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      })
-      if(!res.ok) throw new Error('Scope service error')
-      return await res.json()
-    }
-
-    // Payment functions
-    async function createPaymentIntent(amount, customerInfo, jobDetails) {
-        const response = await fetch('/.netlify/functions/create-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                amount: amount,
-                customer_info: customerInfo,
-                job_details: jobDetails
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Payment setup failed');
+            try {
+                stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+                console.log('✅ Stripe initialized successfully');
+            } catch (error) {
+                console.error('❌ Stripe initialization failed:', error);
+            }
+        } else {
+            console.error('❌ Stripe not loaded yet, retrying...');
+            // Retry after 1 second
+            setTimeout(initializeStripe, 1000);
         }
-
-        return await response.json();
     }
 
-    function showPaymentModal(amount, estimate) {
-        currentAmount = amount;
-        currentEstimate = estimate;
-
-        document.getElementById('paymentAmount').textContent = `$${amount.toFixed(0)}`;
-        document.getElementById('paymentModal').classList.remove('hidden');
-
-        if (!stripe) {
+    // Wait for Stripe script to load
+    function waitForStripe() {
+        if (typeof Stripe !== 'undefined') {
             initializeStripe();
+        } else {
+            console.log('⏳ Waiting for Stripe to load...');
+            setTimeout(waitForStripe, 100);
         }
-
-        setupStripeElements();
     }
 
-    async function setupStripeElements() {
+    // STEP 2: Persist form data in memory
+    function saveFormData() {
+        formData = {
+            name: document.getElementById('customerName').value,
+            phone: document.getElementById('customerPhone').value,
+            email: document.getElementById('customerEmail').value,
+            zip: document.getElementById('customerZip').value,
+            address: document.getElementById('customerAddress').value,
+            category: document.getElementById('taskCategory').value,
+            window: document.getElementById('taskWindow').value,
+            description: document.getElementById('taskDescription').value,
+            rush: document.getElementById('rushOption').checked
+        };
+
+        console.log('✅ Form data saved to memory:', formData);
+        return formData;
+    }
+
+    // STEP 3: Progress animation and AI estimate
+    function showEstimateProgress() {
+        const btn = document.getElementById('getEstimateBtn');
+        const progressBg = document.getElementById('progressBg');
+        const text = document.getElementById('estimateText');
+        const container = document.getElementById('progressContainer');
+        const bar = document.getElementById('progressBar');
+        const message = document.getElementById('progressMessage');
+
+        btn.disabled = true;
+        container.classList.remove('hidden');
+
+        // Stage 1: Start (25%)
+        text.textContent = '📤 Uploading photos...';
+        message.textContent = 'Uploading photos and analyzing task...';
+        progressBg.style.transform = 'translateX(-75%)';
+        bar.style.width = '25%';
+
+        setTimeout(() => {
+            // Stage 2: Processing (60%)
+            text.textContent = '🤖 AI analyzing...';
+            message.textContent = 'AI is analyzing your photos and requirements...';
+            progressBg.style.transform = 'translateX(-40%)';
+            bar.style.width = '60%';
+        }, 1500);
+
+        setTimeout(() => {
+            // Stage 3: Finalizing (90%)
+            text.textContent = '💭 Generating estimate...';
+            message.textContent = 'Creating your personalized estimate...';
+            progressBg.style.transform = 'translateX(-10%)';
+            bar.style.width = '90%';
+        }, 3000);
+
+        setTimeout(() => {
+            // Stage 4: Complete (100%)
+            text.textContent = '✅ Estimate ready!';
+            message.textContent = 'Analysis complete! Estimate generated.';
+            progressBg.style.transform = 'translateX(0%)';
+            bar.style.width = '100%';
+        }, 4000);
+    }
+
+    function resetEstimateProgress() {
+        const btn = document.getElementById('getEstimateBtn');
+        const progressBg = document.getElementById('progressBg');
+        const text = document.getElementById('estimateText');
+        const container = document.getElementById('progressContainer');
+        const bar = document.getElementById('progressBar');
+
+        setTimeout(() => {
+            btn.disabled = false;
+            text.textContent = '🔧 Get instant estimate';
+            container.classList.add('hidden');
+            progressBg.style.transform = 'translateX(-100%)';
+            bar.style.width = '0%';
+        }, 1000);
+    }
+
+    async function generateEstimate() {
+        const data = saveFormData();
+
+        // Validate required fields
+        if (!data.name || !data.phone || !data.email || !data.category) {
+            alert('Please fill out all required fields');
+            return;
+        }
+
+        showEstimateProgress();
+
         try {
-            const customerInfo = {
-                name: document.querySelector('input[name="name"]').value,
-                email: document.querySelector('input[name="email"]').value,
-                phone: document.querySelector('input[name="phone"]').value
+            // Call AI scope function
+            const hours = TASKS[data.category]?.hours || 1.5;
+            const aiPayload = {
+                category: data.category,
+                description: data.description,
+                base_rate_hr: RATE,
+                hours_base: hours,
+                window: data.window,
+                rush: data.rush,
+                name: data.name,
+                phone: data.phone,
+                email: data.email,
+                address: data.address
             };
 
-            const jobDetails = {
-                category: document.getElementById('category').value,
-                window: document.getElementById('window').value,
-                hours: currentEstimate?.estimated_duration_hours
+            const response = await fetch('/.netlify/functions/scope', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(aiPayload)
+            });
+
+            if (!response.ok) {
+                throw new Error('AI estimate failed');
+            }
+
+            const aiResult = await response.json();
+
+            // Calculate pricing
+            const pricing = calculatePricing(hours, data.window, data.rush);
+
+            // Store estimate data
+            estimateData = {
+                ...aiResult,
+                hours,
+                pricing
             };
 
-            const { client_secret } = await createPaymentIntent(currentAmount, customerInfo, jobDetails);
-
-            elements = stripe.elements({ clientSecret: client_secret });
-            paymentElement = elements.create('payment');
-            paymentElement.mount('#payment-element');
+            // Wait for progress to complete, then show estimate
+            setTimeout(() => {
+                showEstimatePanel(estimateData);
+                resetEstimateProgress();
+            }, 4500);
 
         } catch (error) {
-            console.error('Error setting up payment:', error);
-            showPaymentMessage('Failed to setup payment. Please try again.', 'error');
+            console.error('Estimate generation failed:', error);
+            alert('Failed to generate estimate. Please try again.');
+            resetEstimateProgress();
         }
     }
 
-    function hidePaymentModal() {
-        document.getElementById('paymentModal').classList.add('hidden');
-        if (paymentElement) {
-            paymentElement.unmount();
+    function calculatePricing(hours, window, rush) {
+        const base = hours * RATE;
+        let premiums = [];
+        let total = base;
+
+        const sameDay = window.startsWith('today');
+        const evening = window.includes('eve');
+
+        if (sameDay) {
+            const premium = base * PREMIUM_SAMEDAY;
+            premiums.push({ label: 'Same-day premium (15%)', amount: premium });
+            total += premium;
         }
-    }
 
-    function showSuccessModal() {
-        document.getElementById('successModal').classList.remove('hidden');
-    }
-
-    function showPaymentMessage(message, type = 'info') {
-        const messageEl = document.getElementById('payment-message');
-        messageEl.textContent = message;
-        messageEl.className = `mt-4 text-sm ${type === 'error' ? 'text-red-600' : 'text-green-600'}`;
-        messageEl.classList.remove('hidden');
-    }
-
-    // Event listeners
-    document.getElementById('estimateBtn').addEventListener('click', async ()=>{
-      const cat = document.getElementById('category').value
-      if(!cat){ alert('Please choose a task.'); return }
-      const windowVal = document.getElementById('window').value
-      const rush = document.getElementById('rush').checked
-      const desc = document.querySelector('textarea[name="description"]').value || ''
-      const hours = (TASKS[cat] || {hours:1.5}).hours
-      const name = document.querySelector('input[name="name"]').value
-      const phone = document.querySelector('input[name="phone"]').value
-      const email = document.querySelector('input[name="email"]').value
-      const address = document.querySelector('input[name="address"]').value
-
-      const bd = priceBreakdown(hours, windowVal, rush)
-      document.getElementById('estHours').textContent = hours.toFixed(1) + ' hrs'
-      document.getElementById('estPrice').textContent = '$' + bd.total.toFixed(0)
-      document.getElementById('fareBreakdown').innerHTML = renderFareBreakdown(bd)
-
-      try{
-        const aiPayload = {
-          category: cat,
-          description: desc,
-          base_rate_hr: RATE,
-          hours_base: hours,
-          window: windowVal,
-          rush,
-          name,
-          phone,
-          email,
-          address
+        if (evening) {
+            const premium = base * PREMIUM_EVENING;
+            premiums.push({ label: 'Evening window premium (10%)', amount: premium });
+            total += premium;
         }
-        const ai = await callAIScope(aiPayload)
-        currentEstimate = ai;
 
-        document.getElementById('scopeList').innerHTML = (ai.step_scope || []).map(s=>`<li>${s}</li>`).join('')
-        document.getElementById('riskList').innerHTML = (ai.risk_flags || []).map(s=>`<li>${s}</li>`).join('')
-        document.getElementById('estimated_price_usd').value = Math.round(bd.total)
-        document.getElementById('estimated_duration_hours').value = hours.toFixed(1)
-        document.getElementById('ai_scope_json').value = JSON.stringify(ai)
-        document.getElementById('estimatePanel').classList.remove('hidden')
-        document.getElementById('reserveBtn').classList.remove('hidden')
-        window.scrollTo({top: document.querySelector('#estimatePanel').offsetTop - 80, behavior:'smooth'})
-      }catch(err){
-        console.error(err)
-        alert('We could not generate the scope right now. Please try again.')
-      }
-    })
+        if (rush) {
+            const premium = base * PREMIUM_RUSH;
+            premiums.push({ label: 'Optional rush (10%)', amount: premium });
+            total += premium;
+        }
 
-    document.getElementById('reserveBtn').addEventListener('click', () => {
-        const windowVal = document.getElementById('window').value
-        const rush = document.getElementById('rush').checked
-        const cat = document.getElementById('category').value
-        const hours = (TASKS[cat] || {hours:1.5}).hours
-        const bd = priceBreakdown(hours, windowVal, rush)
+        return { base, premiums, total };
+    }
 
-        showPaymentModal(bd.total, currentEstimate);
-    });
+    function showEstimatePanel(estimate) {
+        document.getElementById('estimatedHours').textContent = estimate.hours.toFixed(1) + ' hrs';
+        document.getElementById('estimatedPrice').textContent = '$' + estimate.pricing.total.toFixed(0);
 
-    document.getElementById('closePayment').addEventListener('click', hidePaymentModal);
+        // Fare breakdown
+        let breakdownHtml = `<div class="flex justify-between"><span>Base ($${RATE}/hr)</span><span>$${estimate.pricing.base.toFixed(0)}</span></div>`;
+        estimate.pricing.premiums.forEach(p => {
+            breakdownHtml += `<div class="flex justify-between"><span>${p.label}</span><span>$${p.amount.toFixed(0)}</span></div>`;
+        });
+        breakdownHtml += `<hr class="my-2 border-slate-200"><div class="flex justify-between font-semibold"><span>Total</span><span>$${estimate.pricing.total.toFixed(0)}</span></div>`;
+        document.getElementById('fareBreakdown').innerHTML = breakdownHtml;
 
-    document.getElementById('payment-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
+        // Scope and risks
+        document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
+        document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
 
-        const submitButton = document.getElementById('submit-payment');
-        const buttonText = document.getElementById('payment-button-text');
+        document.getElementById('estimatePanel').classList.remove('hidden');
 
-        submitButton.disabled = true;
-        buttonText.textContent = 'Processing...';
+        // Scroll to estimate
+        document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // STEP 4: Payment processing
+    async function showPaymentModal() {
+        if (!estimateData.pricing) {
+            alert('Please get an estimate first');
+            return;
+        }
+
+        if (!stripe) {
+            alert('Payment system is still loading. Please try again in a moment.');
+            return;
+        }
+
+        document.getElementById('paymentAmount').textContent = '
+
+    async function processPayment(event) {
+        event.preventDefault();
+
+        const submitBtn = document.getElementById('submitPayment');
+        const btnText = document.getElementById('paymentButtonText');
+
+        submitBtn.disabled = true;
+        btnText.textContent = 'Processing payment...';
 
         try {
-            const { error } = await stripe.confirmPayment({
+            const result = await stripe.confirmPayment({
                 elements,
-                confirmParams: {
-                    return_url: window.location.origin + '/success.html'
-                },
                 redirect: 'if_required'
             });
 
-            if (error) {
-                showPaymentMessage(error.message, 'error');
-                submitButton.disabled = false;
-                buttonText.textContent = 'Complete Payment';
-            } else {
-                hidePaymentModal();
-                showSuccessModal();
+            if (result.error) {
+                throw new Error(result.error.message);
             }
-        } catch (err) {
-            console.error('Payment error:', err);
-            showPaymentMessage('Payment failed. Please try again.', 'error');
-            submitButton.disabled = false;
-            buttonText.textContent = 'Complete Payment';
+
+            console.log('✅ Payment successful:', result.paymentIntent.id);
+            paymentIntentId = result.paymentIntent.id;
+
+            // Hide payment modal and show Task Information modal
+            document.getElementById('paymentModal').classList.add('hidden');
+            showTaskInfoModal();
+
+        } catch (error) {
+            console.error('❌ Payment failed:', error);
+            document.getElementById('paymentMessage').textContent = error.message;
+            document.getElementById('paymentMessage').classList.remove('hidden');
+            document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
+
+            submitBtn.disabled = false;
+            btnText.textContent = 'Complete Payment';
+        }
+    }
+
+    // STEP 5: Show Task Information modal with pre-populated data
+    function showTaskInfoModal() {
+        // Pre-populate summary from Step 2 data
+        document.getElementById('summaryName').textContent = formData.name;
+        document.getElementById('summaryPhone').textContent = formData.phone;
+        document.getElementById('summaryEmail').textContent = formData.email;
+        document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
+        document.getElementById('summaryWindow').textContent = formData.window;
+        document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
+
+        // Pre-populate contact phone with customer phone
+        document.getElementById('contactPhone').value = formData.phone;
+
+        document.getElementById('taskInfoModal').classList.remove('hidden');
+    }
+
+    // STEP 6: Send notification and complete flow
+    async function submitTaskInfo(event) {
+        event.preventDefault();
+
+        const submitBtn = event.target.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = '📤 Sending notification...';
+
+        // Collect all data for notification
+        const completeJobData = {
+            payment_intent_id: paymentIntentId,
+            customer: formData,
+            task_info: {
+                property_address: document.getElementById('propertyAddress').value,
+                contact_phone: document.getElementById('contactPhone').value,
+                access_details: document.getElementById('accessDetails').value,
+                pets_and_special: document.getElementById('petsAndSpecial').value,
+                additional_details: document.getElementById('additionalDetails').value
+            },
+            estimate: estimateData,
+            amount: estimateData.pricing.total
+        };
+
+        console.log('📋 Complete job data for notification:', completeJobData);
+
+        try {
+            const response = await fetch('/.netlify/functions/send-notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(completeJobData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('✅ Notification sent successfully:', result);
+            } else {
+                const error = await response.text();
+                console.error('❌ Notification failed:', response.status, error);
+            }
+        } catch (error) {
+            console.error('❌ Notification error:', error);
+        }
+
+        // Show final success regardless of notification status
+        document.getElementById('taskInfoModal').classList.add('hidden');
+        document.getElementById('finalSuccessModal').classList.remove('hidden');
+    }
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait for Stripe to load, then initialize
+        waitForStripe();
+
+        // Task selection buttons
+        document.querySelectorAll('[data-task]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const taskKey = btn.getAttribute('data-task');
+                document.getElementById('taskCategory').value = taskKey;
+                document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Photo upload preview
+        document.getElementById('taskPhotos').addEventListener('change', (e) => {
+            const thumbs = document.getElementById('photoThumbs');
+            thumbs.innerHTML = '';
+            [...e.target.files].slice(0, 5).forEach(file => {
+                const url = URL.createObjectURL(file);
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'h-16 w-16 object-cover rounded-lg border';
+                thumbs.appendChild(img);
+            });
+        });
+
+        // STEP 3: Get Estimate Button
+        document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+        // STEP 4: Reserve Button
+        document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+        // Payment form
+        document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+        // Close payment modal
+        document.getElementById('closePayment').addEventListener('click', () => {
+            document.getElementById('paymentModal').classList.add('hidden');
+        });
+
+        // STEP 5: Task Info Form
+        document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+        // Final success close
+        document.getElementById('closeFinalSuccess').addEventListener('click', () => {
+            document.getElementById('finalSuccessModal').classList.add('hidden');
+            location.reload(); // Reset for new booking
+        });
+
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+    });
+
+    // Fallback: Try to initialize Stripe when window fully loads
+    window.addEventListener('load', () => {
+        if (!stripe && typeof Stripe !== 'undefined') {
+            console.log('🔄 Initializing Stripe on window load...');
+            waitForStripe();
         }
     });
+</script>
+</body>
+</html> + estimateData.pricing.total.toFixed(0);
+document.getElementById('paymentModal').classList.remove('hidden');
 
-    document.getElementById('closeSuccess').addEventListener('click', () => {
-        document.getElementById('successModal').classList.add('hidden');
-        // Optionally redirect or refresh the page
-        window.location.reload();
-    });
+// Initialize Stripe Elements
+try {
+const response = await fetch('/.netlify/functions/create-payment', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+amount: estimateData.pricing.total,
+customer_info: formData,
+job_details: {
+category: formData.category,
+window: formData.window,
+hours: estimateData.hours
+}
+})
+});
 
-    document.getElementById('year').textContent = new Date().getFullYear()
+if (!response.ok) {
+throw new Error('Payment setup failed');
+}
 
-    // Initialize Stripe when page loads
-    window.addEventListener('load', initializeStripe);
+const result = await response.json();
+paymentIntentId = result.payment_intent_id;
+
+elements = stripe.elements({ clientSecret: result.client_secret });
+paymentElement = elements.create('payment');
+paymentElement.mount('#stripe-payment-element');
+
+} catch (error) {
+console.error('Payment setup error:', error);
+document.getElementById('paymentMessage').textContent = 'Payment setup failed. Please try again.';
+document.getElementById('paymentMessage').classList.remove('hidden');
+}
+}
+
+async function processPayment(event) {
+event.preventDefault();
+
+const submitBtn = document.getElementById('submitPayment');
+const btnText = document.getElementById('paymentButtonText');
+
+submitBtn.disabled = true;
+btnText.textContent = 'Processing payment...';
+
+try {
+const result = await stripe.confirmPayment({
+elements,
+redirect: 'if_required'
+});
+
+if (result.error) {
+throw new Error(result.error.message);
+}
+
+console.log('✅ Payment successful:', result.paymentIntent.id);
+paymentIntentId = result.paymentIntent.id;
+
+// Hide payment modal and show Task Information modal
+document.getElementById('paymentModal').classList.add('hidden');
+showTaskInfoModal();
+
+} catch (error) {
+console.error('❌ Payment failed:', error);
+document.getElementById('paymentMessage').textContent = error.message;
+document.getElementById('paymentMessage').classList.remove('hidden');
+document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
+
+submitBtn.disabled = false;
+btnText.textContent = 'Complete Payment';
+}
+}
+
+// STEP 5: Show Task Information modal with pre-populated data
+function showTaskInfoModal() {
+// Pre-populate summary from Step 2 data
+document.getElementById('summaryName').textContent = formData.name;
+document.getElementById('summaryPhone').textContent = formData.phone;
+document.getElementById('summaryEmail').textContent = formData.email;
+document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
+document.getElementById('summaryWindow').textContent = formData.window;
+document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
+
+// Pre-populate contact phone with customer phone
+document.getElementById('contactPhone').value = formData.phone;
+
+document.getElementById('taskInfoModal').classList.remove('hidden');
+}
+
+// STEP 6: Send notification and complete flow
+async function submitTaskInfo(event) {
+event.preventDefault();
+
+const submitBtn = event.target.querySelector('button[type="submit"]');
+submitBtn.disabled = true;
+submitBtn.textContent = '📤 Sending notification...';
+
+// Collect all data for notification
+const completeJobData = {
+payment_intent_id: paymentIntentId,
+customer: formData,
+task_info: {
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value,
+pets_and_special: document.getElementById('petsAndSpecial').value,
+additional_details: document.getElementById('additionalDetails').value
+},
+estimate: estimateData,
+amount: estimateData.pricing.total
+};
+
+console.log('📋 Complete job data for notification:', completeJobData);
+
+try {
+const response = await fetch('/.netlify/functions/send-notification', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(completeJobData)
+});
+
+if (response.ok) {
+const result = await response.json();
+console.log('✅ Notification sent successfully:', result);
+} else {
+const error = await response.text();
+console.error('❌ Notification failed:', response.status, error);
+}
+} catch (error) {
+console.error('❌ Notification error:', error);
+}
+
+// Show final success regardless of notification status
+document.getElementById('taskInfoModal').classList.add('hidden');
+document.getElementById('finalSuccessModal').classList.remove('hidden');
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+// Wait for Stripe to load, then initialize
+waitForStripe();
+
+// Task selection buttons
+document.querySelectorAll('[data-task]').forEach(btn => {
+btn.addEventListener('click', () => {
+const taskKey = btn.getAttribute('data-task');
+document.getElementById('taskCategory').value = taskKey;
+document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+});
+});
+
+// Photo upload preview
+document.getElementById('taskPhotos').addEventListener('change', (e) => {
+const thumbs = document.getElementById('photoThumbs');
+thumbs.innerHTML = '';
+[...e.target.files].slice(0, 5).forEach(file => {
+const url = URL.createObjectURL(file);
+const img = document.createElement('img');
+img.src = url;
+img.className = 'h-16 w-16 object-cover rounded-lg border';
+thumbs.appendChild(img);
+});
+});
+
+// STEP 3: Get Estimate Button
+document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+// STEP 4: Reserve Button
+document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+// Payment form
+document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+// Close payment modal
+document.getElementById('closePayment').addEventListener('click', () => {
+document.getElementById('paymentModal').classList.add('hidden');
+});
+
+// STEP 5: Task Info Form
+document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+// Final success close
+document.getElementById('closeFinalSuccess').addEventListener('click', () => {
+document.getElementById('finalSuccessModal').classList.add('hidden');
+location.reload(); // Reset for new booking
+});
+
+// Set current year
+document.getElementById('year').textContent = new Date().getFullYear();
+});
 </script>
 </body>
 </html>
