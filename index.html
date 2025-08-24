@@ -349,6 +349,44 @@
 <script>
     console.log('📜 JavaScript started loading...');
 
+    // EmailJS Configuration (Option 1 - Quick Setup)
+    const EMAILJS_CONFIG = {
+        SERVICE_ID: 'your_service_id',  // Replace with your EmailJS service ID
+        TEMPLATE_ID: 'your_template_id', // Replace with your EmailJS template ID
+        PUBLIC_KEY: 'your_public_key'   // Replace with your EmailJS public key
+    };
+
+    // Initialize EmailJS
+    function initEmailJS() {
+        if (typeof emailjs !== 'undefined' && EMAILJS_CONFIG.PUBLIC_KEY !== 'your_public_key') {
+            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            console.log('✅ EmailJS initialized');
+        }
+    }
+
+    // Send email notification via EmailJS
+    async function sendEmailNotification(jobData) {
+        if (typeof emailjs === 'undefined' || EMAILJS_CONFIG.PUBLIC_KEY === 'your_public_key') {
+            console.log('⚠️ EmailJS not configured - skipping email notification');
+            return;
+        }
+
+        const emailParams = {
+            task_id: jobData.task_id,
+            customer_name: jobData.name,
+            customer_phone: jobData.phone,
+            customer_email: jobData.email,
+            task_category: jobData.category,
+            time_window: jobData.window,
+            property_address: jobData.property_address,
+            total_amount: '
+
+    // ZAPIER WEBHOOK CONFIGURATION - UPDATE THESE VALUES
+    const ZAPIER_CONFIG = {
+        WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24343571/utpo6n0/', // ⚠️ REPLACE with your actual Zapier webhook URL
+        ENABLED: true // ⚠️ Change to true once you've set up your Zapier webhook
+    };
+
     // GLOBAL STATE - Persisted in memory
     let formData = {};
     let estimateData = {};
@@ -622,79 +660,7 @@
             return;
         }
 
-        document.getElementById('paymentAmount').textContent = '$' + estimateData.pricing.total.toFixed(0);
-        document.getElementById('paymentModal').classList.remove('hidden');
-
-        // Initialize Stripe Elements
-        try {
-            const response = await fetch('/.netlify/functions/create-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: estimateData.pricing.total,
-                    customer_info: formData,
-                    job_details: {
-                        category: formData.category,
-                        window: formData.window,
-                        hours: estimateData.hours
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Payment setup failed');
-            }
-
-            const result = await response.json();
-            paymentIntentId = result.payment_intent_id;
-
-            elements = stripe.elements({ clientSecret: result.client_secret });
-            paymentElement = elements.create('payment');
-            paymentElement.mount('#stripe-payment-element');
-
-        } catch (error) {
-            console.error('Payment setup error:', error);
-            document.getElementById('paymentMessage').textContent = 'Payment setup failed. Please try again.';
-            document.getElementById('paymentMessage').classList.remove('hidden');
-        }
-    }
-
-    async function processPayment(event) {
-        event.preventDefault();
-
-        const submitBtn = document.getElementById('submitPayment');
-        const btnText = document.getElementById('paymentButtonText');
-
-        submitBtn.disabled = true;
-        btnText.textContent = 'Processing payment...';
-
-        try {
-            const result = await stripe.confirmPayment({
-                elements,
-                redirect: 'if_required'
-            });
-
-            if (result.error) {
-                throw new Error(result.error.message);
-            }
-
-            console.log('✅ Payment successful:', result.paymentIntent.id);
-            paymentIntentId = result.paymentIntent.id;
-
-            // Hide payment modal and show Task Information modal
-            document.getElementById('paymentModal').classList.add('hidden');
-            showTaskInfoModal();
-
-        } catch (error) {
-            console.error('❌ Payment failed:', error);
-            document.getElementById('paymentMessage').textContent = error.message;
-            document.getElementById('paymentMessage').classList.remove('hidden');
-            document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
-
-            submitBtn.disabled = false;
-            btnText.textContent = 'Complete Payment';
-        }
-    }
+        document.getElementById('paymentAmount').textContent = '
 
     // STEP 5: Show Task Information modal with pre-populated data
     function showTaskInfoModal() {
@@ -811,6 +777,20 @@
             email: completeJobData.email
         });
 
+        // Send Zapier notification
+        let zapierResult = null;
+        try {
+            zapierResult = await sendZapierNotification(completeJobData);
+            if (zapierResult.success) {
+                console.log('✅ Zapier notification sent successfully');
+            } else {
+                console.log('⚠️ Zapier notification not sent:', zapierResult.message);
+            }
+        } catch (zapierError) {
+            console.error('❌ Zapier notification failed:', zapierError);
+            // Don't block the process if Zapier fails
+        }
+
         try {
             const response = await fetch('/.netlify/functions/send-notification', {
                 method: 'POST',
@@ -843,6 +823,8 @@
 
         // Initialize Stripe
         initializeStripe();
+
+        console.log('🎯 Zapier webhook configured:', ZAPIER_CONFIG.ENABLED ? 'YES' : 'NO');
 
         // Task selection buttons
         document.querySelectorAll('[data-task]').forEach(btn => {
@@ -897,6 +879,1168 @@
     });
 
     console.log('📜 JavaScript finished loading');
+</script>
+</body>
+</html> + estimateData.pricing.total.toFixed(0);
+document.getElementById('paymentModal').classList.remove('hidden');
+
+// Initialize Stripe Elements
+try {
+console.log('🔄 Setting up payment intent...');
+const response = await fetch('/.netlify/functions/create-payment', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+amount: estimateData.pricing.total,
+customer_info: formData,
+job_details: {
+category: formData.category,
+window: formData.window,
+hours: estimateData.hours
+}
+})
+});
+
+if (!response.ok) {
+throw new Error('Payment setup failed');
+}
+
+const result = await response.json();
+paymentIntentId = result.payment_intent_id;
+
+console.log('💳 Initializing Stripe Elements with client secret...');
+
+// Clear any existing elements
+if (paymentElement) {
+paymentElement.unmount();
+}
+
+elements = stripe.elements({
+clientSecret: result.client_secret,
+appearance: {
+theme: 'stripe'
+}
+});
+
+paymentElement = elements.create('payment', {
+layout: 'tabs'
+});
+
+// Wait a moment before mounting to ensure DOM is ready
+setTimeout(() => {
+paymentElement.mount('#stripe-payment-element');
+console.log('✅ Payment element mounted successfully');
+}, 100);
+
+} catch (error) {
+console.error('❌ Payment setup error:', error);
+document.getElementById('paymentMessage').textContent = 'Payment setup failed. Please try again.';
+document.getElementById('paymentMessage').classList.remove('hidden');
+document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
+}
+}
+
+async function processPayment(event) {
+event.preventDefault();
+
+const submitBtn = document.getElementById('submitPayment');
+const btnText = document.getElementById('paymentButtonText');
+
+submitBtn.disabled = true;
+btnText.textContent = 'Processing payment...';
+
+// Clear any previous error messages
+document.getElementById('paymentMessage').classList.add('hidden');
+
+try {
+console.log('🔄 Confirming payment...');
+console.log('Elements object:', elements);
+console.log('Payment element:', paymentElement);
+
+if (!elements || !paymentElement) {
+throw new Error('Payment form is not properly initialized. Please refresh and try again.');
+}
+
+const { error, paymentIntent } = await stripe.confirmPayment({
+elements,
+confirmParams: {
+return_url: window.location.origin + window.location.pathname
+},
+redirect: 'if_required'
+});
+
+if (error) {
+throw new Error(error.message);
+}
+
+if (paymentIntent && paymentIntent.status === 'succeeded') {
+console.log('✅ Payment successful:', paymentIntent.id);
+paymentIntentId = paymentIntent.id;
+
+// Hide payment modal and show Task Information modal
+document.getElementById('paymentModal').classList.add('hidden');
+showTaskInfoModal();
+} else {
+throw new Error('Payment was not completed successfully');
+}
+
+} catch (error) {
+console.error('❌ Payment failed:', error);
+document.getElementById('paymentMessage').textContent = error.message;
+document.getElementById('paymentMessage').classList.remove('hidden');
+document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
+
+submitBtn.disabled = false;
+btnText.textContent = 'Complete Payment';
+}
+}
+
+// STEP 5: Show Task Information modal with pre-populated data
+function showTaskInfoModal() {
+// Generate and store task ID
+const taskId = generateTaskId();
+window.currentTaskId = taskId; // Store for later use
+
+// Pre-populate summary from Step 2 data
+document.getElementById('summaryTaskId').textContent = taskId;
+document.getElementById('summaryName').textContent = formData.name;
+document.getElementById('summaryPhone').textContent = formData.phone;
+document.getElementById('summaryEmail').textContent = formData.email;
+document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
+document.getElementById('summaryWindow').textContent = formData.window;
+document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
+
+// Pre-populate contact phone with customer phone
+document.getElementById('contactPhone').value = formData.phone;
+
+document.getElementById('taskInfoModal').classList.remove('hidden');
+}
+
+// Generate unique task ID
+function generateTaskId() {
+const timestamp = Date.now().toString(36);
+const random = Math.random().toString(36).substring(2, 8);
+return `TASK-${timestamp}-${random}`.toUpperCase();
+}
+
+// STEP 6: Send notification and complete flow
+async function submitTaskInfo(event) {
+event.preventDefault();
+
+const submitBtn = event.target.querySelector('button[type="submit"]');
+submitBtn.disabled = true;
+submitBtn.textContent = '📤 Sending notification...';
+
+// Use the task ID generated when modal was shown
+const taskId = window.currentTaskId;
+
+// Ensure we have fresh form data
+const currentFormData = saveFormData();
+console.log('📋 Fresh form data for notification:', currentFormData);
+
+// Validate that we have required data
+if (!currentFormData.name || !currentFormData.phone || !currentFormData.email || !currentFormData.category) {
+console.error('❌ Missing critical form data:', currentFormData);
+alert('Critical form data is missing. Please refresh and try again.');
+submitBtn.disabled = false;
+submitBtn.textContent = '🚀 Dispatch Handyman';
+return;
+}
+
+// Collect all data for notification with BOTH flat and nested structures
+// (in case backend expects the original nested format)
+const completeJobData = {
+// Flat structure (new)
+task_id: taskId,
+payment_intent_id: paymentIntentId,
+category: currentFormData.category,
+window: currentFormData.window,
+name: currentFormData.name,
+phone: currentFormData.phone,
+email: currentFormData.email,
+zip: currentFormData.zip,
+address: currentFormData.address || '',
+description: currentFormData.description || '',
+rush: currentFormData.rush || false,
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value || '',
+pets_and_special: document.getElementById('petsAndSpecial').value || '',
+additional_details: document.getElementById('additionalDetails').value || '',
+estimated_hours: estimateData.hours,
+total_amount: estimateData.pricing.total,
+base_amount: estimateData.pricing.base,
+premiums: estimateData.pricing.premiums || [],
+step_scope: estimateData.step_scope || [],
+risk_flags: estimateData.risk_flags || [],
+
+// Original nested structure (fallback for backward compatibility)
+customer: {
+name: currentFormData.name,
+phone: currentFormData.phone,
+email: currentFormData.email,
+zip: currentFormData.zip,
+address: currentFormData.address || '',
+category: currentFormData.category,
+window: currentFormData.window,
+description: currentFormData.description || '',
+rush: currentFormData.rush || false
+},
+task_info: {
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value || '',
+pets_and_special: document.getElementById('petsAndSpecial').value || '',
+additional_details: document.getElementById('additionalDetails').value || ''
+},
+estimate: {
+hours: estimateData.hours,
+pricing: estimateData.pricing,
+step_scope: estimateData.step_scope || [],
+risk_flags: estimateData.risk_flags || []
+},
+amount: estimateData.pricing.total
+};
+
+console.log('📋 Complete job data being sent to notification:', completeJobData);
+console.log('🔍 Key fields check:', {
+name: completeJobData.name,
+category: completeJobData.category,
+phone: completeJobData.phone,
+email: completeJobData.email
+});
+
+try {
+const response = await fetch('/.netlify/functions/send-notification', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(completeJobData)
+});
+
+console.log('📡 Notification response status:', response.status);
+
+if (response.ok) {
+const result = await response.json();
+console.log('✅ Notification sent successfully:', result);
+} else {
+const error = await response.text();
+console.error('❌ Notification failed:', response.status, error);
+}
+} catch (error) {
+console.error('❌ Notification error:', error);
+}
+
+// Show final success regardless of notification status
+document.getElementById('finalTaskId').textContent = taskId;
+document.getElementById('taskInfoModal').classList.add('hidden');
+document.getElementById('finalSuccessModal').classList.remove('hidden');
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+console.log('🚀 DOM Content Loaded - Initializing app...');
+
+// Initialize Stripe
+initializeStripe();
+
+// Task selection buttons
+document.querySelectorAll('[data-task]').forEach(btn => {
+btn.addEventListener('click', () => {
+const taskKey = btn.getAttribute('data-task');
+document.getElementById('taskCategory').value = taskKey;
+document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+});
+});
+console.log('✅ Task selection buttons initialized');
+
+// Photo upload preview
+document.getElementById('taskPhotos').addEventListener('change', (e) => {
+const thumbs = document.getElementById('photoThumbs');
+thumbs.innerHTML = '';
+[...e.target.files].slice(0, 5).forEach(file => {
+const url = URL.createObjectURL(file);
+const img = document.createElement('img');
+img.src = url;
+img.className = 'h-16 w-16 object-cover rounded-lg border';
+thumbs.appendChild(img);
+});
+});
+
+// STEP 3: Get Estimate Button
+document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+// STEP 4: Reserve Button
+document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+// Payment form
+document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+// Close payment modal
+document.getElementById('closePayment').addEventListener('click', () => {
+document.getElementById('paymentModal').classList.add('hidden');
+});
+
+// STEP 5: Task Info Form
+document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+// Final success close
+document.getElementById('closeFinalSuccess').addEventListener('click', () => {
+document.getElementById('finalSuccessModal').classList.add('hidden');
+location.reload(); // Reset for new booking
+});
+
+// Set current year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+console.log('🎯 All event listeners initialized successfully');
+});
+
+console.log('📜 JavaScript finished loading');
+</script>
+</body>
+</html> + jobData.total_amount.toFixed(2),
+estimated_hours: jobData.estimated_hours + ' hours',
+description: jobData.description || 'None provided',
+additional_details: jobData.additional_details || 'None provided',
+access_details: jobData.access_details || 'None provided',
+to_email: 'frizzo1999@gmail.com'
+};
+
+try {
+console.log('📧 Sending email notification via EmailJS...');
+const result = await emailjs.send(
+EMAILJS_CONFIG.SERVICE_ID,
+EMAILJS_CONFIG.TEMPLATE_ID,
+emailParams
+);
+console.log('✅ Email sent successfully:', result);
+return result;
+} catch (error) {
+console.error('❌ Email sending failed:', error);
+throw error;
+}
+}
+
+// Alternative: Send email via Netlify Function (Option 2 - Server-side)
+async function sendServerEmailNotification(jobData) {
+try {
+console.log('📧 Sending email notification via server...');
+const response = await fetch('/.netlify/functions/send-email', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+to: 'frizzo1999@gmail.com',
+subject: `New Handyman Request - ${jobData.task_id}`,
+jobData: jobData
+})
+});
+
+if (response.ok) {
+const result = await response.json();
+console.log('✅ Server email sent successfully:', result);
+return result;
+} else {
+throw new Error('Server email failed: ' + response.status);
+}
+} catch (error) {
+console.error('❌ Server email failed:', error);
+throw error;
+}
+}
+
+// GLOBAL STATE - Persisted in memory
+let formData = {};
+let estimateData = {};
+let paymentIntentId = null;
+
+// Stripe Configuration
+const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
+let stripe, elements, paymentElement;
+
+const RATE = 80;
+const PREMIUM_SAMEDAY = 0.15;
+const PREMIUM_EVENING = 0.10;
+const PREMIUM_RUSH = 0.10;
+
+const TASKS = {
+tv_mount: { hours: 1.5, label: "TV Wall Mount (32–65\")" },
+ceiling_fan: { hours: 2.0, label: "Ceiling Fan Install/Replace" },
+light_fixture: { hours: 1.0, label: "Light Fixture / Chandelier Swap" },
+faucet_showerhead: { hours: 1.0, label: "Faucet / Showerhead Replace" },
+smart_doorbell: { hours: 0.75, label: "Smart Doorbell Install" },
+curtains_blinds: { hours: 1.0, label: "Curtain Rods / Blinds" },
+floating_shelf: { hours: 1.0, label: "Floating Shelf Install" },
+appliance_hookup: { hours: 1.5, label: "Appliance Hookup (W/D/DW)" },
+furniture_assembly: { hours: 1.5, label: "Furniture Assembly (S–M)" },
+closet_organizer: { hours: 2.0, label: "Closet Organizer Install" },
+minor_repairs: { hours: 1.5, label: "Minor repairs" }
+};
+
+// Initialize Stripe with error handling
+function initializeStripe() {
+if (typeof Stripe !== 'undefined') {
+if (!STRIPE_PUBLISHABLE_KEY.includes('YOUR_ACTUAL_STRIPE_KEY_HERE')) {
+try {
+stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+console.log('✅ Stripe initialized successfully');
+} catch (error) {
+console.error('❌ Stripe initialization failed:', error);
+}
+} else {
+console.error('❌ Please set your actual Stripe publishable key!');
+}
+} else {
+console.log('⏳ Stripe not loaded yet, retrying...');
+setTimeout(initializeStripe, 1000);
+}
+}
+
+// STEP 2: Persist form data in memory
+function saveFormData() {
+console.log('💾 Saving form data...');
+
+formData = {
+name: document.getElementById('customerName').value,
+phone: document.getElementById('customerPhone').value,
+email: document.getElementById('customerEmail').value,
+zip: document.getElementById('customerZip').value,
+address: document.getElementById('customerAddress').value,
+category: document.getElementById('taskCategory').value,
+window: document.getElementById('taskWindow').value,
+description: document.getElementById('taskDescription').value,
+rush: document.getElementById('rushOption').checked
+};
+
+console.log('✅ Form data saved to memory:', formData);
+return formData;
+}
+
+// STEP 3: Progress animation and AI estimate
+function showEstimateProgress() {
+const btn = document.getElementById('getEstimateBtn');
+const progressBg = document.getElementById('progressBg');
+const text = document.getElementById('estimateText');
+const container = document.getElementById('progressContainer');
+const bar = document.getElementById('progressBar');
+const message = document.getElementById('progressMessage');
+
+btn.disabled = true;
+container.classList.remove('hidden');
+
+// Stage 1: Start (25%)
+text.textContent = '📤 Uploading photos...';
+message.textContent = 'Uploading photos and analyzing task...';
+progressBg.style.transform = 'translateX(-75%)';
+bar.style.width = '25%';
+
+setTimeout(() => {
+// Stage 2: Processing (60%)
+text.textContent = '🤖 AI analyzing...';
+message.textContent = 'AI is analyzing your photos and requirements...';
+progressBg.style.transform = 'translateX(-40%)';
+bar.style.width = '60%';
+}, 1500);
+
+setTimeout(() => {
+// Stage 3: Finalizing (90%)
+text.textContent = '💭 Generating estimate...';
+message.textContent = 'Creating your personalized estimate...';
+progressBg.style.transform = 'translateX(-10%)';
+bar.style.width = '90%';
+}, 3000);
+
+setTimeout(() => {
+// Stage 4: Complete (100%)
+text.textContent = '✅ Estimate ready!';
+message.textContent = 'Analysis complete! Estimate generated.';
+progressBg.style.transform = 'translateX(0%)';
+bar.style.width = '100%';
+}, 4000);
+}
+
+function resetEstimateProgress() {
+const btn = document.getElementById('getEstimateBtn');
+const progressBg = document.getElementById('progressBg');
+const text = document.getElementById('estimateText');
+const container = document.getElementById('progressContainer');
+const bar = document.getElementById('progressBar');
+
+setTimeout(() => {
+btn.disabled = false;
+text.textContent = '🔧 Get instant estimate';
+container.classList.add('hidden');
+progressBg.style.transform = 'translateX(-100%)';
+bar.style.width = '0%';
+}, 1000);
+}
+
+async function generateEstimate() {
+console.log('🔄 Generate estimate button clicked!');
+
+try {
+const data = saveFormData();
+console.log('📋 Form data collected:', data);
+
+// Validate required fields
+if (!data.name || !data.phone || !data.email || !data.category) {
+console.error('❌ Missing required fields:', {
+name: data.name,
+phone: data.phone,
+email: data.email,
+category: data.category
+});
+alert('Please fill out all required fields (Name, Phone, Email, and Task)');
+return;
+}
+
+console.log('✅ Validation passed, starting progress animation...');
+showEstimateProgress();
+
+// Call AI scope function
+const hours = TASKS[data.category]?.hours || 1.5;
+const aiPayload = {
+category: data.category,
+description: data.description,
+base_rate_hr: RATE,
+hours_base: hours,
+window: data.window,
+rush: data.rush,
+name: data.name,
+phone: data.phone,
+email: data.email,
+address: data.address
+};
+
+console.log('📤 Calling AI scope function with payload:', aiPayload);
+
+const response = await fetch('/.netlify/functions/scope', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(aiPayload)
+});
+
+console.log('📡 AI scope response status:', response.status);
+
+if (!response.ok) {
+const errorText = await response.text();
+console.error('❌ AI scope failed:', response.status, errorText);
+throw new Error(`AI estimate failed: ${response.status}`);
+}
+
+const aiResult = await response.json();
+console.log('📊 AI scope result:', aiResult);
+
+// Calculate pricing
+const pricing = calculatePricing(hours, data.window, data.rush);
+console.log('💰 Calculated pricing:', pricing);
+
+// Store estimate data
+estimateData = {
+...aiResult,
+hours,
+pricing
+};
+
+console.log('✅ Estimate data stored:', estimateData);
+
+// Wait for progress to complete, then show estimate
+setTimeout(() => {
+console.log('🎯 Showing estimate panel...');
+showEstimatePanel(estimateData);
+resetEstimateProgress();
+}, 4500);
+
+} catch (error) {
+console.error('❌ Generate estimate error:', error);
+console.error('Error stack:', error.stack);
+alert('Failed to generate estimate: ' + error.message);
+resetEstimateProgress();
+}
+}
+
+function calculatePricing(hours, window, rush) {
+const base = hours * RATE;
+let premiums = [];
+let total = base;
+
+const sameDay = window.startsWith('today');
+const evening = window.includes('eve');
+
+if (sameDay) {
+const premium = base * PREMIUM_SAMEDAY;
+premiums.push({ label: 'Same-day premium (15%)', amount: premium });
+total += premium;
+}
+
+if (evening) {
+const premium = base * PREMIUM_EVENING;
+premiums.push({ label: 'Evening window premium (10%)', amount: premium });
+total += premium;
+}
+
+if (rush) {
+const premium = base * PREMIUM_RUSH;
+premiums.push({ label: 'Optional rush (10%)', amount: premium });
+total += premium;
+}
+
+return { base, premiums, total };
+}
+
+function showEstimatePanel(estimate) {
+document.getElementById('estimatedHours').textContent = estimate.hours.toFixed(1) + ' hrs';
+document.getElementById('estimatedPrice').textContent = '$' + estimate.pricing.total.toFixed(0);
+
+// Fare breakdown
+let breakdownHtml = `<div class="flex justify-between"><span>Base ($${RATE}/hr)</span><span>$${estimate.pricing.base.toFixed(0)}</span></div>`;
+estimate.pricing.premiums.forEach(p => {
+breakdownHtml += `<div class="flex justify-between"><span>${p.label}</span><span>$${p.amount.toFixed(0)}</span></div>`;
+});
+breakdownHtml += `<hr class="my-2 border-slate-200"><div class="flex justify-between font-semibold"><span>Total</span><span>$${estimate.pricing.total.toFixed(0)}</span></div>`;
+document.getElementById('fareBreakdown').innerHTML = breakdownHtml;
+
+// Scope and risks
+document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
+document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
+
+document.getElementById('estimatePanel').classList.remove('hidden');
+
+// Scroll to estimate
+document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// STEP 4: Payment processing
+async function showPaymentModal() {
+if (!estimateData.pricing) {
+alert('Please get an estimate first');
+return;
+}
+
+if (!stripe) {
+alert('Payment system is still loading. Please try again in a moment.');
+return;
+}
+
+document.getElementById('paymentAmount').textContent = '
+
+// STEP 5: Show Task Information modal with pre-populated data
+function showTaskInfoModal() {
+// Generate and store task ID
+const taskId = generateTaskId();
+window.currentTaskId = taskId; // Store for later use
+
+// Pre-populate summary from Step 2 data
+document.getElementById('summaryTaskId').textContent = taskId;
+document.getElementById('summaryName').textContent = formData.name;
+document.getElementById('summaryPhone').textContent = formData.phone;
+document.getElementById('summaryEmail').textContent = formData.email;
+document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
+document.getElementById('summaryWindow').textContent = formData.window;
+document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
+
+// Pre-populate contact phone with customer phone
+document.getElementById('contactPhone').value = formData.phone;
+
+document.getElementById('taskInfoModal').classList.remove('hidden');
+}
+
+// Generate unique task ID
+function generateTaskId() {
+const timestamp = Date.now().toString(36);
+const random = Math.random().toString(36).substring(2, 8);
+return `TASK-${timestamp}-${random}`.toUpperCase();
+}
+
+// STEP 6: Send notification and complete flow
+async function submitTaskInfo(event) {
+event.preventDefault();
+
+const submitBtn = event.target.querySelector('button[type="submit"]');
+submitBtn.disabled = true;
+submitBtn.textContent = '📤 Sending notification...';
+
+// Use the task ID generated when modal was shown
+const taskId = window.currentTaskId;
+
+// Ensure we have fresh form data
+const currentFormData = saveFormData();
+console.log('📋 Fresh form data for notification:', currentFormData);
+
+// Validate that we have required data
+if (!currentFormData.name || !currentFormData.phone || !currentFormData.email || !currentFormData.category) {
+console.error('❌ Missing critical form data:', currentFormData);
+alert('Critical form data is missing. Please refresh and try again.');
+submitBtn.disabled = false;
+submitBtn.textContent = '🚀 Dispatch Handyman';
+return;
+}
+
+// Collect all data for notification with BOTH flat and nested structures
+// (in case backend expects the original nested format)
+const completeJobData = {
+// Flat structure (new)
+task_id: taskId,
+payment_intent_id: paymentIntentId,
+category: currentFormData.category,
+window: currentFormData.window,
+name: currentFormData.name,
+phone: currentFormData.phone,
+email: currentFormData.email,
+zip: currentFormData.zip,
+address: currentFormData.address || '',
+description: currentFormData.description || '',
+rush: currentFormData.rush || false,
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value || '',
+pets_and_special: document.getElementById('petsAndSpecial').value || '',
+additional_details: document.getElementById('additionalDetails').value || '',
+estimated_hours: estimateData.hours,
+total_amount: estimateData.pricing.total,
+base_amount: estimateData.pricing.base,
+premiums: estimateData.pricing.premiums || [],
+step_scope: estimateData.step_scope || [],
+risk_flags: estimateData.risk_flags || [],
+
+// Original nested structure (fallback for backward compatibility)
+customer: {
+name: currentFormData.name,
+phone: currentFormData.phone,
+email: currentFormData.email,
+zip: currentFormData.zip,
+address: currentFormData.address || '',
+category: currentFormData.category,
+window: currentFormData.window,
+description: currentFormData.description || '',
+rush: currentFormData.rush || false
+},
+task_info: {
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value || '',
+pets_and_special: document.getElementById('petsAndSpecial').value || '',
+additional_details: document.getElementById('additionalDetails').value || ''
+},
+estimate: {
+hours: estimateData.hours,
+pricing: estimateData.pricing,
+step_scope: estimateData.step_scope || [],
+risk_flags: estimateData.risk_flags || []
+},
+amount: estimateData.pricing.total
+};
+
+console.log('📋 Complete job data being sent to notification:', completeJobData);
+console.log('🔍 Key fields check:', {
+name: completeJobData.name,
+category: completeJobData.category,
+phone: completeJobData.phone,
+email: completeJobData.email
+});
+
+try {
+const response = await fetch('/.netlify/functions/send-notification', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(completeJobData)
+});
+
+console.log('📡 Notification response status:', response.status);
+
+if (response.ok) {
+const result = await response.json();
+console.log('✅ Notification sent successfully:', result);
+} else {
+const error = await response.text();
+console.error('❌ Notification failed:', response.status, error);
+}
+} catch (error) {
+console.error('❌ Notification error:', error);
+}
+
+// Show final success regardless of notification status
+document.getElementById('finalTaskId').textContent = taskId;
+document.getElementById('taskInfoModal').classList.add('hidden');
+document.getElementById('finalSuccessModal').classList.remove('hidden');
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+console.log('🚀 DOM Content Loaded - Initializing app...');
+
+// Initialize Stripe
+initializeStripe();
+
+// Task selection buttons
+document.querySelectorAll('[data-task]').forEach(btn => {
+btn.addEventListener('click', () => {
+const taskKey = btn.getAttribute('data-task');
+document.getElementById('taskCategory').value = taskKey;
+document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+});
+});
+console.log('✅ Task selection buttons initialized');
+
+// Photo upload preview
+document.getElementById('taskPhotos').addEventListener('change', (e) => {
+const thumbs = document.getElementById('photoThumbs');
+thumbs.innerHTML = '';
+[...e.target.files].slice(0, 5).forEach(file => {
+const url = URL.createObjectURL(file);
+const img = document.createElement('img');
+img.src = url;
+img.className = 'h-16 w-16 object-cover rounded-lg border';
+thumbs.appendChild(img);
+});
+});
+
+// STEP 3: Get Estimate Button
+document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+// STEP 4: Reserve Button
+document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+// Payment form
+document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+// Close payment modal
+document.getElementById('closePayment').addEventListener('click', () => {
+document.getElementById('paymentModal').classList.add('hidden');
+});
+
+// STEP 5: Task Info Form
+document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+// Final success close
+document.getElementById('closeFinalSuccess').addEventListener('click', () => {
+document.getElementById('finalSuccessModal').classList.add('hidden');
+location.reload(); // Reset for new booking
+});
+
+// Set current year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+console.log('🎯 All event listeners initialized successfully');
+});
+
+console.log('📜 JavaScript finished loading');
+</script>
+</body>
+</html> + estimateData.pricing.total.toFixed(0);
+document.getElementById('paymentModal').classList.remove('hidden');
+
+// Initialize Stripe Elements
+try {
+console.log('🔄 Setting up payment intent...');
+const response = await fetch('/.netlify/functions/create-payment', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({
+amount: estimateData.pricing.total,
+customer_info: formData,
+job_details: {
+category: formData.category,
+window: formData.window,
+hours: estimateData.hours
+}
+})
+});
+
+if (!response.ok) {
+throw new Error('Payment setup failed');
+}
+
+const result = await response.json();
+paymentIntentId = result.payment_intent_id;
+
+console.log('💳 Initializing Stripe Elements with client secret...');
+
+// Clear any existing elements
+if (paymentElement) {
+paymentElement.unmount();
+}
+
+elements = stripe.elements({
+clientSecret: result.client_secret,
+appearance: {
+theme: 'stripe'
+}
+});
+
+paymentElement = elements.create('payment', {
+layout: 'tabs'
+});
+
+// Wait a moment before mounting to ensure DOM is ready
+setTimeout(() => {
+paymentElement.mount('#stripe-payment-element');
+console.log('✅ Payment element mounted successfully');
+}, 100);
+
+} catch (error) {
+console.error('❌ Payment setup error:', error);
+document.getElementById('paymentMessage').textContent = 'Payment setup failed. Please try again.';
+document.getElementById('paymentMessage').classList.remove('hidden');
+document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
+}
+}
+
+async function processPayment(event) {
+event.preventDefault();
+
+const submitBtn = document.getElementById('submitPayment');
+const btnText = document.getElementById('paymentButtonText');
+
+submitBtn.disabled = true;
+btnText.textContent = 'Processing payment...';
+
+// Clear any previous error messages
+document.getElementById('paymentMessage').classList.add('hidden');
+
+try {
+console.log('🔄 Confirming payment...');
+console.log('Elements object:', elements);
+console.log('Payment element:', paymentElement);
+
+if (!elements || !paymentElement) {
+throw new Error('Payment form is not properly initialized. Please refresh and try again.');
+}
+
+const { error, paymentIntent } = await stripe.confirmPayment({
+elements,
+confirmParams: {
+return_url: window.location.origin + window.location.pathname
+},
+redirect: 'if_required'
+});
+
+if (error) {
+throw new Error(error.message);
+}
+
+if (paymentIntent && paymentIntent.status === 'succeeded') {
+console.log('✅ Payment successful:', paymentIntent.id);
+paymentIntentId = paymentIntent.id;
+
+// Hide payment modal and show Task Information modal
+document.getElementById('paymentModal').classList.add('hidden');
+showTaskInfoModal();
+} else {
+throw new Error('Payment was not completed successfully');
+}
+
+} catch (error) {
+console.error('❌ Payment failed:', error);
+document.getElementById('paymentMessage').textContent = error.message;
+document.getElementById('paymentMessage').classList.remove('hidden');
+document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
+
+submitBtn.disabled = false;
+btnText.textContent = 'Complete Payment';
+}
+}
+
+// STEP 5: Show Task Information modal with pre-populated data
+function showTaskInfoModal() {
+// Generate and store task ID
+const taskId = generateTaskId();
+window.currentTaskId = taskId; // Store for later use
+
+// Pre-populate summary from Step 2 data
+document.getElementById('summaryTaskId').textContent = taskId;
+document.getElementById('summaryName').textContent = formData.name;
+document.getElementById('summaryPhone').textContent = formData.phone;
+document.getElementById('summaryEmail').textContent = formData.email;
+document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
+document.getElementById('summaryWindow').textContent = formData.window;
+document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
+
+// Pre-populate contact phone with customer phone
+document.getElementById('contactPhone').value = formData.phone;
+
+document.getElementById('taskInfoModal').classList.remove('hidden');
+}
+
+// Generate unique task ID
+function generateTaskId() {
+const timestamp = Date.now().toString(36);
+const random = Math.random().toString(36).substring(2, 8);
+return `TASK-${timestamp}-${random}`.toUpperCase();
+}
+
+// STEP 6: Send notification and complete flow
+async function submitTaskInfo(event) {
+event.preventDefault();
+
+const submitBtn = event.target.querySelector('button[type="submit"]');
+submitBtn.disabled = true;
+submitBtn.textContent = '📤 Sending notification...';
+
+// Use the task ID generated when modal was shown
+const taskId = window.currentTaskId;
+
+// Ensure we have fresh form data
+const currentFormData = saveFormData();
+console.log('📋 Fresh form data for notification:', currentFormData);
+
+// Validate that we have required data
+if (!currentFormData.name || !currentFormData.phone || !currentFormData.email || !currentFormData.category) {
+console.error('❌ Missing critical form data:', currentFormData);
+alert('Critical form data is missing. Please refresh and try again.');
+submitBtn.disabled = false;
+submitBtn.textContent = '🚀 Dispatch Handyman';
+return;
+}
+
+// Collect all data for notification with BOTH flat and nested structures
+// (in case backend expects the original nested format)
+const completeJobData = {
+// Flat structure (new)
+task_id: taskId,
+payment_intent_id: paymentIntentId,
+category: currentFormData.category,
+window: currentFormData.window,
+name: currentFormData.name,
+phone: currentFormData.phone,
+email: currentFormData.email,
+zip: currentFormData.zip,
+address: currentFormData.address || '',
+description: currentFormData.description || '',
+rush: currentFormData.rush || false,
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value || '',
+pets_and_special: document.getElementById('petsAndSpecial').value || '',
+additional_details: document.getElementById('additionalDetails').value || '',
+estimated_hours: estimateData.hours,
+total_amount: estimateData.pricing.total,
+base_amount: estimateData.pricing.base,
+premiums: estimateData.pricing.premiums || [],
+step_scope: estimateData.step_scope || [],
+risk_flags: estimateData.risk_flags || [],
+
+// Original nested structure (fallback for backward compatibility)
+customer: {
+name: currentFormData.name,
+phone: currentFormData.phone,
+email: currentFormData.email,
+zip: currentFormData.zip,
+address: currentFormData.address || '',
+category: currentFormData.category,
+window: currentFormData.window,
+description: currentFormData.description || '',
+rush: currentFormData.rush || false
+},
+task_info: {
+property_address: document.getElementById('propertyAddress').value,
+contact_phone: document.getElementById('contactPhone').value,
+access_details: document.getElementById('accessDetails').value || '',
+pets_and_special: document.getElementById('petsAndSpecial').value || '',
+additional_details: document.getElementById('additionalDetails').value || ''
+},
+estimate: {
+hours: estimateData.hours,
+pricing: estimateData.pricing,
+step_scope: estimateData.step_scope || [],
+risk_flags: estimateData.risk_flags || []
+},
+amount: estimateData.pricing.total
+};
+
+console.log('📋 Complete job data being sent to notification:', completeJobData);
+console.log('🔍 Key fields check:', {
+name: completeJobData.name,
+category: completeJobData.category,
+phone: completeJobData.phone,
+email: completeJobData.email
+});
+
+try {
+const response = await fetch('/.netlify/functions/send-notification', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(completeJobData)
+});
+
+console.log('📡 Notification response status:', response.status);
+
+if (response.ok) {
+const result = await response.json();
+console.log('✅ Notification sent successfully:', result);
+} else {
+const error = await response.text();
+console.error('❌ Notification failed:', response.status, error);
+}
+} catch (error) {
+console.error('❌ Notification error:', error);
+}
+
+// Show final success regardless of notification status
+document.getElementById('finalTaskId').textContent = taskId;
+document.getElementById('taskInfoModal').classList.add('hidden');
+document.getElementById('finalSuccessModal').classList.remove('hidden');
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+console.log('🚀 DOM Content Loaded - Initializing app...');
+
+// Initialize Stripe
+initializeStripe();
+
+// Task selection buttons
+document.querySelectorAll('[data-task]').forEach(btn => {
+btn.addEventListener('click', () => {
+const taskKey = btn.getAttribute('data-task');
+document.getElementById('taskCategory').value = taskKey;
+document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+});
+});
+console.log('✅ Task selection buttons initialized');
+
+// Photo upload preview
+document.getElementById('taskPhotos').addEventListener('change', (e) => {
+const thumbs = document.getElementById('photoThumbs');
+thumbs.innerHTML = '';
+[...e.target.files].slice(0, 5).forEach(file => {
+const url = URL.createObjectURL(file);
+const img = document.createElement('img');
+img.src = url;
+img.className = 'h-16 w-16 object-cover rounded-lg border';
+thumbs.appendChild(img);
+});
+});
+
+// STEP 3: Get Estimate Button
+document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+// STEP 4: Reserve Button
+document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+// Payment form
+document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+// Close payment modal
+document.getElementById('closePayment').addEventListener('click', () => {
+document.getElementById('paymentModal').classList.add('hidden');
+});
+
+// STEP 5: Task Info Form
+document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+// Final success close
+document.getElementById('closeFinalSuccess').addEventListener('click', () => {
+document.getElementById('finalSuccessModal').classList.add('hidden');
+location.reload(); // Reset for new booking
+});
+
+// Set current year
+document.getElementById('year').textContent = new Date().getFullYear();
+
+console.log('🎯 All event listeners initialized successfully');
+});
+
+console.log('📜 JavaScript finished loading');
 </script>
 </body>
 </html>
