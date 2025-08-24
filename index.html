@@ -342,6 +342,8 @@
 </footer>
 
 <script>
+    console.log('📜 JavaScript started loading...');
+
     // GLOBAL STATE - Persisted in memory
     let formData = {};
     let estimateData = {};
@@ -405,6 +407,8 @@
 
     // STEP 2: Persist form data in memory
     function saveFormData() {
+        console.log('💾 Saving form data...');
+
         formData = {
             name: document.getElementById('customerName').value,
             phone: document.getElementById('customerPhone').value,
@@ -481,17 +485,27 @@
     }
 
     async function generateEstimate() {
-        const data = saveFormData();
-
-        // Validate required fields
-        if (!data.name || !data.phone || !data.email || !data.category) {
-            alert('Please fill out all required fields');
-            return;
-        }
-
-        showEstimateProgress();
+        console.log('🔄 Generate estimate button clicked!');
 
         try {
+            const data = saveFormData();
+            console.log('📋 Form data collected:', data);
+
+            // Validate required fields
+            if (!data.name || !data.phone || !data.email || !data.category) {
+                console.error('❌ Missing required fields:', {
+                    name: data.name,
+                    phone: data.phone,
+                    email: data.email,
+                    category: data.category
+                });
+                alert('Please fill out all required fields (Name, Phone, Email, and Task)');
+                return;
+            }
+
+            console.log('✅ Validation passed, starting progress animation...');
+            showEstimateProgress();
+
             // Call AI scope function
             const hours = TASKS[data.category]?.hours || 1.5;
             const aiPayload = {
@@ -507,20 +521,28 @@
                 address: data.address
             };
 
+            console.log('📤 Calling AI scope function with payload:', aiPayload);
+
             const response = await fetch('/.netlify/functions/scope', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(aiPayload)
             });
 
+            console.log('📡 AI scope response status:', response.status);
+
             if (!response.ok) {
-                throw new Error('AI estimate failed');
+                const errorText = await response.text();
+                console.error('❌ AI scope failed:', response.status, errorText);
+                throw new Error(`AI estimate failed: ${response.status}`);
             }
 
             const aiResult = await response.json();
+            console.log('📊 AI scope result:', aiResult);
 
             // Calculate pricing
             const pricing = calculatePricing(hours, data.window, data.rush);
+            console.log('💰 Calculated pricing:', pricing);
 
             // Store estimate data
             estimateData = {
@@ -529,15 +551,19 @@
                 pricing
             };
 
+            console.log('✅ Estimate data stored:', estimateData);
+
             // Wait for progress to complete, then show estimate
             setTimeout(() => {
+                console.log('🎯 Showing estimate panel...');
                 showEstimatePanel(estimateData);
                 resetEstimateProgress();
             }, 4500);
 
         } catch (error) {
-            console.error('Estimate generation failed:', error);
-            alert('Failed to generate estimate. Please try again.');
+            console.error('❌ Generate estimate error:', error);
+            console.error('Error stack:', error.stack);
+            alert('Failed to generate estimate: ' + error.message);
             resetEstimateProgress();
         }
     }
@@ -710,6 +736,8 @@
 
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('🚀 DOM Content Loaded - Initializing app...');
+
         // Wait for Stripe to load, then initialize
         waitForStripe();
 
@@ -721,6 +749,7 @@
                 document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
             });
         });
+        console.log('✅ Task selection buttons initialized');
 
         // Photo upload preview
         document.getElementById('taskPhotos').addEventListener('change', (e) => {
@@ -736,7 +765,20 @@
         });
 
         // STEP 3: Get Estimate Button
-        document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+        const estimateBtn = document.getElementById('getEstimateBtn');
+        if (estimateBtn) {
+            estimateBtn.addEventListener('click', (event) => {
+                console.log('🖱️ BUTTON CLICKED! Event:', event);
+                generateEstimate();
+            });
+            console.log('✅ Estimate button event listener attached');
+
+            // Test that button exists and is clickable
+            console.log('🔍 Button element:', estimateBtn);
+            console.log('🔍 Button disabled?', estimateBtn.disabled);
+        } else {
+            console.error('❌ Estimate button not found!');
+        }
 
         // STEP 4: Reserve Button
         document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
@@ -760,6 +802,8 @@
 
         // Set current year
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        console.log('🎯 All event listeners initialized successfully');
     });
 
     // Fallback: Try to initialize Stripe when window fully loads
