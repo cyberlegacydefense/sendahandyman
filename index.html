@@ -1,42 +1,97 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SendAHandyman — Same-Day / Next-Day Handyman Dispatch</title>
+    <meta name="description" content="Book a vetted handyman today or tomorrow. Upload photos, get an instant AI estimate, and reserve with your card. Serving Palm Beach, Broward & Miami-Dade." />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
     <style>
-        body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+        body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
         .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-
 <!-- Header -->
 <header class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-slate-100">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
-            <img src="/images/helpinghands_logo.png" alt="Logo" class="h-9 w-auto">
+            <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-9 w-auto">
             <span class="font-semibold">SendAHandyman</span>
         </div>
-        <a href="#book" class="bg-indigo-600 px-4 py-2 text-white text-sm font-semibold rounded-xl">Book same-day</a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+            <a href="#how" class="hover:text-indigo-600">How it works</a>
+            <a href="#book" class="hover:text-indigo-600">Book now</a>
+            <a href="#coverage" class="hover:text-indigo-600">Coverage</a>
+            <a href="#faq" class="hover:text-indigo-600">FAQ</a>
+        </nav>
+        <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
     </div>
 </header>
 
 <!-- Hero -->
 <section class="bg-gradient-to-b from-white to-slate-50">
-    <div class="max-w-6xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-10 items-center">
+    <div class="max-w-6xl mx-auto px-4 py-10 md:py-16 grid md:grid-cols-2 gap-10 items-center">
         <div>
-            <h1 class="text-5xl font-extrabold leading-tight">Local handyman help — <span class="text-indigo-600">today or tomorrow</span>.</h1>
-            <p class="mt-4 text-slate-600 text-lg">Upload photos, get an instant AI estimate, and reserve with your card.</p>
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Local handyman help — <span class="text-indigo-600">today or tomorrow</span>.</h1>
+            <p class="mt-4 text-slate-600 text-lg">Upload photos, get an instant AI estimate, and reserve with your card. We dispatch a vetted pro and text you updates. Serving Palm Beach, Broward & Miami-Dade.</p>
+            <ul class="mt-6 space-y-2 text-slate-700">
+                <li>✅ Vetted & background-checked pros</li>
+                <li>✅ Fixed pricing + transparent same-day premium</li>
+                <li>✅ Same-day / next-day time windows</li>
+            </ul>
+            <div class="mt-6 flex gap-3">
+                <a href="#book" class="rounded-xl bg-indigo-600 px-5 py-3 text-white font-semibold shadow-soft">Start your request</a>
+                <a href="#how" class="rounded-xl bg-white px-5 py-3 font-semibold border border-slate-200">How it works</a>
+            </div>
         </div>
-        <div class="bg-white rounded-2xl p-5 shadow-soft border">
-            <div class="aspect-video rounded-xl bg-gray-200"></div>
+        <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
+            <div class="aspect-video rounded-xl bg-[url('/images/Ceiling_Fan_Installation.png')] bg-cover bg-center"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Task Selection -->
+<section class="py-10 border-t border-slate-100 bg-white" id="tasks">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-2xl md:text-3xl font-bold">Popular fixed-price tasks</h2>
+        <p class="text-slate-600 mt-2">Upload photos and a product link. We scope and price it instantly.</p>
+
+        <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="tv_mount"><div class="font-semibold">TV Wall Mount (32–65")</div><div class="text-sm text-slate-600">~1.5 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="ceiling_fan"><div class="font-semibold">Ceiling Fan Install/Replace</div><div class="text-sm text-slate-600">~2.0 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="light_fixture"><div class="font-semibold">Light Fixture / Chandelier Swap</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="faucet_showerhead"><div class="font-semibold">Faucet / Showerhead Replace</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="smart_doorbell"><div class="font-semibold">Smart Doorbell Install</div><div class="text-sm text-slate-600">~0.75 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="curtains_blinds"><div class="font-semibold">Curtain Rods / Blinds</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="floating_shelf"><div class="font-semibold">Floating Shelf Install</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="appliance_hookup"><div class="font-semibold">Appliance Hookup (W/D/DW)</div><div class="text-sm text-slate-600">~1.5 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="furniture_assembly"><div class="font-semibold">Furniture Assembly (S–M)</div><div class="text-sm text-slate-600">~1.5 hr base</div></button>
+            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="closet_organizer"><div class="font-semibold">Closet Organizer Install</div><div class="text-sm text-slate-600">~2.0 hr base</div></button>
+        </div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section id="how" class="py-12">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-2xl md:text-3xl font-bold">How it works</h2>
+        <div class="mt-6 grid md:grid-cols-4 gap-6">
+            <div class="bg-white rounded-xl p-5 shadow-soft border border-slate-100"><div class="font-semibold">1) Tell us what you need</div><p class="text-sm text-slate-600 mt-1">Pick a task, add notes, and upload 2–5 photos.</p></div>
+            <div class="bg-white rounded-xl p-5 shadow-soft border border-slate-100"><div class="font-semibold">2) Instant AI estimate</div><p class="text-sm text-slate-600 mt-1">We analyze your photos to estimate time, parts, and price.</p></div>
+            <div class="bg-white rounded-xl p-5 shadow-soft border border-slate-100"><div class="font-semibold">3) Reserve with card</div><p class="text-sm text-slate-600 mt-1">Same-day & evening premiums shown upfront.</p></div>
+            <div class="bg-white rounded-xl p-5 shadow-soft border border-slate-100"><div class="font-semibold">4) We dispatch a pro</div><p class="text-sm text-slate-600 mt-1">Nearest qualified tech with AI job sheet.</p></div>
         </div>
     </div>
 </section>
@@ -44,101 +99,89 @@
 <!-- STEP 2: Start Your Request Form -->
 <section id="book" class="py-12">
     <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-start">
-        <div class="bg-white rounded-2xl p-6 shadow-soft border">
+        <div class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100">
             <h3 class="text-xl font-bold">Start your request</h3>
+            <p class="text-sm text-slate-600 mt-1">We'll analyze your photos and show an instant estimate before you pay.</p>
 
             <div class="mt-4 grid md:grid-cols-2 gap-4">
-                <div>
-                    <label class="text-sm font-semibold">Full name</label>
-                    <input id="customerName" required class="mt-1 w-full rounded-lg border px-3 py-2">
-                </div>
-                <div>
-                    <label class="text-sm font-semibold">Mobile phone</label>
-                    <input id="customerPhone" required class="mt-1 w-full rounded-lg border px-3 py-2">
-                </div>
-                <div>
-                    <label class="text-sm font-semibold">Email</label>
-                    <input type="email" id="customerEmail" required class="mt-1 w-full rounded-lg border px-3 py-2">
-                </div>
-                <div>
-                    <label class="text-sm font-semibold">ZIP code</label>
-                    <input id="customerZip" required class="mt-1 w-full rounded-lg border px-3 py-2">
-                </div>
+                <div><label class="text-sm font-semibold">Full name</label><input id="customerName" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">Mobile phone</label><input id="customerPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">Email</label><input type="email" id="customerEmail" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
+                <div><label class="text-sm font-semibold">ZIP code</label><input id="customerZip" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
             </div>
+
+            <div class="mt-4"><label class="text-sm font-semibold">Address (optional)</label><input id="customerAddress" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
 
             <div class="mt-4 grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="text-sm font-semibold">Task</label>
-                    <select id="taskCategory" required class="mt-1 w-full rounded-lg border px-3 py-2">
-                        <option value="">Select a task</option>
+                    <select id="taskCategory" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+                        <option value="">Select a task…</option>
                         <option value="tv_mount">TV mounting</option>
                         <option value="ceiling_fan">Ceiling fan install</option>
-                        <option value="light_fixture">Light fixture swap</option>
-                        <option value="faucet_showerhead">Faucet/showerhead replace</option>
+                        <option value="light_fixture">Light fixture / chandelier swap</option>
+                        <option value="faucet_showerhead">Faucet / showerhead replace</option>
                         <option value="smart_doorbell">Smart doorbell install</option>
-                        <option value="curtains_blinds">Curtain rods/blinds</option>
+                        <option value="curtains_blinds">Curtain rods / blinds</option>
                         <option value="floating_shelf">Floating shelf install</option>
-                        <option value="appliance_hookup">Appliance hookup</option>
-                        <option value="furniture_assembly">Furniture assembly</option>
+                        <option value="appliance_hookup">Appliance hookup (W/D/DW)</option>
+                        <option value="furniture_assembly">Furniture assembly (small–medium)</option>
+                        <option value="closet_organizer">Closet organizer install</option>
                         <option value="minor_repairs">Minor repairs</option>
                     </select>
                 </div>
                 <div>
                     <label class="text-sm font-semibold">When?</label>
-                    <select id="taskWindow" required class="mt-1 w-full rounded-lg border px-3 py-2">
-                        <option value="today_am">Today (8-12)</option>
-                        <option value="today_pm">Today (12-4)</option>
-                        <option value="today_eve">Today (4-8)</option>
-                        <option value="tomorrow_am">Tomorrow (8-12)</option>
-                        <option value="tomorrow_pm">Tomorrow (12-4)</option>
+                    <select id="taskWindow" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+                        <option value="today_am">Today (8–12)</option>
+                        <option value="today_pm">Today (12–4)</option>
+                        <option value="today_eve">Today (4–8)</option>
+                        <option value="tomorrow_am">Tomorrow (8–12)</option>
+                        <option value="tomorrow_pm">Tomorrow (12–4)</option>
                     </select>
                 </div>
             </div>
 
             <div class="mt-4">
                 <label class="text-sm font-semibold">Describe the job</label>
-                <textarea id="taskDescription" rows="3" placeholder="Product link, wall type, special notes..." class="mt-1 w-full rounded-lg border px-3 py-2"></textarea>
+                <textarea id="taskDescription" rows="3" placeholder="Product link/model, wall/ceiling type, special notes…" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
             </div>
 
             <div class="mt-4">
-                <label class="text-sm font-semibold">Upload photos</label>
-                <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-1 w-full rounded-lg border px-3 py-2">
+                <label class="text-sm font-semibold">Upload photos (2–5)</label>
+                <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
                 <div id="photoThumbs" class="mt-2 flex flex-wrap gap-2"></div>
             </div>
 
             <div class="mt-6 flex items-center gap-2">
-                <input id="rushOption" type="checkbox" class="h-4 w-4">
-                <label class="text-sm">Optional rush (+10%)</label>
+                <input id="rushOption" type="checkbox" class="h-4 w-4" />
+                <label for="rushOption" class="text-sm">Optional rush (+10%)</label>
             </div>
 
-            <!-- STEP 3: Get Instant Estimate Button -->
+            <!-- STEP 3: Get Instant Estimate Button with Progress -->
             <div class="mt-6">
-                <button type="button" id="getEstimateBtn" class="w-full rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold">
-                    Get instant estimate
+                <button type="button" id="getEstimateBtn" class="relative w-full overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-75">
+                    <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
+                    <span id="estimateText" class="relative z-10">🔧 Get instant estimate</span>
                 </button>
 
-                <!-- Progress Bar -->
+                <!-- Progress Bar Below Button -->
                 <div id="progressContainer" class="mt-3 hidden">
                     <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
                     <div id="progressMessage" class="text-sm text-slate-600 mt-1 text-center">Starting analysis...</div>
                 </div>
             </div>
         </div>
 
-        <!-- AI Estimate Panel -->
-        <div id="estimatePanel" class="bg-white rounded-2xl p-6 shadow-soft border hidden">
+        <!-- AI Estimate Panel (Shows after Step 3 completes) -->
+        <aside id="estimatePanel" class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 hidden">
             <h3 class="text-xl font-bold">AI Estimate</h3>
+            <p class="text-sm text-slate-600">Transparent pricing with same-day premiums shown upfront.</p>
             <div class="mt-4 grid gap-3">
-                <div class="flex items-baseline justify-between">
-                    <span class="text-slate-600">Duration</span>
-                    <strong id="estimatedHours">—</strong>
-                </div>
-                <div class="flex items-baseline justify-between">
-                    <span class="text-slate-600">Price</span>
-                    <strong id="estimatedPrice" class="text-2xl">—</strong>
-                </div>
+                <div class="flex items-baseline justify-between"><span class="text-slate-600">Estimated duration</span><strong id="estimatedHours">—</strong></div>
+                <div class="flex items-baseline justify-between"><span class="text-slate-600">Price (all-in)</span><strong id="estimatedPrice" class="text-2xl">—</strong></div>
                 <div class="rounded-lg bg-slate-50 border p-3 text-sm">
                     <div class="font-semibold mb-1">Fare breakdown</div>
                     <div id="fareBreakdown" class="space-y-1"></div>
@@ -153,18 +196,19 @@
                 <ul id="estimateRisks" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
             </div>
             <div class="mt-6">
-                <button id="reserveBtn" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Reserve with card</button>
+                <button id="reserveBtn" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold shadow-soft">💳 Reserve with card</button>
             </div>
-        </div>
+            <p class="mt-3 text-xs text-slate-500">If site conditions differ, your tech will confirm any changes before work begins.</p>
+        </aside>
     </div>
 </section>
 
 <!-- STEP 4: Payment Modal -->
 <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-xl font-bold">Complete Payment</h3>
-            <button id="closePayment" class="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+            <button id="closePayment" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
 
         <div class="mb-4 p-3 bg-slate-50 rounded-lg">
@@ -174,80 +218,133 @@
 
         <form id="paymentForm">
             <div id="stripe-payment-element" class="mb-4"></div>
-            <button id="submitPayment" type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">
-                Complete Payment
+
+            <button id="submitPayment" type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50 transition-all">
+                <span id="paymentButtonText">Complete Payment</span>
             </button>
+
             <div id="paymentMessage" class="mt-4 text-sm hidden"></div>
         </form>
     </div>
 </div>
 
-<!-- STEP 5: Task Information Modal -->
+<!-- STEP 5: Task Information Modal (Shows after payment approved) -->
 <div id="taskInfoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl">
+    <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="text-center mb-6">
             <div class="text-6xl mb-2">✅</div>
             <h3 class="text-xl font-bold mb-2 text-green-600">Payment Approved!</h3>
-            <p class="text-sm text-green-700">Please provide additional details below.</p>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                <p class="text-sm text-green-700">Your payment was processed successfully. Please provide additional details below to dispatch your handyman.</p>
+            </div>
         </div>
 
         <form id="taskInfoForm">
+            <!-- Pre-populated fields from Step 2 -->
             <div class="bg-slate-50 rounded-lg p-4 mb-6">
-                <h4 class="font-semibold mb-3">Job Summary</h4>
+                <h4 class="font-semibold mb-3">Job Summary (from your request)</h4>
                 <div class="text-sm space-y-1">
                     <div><strong>Customer:</strong> <span id="summaryName">—</span></div>
                     <div><strong>Phone:</strong> <span id="summaryPhone">—</span></div>
                     <div><strong>Email:</strong> <span id="summaryEmail">—</span></div>
                     <div><strong>Task:</strong> <span id="summaryTask">—</span></div>
                     <div><strong>Window:</strong> <span id="summaryWindow">—</span></div>
+                    <div><strong>Description:</strong> <span id="summaryDescription">—</span></div>
                 </div>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-semibold">Property Address</label>
-                    <textarea id="propertyAddress" rows="3" required class="mt-1 w-full rounded-lg border px-3 py-2"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Complete Property Address *</label>
+                    <textarea id="propertyAddress" rows="3" placeholder="123 Main St, Unit 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
 
                 <div>
-                    <label class="text-sm font-semibold">Contact Phone</label>
-                    <input type="tel" id="contactPhone" required class="mt-1 w-full rounded-lg border px-3 py-2">
+                    <label class="text-sm font-semibold text-gray-700">Best Contact Phone *</label>
+                    <input type="tel" id="contactPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500" />
                 </div>
 
                 <div>
-                    <label class="text-sm font-semibold">Property Access Details</label>
-                    <textarea id="accessDetails" rows="2" class="mt-1 w-full rounded-lg border px-3 py-2"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Property Access Details</label>
+                    <textarea id="accessDetails" rows="3" placeholder="Gate code: 1234, Park in visitor spots, Ring doorbell..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
 
                 <div>
-                    <label class="text-sm font-semibold">Additional Details</label>
-                    <textarea id="additionalDetails" rows="3" class="mt-1 w-full rounded-lg border px-3 py-2"></textarea>
+                    <label class="text-sm font-semibold text-gray-700">Pets & Special Considerations</label>
+                    <textarea id="petsAndSpecial" rows="2" placeholder="2 friendly dogs, alarm system code needed, delicate antiques nearby..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-gray-700">Additional Task Details</label>
+                    <textarea id="additionalDetails" rows="3" placeholder="TV model: Samsung 65", wall type: drywall, tools available on site..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
                 </div>
             </div>
 
             <div class="mt-6">
-                <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">
-                    Dispatch Handyman
+                <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+                    🚀 Dispatch Handyman
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Final Success Modal -->
+<!-- STEP 6: Final Success Modal -->
 <div id="finalSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
         <div class="text-6xl mb-4">🚀</div>
         <h3 class="text-xl font-bold mb-2 text-green-600">Handyman Dispatched!</h3>
-        <p class="text-sm text-slate-600 mb-4">Your job details have been sent to our team.</p>
-        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold">Perfect!</button>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+            <p class="text-sm text-green-700 mb-2">
+                <strong>✅ Payment processed</strong><br>
+                <strong>✅ Job details sent to our team</strong><br>
+                <strong>✅ Notification sent to handyman dispatch</strong>
+            </p>
+            <p class="text-sm text-slate-600">
+                You'll receive a text message with your technician's details and estimated arrival time within the next 15 minutes.
+            </p>
+        </div>
+        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">Perfect!</button>
     </div>
 </div>
 
-<script>
-    console.log('JavaScript started loading...');
+<!-- Coverage -->
+<section id="coverage" class="py-12 bg-white border-t border-b border-slate-100">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-2xl md:text-3xl font-bold">Coverage areas</h2>
+        <p class="mt-2 text-slate-600">Palm Beach • Boca Raton • Delray Beach • Boynton Beach • Fort Lauderdale • Hollywood • Aventura • Miami • Coral Gables • Kendall</p>
+    </div>
+</section>
 
-    // GLOBAL STATE
+<!-- FAQ -->
+<section id="faq" class="py-12">
+    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-8">
+        <div><h3 class="text-xl font-bold">Is this a marketplace?</h3><p class="text-slate-600 mt-1">We're a vetted dispatch service. We send a qualified pro and back the work with standardized checklists and guidance.</p></div>
+        <div><h3 class="text-xl font-bold">How do premiums work?</h3><p class="text-slate-600 mt-1">Like airline pricing, same-day and evening windows include a clear premium. It's shown before you pay.</p></div>
+        <div><h3 class="text-xl font-bold">Do you charge before the job?</h3><p class="text-slate-600 mt-1">We place an authorization to secure your time. You're only charged after the tech confirms scope on site.</p></div>
+        <div><h3 class="text-xl font-bold">Are pros background-checked?</h3><p class="text-slate-600 mt-1">Yes. We verify ID, experience, and insurance where applicable.</p></div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-10 border-t border-slate-100 text-sm text-slate-600">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+            <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
+            <span>© <span id="year"></span> SendAHandyman</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="#" class="hover:text-slate-900">Privacy</a>
+            <a href="#" class="hover:text-slate-900">Terms</a>
+            <a href="mailto:info@sendahandyman.com" class="hover:text-slate-900">Contact</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+    console.log('📜 JavaScript started loading...');
+
+    // GLOBAL STATE - Persisted in memory
     let formData = {};
     let estimateData = {};
     let paymentIntentId = null;
@@ -262,101 +359,201 @@
     const PREMIUM_RUSH = 0.10;
 
     const TASKS = {
-        tv_mount: { hours: 1.5, label: 'TV Wall Mount' },
-        ceiling_fan: { hours: 2.0, label: 'Ceiling Fan Install' },
-        light_fixture: { hours: 1.0, label: 'Light Fixture Swap' },
-        faucet_showerhead: { hours: 1.0, label: 'Faucet/Showerhead Replace' },
-        smart_doorbell: { hours: 0.75, label: 'Smart Doorbell Install' },
-        curtains_blinds: { hours: 1.0, label: 'Curtain Rods/Blinds' },
-        floating_shelf: { hours: 1.0, label: 'Floating Shelf Install' },
-        appliance_hookup: { hours: 1.5, label: 'Appliance Hookup' },
-        furniture_assembly: { hours: 1.5, label: 'Furniture Assembly' },
-        minor_repairs: { hours: 1.5, label: 'Minor Repairs' }
+        tv_mount: { hours: 1.5, label: "TV Wall Mount (32–65\")" },
+        ceiling_fan: { hours: 2.0, label: "Ceiling Fan Install/Replace" },
+        light_fixture: { hours: 1.0, label: "Light Fixture / Chandelier Swap" },
+        faucet_showerhead: { hours: 1.0, label: "Faucet / Showerhead Replace" },
+        smart_doorbell: { hours: 0.75, label: "Smart Doorbell Install" },
+        curtains_blinds: { hours: 1.0, label: "Curtain Rods / Blinds" },
+        floating_shelf: { hours: 1.0, label: "Floating Shelf Install" },
+        appliance_hookup: { hours: 1.5, label: "Appliance Hookup (W/D/DW)" },
+        furniture_assembly: { hours: 1.5, label: "Furniture Assembly (S–M)" },
+        closet_organizer: { hours: 2.0, label: "Closet Organizer Install" },
+        minor_repairs: { hours: 1.5, label: "Minor repairs" }
     };
 
-    // Initialize Stripe
+    // Initialize Stripe with error handling
     function initializeStripe() {
         if (typeof Stripe !== 'undefined') {
             if (!STRIPE_PUBLISHABLE_KEY.includes('YOUR_ACTUAL_STRIPE_KEY_HERE')) {
                 try {
                     stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-                    console.log('Stripe initialized successfully');
+                    console.log('✅ Stripe initialized successfully');
                 } catch (error) {
-                    console.error('Stripe initialization failed:', error);
+                    console.error('❌ Stripe initialization failed:', error);
                 }
             } else {
-                console.error('Please set your actual Stripe publishable key!');
+                console.error('❌ Please set your actual Stripe publishable key!');
             }
         } else {
-            console.log('Stripe not loaded yet, retrying...');
+            console.log('⏳ Stripe not loaded yet, retrying...');
             setTimeout(initializeStripe, 1000);
         }
     }
 
-    // Save form data
+    // STEP 2: Persist form data in memory
     function saveFormData() {
-        console.log('Saving form data...');
+        console.log('💾 Saving form data...');
 
         formData = {
             name: document.getElementById('customerName').value,
             phone: document.getElementById('customerPhone').value,
             email: document.getElementById('customerEmail').value,
             zip: document.getElementById('customerZip').value,
+            address: document.getElementById('customerAddress').value,
             category: document.getElementById('taskCategory').value,
             window: document.getElementById('taskWindow').value,
             description: document.getElementById('taskDescription').value,
             rush: document.getElementById('rushOption').checked
         };
 
-        console.log('Form data saved:', formData);
+        console.log('✅ Form data saved to memory:', formData);
         return formData;
     }
 
-    // Show progress
+    // STEP 3: Progress animation and AI estimate
     function showEstimateProgress() {
+        const btn = document.getElementById('getEstimateBtn');
+        const progressBg = document.getElementById('progressBg');
+        const text = document.getElementById('estimateText');
         const container = document.getElementById('progressContainer');
         const bar = document.getElementById('progressBar');
         const message = document.getElementById('progressMessage');
-        const btn = document.getElementById('getEstimateBtn');
 
         btn.disabled = true;
         container.classList.remove('hidden');
 
-        // Progress stages
-        setTimeout(() => {
-            bar.style.width = '25%';
-            message.textContent = 'Analyzing photos...';
-        }, 500);
+        // Stage 1: Start (25%)
+        text.textContent = '📤 Uploading photos...';
+        message.textContent = 'Uploading photos and analyzing task...';
+        progressBg.style.transform = 'translateX(-75%)';
+        bar.style.width = '25%';
 
         setTimeout(() => {
+            // Stage 2: Processing (60%)
+            text.textContent = '🤖 AI analyzing...';
+            message.textContent = 'AI is analyzing your photos and requirements...';
+            progressBg.style.transform = 'translateX(-40%)';
             bar.style.width = '60%';
-            message.textContent = 'AI processing...';
-        }, 2000);
+        }, 1500);
 
         setTimeout(() => {
+            // Stage 3: Finalizing (90%)
+            text.textContent = '💭 Generating estimate...';
+            message.textContent = 'Creating your personalized estimate...';
+            progressBg.style.transform = 'translateX(-10%)';
             bar.style.width = '90%';
-            message.textContent = 'Generating estimate...';
-        }, 3500);
+        }, 3000);
 
         setTimeout(() => {
+            // Stage 4: Complete (100%)
+            text.textContent = '✅ Estimate ready!';
+            message.textContent = 'Analysis complete! Estimate generated.';
+            progressBg.style.transform = 'translateX(0%)';
             bar.style.width = '100%';
-            message.textContent = 'Complete!';
-        }, 4500);
+        }, 4000);
     }
 
     function resetEstimateProgress() {
-        setTimeout(() => {
-            const btn = document.getElementById('getEstimateBtn');
-            const container = document.getElementById('progressContainer');
-            const bar = document.getElementById('progressBar');
+        const btn = document.getElementById('getEstimateBtn');
+        const progressBg = document.getElementById('progressBg');
+        const text = document.getElementById('estimateText');
+        const container = document.getElementById('progressContainer');
+        const bar = document.getElementById('progressBar');
 
+        setTimeout(() => {
             btn.disabled = false;
+            text.textContent = '🔧 Get instant estimate';
             container.classList.add('hidden');
+            progressBg.style.transform = 'translateX(-100%)';
             bar.style.width = '0%';
         }, 1000);
     }
 
-    // Calculate pricing
+    async function generateEstimate() {
+        console.log('🔄 Generate estimate button clicked!');
+
+        try {
+            const data = saveFormData();
+            console.log('📋 Form data collected:', data);
+
+            // Validate required fields
+            if (!data.name || !data.phone || !data.email || !data.category) {
+                console.error('❌ Missing required fields:', {
+                    name: data.name,
+                    phone: data.phone,
+                    email: data.email,
+                    category: data.category
+                });
+                alert('Please fill out all required fields (Name, Phone, Email, and Task)');
+                return;
+            }
+
+            console.log('✅ Validation passed, starting progress animation...');
+            showEstimateProgress();
+
+            // Call AI scope function
+            const hours = TASKS[data.category]?.hours || 1.5;
+            const aiPayload = {
+                category: data.category,
+                description: data.description,
+                base_rate_hr: RATE,
+                hours_base: hours,
+                window: data.window,
+                rush: data.rush,
+                name: data.name,
+                phone: data.phone,
+                email: data.email,
+                address: data.address
+            };
+
+            console.log('📤 Calling AI scope function with payload:', aiPayload);
+
+            const response = await fetch('/.netlify/functions/scope', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(aiPayload)
+            });
+
+            console.log('📡 AI scope response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ AI scope failed:', response.status, errorText);
+                throw new Error(`AI estimate failed: ${response.status}`);
+            }
+
+            const aiResult = await response.json();
+            console.log('📊 AI scope result:', aiResult);
+
+            // Calculate pricing
+            const pricing = calculatePricing(hours, data.window, data.rush);
+            console.log('💰 Calculated pricing:', pricing);
+
+            // Store estimate data
+            estimateData = {
+                ...aiResult,
+                hours,
+                pricing
+            };
+
+            console.log('✅ Estimate data stored:', estimateData);
+
+            // Wait for progress to complete, then show estimate
+            setTimeout(() => {
+                console.log('🎯 Showing estimate panel...');
+                showEstimatePanel(estimateData);
+                resetEstimateProgress();
+            }, 4500);
+
+        } catch (error) {
+            console.error('❌ Generate estimate error:', error);
+            console.error('Error stack:', error.stack);
+            alert('Failed to generate estimate: ' + error.message);
+            resetEstimateProgress();
+        }
+    }
+
     function calculatePricing(hours, window, rush) {
         const base = hours * RATE;
         let premiums = [];
@@ -373,80 +570,19 @@
 
         if (evening) {
             const premium = base * PREMIUM_EVENING;
-            premiums.push({ label: 'Evening premium (10%)', amount: premium });
+            premiums.push({ label: 'Evening window premium (10%)', amount: premium });
             total += premium;
         }
 
         if (rush) {
             const premium = base * PREMIUM_RUSH;
-            premiums.push({ label: 'Rush service (10%)', amount: premium });
+            premiums.push({ label: 'Optional rush (10%)', amount: premium });
             total += premium;
         }
 
         return { base, premiums, total };
     }
 
-    // Generate estimate
-    async function generateEstimate() {
-        console.log('Generate estimate clicked!');
-
-        const data = saveFormData();
-
-        if (!data.name || !data.phone || !data.email || !data.category) {
-            alert('Please fill out all required fields');
-            return;
-        }
-
-        console.log('Starting estimate generation...');
-        showEstimateProgress();
-
-        try {
-            const hours = TASKS[data.category]?.hours || 1.5;
-
-            // Call AI function
-            const response = await fetch('/.netlify/functions/scope', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    category: data.category,
-                    description: data.description,
-                    base_rate_hr: RATE,
-                    hours_base: hours,
-                    window: data.window,
-                    rush: data.rush,
-                    name: data.name,
-                    phone: data.phone,
-                    email: data.email
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('AI estimate failed');
-            }
-
-            const aiResult = await response.json();
-            const pricing = calculatePricing(hours, data.window, data.rush);
-
-            estimateData = {
-                ...aiResult,
-                hours,
-                pricing
-            };
-
-            // Show estimate after progress completes
-            setTimeout(() => {
-                showEstimatePanel(estimateData);
-                resetEstimateProgress();
-            }, 5000);
-
-        } catch (error) {
-            console.error('Estimate generation failed:', error);
-            alert('Failed to generate estimate. Please try again.');
-            resetEstimateProgress();
-        }
-    }
-
-    // Show estimate panel
     function showEstimatePanel(estimate) {
         document.getElementById('estimatedHours').textContent = estimate.hours.toFixed(1) + ' hrs';
         document.getElementById('estimatedPrice').textContent = '$' + estimate.pricing.total.toFixed(0);
@@ -456,7 +592,7 @@
         estimate.pricing.premiums.forEach(p => {
             breakdownHtml += `<div class="flex justify-between"><span>${p.label}</span><span>$${p.amount.toFixed(0)}</span></div>`;
         });
-        breakdownHtml += `<hr class="my-2"><div class="flex justify-between font-semibold"><span>Total</span><span>$${estimate.pricing.total.toFixed(0)}</span></div>`;
+        breakdownHtml += `<hr class="my-2 border-slate-200"><div class="flex justify-between font-semibold"><span>Total</span><span>$${estimate.pricing.total.toFixed(0)}</span></div>`;
         document.getElementById('fareBreakdown').innerHTML = breakdownHtml;
 
         // Scope and risks
@@ -464,18 +600,27 @@
         document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
 
         document.getElementById('estimatePanel').classList.remove('hidden');
+
+        // Scroll to estimate
+        document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // Show payment modal
+    // STEP 4: Payment processing
     async function showPaymentModal() {
+        if (!estimateData.pricing) {
+            alert('Please get an estimate first');
+            return;
+        }
+
         if (!stripe) {
-            alert('Payment system is still loading. Please try again.');
+            alert('Payment system is still loading. Please try again in a moment.');
             return;
         }
 
         document.getElementById('paymentAmount').textContent = '$' + estimateData.pricing.total.toFixed(0);
         document.getElementById('paymentModal').classList.remove('hidden');
 
+        // Initialize Stripe Elements
         try {
             const response = await fetch('/.netlify/functions/create-payment', {
                 method: 'POST',
@@ -509,13 +654,14 @@
         }
     }
 
-    // Process payment
     async function processPayment(event) {
         event.preventDefault();
 
         const submitBtn = document.getElementById('submitPayment');
+        const btnText = document.getElementById('paymentButtonText');
+
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
+        btnText.textContent = 'Processing payment...';
 
         try {
             const result = await stripe.confirmPayment({
@@ -527,42 +673,49 @@
                 throw new Error(result.error.message);
             }
 
-            console.log('Payment successful:', result.paymentIntent.id);
+            console.log('✅ Payment successful:', result.paymentIntent.id);
             paymentIntentId = result.paymentIntent.id;
 
+            // Hide payment modal and show Task Information modal
             document.getElementById('paymentModal').classList.add('hidden');
             showTaskInfoModal();
 
         } catch (error) {
-            console.error('Payment failed:', error);
+            console.error('❌ Payment failed:', error);
             document.getElementById('paymentMessage').textContent = error.message;
             document.getElementById('paymentMessage').classList.remove('hidden');
+            document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
 
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Complete Payment';
+            btnText.textContent = 'Complete Payment';
         }
     }
 
-    // Show task info modal
+    // STEP 5: Show Task Information modal with pre-populated data
     function showTaskInfoModal() {
+        // Pre-populate summary from Step 2 data
         document.getElementById('summaryName').textContent = formData.name;
         document.getElementById('summaryPhone').textContent = formData.phone;
         document.getElementById('summaryEmail').textContent = formData.email;
         document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
         document.getElementById('summaryWindow').textContent = formData.window;
+        document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
 
+        // Pre-populate contact phone with customer phone
         document.getElementById('contactPhone').value = formData.phone;
+
         document.getElementById('taskInfoModal').classList.remove('hidden');
     }
 
-    // Submit task info
+    // STEP 6: Send notification and complete flow
     async function submitTaskInfo(event) {
         event.preventDefault();
 
         const submitBtn = event.target.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending notification...';
+        submitBtn.textContent = '📤 Sending notification...';
 
+        // Collect all data for notification
         const completeJobData = {
             payment_intent_id: paymentIntentId,
             customer: formData,
@@ -570,13 +723,14 @@
                 property_address: document.getElementById('propertyAddress').value,
                 contact_phone: document.getElementById('contactPhone').value,
                 access_details: document.getElementById('accessDetails').value,
+                pets_and_special: document.getElementById('petsAndSpecial').value,
                 additional_details: document.getElementById('additionalDetails').value
             },
             estimate: estimateData,
             amount: estimateData.pricing.total
         };
 
-        console.log('Sending job data:', completeJobData);
+        console.log('📋 Complete job data for notification:', completeJobData);
 
         try {
             const response = await fetch('/.netlify/functions/send-notification', {
@@ -586,23 +740,37 @@
             });
 
             if (response.ok) {
-                console.log('Notification sent successfully');
+                const result = await response.json();
+                console.log('✅ Notification sent successfully:', result);
             } else {
-                console.error('Notification failed');
+                const error = await response.text();
+                console.error('❌ Notification failed:', response.status, error);
             }
         } catch (error) {
-            console.error('Notification error:', error);
+            console.error('❌ Notification error:', error);
         }
 
+        // Show final success regardless of notification status
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
 
-    // Initialize everything
+    // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOM loaded, initializing...');
+        console.log('🚀 DOM Content Loaded - Initializing app...');
 
+        // Initialize Stripe
         initializeStripe();
+
+        // Task selection buttons
+        document.querySelectorAll('[data-task]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const taskKey = btn.getAttribute('data-task');
+                document.getElementById('taskCategory').value = taskKey;
+                document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+        console.log('✅ Task selection buttons initialized');
 
         // Photo upload preview
         document.getElementById('taskPhotos').addEventListener('change', (e) => {
@@ -617,24 +785,36 @@
             });
         });
 
-        // Event listeners
+        // STEP 3: Get Estimate Button
         document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+        // STEP 4: Reserve Button
         document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+        // Payment form
         document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+        // Close payment modal
         document.getElementById('closePayment').addEventListener('click', () => {
             document.getElementById('paymentModal').classList.add('hidden');
         });
+
+        // STEP 5: Task Info Form
         document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+        // Final success close
         document.getElementById('closeFinalSuccess').addEventListener('click', () => {
             document.getElementById('finalSuccessModal').classList.add('hidden');
-            location.reload();
+            location.reload(); // Reset for new booking
         });
 
-        console.log('All initialized successfully');
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        console.log('🎯 All event listeners initialized successfully');
     });
 
-    console.log('JavaScript finished loading');
+    console.log('📜 JavaScript finished loading');
 </script>
-
 </body>
 </html>
