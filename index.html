@@ -351,7 +351,7 @@
 
     // ZAPIER WEBHOOK CONFIGURATION - UPDATE THESE VALUES
     const ZAPIER_CONFIG = {
-        WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24343571/utpo6n0/', // ⚠️ REPLACE with your actual Zapier webhook URL
+        WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24343571/utpiwwr/', // ⚠️ REPLACE with your actual Zapier webhook URL
         ENABLED: true // ⚠️ Change to true once you've set up your Zapier webhook
     };
 
@@ -464,15 +464,18 @@
             console.log('🔗 Webhook URL:', ZAPIER_CONFIG.WEBHOOK_URL);
             console.log('📦 Data being sent:', zapierData);
 
-            // Convert to FormData to avoid CORS preflight while maintaining structure
-            const formData = new FormData();
+            // Try sending as URL-encoded form data (traditional POST)
+            const params = new URLSearchParams();
             Object.keys(zapierData).forEach(key => {
-                formData.append(key, zapierData[key]);
+                params.append(key, zapierData[key]);
             });
 
             const response = await fetch(ZAPIER_CONFIG.WEBHOOK_URL, {
                 method: 'POST',
-                body: formData  // FormData doesn't require Content-Type header and avoids CORS
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: params.toString()
             });
 
             if (response.ok) {
