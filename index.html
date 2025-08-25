@@ -464,13 +464,15 @@
             console.log('🔗 Webhook URL:', ZAPIER_CONFIG.WEBHOOK_URL);
             console.log('📦 Data being sent:', zapierData);
 
+            // Convert to FormData to avoid CORS preflight while maintaining structure
+            const formData = new FormData();
+            Object.keys(zapierData).forEach(key => {
+                formData.append(key, zapierData[key]);
+            });
+
             const response = await fetch(ZAPIER_CONFIG.WEBHOOK_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(zapierData),
-                mode: 'no-cors'  // This bypasses CORS but still sends JSON properly
+                body: formData  // FormData doesn't require Content-Type header and avoids CORS
             });
 
             if (response.ok) {
