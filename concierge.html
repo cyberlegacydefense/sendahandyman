@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SendAHandyman Concierge — AI‑Powered Property Management Lite</title>
+    <meta name="description" content="Save ~50% vs traditional property managers. 24/7 AI tenant concierge + instant maintenance triage + our vetted local handyman network. $99/mo per unit." />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="SendAHandyman Concierge — AI‑Powered Property Management Lite" />
+    <meta property="og:description" content="Save ~50% vs traditional PM. AI tenant concierge + local handyman dispatch. $99/mo per unit." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sendahandyman.com/concierge" />
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                brand: {
+                  DEFAULT: '#0ea5e9',
+                  dark: '#0369a1',
+                  light: '#e0f2fe'
+                }
+              }
+            }
+          }
+        }
+    </script>
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "SendAHandyman Concierge",
+            "areaServed": "South Florida",
+            "serviceType": "AI-assisted property management for condo rentals",
+            "provider": {"@type": "Organization", "name": "SendAHandyman"},
+            "offers": {"@type": "Offer", "price": "99", "priceCurrency": "USD", "description": "$99/mo per unit – AI tenant concierge, 24/7 maintenance triage, owner dashboard"}
+        }
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        .container { max-width: 1200px; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<!-- Header -->
+<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+        <a href="#top" class="flex items-center gap-3 font-semibold text-slate-900">
+            <span class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-brand.light text-brand">🔧</span>
+            <span>SendAHandyman Concierge</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+            <a href="#how" class="hover:text-brand">How it works</a>
+            <a href="#pricing" class="hover:text-brand">Pricing</a>
+            <a href="#roi" class="hover:text-brand">ROI</a>
+            <a href="#faq" class="hover:text-brand">FAQ</a>
+        </nav>
+        <div class="flex items-center gap-2">
+            <a href="#cta" class="inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white font-medium hover:bg-brand-dark">Get Started</a>
+        </div>
+    </div>
+</header>
+
+<!-- Hero -->
+<section id="top" class="relative overflow-hidden">
+    <div class="container mx-auto px-4 sm:px-6 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
+        <div>
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900">
+                AI‑Powered Property Management <span class="text-brand">Lite</span> for South Florida Condo Owners
+            </h1>
+            <p class="mt-4 text-lg text-slate-600">Save ~50% vs traditional managers. 24/7 AI tenant concierge + instant maintenance triage + our vetted local handyman network. Flat <span class="font-semibold">$99/mo per unit</span>.</p>
+            <ul class="mt-6 space-y-2 text-slate-700">
+                <li>✅ 24/7 tenant replies and rent reminders</li>
+                <li>✅ Photo/video triage before dispatch</li>
+                <li>✅ Flat‑rate service calls + clear reports</li>
+            </ul>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a href="#cta" class="inline-flex items-center rounded-xl bg-brand px-5 py-3 text-white font-semibold hover:bg-brand-dark">Request a Call</a>
+                <a href="#pricing" class="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 font-semibold hover:border-brand hover:text-brand">See Pricing</a>
+            </div>
+            <p class="mt-3 text-xs text-slate-500">Perfect for out‑of‑state owners with 2–3 rental condos.</p>
+        </div>
+        <div class="relative">
+            <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="rounded-xl bg-slate-50 p-4">
+                        <div class="text-3xl font-extrabold text-slate-900">$99</div>
+                        <div class="text-sm text-slate-500">/mo per unit</div>
+                    </div>
+                    <div class="rounded-xl bg-slate-50 p-4">
+                        <div class="text-3xl font-extrabold text-emerald-600">~50%</div>
+                        <div class="text-sm text-slate-500">Avg annual savings</div>
+                    </div>
+                    <div class="rounded-xl bg-slate-50 p-4 col-span-2">
+                        <div class="text-sm text-slate-500">Backed by AI + local pros</div>
+                        <div class="text-base font-semibold">Less cost. Less headache.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trust strip -->
+<section class="bg-white border-y border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 py-6 grid md:grid-cols-3 gap-4 text-center text-sm">
+        <div>⏱️ <span class="font-semibold">Faster response</span> than traditional PMs</div>
+        <div>🛠️ <span class="font-semibold">Local handyman network</span> you can trust</div>
+        <div>📊 <span class="font-semibold">Clear monthly reports</span> for peace of mind</div>
+    </div>
+</section>
+
+<!-- How it works -->
+<section id="how" class="container mx-auto px-4 sm:px-6 py-16">
+    <h2 class="text-2xl sm:text-3xl font-bold">How it works</h2>
+    <div class="mt-8 grid lg:grid-cols-4 gap-6">
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-2xl" aria-hidden="true">💬</div>
+            <h3 class="font-semibold mt-3">Tenant contacts AI</h3>
+            <p class="text-sm text-slate-600 mt-2">24/7 concierge answers, gathers photos/videos, and logs details.</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-2xl" aria-hidden="true">🧠</div>
+            <h3 class="font-semibold mt-3">Smart triage</h3>
+            <p class="text-sm text-slate-600 mt-2">AI classifies urgency (e.g., AC outage vs. routine drip) and suggests next steps.</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-2xl" aria-hidden="true">📅</div>
+            <h3 class="font-semibold mt-3">Auto‑dispatch & scheduling</h3>
+            <p class="text-sm text-slate-600 mt-2">Jobs route to SendAHandyman. Tenant picks a time; owner notified.</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="text-2xl" aria-hidden="true">📈</div>
+            <h3 class="font-semibold mt-3">Completion & reporting</h3>
+            <p class="text-sm text-slate-600 mt-2">Tech notes & photos appear in your monthly report. Track costs & turnaround.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" class="bg-white border-y border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 py-16">
+        <h2 class="text-2xl sm:text-3xl font-bold">Simple pricing</h2>
+        <div class="mt-8 grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <ul class="space-y-2 text-slate-700 text-sm">
+                    <li>• <b>$99/mo per unit</b> — AI tenant concierge, 24/7 triage, owner dashboard</li>
+                    <li>• <b>$99 flat service call</b> + materials. Optional auto‑approval under $250</li>
+                    <li>• Add‑ons: Tenant placement (½ month rent), Lease renewal $200, Annual inspection $149</li>
+                </ul>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <p class="text-sm text-slate-500">Typical PM fee at 10% of rent</p>
+                <div class="text-3xl font-extrabold text-slate-900">$200/mo</div>
+                <p class="text-xs text-slate-500 mt-1">at $2,000 rent</p>
+                <div class="mt-3 text-emerald-600 text-sm font-semibold">You keep more of your investment ✔</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ROI Calculator -->
+<section id="roi" class="container mx-auto px-4 sm:px-6 py-16">
+    <h2 class="text-2xl sm:text-3xl font-bold">ROI calculator</h2>
+    <p class="text-sm text-slate-600 mt-2">Estimate annual savings vs a traditional 10% property manager.</p>
+
+    <div class="mt-6 grid lg:grid-cols-2 gap-8">
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <label for="rent" class="block text-sm font-medium">Monthly rent per unit ($)</label>
+            <input id="rent" type="number" min="500" step="50" value="2000" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+
+            <label for="units" class="block text-sm font-medium mt-4"># of units</label>
+            <input id="units" type="number" min="1" step="1" value="2" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+
+            <button id="calcBtn" class="mt-4 inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white font-semibold hover:bg-brand-dark">Calculate</button>
+            <p class="text-xs text-slate-500 mt-2">Assumes $99/mo per unit for SendAHandyman Concierge vs 10% of rent traditional PM.</p>
+        </div>
+
+        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <div class="grid grid-cols-2 gap-4 text-center">
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <div class="text-sm text-slate-500">Traditional PM</div>
+                    <div id="pmCost" class="text-2xl font-extrabold">$4,800/yr</div>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-4">
+                    <div class="text-sm text-slate-500">Concierge</div>
+                    <div id="ourCost" class="text-2xl font-extrabold">$2,376/yr</div>
+                </div>
+                <div class="rounded-xl bg-emerald-50 p-4 col-span-2">
+                    <div class="text-sm text-emerald-700">Estimated annual savings</div>
+                    <div id="savings" class="text-3xl font-extrabold text-emerald-700">$2,424</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="bg-white border-y border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 py-16">
+        <h2 class="text-2xl sm:text-3xl font-bold">FAQ</h2>
+        <div class="mt-8 grid lg:grid-cols-2 gap-6">
+            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" open>
+                <summary class="font-semibold cursor-pointer">What does the $99/mo include?</summary>
+                <p class="text-sm text-slate-600 mt-2">24/7 AI tenant concierge, maintenance triage with photo/video intake, rent reminders, and a monthly owner report.</p>
+            </details>
+            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <summary class="font-semibold cursor-pointer">How do service calls work?</summary>
+                <p class="text-sm text-slate-600 mt-2">AI triage routes issues to our dispatch. We charge $99 per visit plus materials. You can auto‑approve jobs under $250 for faster turnaround.</p>
+            </details>
+            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <summary class="font-semibold cursor-pointer">Do you replace a full property manager?</summary>
+                <p class="text-sm text-slate-600 mt-2">We’re a cost‑effective alternative focused on operations & maintenance. If you need full leasing/eviction services, we can add those as needed.</p>
+            </details>
+            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <summary class="font-semibold cursor-pointer">Can you integrate with my existing tools?</summary>
+                <p class="text-sm text-slate-600 mt-2">Yes. We can connect with AI PM platforms for tenant comms and scheduling, and sync your preferred accounting/export options.</p>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- CTA / Contact form -->
+<section id="cta" class="container mx-auto px-4 sm:px-6 py-16">
+    <div class="grid lg:grid-cols-2 gap-8 items-center">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-bold">Ready to keep your investment hands‑off?</h2>
+            <p class="mt-3 text-slate-600">Tell us about your condos and we’ll reach out to set up your Concierge plan. We can start with one unit and scale to all of them.</p>
+            <ul class="mt-4 space-y-2 text-slate-700 text-sm">
+                <li>• South Florida coverage</li>
+                <li>• Start in days, not weeks</li>
+                <li>• Cancel anytime</li>
+            </ul>
+        </div>
+
+        <!-- Netlify-ready form (also works with basic POST fallback) -->
+        <form id="leadForm" name="concierge-lead" method="POST" data-netlify="true" class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+            <input type="hidden" name="form-name" value="concierge-lead" />
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium">Full name</label>
+                    <input id="name" name="name" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium">Email</label>
+                    <input id="email" name="email" type="email" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                </div>
+                <div>
+                    <label for="phone" class="block text-sm font-medium">Phone</label>
+                    <input id="phone" name="phone" type="tel" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                </div>
+                <div>
+                    <label for="unitsQ" class="block text-sm font-medium">How many units?</label>
+                    <input id="unitsQ" name="units" type="number" min="1" value="2" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                </div>
+            </div>
+            <label for="message" class="block text-sm font-medium mt-4">Anything we should know?</label>
+            <textarea id="message" name="message" rows="4" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" placeholder="e.g., Two condos in Boca & Lake Worth, need AC priority and after‑hours coverage"></textarea>
+
+            <div class="mt-4 flex items-start gap-2 text-sm">
+                <input id="consent" type="checkbox" required class="mt-1" />
+                <label for="consent">I agree to be contacted about SendAHandyman Concierge.</label>
+            </div>
+
+            <button class="mt-6 w-full inline-flex items-center justify-center rounded-xl bg-brand px-5 py-3 text-white font-semibold hover:bg-brand-dark">Request my plan</button>
+            <p id="formMsg" class="mt-3 text-sm text-slate-500" role="status" aria-live="polite"></p>
+        </form>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-white border-t border-slate-200">
+    <div class="container mx-auto px-4 sm:px-6 py-10 grid md:grid-cols-3 gap-6 text-sm">
+        <div>
+            <div class="font-semibold">SendAHandyman Concierge</div>
+            <p class="text-slate-600 mt-2">Less cost. Less headache. More peace of mind.</p>
+        </div>
+        <nav class="space-y-2">
+            <a href="#how" class="block hover:text-brand">How it works</a>
+            <a href="#pricing" class="block hover:text-brand">Pricing</a>
+            <a href="#roi" class="block hover:text-brand">ROI</a>
+            <a href="#faq" class="block hover:text-brand">FAQ</a>
+        </nav>
+        <div>
+            <p class="text-slate-600">Serving South Florida condo owners</p>
+            <p class="text-slate-600 mt-1">Questions? <a href="mailto:hello@sendahandyman.com" class="text-brand hover:text-brand-dark">hello@sendahandyman.com</a></p>
+        </div>
+    </div>
+    <div class="text-center text-xs text-slate-500 pb-6">© <span id="year"></span> SendAHandyman. All rights reserved.</div>
+</footer>
+
+<script>
+    // ROI calculator logic
+    function fmtUSD(n){ return n.toLocaleString(undefined,{ style:'currency', currency:'USD', maximumFractionDigits:0}); }
+    function calc(){
+      const rent = Math.max(0, Number(document.getElementById('rent').value || 0));
+      const units = Math.max(1, Math.floor(Number(document.getElementById('units').value || 1)));
+      const pm = rent * 0.10 * 12 * units; // 10% manager
+      const ours = 99 * 12 * units; // $99/mo per unit
+      const save = Math.max(0, pm - ours);
+      document.getElementById('pmCost').textContent = fmtUSD(pm) + '/yr';
+      document.getElementById('ourCost').textContent = fmtUSD(ours) + '/yr';
+      document.getElementById('savings').textContent = fmtUSD(save);
+    }
+    document.getElementById('calcBtn').addEventListener('click', function(e){ e.preventDefault(); calc(); });
+    calc();
+
+    // Year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Progressive enhancement for the form
+    const form = document.getElementById('leadForm');
+    const msg  = document.getElementById('formMsg');
+    form?.addEventListener('submit', async (e) => {
+      // If Netlify handles it, the POST will succeed even without JS; this is for inline feedback
+      msg.textContent = 'Submitting…';
+    });
+</script>
+</body>
+</html>
