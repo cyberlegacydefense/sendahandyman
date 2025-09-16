@@ -20,6 +20,41 @@
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
+
+        .pricing-option {
+            transition: all 0.2s ease;
+        }
+
+        .pricing-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,.1);
+        }
+
+        .pricing-option.selected {
+            border-color: #4f46e5;
+            background-color: #f8fafc;
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4f46e5;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .pricing-badge.premium {
+            background: #dc2626;
+        }
+
+        .pricing-badge.discount {
+            background: #059669;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -103,7 +138,7 @@
     <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-start">
         <div class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100">
             <h3 class="text-xl font-bold">Start your request</h3>
-            <p class="text-sm text-slate-600 mt-1">We'll analyze your photos and show an instant estimate before you pay.</p>
+            <p class="text-sm text-slate-600 mt-1">We'll analyze your photos and show pricing options before you pay.</p>
 
             <div class="mt-4 grid md:grid-cols-2 gap-4">
                 <div><label class="text-sm font-semibold">Full name</label><input id="customerName" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
@@ -133,7 +168,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-sm font-semibold">When?</label>
+                    <label class="text-sm font-semibold">Preferred timing</label>
                     <select id="taskWindow" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
                         <option value="today_am">Today (8–12)</option>
                         <option value="today_pm">Today (12–4)</option>
@@ -164,7 +199,7 @@
             <div class="mt-6">
                 <button type="button" id="getEstimateBtn" class="relative w-full overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-75">
                     <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
-                    <span id="estimateText" class="relative z-10">🔧 Get instant estimate</span>
+                    <span id="estimateText" class="relative z-10">🔧 Get pricing options</span>
                 </button>
 
                 <!-- Progress Bar Below Button -->
@@ -179,16 +214,14 @@
 
         <!-- AI Estimate Panel (Shows after Step 3 completes) -->
         <aside id="estimatePanel" class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 hidden">
-            <h3 class="text-xl font-bold">AI Estimate</h3>
-            <p class="text-sm text-slate-600">Transparent pricing with same-day premiums shown upfront.</p>
-            <div class="mt-4 grid gap-3">
-                <div class="flex items-baseline justify-between"><span class="text-slate-600">Estimated duration</span><strong id="estimatedHours">—</strong></div>
-                <div class="flex items-baseline justify-between"><span class="text-slate-600">Price (all-in)</span><strong id="estimatedPrice" class="text-2xl">—</strong></div>
-                <div class="rounded-lg bg-slate-50 border p-3 text-sm">
-                    <div class="font-semibold mb-1">Fare breakdown</div>
-                    <div id="fareBreakdown" class="space-y-1"></div>
-                </div>
+            <h3 class="text-xl font-bold">Choose your timing & price</h3>
+            <p class="text-sm text-slate-600 mb-6">Select your preferred option. All prices include everything.</p>
+
+            <!-- Pricing Options Container -->
+            <div id="pricingOptions" class="space-y-4 mb-6">
+                <!-- Options will be dynamically inserted here -->
             </div>
+
             <div class="mt-4">
                 <h4 class="font-semibold">What we'll do</h4>
                 <ul id="estimateScope" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
@@ -198,7 +231,7 @@
                 <ul id="estimateRisks" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
             </div>
             <div class="mt-6">
-                <button id="reserveBtn" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold shadow-soft">💳 Reserve with card</button>
+                <button id="reserveBtn" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold shadow-soft disabled:opacity-50" disabled>💳 Reserve with card</button>
             </div>
             <p class="mt-3 text-xs text-slate-500">If site conditions differ, your tech will confirm any changes before work begins.</p>
         </aside>
@@ -216,6 +249,9 @@
         <div class="mb-4 p-3 bg-slate-50 rounded-lg">
             <div class="text-sm text-slate-600">Total amount</div>
             <div id="paymentAmount" class="text-2xl font-bold">$0</div>
+            <div class="text-sm text-slate-600 mt-1">
+                <span id="paymentTiming">Selected timing</span>
+            </div>
         </div>
 
         <form id="paymentForm">
@@ -360,6 +396,7 @@
     // GLOBAL STATE - Persisted in memory
     let formData = {};
     let estimateData = {};
+    let selectedPricingOption = null;
     let paymentIntentId = null;
 
     // Stripe Configuration
@@ -370,6 +407,8 @@
     const PREMIUM_SAMEDAY = 0.15;
     const PREMIUM_EVENING = 0.10;
     const PREMIUM_RUSH = 0.10;
+    const PREMIUM_SOONER = 0.20;
+    const DISCOUNT_LATER = 0.10;
 
     const TASKS = {
         tv_mount: { hours: 1.5, label: "TV Wall Mount (32–65\")" },
@@ -383,6 +422,23 @@
         furniture_assembly: { hours: 1.5, label: "Furniture Assembly (S–M)" },
         closet_organizer: { hours: 2.0, label: "Closet Organizer Install" },
         minor_repairs: { hours: 1.5, label: "Minor repairs" }
+    };
+
+    const TIME_WINDOWS = {
+        today_am: "Today (8–12)",
+        today_pm: "Today (12–4)",
+        today_eve: "Today (4–8)",
+        tomorrow_am: "Tomorrow (8–12)",
+        tomorrow_pm: "Tomorrow (12–4)"
+    };
+
+    // Time window mapping for sooner/later options
+    const TIME_MAPPING = {
+        today_am: { sooner: null, later: 'today_pm' },
+        today_pm: { sooner: 'today_am', later: 'today_eve' },
+        today_eve: { sooner: 'today_pm', later: 'tomorrow_am' },
+        tomorrow_am: { sooner: 'today_eve', later: 'tomorrow_pm' },
+        tomorrow_pm: { sooner: 'tomorrow_am', later: null }
     };
 
     // Initialize Stripe with error handling
@@ -542,16 +598,16 @@
 
         setTimeout(() => {
             // Stage 3: Finalizing (90%)
-            text.textContent = '💭 Generating estimate...';
-            message.textContent = 'Creating your personalized estimate...';
+            text.textContent = '💭 Generating options...';
+            message.textContent = 'Creating your pricing options...';
             progressBg.style.transform = 'translateX(-10%)';
             bar.style.width = '90%';
         }, 3000);
 
         setTimeout(() => {
             // Stage 4: Complete (100%)
-            text.textContent = '✅ Estimate ready!';
-            message.textContent = 'Analysis complete! Estimate generated.';
+            text.textContent = '✅ Options ready!';
+            message.textContent = 'Analysis complete! Options generated.';
             progressBg.style.transform = 'translateX(0%)';
             bar.style.width = '100%';
         }, 4000);
@@ -566,7 +622,7 @@
 
         setTimeout(() => {
             btn.disabled = false;
-            text.textContent = '🔧 Get instant estimate';
+            text.textContent = '🔧 Get pricing options';
             container.classList.add('hidden');
             progressBg.style.transform = 'translateX(-100%)';
             bar.style.width = '0%';
@@ -629,15 +685,15 @@
             const aiResult = await response.json();
             console.log('📊 AI scope result:', aiResult);
 
-            // Calculate pricing
-            const pricing = calculatePricing(hours, data.window, data.rush);
-            console.log('💰 Calculated pricing:', pricing);
+            // Generate multiple pricing options
+            const pricingOptions = generatePricingOptions(hours, data.window, data.rush);
+            console.log('💰 Generated pricing options:', pricingOptions);
 
             // Store estimate data
             estimateData = {
                 ...aiResult,
                 hours,
-                pricing
+                pricingOptions
             };
 
             console.log('✅ Estimate data stored:', estimateData);
@@ -655,6 +711,62 @@
             alert('Failed to generate estimate: ' + error.message);
             resetEstimateProgress();
         }
+    }
+
+    function generatePricingOptions(hours, selectedWindow, rush) {
+        const options = [];
+        const mapping = TIME_MAPPING[selectedWindow];
+
+        // Calculate base pricing for selected option
+        const selectedPricing = calculatePricing(hours, selectedWindow, rush);
+
+        // Option 1: Sooner (+20%)
+        if (mapping.sooner) {
+            const soonerPricing = calculatePricing(hours, mapping.sooner, rush);
+            const soonerTotal = soonerPricing.total * (1 + PREMIUM_SOONER);
+            options.push({
+                type: 'sooner',
+                window: mapping.sooner,
+                windowLabel: TIME_WINDOWS[mapping.sooner],
+                pricing: {
+                    ...soonerPricing,
+                    total: soonerTotal,
+                    premiums: [...soonerPricing.premiums, { label: 'Sooner premium (20%)', amount: soonerPricing.total * PREMIUM_SOONER }]
+                },
+                badge: 'Premium',
+                badgeClass: 'premium'
+            });
+        }
+
+        // Option 2: Selected (middle)
+        options.push({
+            type: 'selected',
+            window: selectedWindow,
+            windowLabel: TIME_WINDOWS[selectedWindow],
+            pricing: selectedPricing,
+            badge: 'Your Choice',
+            badgeClass: 'selected'
+        });
+
+        // Option 3: Later (-10%)
+        if (mapping.later) {
+            const laterPricing = calculatePricing(hours, mapping.later, rush);
+            const laterTotal = laterPricing.total * (1 - DISCOUNT_LATER);
+            options.push({
+                type: 'later',
+                window: mapping.later,
+                windowLabel: TIME_WINDOWS[mapping.later],
+                pricing: {
+                    ...laterPricing,
+                    total: laterTotal,
+                    premiums: [...laterPricing.premiums, { label: 'Later discount (-10%)', amount: -laterPricing.total * DISCOUNT_LATER }]
+                },
+                badge: 'Save',
+                badgeClass: 'discount'
+            });
+        }
+
+        return options;
     }
 
     function calculatePricing(hours, window, rush) {
@@ -687,16 +799,40 @@
     }
 
     function showEstimatePanel(estimate) {
-        document.getElementById('estimatedHours').textContent = estimate.hours.toFixed(1) + ' hrs';
-        document.getElementById('estimatedPrice').textContent = '$' + estimate.pricing.total.toFixed(0);
+        // Generate pricing option cards
+        const optionsContainer = document.getElementById('pricingOptions');
+        optionsContainer.innerHTML = '';
 
-        // Fare breakdown
-        let breakdownHtml = `<div class="flex justify-between"><span>Base ($${RATE}/hr)</span><span>$${estimate.pricing.base.toFixed(0)}</span></div>`;
-        estimate.pricing.premiums.forEach(p => {
-            breakdownHtml += `<div class="flex justify-between"><span>${p.label}</span><span>$${p.amount.toFixed(0)}</span></div>`;
+        estimate.pricingOptions.forEach((option, index) => {
+            const optionCard = document.createElement('div');
+            optionCard.className = 'pricing-option relative border-2 border-slate-200 rounded-xl p-4 cursor-pointer';
+            optionCard.dataset.optionType = option.type;
+            optionCard.dataset.window = option.window;
+
+            optionCard.innerHTML = `
+                <div class="pricing-badge ${option.badgeClass}">${option.badge}</div>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-semibold text-lg">${option.windowLabel}</div>
+                        <div class="text-sm text-slate-600">${estimate.hours.toFixed(1)} hours estimated</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-bold">$${option.pricing.total.toFixed(0)}</div>
+                        ${option.type !== 'selected' ? `<div class="text-sm text-slate-500">vs $${estimate.pricingOptions.find(o => o.type === 'selected').pricing.total.toFixed(0)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Add click handler
+            optionCard.addEventListener('click', () => selectPricingOption(option, optionCard));
+
+            optionsContainer.appendChild(optionCard);
+
+            // Auto-select the middle option
+            if (option.type === 'selected') {
+                setTimeout(() => selectPricingOption(option, optionCard), 100);
+            }
         });
-        breakdownHtml += `<hr class="my-2 border-slate-200"><div class="flex justify-between font-semibold"><span>Total</span><span>$${estimate.pricing.total.toFixed(0)}</span></div>`;
-        document.getElementById('fareBreakdown').innerHTML = breakdownHtml;
 
         // Scope and risks
         document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
@@ -708,10 +844,28 @@
         document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    function selectPricingOption(option, cardElement) {
+        // Remove selection from all cards
+        document.querySelectorAll('.pricing-option').forEach(card => {
+            card.classList.remove('selected');
+        });
+
+        // Add selection to clicked card
+        cardElement.classList.add('selected');
+
+        // Store selected option
+        selectedPricingOption = option;
+
+        // Enable reserve button
+        document.getElementById('reserveBtn').disabled = false;
+
+        console.log('✅ Selected pricing option:', option);
+    }
+
     // STEP 4: Payment processing
     async function showPaymentModal() {
-        if (!estimateData.pricing) {
-            alert('Please get an estimate first');
+        if (!selectedPricingOption) {
+            alert('Please select a pricing option first');
             return;
         }
 
@@ -720,7 +874,8 @@
             return;
         }
 
-        document.getElementById('paymentAmount').textContent = '$' + estimateData.pricing.total.toFixed(0);
+        document.getElementById('paymentAmount').textContent = '$' + selectedPricingOption.pricing.total.toFixed(0);
+        document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
         document.getElementById('paymentModal').classList.remove('hidden');
 
         // Initialize Stripe Elements
@@ -730,11 +885,11 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: estimateData.pricing.total,
+                    amount: selectedPricingOption.pricing.total,
                     customer_info: formData,
                     job_details: {
                         category: formData.category,
-                        window: formData.window,
+                        window: selectedPricingOption.window,
                         hours: estimateData.hours
                     }
                 })
@@ -840,13 +995,13 @@
         const taskId = generateTaskId();
         window.currentTaskId = taskId; // Store for later use
 
-        // Pre-populate summary from Step 2 data
+        // Pre-populate summary from Step 2 data and selected option
         document.getElementById('summaryTaskId').textContent = taskId;
         document.getElementById('summaryName').textContent = formData.name;
         document.getElementById('summaryPhone').textContent = formData.phone;
         document.getElementById('summaryEmail').textContent = formData.email;
         document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
-        document.getElementById('summaryWindow').textContent = formData.window;
+        document.getElementById('summaryWindow').textContent = selectedPricingOption.windowLabel;
         document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
 
         // Pre-populate contact phone with customer phone
@@ -879,14 +1034,13 @@
             return;
         }
 
-        // Collect all data for notification with BOTH flat and nested structures
-        // (in case backend expects the original nested format)
+        // Collect all data for notification using selected pricing option
         const completeJobData = {
             // Flat structure (new)
             task_id: taskId,
             payment_intent_id: paymentIntentId,
             category: currentFormData.category,
-            window: currentFormData.window,
+            window: selectedPricingOption.window, // Use selected window, not original
             name: currentFormData.name,
             phone: currentFormData.phone,
             email: currentFormData.email,
@@ -900,9 +1054,9 @@
             pets_and_special: document.getElementById('petsAndSpecial').value || '',
             additional_details: document.getElementById('additionalDetails').value || '',
             estimated_hours: estimateData.hours,
-            total_amount: estimateData.pricing.total,
-            base_amount: estimateData.pricing.base,
-            premiums: estimateData.pricing.premiums || [],
+            total_amount: selectedPricingOption.pricing.total,
+            base_amount: selectedPricingOption.pricing.base,
+            premiums: selectedPricingOption.pricing.premiums || [],
             step_scope: estimateData.step_scope || [],
             risk_flags: estimateData.risk_flags || [],
 
@@ -914,7 +1068,7 @@
                 zip: currentFormData.zip,
                 address: currentFormData.address || '',
                 category: currentFormData.category,
-                window: currentFormData.window,
+                window: selectedPricingOption.window, // Use selected window
                 description: currentFormData.description || '',
                 rush: currentFormData.rush || false
             },
@@ -927,11 +1081,11 @@
             },
             estimate: {
                 hours: estimateData.hours,
-                pricing: estimateData.pricing,
+                pricing: selectedPricingOption.pricing,
                 step_scope: estimateData.step_scope || [],
                 risk_flags: estimateData.risk_flags || []
             },
-            amount: estimateData.pricing.total
+            amount: selectedPricingOption.pricing.total
         };
 
         console.log('📋 Complete job data being sent to notification:', completeJobData);
@@ -939,7 +1093,8 @@
             name: completeJobData.name,
             category: completeJobData.category,
             phone: completeJobData.phone,
-            email: completeJobData.email
+            email: completeJobData.email,
+            window: completeJobData.window
         });
 
         // Send Zapier notification
