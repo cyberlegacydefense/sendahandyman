@@ -103,19 +103,638 @@
 <section class="py-10 border-t border-slate-100 bg-white" id="tasks">
     <div class="max-w-6xl mx-auto px-4">
         <h2 class="text-2xl md:text-3xl font-bold">Popular fixed-price tasks</h2>
-        <p class="text-slate-600 mt-2">Upload photos and a product link. We scope and price it instantly.</p>
+        <p class="text-slate-600 mt-2">Click any service to see what's included and answer a few quick questions.</p>
 
-        <div class="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="tv_mount"><div class="font-semibold">TV Wall Mount (32–65")</div><div class="text-sm text-slate-600">~1.5 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="ceiling_fan"><div class="font-semibold">Ceiling Fan Install/Replace</div><div class="text-sm text-slate-600">~2.0 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="light_fixture"><div class="font-semibold">Light Fixture / Chandelier Swap</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="faucet_showerhead"><div class="font-semibold">Faucet / Showerhead Replace</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="smart_doorbell"><div class="font-semibold">Smart Doorbell Install</div><div class="text-sm text-slate-600">~0.75 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="curtains_blinds"><div class="font-semibold">Curtain Rods / Blinds</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="floating_shelf"><div class="font-semibold">Floating Shelf Install</div><div class="text-sm text-slate-600">~1.0 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="appliance_hookup"><div class="font-semibold">Appliance Hookup (W/D/DW)</div><div class="text-sm text-slate-600">~1.5 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="furniture_assembly"><div class="font-semibold">Furniture Assembly (S–M)</div><div class="text-sm text-slate-600">~1.5 hr base</div></button>
-            <button class="rounded-xl border p-4 text-left hover:border-indigo-400" data-task="closet_organizer"><div class="font-semibold">Closet Organizer Install</div><div class="text-sm text-slate-600">~2.0 hr base</div></button>
+        <div class="mt-6 space-y-4">
+            <!-- TV Mount Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="tv_mount">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">📺 TV Wall Mount (32–65")</h3>
+                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Mounting TV (32–65") on drywall with wood studs</li>
+                                <li>• Using customer-supplied mount</li>
+                                <li>• Cord cover (if provided)</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$40: Mounting on brick, concrete, or over fireplace</li>
+                                <li>• +$25: TVs larger than 65"</li>
+                                <li>• New outlet/electrical work not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">What size is your TV?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>32-65 inches</option>
+                                        <option>Larger than 65 inches (+$25)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Do you have the wall mount?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, I have it</option>
+                                        <option>No, need to purchase</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">What type of wall?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Drywall with studs</option>
+                                        <option>Brick/concrete (+$40)</option>
+                                        <option>Above fireplace (+$40)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="tv_mount">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ceiling Fan Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="ceiling_fan">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">💡 Ceiling Fan Install/Replace</h3>
+                            <p class="text-sm text-slate-600">~2.0 hr base • Starting at $160</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Replacing existing fan or light fixture</li>
+                                <li>• Using existing wiring and fan-rated box</li>
+                                <li>• Assembling blades/light kit</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$50: No fan-rated box (requires replacement)</li>
+                                <li>• +$40: Ceilings higher than 10 ft</li>
+                                <li>• New wiring or switches not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">Replacing existing fan or light?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, existing fan</option>
+                                        <option>Yes, existing light fixture</option>
+                                        <option>New installation</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Is ceiling box fan-rated?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes/Don't know</option>
+                                        <option>No, needs replacement (+$50)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Ceiling height?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Under 10 feet</option>
+                                        <option>Over 10 feet (+$40)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="ceiling_fan">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Light Fixture Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="light_fixture">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">✨ Light Fixture / Chandelier Swap</h3>
+                            <p class="text-sm text-slate-600">~1.0 hr base • Starting at $80</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Remove old fixture, install new</li>
+                                <li>• Connect to existing wiring</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$40: Chandeliers over 25 lbs</li>
+                                <li>• +$30: Ceiling over 10 ft</li>
+                                <li>• Structural bracing or rewiring not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">Type of fixture?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Standard light fixture</option>
+                                        <option>Chandelier (under 25 lbs)</option>
+                                        <option>Heavy chandelier (+$40)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Ceiling height?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Under 10 feet</option>
+                                        <option>Over 10 feet (+$30)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Remove old fixture?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, dispose of it</option>
+                                        <option>Yes, but I'll keep it</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="light_fixture">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Faucet/Showerhead Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="faucet_showerhead">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">🚰 Faucet / Showerhead Replace</h3>
+                            <p class="text-sm text-slate-600">~1.0 hr base • Starting at $80</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Remove old fixture and install new</li>
+                                <li>• Connect to existing plumbing</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$40: Corroded plumbing requiring extra work</li>
+                                <li>• +$30: Removing sink/vanity for access</li>
+                                <li>• Leak repairs not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">What are you replacing?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Kitchen/bathroom faucet</option>
+                                        <option>Showerhead</option>
+                                        <option>Both faucet and showerhead</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Do you have the new fixture?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, I have it</option>
+                                        <option>No, need to purchase</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Any plumbing issues?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>No issues</option>
+                                        <option>Some corrosion/leaks (+$40)</option>
+                                        <option>Need sink removal (+$30)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="faucet_showerhead">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Doorbell Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="smart_doorbell">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">🔔 Smart Doorbell Install</h3>
+                            <p class="text-sm text-slate-600">~0.75 hr base • Starting at $60</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Replace old doorbell or install wireless unit</li>
+                                <li>• Connect to existing wiring or Wi-Fi</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$30: No wiring, drilling required</li>
+                                <li>• +$40: Chime module/transformer replacement</li>
+                                <li>• Complex rewiring not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">Installation type?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Replacing existing doorbell</option>
+                                        <option>New wireless install (+$30)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Doorbell brand/model?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Ring</option>
+                                        <option>Nest</option>
+                                        <option>Other brand</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Current doorbell chime working?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, works fine</option>
+                                        <option>No/needs replacement (+$40)</option>
+                                        <option>Don't want chime connected</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="smart_doorbell">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Curtains/Blinds Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="curtains_blinds">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">🪟 Curtain Rods / Blinds</h3>
+                            <p class="text-sm text-slate-600">~1.0 hr base • Starting at $80</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Install up to 2 rods OR 2 blinds</li>
+                                <li>• Mount to drywall with anchors</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$20: Each extra rod/blind beyond 2</li>
+                                <li>• +$40: Mounting on brick, tile, or concrete</li>
+                                <li>• Custom carpentry not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">How many rods/blinds?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>1-2 items (included)</option>
+                                        <option>3-4 items (+$40)</option>
+                                        <option>5+ items (+$80)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Type of installation?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Curtain rods</option>
+                                        <option>Roller blinds</option>
+                                        <option>Venetian blinds</option>
+                                        <option>Mixed rods & blinds</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">What type of wall?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Drywall</option>
+                                        <option>Brick/tile/concrete (+$40)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="curtains_blinds">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Shelf Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="floating_shelf">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">📚 Floating Shelf Install</h3>
+                            <p class="text-sm text-slate-600">~1.0 hr base • Starting at $80</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Install up to 2 shelves</li>
+                                <li>• Standard drywall mounting with anchors</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$20: Each extra shelf beyond 2</li>
+                                <li>• +$30: Shelves over 25 lbs or heavy-duty models</li>
+                                <li>• Masonry/tile installs not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">How many shelves?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>1-2 shelves (included)</option>
+                                        <option>3-4 shelves (+$40)</option>
+                                        <option>5+ shelves (+$80)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Shelf weight/size?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Standard (under 25 lbs)</option>
+                                        <option>Heavy-duty (over 25 lbs) (+$30)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">What type of wall?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Drywall</option>
+                                        <option>Tile/brick (not included)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="floating_shelf">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appliance Hookup Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="appliance_hookup">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">⚡ Appliance Hookup (W/D/DW)</h3>
+                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Connect new appliance to existing hookups</li>
+                                <li>• Level and test basic function</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$40: Old appliance removal/disposal</li>
+                                <li>• +$30: New vent or supply line required</li>
+                                <li>• Plumbing/electrical modifications not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">What appliance?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Washer</option>
+                                        <option>Dryer</option>
+                                        <option>Dishwasher</option>
+                                        <option>Multiple appliances</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Replacing an old unit?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, remove old (+$40)</option>
+                                        <option>No, new installation</option>
+                                        <option>Just disconnecting old</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Are hookups ready?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Yes, all connections ready</option>
+                                        <option>Need new vent/line (+$30)</option>
+                                        <option>Not sure</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="appliance_hookup">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Furniture Assembly Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="furniture_assembly">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">🪑 Furniture Assembly (S–M)</h3>
+                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Assembly of 1 major item or 2–3 small items</li>
+                                <li>• Standard flat-pack furniture</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$30: Large/complex pieces (beds, wardrobes, sectionals)</li>
+                                <li>• +$20 per extra small item</li>
+                                <li>• Wall anchoring not included unless specified</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">What type of furniture?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Dresser/desk/table</option>
+                                        <option>Bed frame (+$30)</option>
+                                        <option>Large wardrobe (+$30)</option>
+                                        <option>Multiple small items</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">How many items?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>1 major item</option>
+                                        <option>2-3 small items</option>
+                                        <option>4+ items (+$40)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Need wall anchoring?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>No wall mounting needed</option>
+                                        <option>Yes, anchor to wall</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="furniture_assembly">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Closet Organizer Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden">
+                <div class="service-header p-4 cursor-pointer hover:bg-slate-50 transition-colors" data-task="closet_organizer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">👕 Closet Organizer Install</h3>
+                            <p class="text-sm text-slate-600">~2.0 hr base • Starting at $160</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• Install standard closet kit (customer-supplied)</li>
+                                <li>• Mount to drywall with included hardware</li>
+                            </ul>
+                            <h4 class="font-semibold text-orange-600 mb-2 mt-4">⚠️ Add-ons:</h4>
+                            <ul class="text-sm space-y-1 text-slate-700">
+                                <li>• +$50: Cutting/custom fitting required</li>
+                                <li>• +$40: Masonry or non-standard walls</li>
+                                <li>• Electrical/lighting not included</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">Quick Questions:</h4>
+                            <div class="space-y-2 text-sm">
+                                <div>
+                                    <label class="block text-slate-600">Type of organizer?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Shelves and rods</option>
+                                        <option>Modular cube system</option>
+                                        <option>Wire rack system</option>
+                                        <option>Custom wood system</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">Need custom cutting?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>No, standard sizes</option>
+                                        <option>Yes, custom fitting (+$50)</option>
+                                        <option>Not sure</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-slate-600">What type of wall?</label>
+                                    <select class="mt-1 w-full rounded border border-slate-200 px-2 py-1 text-sm">
+                                        <option>Standard drywall</option>
+                                        <option>Concrete/masonry (+$40)</option>
+                                        <option>Not sure</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="mt-3 w-full bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors select-service-btn" data-task="closet_organizer">
+                                Select This Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Standard Policy Note -->
+        <div class="mt-8 bg-slate-50 border border-slate-200 rounded-xl p-6">
+            <h3 class="font-semibold text-lg mb-3">🔑 Standard Policy for All Tasks</h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm text-slate-700">
+                <ul class="space-y-2">
+                    <li>• Flat-rate pricing covers base scope</li>
+                    <li>• Add-ons are always quoted and approved before work begins</li>
+                </ul>
+                <ul class="space-y-2">
+                    <li>• Cancel anytime before work starts — no charge</li>
+                    <li>• Customer must supply fixtures, furniture, appliances, and hardware</li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
@@ -400,7 +1019,7 @@
     let paymentIntentId = null;
 
     // Stripe Configuration
-    const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Rz41zHQ4TkcNcqv0IXVWGjAjLo8EoSkGO2fbeINw6U23GsLSiaOsHYVSEPwlJbR2EZ515tqPDJcRPvDBYSdv2Wy00N7DPqhI3';
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
     let stripe, elements, paymentElement;
 
     const RATE = 80;
@@ -1146,15 +1765,94 @@
 
         console.log('🎯 Zapier webhook configured:', ZAPIER_CONFIG.ENABLED ? 'YES' : 'NO');
 
-        // Task selection buttons
-        document.querySelectorAll('[data-task]').forEach(btn => {
+        // Service card expand/collapse functionality
+        document.querySelectorAll('.service-header').forEach(header => {
+            header.addEventListener('click', (e) => {
+                // Don't expand if clicking on select button
+                if (e.target.classList.contains('select-service-btn')) return;
+
+                const card = header.closest('.service-card');
+                const details = card.querySelector('.service-details');
+                const icon = header.querySelector('.expand-icon');
+
+                // Close all other cards
+                document.querySelectorAll('.service-card').forEach(otherCard => {
+                    if (otherCard !== card) {
+                        const otherDetails = otherCard.querySelector('.service-details');
+                        const otherIcon = otherCard.querySelector('.expand-icon');
+                        otherDetails.classList.add('hidden');
+                        otherIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+
+                // Toggle current card
+                if (details.classList.contains('hidden')) {
+                    details.classList.remove('hidden');
+                    icon.style.transform = 'rotate(180deg)';
+                    // Scroll to card after opening
+                    setTimeout(() => {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                } else {
+                    details.classList.add('hidden');
+                    icon.style.transform = 'rotate(0deg)';
+                }
+            });
+        });
+
+        // Service selection buttons
+        document.querySelectorAll('.select-service-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card collapse
+                const taskKey = btn.getAttribute('data-task');
+                document.getElementById('taskCategory').value = taskKey;
+
+                // Collect answers from the service card questions
+                const card = btn.closest('.service-card');
+                const answers = [];
+                card.querySelectorAll('select').forEach(select => {
+                    if (select.value) {
+                        answers.push(`${select.previousElementSibling.textContent}: ${select.value}`);
+                    }
+                });
+
+                // Add answers to the description field
+                const descriptionField = document.getElementById('taskDescription');
+                if (answers.length > 0) {
+                    const currentDescription = descriptionField.value;
+                    const newDescription = answers.join('\n') + (currentDescription ? '\n\n' + currentDescription : '');
+                    descriptionField.value = newDescription;
+                }
+
+                // Scroll to booking form
+                document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+
+                // Close the service card
+                const details = card.querySelector('.service-details');
+                const icon = card.querySelector('.expand-icon');
+                details.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+
+                // Highlight the selected service briefly
+                btn.classList.add('bg-green-600');
+                btn.textContent = '✓ Service Selected';
+                setTimeout(() => {
+                    btn.classList.remove('bg-green-600');
+                    btn.classList.add('bg-indigo-600');
+                    btn.textContent = 'Select This Service';
+                }, 2000);
+            });
+        });
+
+        // Legacy task selection buttons (for any remaining simple buttons)
+        document.querySelectorAll('[data-task]:not(.select-service-btn)').forEach(btn => {
             btn.addEventListener('click', () => {
                 const taskKey = btn.getAttribute('data-task');
                 document.getElementById('taskCategory').value = taskKey;
                 document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
             });
         });
-        console.log('✅ Task selection buttons initialized');
+        console.log('✅ Service selection system initialized');
 
         // Photo upload preview
         document.getElementById('taskPhotos').addEventListener('change', (e) => {
