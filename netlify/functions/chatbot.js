@@ -1,19 +1,28 @@
-// netlify/functions/chatbot.js
+const fetch = require('node-fetch');
+
 exports.handler = async (event, context) => {
   // Handle CORS for browser requests
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      }
+      headers,
+      body: ''
     };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
 
   try {
@@ -22,7 +31,19 @@ exports.handler = async (event, context) => {
     if (!message) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'Message is required' })
+      };
+    }
+
+    // Check for API key - try both common environment variable names
+    const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+    if (!ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY or CLAUDE_API_KEY environment variable not set');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'API configuration error' })
       };
     }
 
@@ -96,20 +117,26 @@ exports.handler = async (event, context) => {
 
     // Build conversation context
     let conversationContext = knowledgeBase + "\n\nCONVERSATION HISTORY:\n";
-    conversationHistory.forEach(msg => {
-      conversationContext += `${msg.role}: ${msg.content}\n`;
-    });
+    if (conversationHistory && Array.isArray(conversationHistory)) {
+      conversationHistory.forEach(msg => {
+        if (msg.role && msg.content) {
+          conversationContext += `${msg.role}: ${msg.content}\n`;
+        }
+      });
+    }
     conversationContext += `human: ${message}`;
+
+    console.log('Making request to Claude API with model: claude-3-haiku-20240307');
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.CLAUDE_API_KEY,
+        'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-sonnet-20240229',
+        model: 'claude-3-haiku-20240307',
         max_tokens: 400,
         messages: [{
           role: 'user',
@@ -120,7 +147,7 @@ Guidelines:
 - Provide specific pricing when relevant
 - Mention service areas when location questions arise
 - Encourage booking when appropriate
-- If the question is outside your scope, offer to connect them with Franco (the owner)
+- If the question is outside your scope, offer to connect them with info@sendahandyman.com
 - Always be accurate about what services are and aren't included
 - Use the exact pricing and add-on information provided
 
@@ -132,18 +159,28 @@ assistant:`
     });
 
     if (!response.ok) {
-      throw new Error(`Claude API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Claude API error:', response.status, response.statusText);
+      console.error('Error details:', errorText);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({
+          error: 'AI service temporarily unavailable. Please try again or contact us directly at info@sendahandyman.com'
+        })
+      };
     }
 
     const result = await response.json();
-    const botReply = result.content[0].text;
+    const botReply = result.content && result.content[0] && result.content[0].text
+      ? result.content[0].text
+      : 'I apologize, but I\'m having trouble processing your request right now.';
+
+    console.log('Claude API response received successfully');
 
     return {
       statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({
         reply: botReply,
         conversationId: Date.now().toString()
@@ -152,14 +189,12 @@ assistant:`
 
   } catch (error) {
     console.error('Chatbot error:', error);
+    console.error('Error stack:', error.stack);
     return {
       statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
-      },
+      headers,
       body: JSON.stringify({
-        error: 'Sorry, I encountered an error. Please try again or contact us directly.',
+        error: 'Sorry, I encountered an error. Please try again or contact us directly at info@sendahandyman.com',
         fallback: true
       })
     };

@@ -2,14 +2,14 @@
   "name": "sendahandyman",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "netlify dev",
     "build": "echo 'No build process needed'"
   },
   "dependencies": {
     "openai": "^4.55.0",
-    "stripe": "^14.0.0"
+    "stripe": "^14.0.0",
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {
     "netlify-cli": "^17.0.0"
