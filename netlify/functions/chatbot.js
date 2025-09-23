@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-exports.handler = async (event, context) => {
+export const handler = async (event, context) => {
   // Handle CORS for browser requests
   const headers = {
     'Access-Control-Allow-Origin': '*',
