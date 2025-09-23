@@ -71,23 +71,249 @@
             60% { content: '..'; }
             80%, 100% { content: '...'; }
         }
+
+        /* Enhanced Chatbot Styling */
+        #chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        #chatbot-toggle {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #chatbot-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.6);
+            background: linear-gradient(135deg, #3730a3 0%, #6d28d9 100%);
+        }
+
+        #chatbot-toggle:active {
+            transform: translateY(-1px);
+        }
+
+        /* Pulsing animation for attention */
+        #chatbot-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: chatbot-pulse 2s infinite;
+        }
+
+        @keyframes chatbot-pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.7;
+            }
+        }
+
+        /* Icon styling */
+        #chatbot-toggle svg {
+            width: 32px;
+            height: 32px;
+            z-index: 2;
+            position: relative;
+        }
+
+        /* Help text that appears on hover */
+        #chatbot-toggle::after {
+            content: 'Need help? Click to chat!';
+            position: absolute;
+            right: 85px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        #chatbot-toggle:hover::after {
+            opacity: 1;
+            visibility: visible;
+            right: 80px;
+        }
+
+        /* Small notification badge */
+        .chatbot-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* Chat window improvements */
+        #chatbot-window {
+            width: 380px;
+            height: 500px;
+            bottom: 100px;
+            right: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Mobile hamburger menu */
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .desktop-nav {
+                display: none;
+            }
+
+            .mobile-menu.active {
+                display: block;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border-top: 1px solid #e2e8f0;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .mobile-menu a {
+                display: block;
+                padding: 12px 16px;
+                border-bottom: 1px solid #f1f5f9;
+                color: #475569;
+                text-decoration: none;
+            }
+
+            .mobile-menu a:hover {
+                background: #f8fafc;
+                color: #4f46e5;
+            }
+
+            #chatbot-container {
+                bottom: 15px;
+                right: 15px;
+            }
+
+            #chatbot-toggle {
+                width: 65px;
+                height: 65px;
+            }
+
+            #chatbot-toggle svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            #chatbot-toggle::after {
+                display: none; /* Hide help text on mobile */
+            }
+
+            #chatbot-window {
+                width: 95vw;
+                height: 70vh;
+                right: 2.5vw;
+                bottom: 85px;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
 <!-- Header -->
 <header class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-slate-100">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between relative">
         <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-9 w-auto">
             <span class="font-semibold">SendAHandyman</span>
         </a>
-        <nav class="hidden md:flex items-center gap-6 text-sm">
+
+        <!-- Desktop Navigation -->
+        <nav class="desktop-nav hidden md:flex items-center gap-6 text-sm">
             <a href="#how" class="hover:text-indigo-600">How it works</a>
             <a href="#book" class="hover:text-indigo-600">Book now</a>
             <a href="concierge.html" class="hover:text-indigo-600">Concierge</a>
             <a href="#coverage" class="hover:text-indigo-600">Coverage</a>
             <a href="#faq" class="hover:text-indigo-600">FAQ</a>
         </nav>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn md:hidden p-2" id="mobile-menu-btn">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#how">How it works</a>
+            <a href="#book">Book now</a>
+            <a href="concierge.html">Concierge</a>
+            <a href="#coverage">Coverage</a>
+            <a href="#faq">FAQ</a>
+        </div>
+
         <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
     </div>
 </header>
@@ -777,17 +1003,18 @@
     </div>
 </section>
 
-<!-- Chatbot UI -->
+<!-- Enhanced Chatbot UI -->
 <div id="chatbot-container" class="fixed bottom-4 right-4 z-50">
-    <!-- Chat Button -->
-    <button id="chatbot-toggle" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 ease-in-out">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Chat Button with notification badge -->
+    <button id="chatbot-toggle" class="relative">
+        <div class="chatbot-notification">!</div>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
         </svg>
     </button>
 
     <!-- Chat Window -->
-    <div id="chatbot-window" class="hidden absolute bottom-16 right-0 w-80 h-96 bg-white rounded-lg shadow-2xl border border-slate-200 flex flex-col">
+    <div id="chatbot-window" class="hidden absolute bottom-16 right-0 bg-white rounded-lg shadow-2xl border border-slate-200 flex flex-col">
         <!-- Chat Header -->
         <div class="bg-indigo-600 text-white p-4 rounded-t-lg flex items-center justify-between">
             <div>
@@ -1193,6 +1420,34 @@
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2, 8);
         return `TASK-${timestamp}-${random}`.toUpperCase();
+    }
+
+    // Send SMS notification via Twilio
+    async function sendSMSNotification(type, data) {
+        try {
+            console.log(`📱 Sending ${type} SMS notification...`);
+            const response = await fetch('/.netlify/functions/send-sms', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: type,
+                    data: data
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log(`✅ ${type} SMS sent successfully:`, result.messageSid);
+                return { success: true, data: result };
+            } else {
+                const error = await response.json();
+                console.log(`⚠️ SMS ${type} failed:`, error.error);
+                return { success: false, error: error.error };
+            }
+        } catch (error) {
+            console.error(`❌ SMS ${type} error:`, error);
+            return { success: false, error: error.message };
+        }
     }
 
     // Send notification via Zapier Webhook
@@ -1910,6 +2165,19 @@
             window: completeJobData.window
         });
 
+        // Send SMS confirmation to customer
+        try {
+            await sendSMSNotification('booking_confirmation', {
+                customer_phone: completeJobData.phone,
+                task_id: taskId,
+                service_name: TASKS[completeJobData.category]?.label,
+                time_window: TIME_WINDOWS[completeJobData.window],
+                total_amount: selectedPricingOption.pricing.total.toFixed(0)
+            });
+        } catch (smsError) {
+            console.log('📱 SMS failed but continuing:', smsError);
+        }
+
         // Send Zapier notification
         let zapierResult = null;
         try {
@@ -1948,6 +2216,30 @@
         document.getElementById('finalTaskId').textContent = taskId;
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
+    }
+
+    // Mobile Menu functionality
+    function initializeMobileMenu() {
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
     }
 
     // Chatbot functionality
@@ -2123,6 +2415,9 @@
         initializeStripe();
 
         console.log('🎯 Zapier webhook configured:', ZAPIER_CONFIG.ENABLED ? 'YES' : 'NO');
+
+        // Initialize mobile menu
+        initializeMobileMenu();
 
         // Service card expand/collapse functionality (now informational only)
         document.querySelectorAll('.service-card').forEach(card => {
