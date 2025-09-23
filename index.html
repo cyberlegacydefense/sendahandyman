@@ -1961,6 +1961,7 @@
         selectedPricingOption.pricing = updatedPricing;
 
         document.getElementById('paymentAmount').textContent = '$' + updatedPricing.total.toFixed(0);
+        document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
 
         // Initialize Stripe Elements
         try {
