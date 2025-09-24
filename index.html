@@ -2502,38 +2502,51 @@
         // Initialize mobile menu
         initializeMobileMenu();
 
-        // Service card expand/collapse functionality (now informational only)
+        // Service card expand/collapse functionality
         document.querySelectorAll('.service-card').forEach(card => {
-            card.addEventListener('click', (e) => {
+            const header = card.querySelector('.service-header');
+            header.addEventListener('click', (e) => {
                 const taskKey = card.getAttribute('data-task');
                 const details = card.querySelector('.service-details');
                 const icon = card.querySelector('.expand-icon');
 
-                // Close all other cards
+                // Close all other cards first
                 document.querySelectorAll('.service-card').forEach(otherCard => {
                     if (otherCard !== card) {
                         const otherDetails = otherCard.querySelector('.service-details');
                         const otherIcon = otherCard.querySelector('.expand-icon');
-                        otherDetails.classList.add('hidden');
-                        otherIcon.style.transform = 'rotate(0deg)';
+                        if (otherDetails) {
+                            otherDetails.classList.add('hidden');
+                        }
+                        if (otherIcon) {
+                            otherIcon.style.transform = 'rotate(0deg)';
+                        }
                     }
                 });
 
                 // Toggle current card
-                if (details.classList.contains('hidden')) {
-                    details.classList.remove('hidden');
-                    icon.style.transform = 'rotate(180deg)';
+                if (details && icon) {
+                    if (details.classList.contains('hidden')) {
+                        details.classList.remove('hidden');
+                        icon.style.transform = 'rotate(180deg)';
 
-                    // Auto-select this task in the form and scroll to booking
-                    document.getElementById('taskCategory').value = taskKey;
-                    showTaskQuestions(taskKey); // Show dynamic Q&A
+                        // Auto-select this task in the form and scroll to booking
+                        const taskSelect = document.getElementById('taskCategory');
+                        if (taskSelect) {
+                            taskSelect.value = taskKey;
+                            showTaskQuestions(taskKey);
+                        }
 
-                    setTimeout(() => {
-                        document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
-                    }, 500);
-                } else {
-                    details.classList.add('hidden');
-                    icon.style.transform = 'rotate(0deg)';
+                        setTimeout(() => {
+                            const bookSection = document.getElementById('book');
+                            if (bookSection) {
+                                bookSection.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }, 500);
+                    } else {
+                        details.classList.add('hidden');
+                        icon.style.transform = 'rotate(0deg)';
+                    }
                 }
             });
         });
