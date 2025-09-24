@@ -209,42 +209,53 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         }
 
-        /* Mobile menu styles - UPDATED */
+        /* Mobile hamburger menu */
+        .mobile-menu-btn {
+            display: none;
+        }
+
         .mobile-menu {
             display: none;
         }
 
-        .mobile-menu.active {
-            display: block;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-        }
-
-        .mobile-menu a {
-            display: block;
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #475569;
-            text-decoration: none;
-        }
-
-        .mobile-menu a:hover {
-            background: #f8fafc;
-            color: #4f46e5;
-        }
-
-        /* Mobile responsiveness - UPDATED */
+        /* Mobile responsiveness - ONLY ADDED TWO-ROW MOBILE HEADER STYLES */
         @media (max-width: 768px) {
-            /* Adjust header padding for mobile to accommodate two rows */
-            header .max-w-6xl > div {
-                padding-top: 0.5rem;
-                padding-bottom: 0.5rem;
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .desktop-nav {
+                display: none;
+            }
+
+            .mobile-menu.active {
+                display: block;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                border-top: 1px solid #e2e8f0;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                z-index: 50;
+            }
+
+            .mobile-menu a {
+                display: block;
+                padding: 12px 16px;
+                border-bottom: 1px solid #f1f5f9;
+                color: #475569;
+                text-decoration: none;
+            }
+
+            .mobile-menu a:hover {
+                background: #f8fafc;
+                color: #4f46e5;
+            }
+
+            /* Two-row mobile header spacing */
+            .mobile-header-row-2 {
+                margin-top: 0.5rem;
             }
 
             #chatbot-container {
@@ -276,7 +287,7 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-<!-- Header - UPDATED WITH TWO-ROW MOBILE LAYOUT -->
+<!-- Header - MODIFIED FOR TWO-ROW MOBILE LAYOUT -->
 <header class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-slate-100">
     <div class="max-w-6xl mx-auto px-4 py-3 relative">
         <!-- Desktop Layout -->
@@ -287,7 +298,7 @@
             </a>
 
             <!-- Desktop Navigation -->
-            <nav class="flex items-center gap-6 text-sm">
+            <nav class="desktop-nav flex items-center gap-6 text-sm">
                 <a href="#how" class="hover:text-indigo-600">How it works</a>
                 <a href="#book" class="hover:text-indigo-600">Book now</a>
                 <a href="concierge.html" class="hover:text-indigo-600">Concierge</a>
@@ -298,30 +309,31 @@
             <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
         </div>
 
-        <!-- Mobile Layout - TWO ROWS -->
+        <!-- Mobile Layout - Two Rows -->
         <div class="md:hidden">
-            <!-- Top row: Logo and Menu Button -->
+            <!-- Row 1: Logo + Hamburger -->
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
-                    <span class="font-semibold text-sm">SendAHandyman</span>
+                    <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-9 w-auto">
+                    <span class="font-semibold">SendAHandyman</span>
                 </a>
 
-                <button class="p-2" id="mobile-menu-btn">
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn p-2" id="mobile-menu-btn">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
             </div>
 
-            <!-- Second row: Action button -->
-            <div class="mt-2 flex justify-center">
+            <!-- Row 2: Book Button -->
+            <div class="mobile-header-row-2 flex justify-center">
                 <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
             </div>
         </div>
 
-        <!-- Mobile Menu Dropdown -->
-        <div class="mobile-menu md:hidden" id="mobile-menu">
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobile-menu">
             <a href="#how">How it works</a>
             <a href="#book">Book now</a>
             <a href="concierge.html">Concierge</a>
@@ -2502,51 +2514,101 @@
         // Initialize mobile menu
         initializeMobileMenu();
 
-        // Service card expand/collapse functionality
+        // Service card expand/collapse functionality - CRITICAL FUNCTIONALITY RESTORED
         document.querySelectorAll('.service-card').forEach(card => {
-            const header = card.querySelector('.service-header');
-            header.addEventListener('click', (e) => {
+            card.addEventListener('click', (e) => {
                 const taskKey = card.getAttribute('data-task');
                 const details = card.querySelector('.service-details');
                 const icon = card.querySelector('.expand-icon');
 
-                // Close all other cards first
+                // Close all other cards
                 document.querySelectorAll('.service-card').forEach(otherCard => {
                     if (otherCard !== card) {
                         const otherDetails = otherCard.querySelector('.service-details');
                         const otherIcon = otherCard.querySelector('.expand-icon');
-                        if (otherDetails) {
-                            otherDetails.classList.add('hidden');
-                        }
-                        if (otherIcon) {
-                            otherIcon.style.transform = 'rotate(0deg)';
-                        }
+                        otherDetails.classList.add('hidden');
+                        otherIcon.style.transform = 'rotate(0deg)';
                     }
                 });
 
                 // Toggle current card
-                if (details && icon) {
-                    if (details.classList.contains('hidden')) {
-                        details.classList.remove('hidden');
-                        icon.style.transform = 'rotate(180deg)';
+                if (details.classList.contains('hidden')) {
+                    details.classList.remove('hidden');
+                    icon.style.transform = 'rotate(180deg)';
 
-                        // Auto-select this task in the form and scroll to booking
-                        const taskSelect = document.getElementById('taskCategory');
-                        if (taskSelect) {
-                            taskSelect.value = taskKey;
-                            showTaskQuestions(taskKey);
-                        }
+                    // Auto-select this task in the form and scroll to booking
+                    document.getElementById('taskCategory').value = taskKey;
+                    showTaskQuestions(taskKey); // Show dynamic Q&A
 
-                        setTimeout(() => {
-                            const bookSection = document.getElementById('book');
-                            if (bookSection) {
-                                bookSection.scrollIntoView({ behavior: 'smooth' });
-                            }
-                        }, 500);
-                    } else {
-                        details.classList.add('hidden');
-                        icon.style.transform = 'rotate(0deg)';
-                    }
+                    setTimeout(() => {
+                        document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                } else {
+                    details.classList.add('hidden');
+                    icon.style.transform = 'rotate(0deg)';
                 }
             });
         });
+
+        // Task dropdown change handler
+        document.getElementById('taskCategory').addEventListener('change', (e) => {
+            const taskKey = e.target.value;
+            if (taskKey) {
+                showTaskQuestions(taskKey);
+            } else {
+                document.getElementById('taskQuestions').classList.add('hidden');
+            }
+        });
+
+        console.log('✅ Service selection system initialized');
+
+        // Photo upload preview
+        document.getElementById('taskPhotos').addEventListener('change', (e) => {
+            const thumbs = document.getElementById('photoThumbs');
+            thumbs.innerHTML = '';
+            [...e.target.files].slice(0, 5).forEach(file => {
+                const url = URL.createObjectURL(file);
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'h-16 w-16 object-cover rounded-lg border';
+                thumbs.appendChild(img);
+            });
+        });
+
+        // STEP 3: Get Estimate Button
+        document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
+
+        // STEP 4: Reserve Button
+        document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
+
+        // Payment form
+        document.getElementById('paymentForm').addEventListener('submit', processPayment);
+
+        // Close payment modal
+        document.getElementById('closePayment').addEventListener('click', () => {
+            document.getElementById('paymentModal').classList.add('hidden');
+        });
+
+        // STEP 5: Task Info Form
+        document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+
+        // Final success close
+        document.getElementById('closeFinalSuccess').addEventListener('click', () => {
+            document.getElementById('finalSuccessModal').classList.add('hidden');
+            location.reload(); // Reset for new booking
+        });
+
+        // Set current year and version
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('version').textContent = APP_VERSION;
+
+        console.log('🎯 All event listeners initialized successfully');
+
+        // Initialize chatbot
+        initializeChatbot();
+    });
+
+    console.log('📜 JavaScript finished loading');
+</script>
+</body>
+</html>
