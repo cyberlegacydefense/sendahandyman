@@ -745,6 +745,49 @@
                 </div>
             </div>
 
+            <!-- General Handyman Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="general_handyman">
+                <div class="service-header p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">🔧 General Handyman (2+ hours)</h3>
+                            <p class="text-sm text-slate-600">~2.0 hr minimum • Starting at $160</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-slate-700">
+                                    <li>• 2-hour minimum for general repairs & tasks</li>
+                                    <li>• Basic tools and hardware</li>
+                                    <li>• Multiple small tasks or one larger project</li>
+                                    <li>• Troubleshooting and problem-solving</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Add-on Options:</h4>
+                                <ul class="text-sm space-y-1 text-slate-700">
+                                    <li>• +$180: Additional 3-hour block (discounted rate)</li>
+                                    <li>• +$360: Two additional 3-hour blocks (6 hours total)</li>
+                                    <li>• Materials and parts charged separately</li>
+                                    <li>• Specialized trades (plumbing/electrical) not included</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                            <p class="text-sm text-amber-700"><strong>Perfect for:</strong> Touch-up painting, caulking, door adjustments, squeaky hinges, loose handles, weatherstripping, minor drywall repairs, picture hanging, shelf brackets, cabinet adjustments, and other miscellaneous tasks.</p>
+                        </div>
+                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-sm text-blue-700">Click to select this service and specify your tasks in the booking form.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Standard Policy Note -->
@@ -808,6 +851,7 @@
                         <option value="appliance_hookup">Appliance hookup (W/D/DW)</option>
                         <option value="furniture_assembly">Furniture assembly (small–medium)</option>
                         <option value="closet_organizer">Closet organizer install</option>
+                        <option value="general_handyman">General handyman (2+ hours)</option>
                         <option value="minor_repairs">Minor repairs</option>
                     </select>
                 </div>
@@ -1401,6 +1445,39 @@
                         { value: 'drywall', label: 'Standard drywall', addon: 0 },
                         { value: 'masonry', label: 'Concrete/masonry', addon: 40 },
                         { value: 'unsure', label: 'Not sure', addon: 0 }
+                    ]
+                }
+            ]
+        },
+        general_handyman: {
+            hours: 2.0,
+            label: "General Handyman (2+ hours)",
+            questions: [
+                {
+                    id: 'task_complexity',
+                    label: 'What type of tasks do you need done?',
+                    options: [
+                        { value: 'basic', label: 'Basic repairs, adjustments, or maintenance', addon: 0 },
+                        { value: 'multiple', label: 'Multiple small tasks or repairs', addon: 0 },
+                        { value: 'complex', label: 'More complex projects requiring planning', addon: 0 }
+                    ]
+                },
+                {
+                    id: 'additional_time',
+                    label: 'Do you need additional time beyond 2 hours?',
+                    options: [
+                        { value: 'none', label: 'No, 2 hours should be sufficient', addon: 0 },
+                        { value: 'one_block', label: 'Yes, add 3 more hours (+$180)', addon: 180 },
+                        { value: 'two_blocks', label: 'Yes, add 6 more hours (+$360)', addon: 360 }
+                    ]
+                },
+                {
+                    id: 'materials_needed',
+                    label: 'Will materials or parts be needed?',
+                    options: [
+                        { value: 'customer_supplies', label: 'I will provide all materials', addon: 0 },
+                        { value: 'basic_supplies', label: 'May need basic supplies (screws, caulk, etc.)', addon: 0 },
+                        { value: 'unsure', label: 'Not sure what will be needed', addon: 0 }
                     ]
                 }
             ]
