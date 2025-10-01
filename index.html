@@ -1176,6 +1176,30 @@
     const PREMIUM_RUSH = 0.10;
     const PREMIUM_SOONER = 0.20;
     const DISCOUNT_LATER = 0.10;
+    const DISCOUNT_FLEXIBLE = 0.15;
+
+
+    // Function to determine if a time window is in the future
+    function isTimeWindowAvailable(windowKey) {
+    const now = new Date();
+    const currentHour = now.getHours();
+
+    if (windowKey.startsWith('today_')) {
+        if (windowKey === 'today_am' && currentHour >= 12) return false;
+        if (windowKey === 'today_pm' && currentHour >= 16) return false;
+        if (windowKey === 'today_eve' && currentHour >= 20) return false;
+    }
+
+    return true; // Tomorrow slots are always available
+    }
+
+    // Function to get available time windows
+    function getAvailableTimeWindows() {
+        return Object.keys(TIME_WINDOWS).filter(isTimeWindowAvailable);
+    }
+
+
+
 
     const TASKS = {
         tv_mount: {
