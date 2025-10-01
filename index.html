@@ -72,6 +72,43 @@
             80%, 100% { content: '...'; }
         }
 
+        /* Image Carousel Styles */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+        }
+
+        .carousel-track {
+            display: flex;
+            animation: carousel-scroll 24s linear infinite;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            aspect-ratio: 16/9;
+            background-size: cover;
+            background-position: center;
+        }
+
+        @keyframes carousel-scroll {
+            0% { transform: translateX(0); }
+            16.66% { transform: translateX(0); }
+            20% { transform: translateX(-100%); }
+            36.66% { transform: translateX(-100%); }
+            40% { transform: translateX(-200%); }
+            56.66% { transform: translateX(-200%); }
+            60% { transform: translateX(-300%); }
+            76.66% { transform: translateX(-300%); }
+            80% { transform: translateX(-400%); }
+            96.66% { transform: translateX(-400%); }
+            100% { transform: translateX(-500%); }
+        }
+
+        .carousel-container:hover .carousel-track {
+            animation-play-state: paused;
+        }
+
         /* Enhanced Chatbot Styling */
         #chatbot-container {
             position: fixed;
@@ -107,7 +144,6 @@
             transform: translateY(-1px);
         }
 
-        /* Pulsing animation for attention */
         #chatbot-toggle::before {
             content: '';
             position: absolute;
@@ -135,7 +171,6 @@
             }
         }
 
-        /* Icon styling */
         #chatbot-toggle svg {
             width: 32px;
             height: 32px;
@@ -143,7 +178,6 @@
             position: relative;
         }
 
-        /* Help text that appears on hover */
         #chatbot-toggle::after {
             content: 'Need help? Click to chat!';
             position: absolute;
@@ -168,7 +202,6 @@
             right: 80px;
         }
 
-        /* Small notification badge */
         .chatbot-notification {
             position: absolute;
             top: -5px;
@@ -198,7 +231,6 @@
             }
         }
 
-        /* Chat window improvements */
         #chatbot-window {
             width: 380px;
             height: 500px;
@@ -209,7 +241,6 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
         }
 
-        /* Mobile hamburger menu */
         .mobile-menu-btn {
             display: none;
         }
@@ -218,7 +249,6 @@
             display: none;
         }
 
-        /* Mobile responsiveness - ONLY ADDED TWO-ROW MOBILE HEADER STYLES */
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
@@ -253,7 +283,6 @@
                 color: #4f46e5;
             }
 
-            /* Two-row mobile header spacing */
             .mobile-header-row-2 {
                 margin-top: 0.5rem;
             }
@@ -274,7 +303,7 @@
             }
 
             #chatbot-toggle::after {
-                display: none; /* Hide help text on mobile */
+                display: none;
             }
 
             #chatbot-window {
@@ -287,7 +316,7 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
-<!-- Header - MODIFIED FOR TWO-ROW MOBILE LAYOUT -->
+<!-- Header -->
 <header class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-slate-100">
     <div class="max-w-6xl mx-auto px-4 py-3 relative">
         <!-- Desktop Layout -->
@@ -297,7 +326,6 @@
                 <span class="font-semibold">SendAHandyman</span>
             </a>
 
-            <!-- Desktop Navigation -->
             <nav class="desktop-nav flex items-center gap-6 text-sm">
                 <a href="#how" class="hover:text-indigo-600">How it works</a>
                 <a href="#book" class="hover:text-indigo-600">Book now</a>
@@ -309,16 +337,14 @@
             <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
         </div>
 
-        <!-- Mobile Layout - Two Rows -->
+        <!-- Mobile Layout -->
         <div class="md:hidden">
-            <!-- Row 1: Logo + Hamburger -->
             <div class="flex items-center justify-between">
                 <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
                     <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-9 w-auto">
                     <span class="font-semibold">SendAHandyman</span>
                 </a>
 
-                <!-- Mobile Menu Button -->
                 <button class="mobile-menu-btn p-2" id="mobile-menu-btn">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -326,13 +352,11 @@
                 </button>
             </div>
 
-            <!-- Row 2: Book Button -->
             <div class="mobile-header-row-2 flex justify-center">
                 <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
             </div>
         </div>
 
-        <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobile-menu">
             <a href="#how">How it works</a>
             <a href="#book">Book now</a>
@@ -361,7 +385,16 @@
             </div>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
-            <div class="aspect-video rounded-xl bg-[url('/images/Ceiling_Fan_Installation.png')] bg-cover bg-center"></div>
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <div class="carousel-slide" style="background-image: url('/images/Ceiling_Fan_Installation.png')"></div>
+                    <div class="carousel-slide" style="background-image: url('/images/Mounting_TV.png')"></div>
+                    <div class="carousel-slide" style="background-image: url('/images/Assembling_Furniture.png')"></div>
+                    <div class="carousel-slide" style="background-image: url('/images/Installing_Blinds.png')"></div>
+                    <div class="carousel-slide" style="background-image: url('/images/Installing_Faucet.png')"></div>
+                    <div class="carousel-slide" style="background-image: url('/images/Smart_Doorbell_Installation.png')"></div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -858,11 +891,7 @@
                 <div>
                     <label class="text-sm font-semibold">Preferred timing</label>
                     <select id="taskWindow" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
-                        <option value="today_am">Today (8–12)</option>
-                        <option value="today_pm">Today (12–4)</option>
-                        <option value="today_eve">Today (4–8)</option>
-                        <option value="tomorrow_am">Tomorrow (8–12)</option>
-                        <option value="tomorrow_pm">Tomorrow (12–4)</option>
+                        <option value="flexible">I'm flexible (lowest price)</option>
                     </select>
                 </div>
             </div>
@@ -891,21 +920,18 @@
                 <label for="rushOption" class="text-sm">Optional rush (+10%)</label>
             </div>
 
-            <!-- Disclaimer about add-ons -->
             <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p class="text-sm text-amber-800">
                     <strong>⚠️ Important:</strong> The final price may include additional charges if site conditions differ from what's described above (e.g., non-standard materials, unexpected complications, etc.). Your technician will always get approval before performing any add-on work.
                 </p>
             </div>
 
-            <!-- STEP 3: Get Instant Estimate Button with Progress -->
             <div class="mt-6">
                 <button type="button" id="getEstimateBtn" class="relative w-full overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-75">
                     <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
                     <span id="estimateText" class="relative z-10">🔧 Get pricing options</span>
                 </button>
 
-                <!-- Progress Bar Below Button -->
                 <div id="progressContainer" class="mt-3 hidden">
                     <div class="w-full bg-slate-200 rounded-full h-2">
                         <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -915,15 +941,18 @@
             </div>
         </div>
 
-        <!-- AI Estimate Panel (Shows after Step 3 completes) -->
+        <!-- AI Estimate Panel -->
         <aside id="estimatePanel" class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 hidden">
             <h3 class="text-xl font-bold">Choose your timing & price</h3>
-            <p class="text-sm text-slate-600 mb-6">Select your preferred option. All prices include everything.</p>
+            <p class="text-sm text-slate-600 mb-2">Select your preferred option. All prices include everything.</p>
 
-            <!-- Pricing Options Container -->
-            <div id="pricingOptions" class="space-y-4 mb-6">
-                <!-- Options will be dynamically inserted here -->
+            <div id="flexibleNotice" class="hidden mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p class="text-sm text-green-700">
+                    💡 <strong>Great choice!</strong> You selected "I'm flexible" so we've automatically found the best value timing for you with an extra 15% discount.
+                </p>
             </div>
+
+            <div id="pricingOptions" class="space-y-4 mb-6"></div>
 
             <div class="mt-4">
                 <h4 class="font-semibold">What we'll do</h4>
@@ -941,7 +970,7 @@
     </div>
 </section>
 
-<!-- STEP 4: Payment Modal -->
+<!-- Payment Modal -->
 <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
@@ -959,17 +988,15 @@
 
         <form id="paymentForm">
             <div id="stripe-payment-element" class="mb-4"></div>
-
             <button id="submitPayment" type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold disabled:opacity-50 transition-all">
                 <span id="paymentButtonText">Complete Payment</span>
             </button>
-
             <div id="paymentMessage" class="mt-4 text-sm hidden"></div>
         </form>
     </div>
 </div>
 
-<!-- STEP 5: Task Information Modal (Shows after payment approved) -->
+<!-- Task Information Modal -->
 <div id="taskInfoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
         <div class="text-center mb-6">
@@ -981,7 +1008,6 @@
         </div>
 
         <form id="taskInfoForm">
-            <!-- Pre-populated fields from Step 2 -->
             <div class="bg-slate-50 rounded-lg p-4 mb-6">
                 <h4 class="font-semibold mb-3">Job Summary (from your request)</h4>
                 <div class="text-sm space-y-1">
@@ -1031,7 +1057,7 @@
     </div>
 </div>
 
-<!-- STEP 6: Final Success Modal -->
+<!-- Final Success Modal -->
 <div id="finalSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
         <div class="text-6xl mb-4">🚀</div>
@@ -1072,9 +1098,8 @@
     </div>
 </section>
 
-<!-- Enhanced Chatbot UI -->
+<!-- Chatbot -->
 <div id="chatbot-container" class="fixed bottom-4 right-4 z-50">
-    <!-- Chat Button with notification badge -->
     <button id="chatbot-toggle" class="relative">
         <div class="chatbot-notification">!</div>
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1082,9 +1107,7 @@
         </svg>
     </button>
 
-    <!-- Chat Window -->
     <div id="chatbot-window" class="hidden absolute bottom-16 right-0 bg-white rounded-lg shadow-2xl border border-slate-200 flex flex-col">
-        <!-- Chat Header -->
         <div class="bg-indigo-600 text-white p-4 rounded-t-lg flex items-center justify-between">
             <div>
                 <h3 class="font-semibold">SendAHandyman Help</h3>
@@ -1097,7 +1120,6 @@
             </button>
         </div>
 
-        <!-- Chat Messages -->
         <div id="chatbot-messages" class="flex-1 p-4 overflow-y-auto space-y-3">
             <div class="flex items-start space-x-2">
                 <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0">
@@ -1111,22 +1133,10 @@
             </div>
         </div>
 
-        <!-- Chat Input -->
         <div class="border-t border-slate-200 p-4">
             <div class="flex space-x-2">
-                <input
-                        type="text"
-                        id="chatbot-input"
-                        placeholder="Type your question..."
-                        class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        maxlength="500"
-                />
-                <button
-                        id="chatbot-send"
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    Send
-                </button>
+                <input type="text" id="chatbot-input" placeholder="Type your question..." class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="500" />
+                <button id="chatbot-send" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Send</button>
             </div>
         </div>
     </div>
@@ -1150,20 +1160,19 @@
 <script>
     console.log('📜 JavaScript started loading...');
 
-    // ZAPIER WEBHOOK CONFIGURATION - UPDATE THESE VALUES
+    // ZAPIER WEBHOOK CONFIGURATION
     const ZAPIER_CONFIG = {
-        WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24412806/uh8lvew/', // ⚠️ REPLACE with your actual Zapier webhook URL
-        ENABLED: true // ⚠️ Change to true once you've set up your Zapier webhook
+        WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24412806/uh8lvew/',
+        ENABLED: true
     };
 
-    // GLOBAL STATE - Persisted in memory
+    // GLOBAL STATE
     let formData = {};
     let estimateData = {};
     let selectedPricingOption = null;
     let paymentIntentId = null;
-    let paymentElementReady = false; // Track payment element readiness
+    let paymentElementReady = false;
 
-    // App version (update when package.json changes)
     const APP_VERSION = "1.0.0";
 
     // Stripe Configuration
@@ -1178,28 +1187,24 @@
     const DISCOUNT_LATER = 0.10;
     const DISCOUNT_FLEXIBLE = 0.15;
 
-
     // Function to determine if a time window is in the future
     function isTimeWindowAvailable(windowKey) {
-    const now = new Date();
-    const currentHour = now.getHours();
+        const now = new Date();
+        const currentHour = now.getHours();
 
-    if (windowKey.startsWith('today_')) {
-        if (windowKey === 'today_am' && currentHour >= 12) return false;
-        if (windowKey === 'today_pm' && currentHour >= 16) return false;
-        if (windowKey === 'today_eve' && currentHour >= 20) return false;
-    }
+        if (windowKey.startsWith('today_')) {
+            if (windowKey === 'today_am' && currentHour >= 12) return false;
+            if (windowKey === 'today_pm' && currentHour >= 16) return false;
+            if (windowKey === 'today_eve' && currentHour >= 20) return false;
+        }
 
-    return true; // Tomorrow slots are always available
+        return true;
     }
 
     // Function to get available time windows
     function getAvailableTimeWindows() {
         return Object.keys(TIME_WINDOWS).filter(isTimeWindowAvailable);
     }
-
-
-
 
     const TASKS = {
         tv_mount: {
@@ -1367,7 +1372,7 @@
                     options: [
                         { value: 'standard', label: '1-2 shelves (included)', addon: 0 },
                         { value: 'medium', label: '3-4 shelves', addon: 40 },
-                        { value: 'large', label: '5+ shelves', addon: 80 }
+                        { value: 'large', label: '5+ items', addon: 80 }
                     ]
                 },
                 {
@@ -1517,16 +1522,6 @@
         tomorrow_pm: "Tomorrow (12–4)"
     };
 
-    // Time window mapping for sooner/later options
-    const TIME_MAPPING = {
-        today_am: { sooner: null, later: 'today_pm' },
-        today_pm: { sooner: 'today_am', later: 'today_eve' },
-        today_eve: { sooner: 'today_pm', later: 'tomorrow_am' },
-        tomorrow_am: { sooner: 'today_eve', later: 'tomorrow_pm' },
-        tomorrow_pm: { sooner: 'tomorrow_am', later: null }
-    };
-
-    // Debug logging function
     function debugPricingFlow(step, data) {
         console.log(`🔍 PRICING DEBUG [${step}]:`, {
             selectedOption: selectedPricingOption?.type,
@@ -1536,7 +1531,6 @@
         });
     }
 
-    // Initialize Stripe with error handling
     function initializeStripe() {
         if (typeof Stripe !== 'undefined') {
             if (!STRIPE_PUBLISHABLE_KEY.includes('YOUR_ACTUAL_STRIPE_KEY_HERE')) {
@@ -1555,14 +1549,12 @@
         }
     }
 
-    // Generate unique task ID
     function generateTaskId() {
         const timestamp = Date.now().toString(36);
         const random = Math.random().toString(36).substring(2, 8);
         return `TASK-${timestamp}-${random}`.toUpperCase();
     }
 
-    // Send SMS notification via Twilio
     async function sendSMSNotification(type, data) {
         try {
             console.log(`📱 Sending ${type} SMS notification...`);
@@ -1590,62 +1582,43 @@
         }
     }
 
-    // Send notification via Zapier Webhook
     async function sendZapierNotification(jobData) {
         if (!ZAPIER_CONFIG.ENABLED || ZAPIER_CONFIG.WEBHOOK_URL.includes('YOUR_ZAPIER_WEBHOOK_ID')) {
             console.log('⚠️ Zapier webhook not configured - skipping notification');
             return { success: false, message: 'Webhook not configured' };
         }
 
-        // Prepare data for Zapier - clean and formatted
         const zapierData = {
-            // Core job information
             task_id: jobData.task_id,
             timestamp: new Date().toISOString(),
-
-            // Customer details
             customer_name: jobData.name,
             customer_phone: jobData.phone,
             customer_email: jobData.email,
             customer_zip: jobData.zip,
             customer_address: jobData.address || '',
-
-            // Job details
             task_category: jobData.category,
             task_category_label: TASKS[jobData.category]?.label || jobData.category,
             time_window: jobData.window,
             description: jobData.description || 'None provided',
             rush_service: jobData.rush,
-
-            // Pricing
             estimated_hours: jobData.estimated_hours,
             base_amount: jobData.base_amount,
             total_amount: jobData.total_amount,
             total_amount_formatted: '$' + jobData.total_amount.toFixed(2),
             premiums_applied: jobData.premiums?.map(p => p.label).join(', ') || 'None',
-
-            // Property and access
             property_address: jobData.property_address,
             contact_phone: jobData.contact_phone,
             access_details: jobData.access_details || 'None provided',
             pets_and_special: jobData.pets_and_special || 'None provided',
             additional_details: jobData.additional_details || 'None provided',
-
-            // Technical details
             payment_intent_id: jobData.payment_intent_id,
             step_scope: jobData.step_scope?.join(' • ') || 'Standard scope',
             risk_flags: jobData.risk_flags?.join(' • ') || 'No special risks noted',
-
-            // Business data
             notification_email: 'info@sendahandyman.com'
         };
 
         try {
             console.log('📧 Sending notification via Zapier webhook...');
-            console.log('🔗 Webhook URL:', ZAPIER_CONFIG.WEBHOOK_URL);
-            console.log('📦 Data being sent:', zapierData);
-
-            // Try sending as URL-encoded form data (traditional POST)
             const params = new URLSearchParams();
             Object.keys(zapierData).forEach(key => {
                 params.append(key, zapierData[key]);
@@ -1673,7 +1646,6 @@
         }
     }
 
-    // Dynamic Q&A functionality
     function showTaskQuestions(taskKey) {
         const task = TASKS[taskKey];
         const questionsSection = document.getElementById('taskQuestions');
@@ -1699,13 +1671,11 @@
             select.id = `question_${question.id}`;
             select.addEventListener('change', updateEstimateWithAddons);
 
-            // Add default option
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Please select...';
             select.appendChild(defaultOption);
 
-            // Add question options
             question.options.forEach(option => {
                 const optionElement = document.createElement('option');
                 optionElement.value = option.value;
@@ -1722,7 +1692,6 @@
         questionsSection.classList.remove('hidden');
     }
 
-    // Calculate add-ons from Q&A answers
     function calculateAddons(taskKey) {
         const task = TASKS[taskKey];
         if (!task || !task.questions) return 0;
@@ -1744,20 +1713,18 @@
         return totalAddons;
     }
 
-    // Update pricing with add-ons (for real-time feedback)
     function updateEstimateWithAddons() {
         const taskKey = document.getElementById('taskCategory').value;
         if (!taskKey) return;
 
         const addons = calculateAddons(taskKey);
-        // This function provides real-time feedback but final pricing happens in generateEstimate
         console.log('Current add-ons total:', addons);
     }
 
     function calculatePricing(hours, window, rush, addons = 0) {
         const base = hours * RATE;
         let premiums = [];
-        let total = base + addons; // Add the add-ons to the base
+        let total = base + addons;
 
         const sameDay = window.startsWith('today');
         const evening = window.includes('eve');
@@ -1787,7 +1754,6 @@
         return { base, premiums, total, addons };
     }
 
-    // STEP 2: Persist form data in memory
     function saveFormData() {
         console.log('💾 Saving form data...');
 
@@ -1807,7 +1773,6 @@
         return formData;
     }
 
-    // STEP 3: Progress animation and AI estimate
     function showEstimateProgress() {
         const btn = document.getElementById('getEstimateBtn');
         const progressBg = document.getElementById('progressBg');
@@ -1819,14 +1784,12 @@
         btn.disabled = true;
         container.classList.remove('hidden');
 
-        // Stage 1: Start (25%)
         text.textContent = '📤 Uploading photos...';
         message.textContent = 'Uploading photos and analyzing task...';
         progressBg.style.transform = 'translateX(-75%)';
         bar.style.width = '25%';
 
         setTimeout(() => {
-            // Stage 2: Processing (60%)
             text.textContent = '🤖 AI analyzing...';
             message.textContent = 'AI is analyzing your photos and requirements...';
             progressBg.style.transform = 'translateX(-40%)';
@@ -1834,7 +1797,6 @@
         }, 1500);
 
         setTimeout(() => {
-            // Stage 3: Finalizing (90%)
             text.textContent = '💭 Generating options...';
             message.textContent = 'Creating your pricing options...';
             progressBg.style.transform = 'translateX(-10%)';
@@ -1842,7 +1804,6 @@
         }, 3000);
 
         setTimeout(() => {
-            // Stage 4: Complete (100%)
             text.textContent = '✅ Options ready!';
             message.textContent = 'Analysis complete! Options generated.';
             progressBg.style.transform = 'translateX(0%)';
@@ -1873,14 +1834,8 @@
             const data = saveFormData();
             console.log('📋 Form data collected:', data);
 
-            // Validate required fields
             if (!data.name || !data.phone || !data.email || !data.category) {
-                console.error('❌ Missing required fields:', {
-                    name: data.name,
-                    phone: data.phone,
-                    email: data.email,
-                    category: data.category
-                });
+                console.error('❌ Missing required fields');
                 alert('Please fill out all required fields (Name, Phone, Email, and Task)');
                 return;
             }
@@ -1888,9 +1843,8 @@
             console.log('✅ Validation passed, starting progress animation...');
             showEstimateProgress();
 
-            // Call AI scope function
             const hours = TASKS[data.category]?.hours || 1.5;
-            const addons = calculateAddons(data.category); // Calculate add-ons from Q&A
+            const addons = calculateAddons(data.category);
 
             const aiPayload = {
                 category: data.category,
@@ -1899,7 +1853,7 @@
                 hours_base: hours,
                 window: data.window,
                 rush: data.rush,
-                addons: addons, // Include add-ons in AI payload
+                addons: addons,
                 name: data.name,
                 phone: data.phone,
                 email: data.email,
@@ -1925,11 +1879,9 @@
             const aiResult = await response.json();
             console.log('📊 AI scope result:', aiResult);
 
-            // Generate multiple pricing options with add-ons
             const pricingOptions = generatePricingOptions(hours, data.window, data.rush, addons);
             console.log('💰 Generated pricing options:', pricingOptions);
 
-            // Store estimate data
             estimateData = {
                 ...aiResult,
                 hours,
@@ -1938,7 +1890,6 @@
 
             console.log('✅ Estimate data stored:', estimateData);
 
-            // Wait for progress to complete, then show estimate
             setTimeout(() => {
                 console.log('🎯 Showing estimate panel...');
                 showEstimatePanel(estimateData);
@@ -1947,7 +1898,6 @@
 
         } catch (error) {
             console.error('❌ Generate estimate error:', error);
-            console.error('Error stack:', error.stack);
             alert('Failed to generate estimate: ' + error.message);
             resetEstimateProgress();
         }
@@ -1955,30 +1905,83 @@
 
     function generatePricingOptions(hours, selectedWindow, rush, addons = 0) {
         const options = [];
-        const mapping = TIME_MAPPING[selectedWindow];
+        const availableWindows = getAvailableTimeWindows();
 
-        // Calculate base pricing for selected option
-        const selectedPricing = calculatePricing(hours, selectedWindow, rush, addons);
+        if (selectedWindow === 'flexible') {
+            let cheapestWindow = null;
+            let cheapestPrice = Infinity;
 
-        // Option 1: Sooner (+20%)
-        if (mapping.sooner) {
-            const soonerPricing = calculatePricing(hours, mapping.sooner, rush, addons);
-            const soonerTotal = soonerPricing.total * (1 + PREMIUM_SOONER);
-            options.push({
-                type: 'sooner',
-                window: mapping.sooner,
-                windowLabel: TIME_WINDOWS[mapping.sooner],
-                pricing: {
-                    ...soonerPricing,
-                    total: soonerTotal,
-                    premiums: [...soonerPricing.premiums, { label: 'Sooner premium (20%)', amount: soonerPricing.total * PREMIUM_SOONER }]
-                },
-                badge: 'Premium',
-                badgeClass: 'premium'
+            availableWindows.forEach(window => {
+                const pricing = calculatePricing(hours, window, rush, addons);
+                if (pricing.total < cheapestPrice) {
+                    cheapestPrice = pricing.total;
+                    cheapestWindow = window;
+                }
             });
+
+            const flexiblePricing = calculatePricing(hours, cheapestWindow, rush, addons);
+            const flexibleTotal = flexiblePricing.total * (1 - DISCOUNT_FLEXIBLE);
+
+            options.push({
+                type: 'flexible',
+                window: cheapestWindow,
+                windowLabel: 'Flexible - ' + TIME_WINDOWS[cheapestWindow],
+                pricing: {
+                    ...flexiblePricing,
+                    total: flexibleTotal,
+                    premiums: [...flexiblePricing.premiums, { label: 'Flexible timing discount (-15%)', amount: -flexiblePricing.total * DISCOUNT_FLEXIBLE }]
+                },
+                badge: 'Best Value',
+                badgeClass: 'discount'
+            });
+
+            let count = 0;
+            availableWindows.forEach(window => {
+                if (window !== cheapestWindow && count < 2) {
+                    const pricing = calculatePricing(hours, window, rush, addons);
+                    options.push({
+                        type: 'alternative',
+                        window: window,
+                        windowLabel: TIME_WINDOWS[window],
+                        pricing: pricing,
+                        badge: 'Alternative',
+                        badgeClass: 'selected'
+                    });
+                    count++;
+                }
+            });
+
+            return options;
         }
 
-        // Option 2: Selected (middle)
+        if (!isTimeWindowAvailable(selectedWindow)) {
+            console.warn('Selected window no longer available, using flexible');
+            return generatePricingOptions(hours, 'flexible', rush, addons);
+        }
+
+        const selectedIndex = availableWindows.indexOf(selectedWindow);
+        const selectedPricing = calculatePricing(hours, selectedWindow, rush, addons);
+
+        if (selectedIndex > 0) {
+            const soonerWindow = availableWindows[selectedIndex - 1];
+            if (isTimeWindowAvailable(soonerWindow)) {
+                const soonerPricing = calculatePricing(hours, soonerWindow, rush, addons);
+                const soonerTotal = soonerPricing.total * (1 + PREMIUM_SOONER);
+                options.push({
+                    type: 'sooner',
+                    window: soonerWindow,
+                    windowLabel: TIME_WINDOWS[soonerWindow],
+                    pricing: {
+                        ...soonerPricing,
+                        total: soonerTotal,
+                        premiums: [...soonerPricing.premiums, { label: 'Sooner premium (20%)', amount: soonerPricing.total * PREMIUM_SOONER }]
+                    },
+                    badge: 'Premium',
+                    badgeClass: 'premium'
+                });
+            }
+        }
+
         options.push({
             type: 'selected',
             window: selectedWindow,
@@ -1988,29 +1991,38 @@
             badgeClass: 'selected'
         });
 
-        // Option 3: Later (-10%)
-        if (mapping.later) {
-            const laterPricing = calculatePricing(hours, mapping.later, rush, addons);
-            const laterTotal = laterPricing.total * (1 - DISCOUNT_LATER);
-            options.push({
-                type: 'later',
-                window: mapping.later,
-                windowLabel: TIME_WINDOWS[mapping.later],
-                pricing: {
-                    ...laterPricing,
-                    total: laterTotal,
-                    premiums: [...laterPricing.premiums, { label: 'Later discount (-10%)', amount: -laterPricing.total * DISCOUNT_LATER }]
-                },
-                badge: 'Save',
-                badgeClass: 'discount'
-            });
+        if (selectedIndex < availableWindows.length - 1) {
+            const laterWindow = availableWindows[selectedIndex + 1];
+            if (isTimeWindowAvailable(laterWindow)) {
+                const laterPricing = calculatePricing(hours, laterWindow, rush, addons);
+                const laterTotal = laterPricing.total * (1 - DISCOUNT_LATER);
+                options.push({
+                    type: 'later',
+                    window: laterWindow,
+                    windowLabel: TIME_WINDOWS[laterWindow],
+                    pricing: {
+                        ...laterPricing,
+                        total: laterTotal,
+                        premiums: [...laterPricing.premiums, { label: 'Later discount (-10%)', amount: -laterPricing.total * DISCOUNT_LATER }]
+                    },
+                    badge: 'Save',
+                    badgeClass: 'discount'
+                });
+            }
         }
 
         return options;
     }
 
     function showEstimatePanel(estimate) {
-        // Generate pricing option cards
+        const isFlexible = formData.window === 'flexible';
+        const flexibleNotice = document.getElementById('flexibleNotice');
+        if (isFlexible) {
+            flexibleNotice.classList.remove('hidden');
+        } else {
+            flexibleNotice.classList.add('hidden');
+        }
+
         const optionsContainer = document.getElementById('pricingOptions');
         optionsContainer.innerHTML = '';
 
@@ -2029,61 +2041,46 @@
                     </div>
                     <div class="text-right">
                         <div class="text-2xl font-bold">$${option.pricing.total.toFixed(0)}</div>
-                        ${option.type !== 'selected' ? `<div class="text-sm text-slate-500">vs $${estimate.pricingOptions.find(o => o.type === 'selected').pricing.total.toFixed(0)}</div>` : ''}
+                        ${option.type !== 'selected' && option.type !== 'flexible' ? `<div class="text-sm text-slate-500">vs $${estimate.pricingOptions.find(o => o.type === 'selected' || o.type === 'flexible').pricing.total.toFixed(0)}</div>` : ''}
                     </div>
                 </div>
             `;
 
-            // Add click handler
             optionCard.addEventListener('click', () => selectPricingOption(option, optionCard));
-
             optionsContainer.appendChild(optionCard);
 
-            // Auto-select the middle option
-            if (option.type === 'selected') {
+            if (index === 0) {
                 setTimeout(() => selectPricingOption(option, optionCard), 100);
             }
         });
 
-        // Scope and risks
         document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
         document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
 
         document.getElementById('estimatePanel').classList.remove('hidden');
-
-        // Scroll to estimate
         document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function selectPricingOption(option, cardElement) {
-        // Remove selection from all cards
         document.querySelectorAll('.pricing-option').forEach(card => {
             card.classList.remove('selected');
         });
 
-        // Add selection to clicked card
         cardElement.classList.add('selected');
 
-        // Store selected option with validation
         selectedPricingOption = {
             ...option,
-            // Ensure we have all required fields
             window: option.window,
             windowLabel: option.windowLabel,
             type: option.type,
             pricing: { ...option.pricing }
         };
 
-        // Enable reserve button
         document.getElementById('reserveBtn').disabled = false;
-
         debugPricingFlow('OPTION_SELECTED', option);
         console.log('✅ Selected pricing option:', selectedPricingOption);
-        console.log('🔍 Selected window:', selectedPricingOption.window);
-        console.log('💰 Selected amount:', selectedPricingOption.pricing.total);
     }
 
-    // STEP 4: Payment processing
     async function showPaymentModal() {
         if (!selectedPricingOption) {
             alert('Please select a pricing option first');
@@ -2095,25 +2092,17 @@
             return;
         }
 
-        // Recalculate addons with current Q&A values to ensure accuracy
         const currentAddons = calculateAddons(formData.category);
         const hours = TASKS[formData.category]?.hours || 1.5;
-
-        // Recalculate pricing with current addons
         const updatedPricing = calculatePricing(hours, selectedPricingOption.window, formData.rush, currentAddons);
-        console.log('💰 Updated pricing for payment modal:', updatedPricing);
 
-        // Update the selected pricing option with recalculated values
         selectedPricingOption.pricing = updatedPricing;
-
         debugPricingFlow('PAYMENT_MODAL_OPENED', updatedPricing);
 
-        // Show the modal with correct amount
         document.getElementById('paymentAmount').textContent = '$' + updatedPricing.total.toFixed(0);
         document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
         document.getElementById('paymentModal').classList.remove('hidden');
 
-        // Reset payment element ready state
         paymentElementReady = false;
 
         try {
@@ -2122,13 +2111,13 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: updatedPricing.total, // Use recalculated amount
+                    amount: updatedPricing.total,
                     customer_info: formData,
                     job_details: {
                         category: formData.category,
-                        window: selectedPricingOption.window, // Use selected window
+                        window: selectedPricingOption.window,
                         hours: estimateData.hours,
-                        selected_option_type: selectedPricingOption.type // Add this for debugging
+                        selected_option_type: selectedPricingOption.type
                     }
                 })
             });
@@ -2142,7 +2131,6 @@
 
             console.log('💳 Initializing Stripe Elements with client secret...');
 
-            // Clear any existing elements
             if (paymentElement) {
                 try {
                     paymentElement.unmount();
@@ -2162,7 +2150,6 @@
                 layout: 'tabs'
             });
 
-            // Wait for element to be ready
             await new Promise((resolve, reject) => {
                 paymentElement.mount('#stripe-payment-element');
 
@@ -2177,7 +2164,6 @@
                     reject(error);
                 });
 
-                // Timeout fallback
                 setTimeout(() => {
                     if (!paymentElementReady) {
                         console.log('⚠️ Payment element ready timeout, assuming mounted');
@@ -2201,7 +2187,6 @@
         const submitBtn = document.getElementById('submitPayment');
         const btnText = document.getElementById('paymentButtonText');
 
-        // Validate that payment element is ready
         if (!elements || !paymentElement || !paymentElementReady) {
             alert('Payment form is not properly initialized. Please refresh and try again.');
             return;
@@ -2209,8 +2194,6 @@
 
         submitBtn.disabled = true;
         btnText.textContent = 'Processing payment...';
-
-        // Clear any previous error messages
         document.getElementById('paymentMessage').classList.add('hidden');
 
         debugPricingFlow('PAYMENT_PROCESSING', null);
@@ -2232,10 +2215,8 @@
 
             if (paymentIntent && paymentIntent.status === 'succeeded') {
                 console.log('✅ Payment successful:', paymentIntent.id);
-                console.log('💰 Amount charged:', paymentIntent.amount / 100);
                 paymentIntentId = paymentIntent.id;
 
-                // Hide payment modal and show Task Information modal
                 document.getElementById('paymentModal').classList.add('hidden');
                 showTaskInfoModal();
             } else {
@@ -2253,13 +2234,10 @@
         }
     }
 
-    // STEP 5: Show Task Information modal with pre-populated data
     function showTaskInfoModal() {
-        // Generate and store task ID
         const taskId = generateTaskId();
-        window.currentTaskId = taskId; // Store for later use
+        window.currentTaskId = taskId;
 
-        // Pre-populate summary from Step 2 data and selected option
         document.getElementById('summaryTaskId').textContent = taskId;
         document.getElementById('summaryName').textContent = formData.name;
         document.getElementById('summaryPhone').textContent = formData.phone;
@@ -2268,13 +2246,10 @@
         document.getElementById('summaryWindow').textContent = selectedPricingOption.windowLabel;
         document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
 
-        // Pre-populate contact phone with customer phone
         document.getElementById('contactPhone').value = formData.phone;
-
         document.getElementById('taskInfoModal').classList.remove('hidden');
     }
 
-    // STEP 6: Send notification and complete flow
     async function submitTaskInfo(event) {
         event.preventDefault();
 
@@ -2282,29 +2257,22 @@
         submitBtn.disabled = true;
         submitBtn.textContent = '📤 Sending notification...';
 
-        // Use the task ID generated when modal was shown
         const taskId = window.currentTaskId;
-
-        // Ensure we have fresh form data
         const currentFormData = saveFormData();
-        console.log('📋 Fresh form data for notification:', currentFormData);
 
-        // Validate that we have required data
         if (!currentFormData.name || !currentFormData.phone || !currentFormData.email || !currentFormData.category) {
-            console.error('❌ Missing critical form data:', currentFormData);
+            console.error('❌ Missing critical form data');
             alert('Critical form data is missing. Please refresh and try again.');
             submitBtn.disabled = false;
             submitBtn.textContent = '🚀 Dispatch Handyman';
             return;
         }
 
-        // Collect all data for notification using selected pricing option
         const completeJobData = {
-            // Flat structure (new)
             task_id: taskId,
             payment_intent_id: paymentIntentId,
             category: currentFormData.category,
-            window: selectedPricingOption.window, // Use selected window, not original
+            window: selectedPricingOption.window,
             name: currentFormData.name,
             phone: currentFormData.phone,
             email: currentFormData.email,
@@ -2324,7 +2292,6 @@
             step_scope: estimateData.step_scope || [],
             risk_flags: estimateData.risk_flags || [],
 
-            // Original nested structure (fallback for backward compatibility)
             customer: {
                 name: currentFormData.name,
                 phone: currentFormData.phone,
@@ -2332,7 +2299,7 @@
                 zip: currentFormData.zip,
                 address: currentFormData.address || '',
                 category: currentFormData.category,
-                window: selectedPricingOption.window, // Use selected window
+                window: selectedPricingOption.window,
                 description: currentFormData.description || '',
                 rush: currentFormData.rush || false
             },
@@ -2352,16 +2319,6 @@
             amount: selectedPricingOption.pricing.total
         };
 
-        console.log('📋 Complete job data being sent to notification:', completeJobData);
-        console.log('🔍 Key fields check:', {
-            name: completeJobData.name,
-            category: completeJobData.category,
-            phone: completeJobData.phone,
-            email: completeJobData.email,
-            window: completeJobData.window
-        });
-
-        // Send SMS confirmation to customer
         try {
             await sendSMSNotification('booking_confirmation', {
                 customer_phone: completeJobData.phone,
@@ -2374,18 +2331,10 @@
             console.log('📱 SMS failed but continuing:', smsError);
         }
 
-        // Send Zapier notification
-        let zapierResult = null;
         try {
-            zapierResult = await sendZapierNotification(completeJobData);
-            if (zapierResult.success) {
-                console.log('✅ Zapier notification sent successfully');
-            } else {
-                console.log('⚠️ Zapier notification not sent:', zapierResult.message);
-            }
+            await sendZapierNotification(completeJobData);
         } catch (zapierError) {
             console.error('❌ Zapier notification failed:', zapierError);
-            // Don't block the process if Zapier fails
         }
 
         try {
@@ -2395,26 +2344,19 @@
                 body: JSON.stringify(completeJobData)
             });
 
-            console.log('📡 Notification response status:', response.status);
-
             if (response.ok) {
                 const result = await response.json();
                 console.log('✅ Notification sent successfully:', result);
-            } else {
-                const error = await response.text();
-                console.error('❌ Notification failed:', response.status, error);
             }
         } catch (error) {
             console.error('❌ Notification error:', error);
         }
 
-        // Show final success regardless of notification status
         document.getElementById('finalTaskId').textContent = taskId;
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
 
-    // Mobile Menu functionality
     function initializeMobileMenu() {
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -2423,14 +2365,12 @@
             mobileMenu.classList.toggle('active');
         });
 
-        // Close mobile menu when clicking on a link
         document.querySelectorAll('#mobile-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 mobileMenu.classList.remove('active');
             });
         });
 
-        // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
                 mobileMenu.classList.remove('active');
@@ -2438,7 +2378,6 @@
         });
     }
 
-    // Chatbot functionality
     function initializeChatbot() {
         const chatToggle = document.getElementById('chatbot-toggle');
         const chatWindow = document.getElementById('chatbot-window');
@@ -2450,7 +2389,6 @@
         let conversationHistory = [];
         let isOpen = false;
 
-        // Toggle chat window
         chatToggle.addEventListener('click', () => {
             isOpen = !isOpen;
             if (isOpen) {
@@ -2461,13 +2399,11 @@
             }
         });
 
-        // Close chat window
         chatClose.addEventListener('click', () => {
             isOpen = false;
             chatWindow.classList.add('hidden');
         });
 
-        // Send message on Enter key
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -2475,18 +2411,15 @@
             }
         });
 
-        // Send message on button click
         chatSend.addEventListener('click', sendMessage);
 
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message) return;
 
-            // Add user message to chat
             addMessage(message, 'user');
             chatInput.value = '';
 
-            // Show typing indicator
             const typingIndicator = addTypingIndicator();
 
             try {
@@ -2501,7 +2434,6 @@
                     })
                 });
 
-                // Remove typing indicator
                 typingIndicator.remove();
 
                 if (!response.ok) {
@@ -2516,13 +2448,11 @@
                     addMessage(result.reply, 'bot');
                 }
 
-                // Update conversation history
                 conversationHistory.push(
                     { role: 'human', content: message },
                     { role: 'assistant', content: result.reply || 'Error occurred' }
                 );
 
-                // Keep only last 10 exchanges to manage context length
                 if (conversationHistory.length > 20) {
                     conversationHistory = conversationHistory.slice(-20);
                 }
@@ -2593,7 +2523,6 @@
         }
 
         function formatBotMessage(content) {
-            // Convert line breaks to <br> tags and preserve formatting
             return escapeHtml(content)
                 .replace(/\n/g, '<br>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -2607,22 +2536,43 @@
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 DOM Content Loaded - Initializing app...');
 
-        // Initialize Stripe
+        // Populate time window dropdown with only available slots
+        function populateTimeWindows() {
+            const select = document.getElementById('taskWindow');
+            const availableWindows = getAvailableTimeWindows();
+
+            select.innerHTML = '<option value="flexible">I\'m flexible (lowest price)</option>';
+
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '──────────────────';
+            select.appendChild(separator);
+
+            availableWindows.forEach(windowKey => {
+                const option = document.createElement('option');
+                option.value = windowKey;
+                option.textContent = TIME_WINDOWS[windowKey];
+                select.appendChild(option);
+            });
+
+            console.log('⏰ Available time windows:', availableWindows);
+        }
+
+        populateTimeWindows();
+        setInterval(populateTimeWindows, 60000);
+
         initializeStripe();
 
         console.log('🎯 Zapier webhook configured:', ZAPIER_CONFIG.ENABLED ? 'YES' : 'NO');
 
-        // Initialize mobile menu
         initializeMobileMenu();
 
-        // Service card expand/collapse functionality - CRITICAL FUNCTIONALITY RESTORED
         document.querySelectorAll('.service-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const taskKey = card.getAttribute('data-task');
                 const details = card.querySelector('.service-details');
                 const icon = card.querySelector('.expand-icon');
 
-                // Close all other cards
                 document.querySelectorAll('.service-card').forEach(otherCard => {
                     if (otherCard !== card) {
                         const otherDetails = otherCard.querySelector('.service-details');
@@ -2632,14 +2582,12 @@
                     }
                 });
 
-                // Toggle current card
                 if (details.classList.contains('hidden')) {
                     details.classList.remove('hidden');
                     icon.style.transform = 'rotate(180deg)';
 
-                    // Auto-select this task in the form and scroll to booking
                     document.getElementById('taskCategory').value = taskKey;
-                    showTaskQuestions(taskKey); // Show dynamic Q&A
+                    showTaskQuestions(taskKey);
 
                     setTimeout(() => {
                         document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
@@ -2651,7 +2599,6 @@
             });
         });
 
-        // Task dropdown change handler
         document.getElementById('taskCategory').addEventListener('change', (e) => {
             const taskKey = e.target.value;
             if (taskKey) {
@@ -2663,7 +2610,6 @@
 
         console.log('✅ Service selection system initialized');
 
-        // Photo upload preview
         document.getElementById('taskPhotos').addEventListener('change', (e) => {
             const thumbs = document.getElementById('photoThumbs');
             thumbs.innerHTML = '';
@@ -2676,36 +2622,26 @@
             });
         });
 
-        // STEP 3: Get Estimate Button
         document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
-
-        // STEP 4: Reserve Button
         document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
-
-        // Payment form
         document.getElementById('paymentForm').addEventListener('submit', processPayment);
 
-        // Close payment modal
         document.getElementById('closePayment').addEventListener('click', () => {
             document.getElementById('paymentModal').classList.add('hidden');
         });
 
-        // STEP 5: Task Info Form
         document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
 
-        // Final success close
         document.getElementById('closeFinalSuccess').addEventListener('click', () => {
             document.getElementById('finalSuccessModal').classList.add('hidden');
-            location.reload(); // Reset for new booking
+            location.reload();
         });
 
-        // Set current year and version
         document.getElementById('year').textContent = new Date().getFullYear();
         document.getElementById('version').textContent = APP_VERSION;
 
         console.log('🎯 All event listeners initialized successfully');
 
-        // Initialize chatbot
         initializeChatbot();
     });
 
