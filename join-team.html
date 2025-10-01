@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Join Our Team — Earn $64/hr as a Vetted Handyman</title>
+  <meta name="description" content="Join SendAHandyman's network of professional handymen. Earn $64/hr with flexible scheduling, guaranteed pay, and steady work in Palm Beach, Broward & Miami-Dade." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
+    .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+
+    .benefit-card {
+        transition: all 0.3s ease;
+    }
+
+    .benefit-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 35px rgba(0,0,0,.1);
+    }
+
+    .mobile-menu-btn {
+        display: none;
+    }
+
+    .mobile-menu {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .mobile-menu-btn {
+            display: block;
+        }
+
+        .desktop-nav {
+            display: none;
+        }
+
+        .mobile-menu.active {
+            display: block;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #475569;
+            text-decoration: none;
+        }
+
+        .mobile-menu a:hover {
+            background: #f8fafc;
+            color: #4f46e5;
+        }
+
+        .mobile-header-row-2 {
+            margin-top: 0.5rem;
+        }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+<!-- Header -->
+<header class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-slate-100">
+  <div class="max-w-6xl mx-auto px-4 py-3 relative">
+    <!-- Desktop Layout -->
+    <div class="hidden md:flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-9 w-auto">
+        <span class="font-semibold">SendAHandyman</span>
+      </a>
+
+      <nav class="desktop-nav flex items-center gap-6 text-sm">
+        <a href="index.html" class="hover:text-indigo-600">For Customers</a>
+        <a href="#benefits" class="hover:text-indigo-600">Benefits</a>
+        <a href="#how" class="hover:text-indigo-600">How it works</a>
+        <a href="#apply" class="hover:text-indigo-600">Apply now</a>
+      </nav>
+
+      <a href="#apply" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Join our team</a>
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="md:hidden">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-9 w-auto">
+          <span class="font-semibold">SendAHandyman</span>
+        </a>
+
+        <button class="mobile-menu-btn p-2" id="mobile-menu-btn">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="mobile-header-row-2 flex justify-center">
+        <a href="#apply" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Join our team</a>
+      </div>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="index.html">For Customers</a>
+      <a href="#benefits">Benefits</a>
+      <a href="#how">How it works</a>
+      <a href="#apply">Apply now</a>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="bg-gradient-to-br from-green-50 via-white to-blue-50">
+  <div class="max-w-6xl mx-auto px-4 py-10 md:py-16">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="inline-block bg-green-100 text-green-800 px-4 py-1 rounded-full text-sm font-semibold mb-4">
+        Now Hiring in South Florida
+      </div>
+      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+        Earn <span class="text-green-600">$64/hour</span> as a vetted handyman
+      </h1>
+      <p class="mt-4 text-xl text-slate-700">
+        Join our network of trusted professionals. Get steady work, flexible scheduling, and guaranteed pay for every job.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#apply" class="rounded-xl bg-green-600 px-6 py-3 text-white font-semibold shadow-soft hover:bg-green-700 transition-colors">
+          Apply now — 5 min
+        </a>
+        <a href="#how" class="rounded-xl bg-white px-6 py-3 font-semibold border border-slate-200 hover:border-green-600 transition-colors">
+          How it works
+        </a>
+      </div>
+
+      <div class="mt-8 grid grid-cols-3 gap-4 text-center">
+        <div>
+          <div class="text-3xl font-bold text-green-600">$64/hr</div>
+          <div class="text-sm text-slate-600">Hourly rate</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-green-600">Flexible</div>
+          <div class="text-sm text-slate-600">Set your schedule</div>
+        </div>
+        <div>
+          <div class="text-3xl font-bold text-green-600">Weekly</div>
+          <div class="text-sm text-slate-600">Guaranteed pay</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits -->
+<section id="benefits" class="py-12 bg-white">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-3">Why join SendAHandyman?</h2>
+    <p class="text-center text-slate-600 mb-10">We handle the marketing, scheduling, and payments — you focus on the work.</p>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
+        <div class="text-4xl mb-3">💰</div>
+        <h3 class="text-xl font-bold mb-2">Competitive Pay</h3>
+        <p class="text-slate-700">Earn $64/hour with weekly direct deposit. No chasing payments or dealing with invoice delays.</p>
+      </div>
+
+      <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
+        <div class="text-4xl mb-3">📅</div>
+        <h3 class="text-xl font-bold mb-2">Flexible Schedule</h3>
+        <p class="text-slate-700">Choose which jobs you want and when you're available. Work full-time, part-time, or weekends only.</p>
+      </div>
+
+      <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
+        <div class="text-4xl mb-3">🎯</div>
+        <h3 class="text-xl font-bold mb-2">Steady Work</h3>
+        <p class="text-slate-700">We provide the leads and handle all customer acquisition. You'll never run out of jobs.</p>
+      </div>
+
+      <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
+        <div class="text-4xl mb-3">📱</div>
+        <h3 class="text-xl font-bold mb-2">Simple App</h3>
+        <p class="text-slate-700">Get job details, customer info, and navigation all in one place. Clock in/out right from your phone.</p>
+      </div>
+
+      <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
+        <div class="text-4xl mb-3">🛡️</div>
+        <h3 class="text-xl font-bold mb-2">Support & Protection</h3>
+        <p class="text-slate-700">We handle customer issues and disputes. You're backed by our team and liability coverage.</p>
+      </div>
+
+      <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
+        <div class="text-4xl mb-3">⭐</div>
+        <h3 class="text-xl font-bold mb-2">Build Your Reputation</h3>
+        <p class="text-slate-700">Get rated by customers and earn bonuses for excellent service. Top performers get priority jobs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it Works -->
+<section id="how" class="py-12">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-10">How it works</h2>
+
+    <div class="grid md:grid-cols-4 gap-6">
+      <div class="text-center">
+        <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-green-600 font-bold text-xl">1</span>
+        </div>
+        <h3 class="font-bold mb-2">Apply Online</h3>
+        <p class="text-sm text-slate-600">Fill out our quick application. Takes 5 minutes.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-green-600 font-bold text-xl">2</span>
+        </div>
+        <h3 class="font-bold mb-2">Background Check</h3>
+        <p class="text-sm text-slate-600">We verify your experience and run a background check.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-green-600 font-bold text-xl">3</span>
+        </div>
+        <h3 class="font-bold mb-2">Onboarding</h3>
+        <p class="text-sm text-slate-600">Quick orientation and app training. You're ready to work.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-green-600 font-bold text-xl">4</span>
+        </div>
+        <h3 class="font-bold mb-2">Start Earning</h3>
+        <p class="text-sm text-slate-600">Accept jobs, complete work, get paid weekly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Requirements -->
+<section class="py-12 bg-white">
+  <div class="max-w-4xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-10">Who we're looking for</h2>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div>
+        <h3 class="text-xl font-bold mb-4 text-green-600">Required</h3>
+        <ul class="space-y-3 text-slate-700">
+          <li class="flex items-start gap-2">
+            <span class="text-green-600 font-bold">✓</span>
+            <span>3+ years of hands-on handyman experience</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-green-600 font-bold">✓</span>
+            <span>Own reliable transportation and basic tools</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-green-600 font-bold">✓</span>
+            <span>Smartphone for job management app</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-green-600 font-bold">✓</span>
+            <span>Clean background check</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-green-600 font-bold">✓</span>
+            <span>Legal authorization to work in the US</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-green-600 font-bold">✓</span>
+            <span>Professional appearance and communication</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-bold mb-4 text-blue-600">Preferred (Bonus)</h3>
+        <ul class="space-y-3 text-slate-700">
+          <li class="flex items-start gap-2">
+            <span class="text-blue-600 font-bold">+</span>
+            <span>General contractor or trade licenses</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-600 font-bold">+</span>
+            <span>Liability insurance</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-600 font-bold">+</span>
+            <span>Experience with electrical, plumbing, HVAC</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-600 font-bold">+</span>
+            <span>Positive customer reviews or references</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-600 font-bold">+</span>
+            <span>Bilingual (English/Spanish)</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-blue-600 font-bold">+</span>
+            <span>Evening and weekend availability</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Application Form -->
+<section id="apply" class="py-12">
+  <div class="max-w-3xl mx-auto px-4">
+    <div class="bg-white rounded-2xl p-8 shadow-soft border border-slate-100">
+      <h2 class="text-3xl font-bold mb-2 text-center">Apply to join our team</h2>
+      <p class="text-center text-slate-600 mb-8">Fill out the application below. We'll review and contact you within 2 business days.</p>
+
+      <form id="handymanApplicationForm">
+        <!-- Personal Information -->
+        <div class="mb-8">
+          <h3 class="text-xl font-bold mb-4 pb-2 border-b border-slate-200">Personal Information</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">First Name *</label>
+              <input type="text" id="firstName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Last Name *</label>
+              <input type="text" id="lastName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Phone Number *</label>
+              <input type="tel" id="phone" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Email Address *</label>
+              <input type="email" id="email" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">ZIP Code *</label>
+              <input type="text" id="zip" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">City *</label>
+              <input type="text" id="city" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="mb-8">
+          <h3 class="text-xl font-bold mb-4 pb-2 border-b border-slate-200">Experience & Skills</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Years of Handyman Experience *</label>
+              <select id="yearsExperience" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select...</option>
+                <option value="3-5">3-5 years</option>
+                <option value="5-10">5-10 years</option>
+                <option value="10+">10+ years</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-3">Skills & Services (Select all that apply) *</label>
+              <div class="grid md:grid-cols-2 gap-3">
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="tv_mounting" class="skill-checkbox">
+                  <span class="text-sm">TV Mounting</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="electrical" class="skill-checkbox">
+                  <span class="text-sm">Basic Electrical</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="plumbing" class="skill-checkbox">
+                  <span class="text-sm">Basic Plumbing</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="furniture_assembly" class="skill-checkbox">
+                  <span class="text-sm">Furniture Assembly</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="painting" class="skill-checkbox">
+                  <span class="text-sm">Painting</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="drywall" class="skill-checkbox">
+                  <span class="text-sm">Drywall Repair</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="flooring" class="skill-checkbox">
+                  <span class="text-sm">Flooring</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name="skills" value="carpentry" class="skill-checkbox">
+                  <span class="text-sm">Carpentry</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-1">Describe your experience and expertise *</label>
+              <textarea id="experience" rows="4" required placeholder="Tell us about your handyman background, specialty skills, and types of projects you've completed..." class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="mb-8">
+          <h3 class="text-xl font-bold mb-4 pb-2 border-b border-slate-200">Availability</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Preferred Work Schedule *</label>
+              <select id="schedule" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select...</option>
+                <option value="full-time">Full-time (30+ hours/week)</option>
+                <option value="part-time">Part-time (15-30 hours/week)</option>
+                <option value="weekends">Weekends only</option>
+                <option value="flexible">Flexible / As needed</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-1">Can you work evenings (after 4 PM)? *</label>
+              <select id="evenings" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="sometimes">Sometimes</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="mb-8">
+          <h3 class="text-xl font-bold mb-4 pb-2 border-b border-slate-200">Additional Information</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Do you have liability insurance? *</label>
+              <select id="insurance" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+                <option value="willing">No, but willing to obtain</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-1">Do you have any trade licenses or certifications?</label>
+              <input type="text" id="licenses" placeholder="e.g., General Contractor, Electrical License, etc." class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-1">References (Name, Phone, Relationship)</label>
+              <textarea id="references" rows="3" placeholder="Reference 1: John Smith, (555) 123-4567, Former Client&#10;Reference 2: Jane Doe, (555) 987-6543, Contractor Partner" class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-1">How did you hear about us?</label>
+              <select id="referralSource" class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select...</option>
+                <option value="google">Google Search</option>
+                <option value="social">Social Media</option>
+                <option value="friend">Friend/Colleague Referral</option>
+                <option value="indeed">Job Board (Indeed, etc.)</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agreements -->
+        <div class="mb-8">
+          <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="backgroundCheck" required class="mt-1">
+              <span class="text-sm text-slate-700">I agree to undergo a background check and understand that employment is contingent on passing this check. *</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-8">
+          <div class="bg-slate-50 rounded-lg p-4 border border-slate-200">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="termsAgree" required class="mt-1">
+              <span class="text-sm text-slate-700">I certify that all information provided is accurate and understand that false information may result in disqualification. *</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" id="submitApplication" class="w-full rounded-xl bg-green-600 text-white px-6 py-3 font-semibold shadow-soft hover:bg-green-700 transition-colors">
+          Submit Application
+        </button>
+
+        <p class="mt-4 text-sm text-center text-slate-500">
+          By submitting this application, you agree to our terms of service and privacy policy.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl text-center">
+    <div class="text-6xl mb-4">✅</div>
+    <h3 class="text-2xl font-bold mb-3 text-green-600">Application Submitted!</h3>
+    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+      <p class="text-sm text-green-700 mb-2">
+        Thank you for applying to join SendAHandyman! We've received your application.
+      </p>
+      <p class="text-sm text-slate-600">
+        Our team will review your application and contact you within 2 business days at the phone number and email you provided.
+      </p>
+    </div>
+    <div class="mb-4 p-3 bg-slate-50 rounded-lg">
+      <p class="text-xs text-slate-500 mb-1">Your Application ID</p>
+      <p id="applicationId" class="font-mono text-sm font-semibold text-indigo-600">—</p>
+    </div>
+    <button id="closeSuccess" class="rounded-xl bg-green-600 text-white px-6 py-3 font-semibold hover:bg-green-700 transition-colors">
+      Close
+    </button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="py-10 border-t border-slate-100 text-sm text-slate-600">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
+        <span>© <span id="year"></span> SendAHandyman</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="hover:text-slate-900">For Customers</a>
+        <a href="privacy.html" class="hover:text-slate-900">Privacy</a>
+        <a href="terms.html" class="hover:text-slate-900">Terms</a>
+        <a href="mailto:careers@sendahandyman.com" class="hover:text-slate-900">careers@sendahandyman.com</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu functionality
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+  });
+
+  document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+          mobileMenu.classList.remove('active');
+      });
+  });
+
+  // Form submission
+  document.getElementById('handymanApplicationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById('submitApplication');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
+
+      // Validate at least one skill is selected
+      const selectedSkills = document.querySelectorAll('.skill-checkbox:checked');
+      if (selectedSkills.length === 0) {
+          alert('Please select at least one skill/service');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Application';
+          return;
+      }
+
+      // Generate application ID
+      const applicationId = 'APP-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      // Collect form data
+      const formData = {
+          application_id: applicationId,
+          timestamp: new Date().toISOString(),
+          first_name: document.getElementById('firstName').value,
+          last_name: document.getElementById('lastName').value,
+          phone: document.getElementById('phone').value,
+          email: document.getElementById('email').value,
+          zip: document.getElementById('zip').value,
+          city: document.getElementById('city').value,
+          years_experience: document.getElementById('yearsExperience').value,
+          skills: Array.from(selectedSkills).map(cb => cb.value).join(', '),
+          experience_description: document.getElementById('experience').value,
+          schedule: document.getElementById('schedule').value,
+          evenings: document.getElementById('evenings').value,
+          insurance: document.getElementById('insurance').value,
+          licenses: document.getElementById('licenses').value || 'None',
+          references: document.getElementById('references').value || 'Not provided',
+          referral_source: document.getElementById('referralSource').value || 'Not specified',
+          notification_email: 'careers@sendahandyman.com'
+      };
+
+      console.log('Handyman application submitted:', formData);
+
+      // Here you would send to your backend/Zapier webhook
+      // For now, we'll simulate a successful submission
+
+      setTimeout(() => {
+          document.getElementById('applicationId').textContent = applicationId;
+          document.getElementById('successModal').classList.remove('hidden');
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit Application';
+
+          // Reset form
+          document.getElementById('handymanApplicationForm').reset();
+      }, 1500);
+  });
+
+  // Close success modal
+  document.getElementById('closeSuccess').addEventListener('click', () => {
+      document.getElementById('successModal').classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Set current year
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
