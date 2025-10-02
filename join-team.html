@@ -618,13 +618,15 @@
       console.log('Handyman application submitted:', formData);
 
       try {
-          // Send to Zapier webhook
+          // Convert form data to URLSearchParams to avoid CORS issues
+          const urlParams = new URLSearchParams();
+          for (const key in formData) {
+              urlParams.append(key, formData[key]);
+          }
+
           const response = await fetch(HANDYMAN_ZAPIER_WEBHOOK, {
               method: 'POST',
-              headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-              },
-              body: params.toString()
+              body: urlParams
           });
 
           if (response.ok) {
@@ -633,7 +635,7 @@
               document.getElementById('successModal').classList.remove('hidden');
               document.getElementById('handymanApplicationForm').reset();
           } else {
-              throw new Error('Zapier submission failed');
+              throw new Error('Zapier submission failed with status: ' + response.status);
           }
       } catch (error) {
           console.error('❌ Application submission error:', error);
