@@ -189,7 +189,7 @@
 
       <div class="benefit-card bg-slate-50 rounded-xl p-6 border border-slate-100">
         <div class="text-4xl mb-3">📱</div>
-        <h3 class="text-xl font-bold mb-2">Simple App</h3>
+        <h3 class="text-xl font-bold mb-2">Simple Dashboard</h3>
         <p class="text-slate-700">Get job details, customer info, and navigation all in one place. Clock in/out right from your phone.</p>
       </div>
 
@@ -235,7 +235,7 @@
           <span class="text-green-600 font-bold text-xl">3</span>
         </div>
         <h3 class="font-bold mb-2">Onboarding</h3>
-        <p class="text-sm text-slate-600">Quick orientation and app training. You're ready to work.</p>
+        <p class="text-sm text-slate-600">Quick orientation and dashboard training. You're ready to work.</p>
       </div>
 
       <div class="text-center">
@@ -268,7 +268,7 @@
           </li>
           <li class="flex items-start gap-2">
             <span class="text-green-600 font-bold">✓</span>
-            <span>Smartphone for job management app</span>
+            <span>Smartphone for job management dashboard</span>
           </li>
           <li class="flex items-start gap-2">
             <span class="text-green-600 font-bold">✓</span>
@@ -555,6 +555,9 @@
 </footer>
 
 <script>
+  // Zapier webhook configuration
+  const HANDYMAN_ZAPIER_WEBHOOK = 'https://hooks.zapier.com/hooks/catch/24412806/u99a8gg/';
+
   // Mobile menu functionality
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
@@ -595,6 +598,7 @@
           timestamp: new Date().toISOString(),
           first_name: document.getElementById('firstName').value,
           last_name: document.getElementById('lastName').value,
+          full_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
           phone: document.getElementById('phone').value,
           email: document.getElementById('email').value,
           zip: document.getElementById('zip').value,
@@ -613,19 +617,31 @@
 
       console.log('Handyman application submitted:', formData);
 
-      // Here you would send to your backend/Zapier webhook
-      // For now, we'll simulate a successful submission
+      try {
+          // Send to Zapier webhook
+          const response = await fetch(HANDYMAN_ZAPIER_WEBHOOK, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData)
+          });
 
-      setTimeout(() => {
-          document.getElementById('applicationId').textContent = applicationId;
-          document.getElementById('successModal').classList.remove('hidden');
-
+          if (response.ok) {
+              console.log('✅ Application sent to Zapier successfully');
+              document.getElementById('applicationId').textContent = applicationId;
+              document.getElementById('successModal').classList.remove('hidden');
+              document.getElementById('handymanApplicationForm').reset();
+          } else {
+              throw new Error('Zapier submission failed');
+          }
+      } catch (error) {
+          console.error('❌ Application submission error:', error);
+          alert('There was an error submitting your application. Please try again or email careers@sendahandyman.com directly.');
+      } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit Application';
-
-          // Reset form
-          document.getElementById('handymanApplicationForm').reset();
-      }, 1500);
+      }
   });
 
   // Close success modal

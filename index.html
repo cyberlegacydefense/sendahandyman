@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SendAHandyman — Same-Day / Next-Day Handyman Dispatch</title>
     <meta name="description" content="Book a vetted handyman today or tomorrow. Upload photos, get an instant AI estimate, and reserve with your card. Serving Palm Beach, Broward & Miami-Dade." />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17598022946"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-17598022946');
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -395,6 +402,7 @@
                     <div class="carousel-slide" style="background-image: url('/images/Installing_Blinds.png')"></div>
                     <div class="carousel-slide" style="background-image: url('/images/Installing_Faucet.png')"></div>
                     <div class="carousel-slide" style="background-image: url('/images/Smart_Doorbell_Installation.png')"></div>
+                    <div class="carousel-slide" style="background-image: url('/images/Closet_Organizer_Installation.png')"></div>
                 </div>
             </div>
         </div>
@@ -1175,7 +1183,7 @@
     let paymentIntentId = null;
     let paymentElementReady = false;
 
-    const APP_VERSION = "1.0.0";
+    const APP_VERSION = "1.5.0";
 
     // Stripe Configuration
     const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Rz41zHQ4TkcNcqv0IXVWGjAjLo8EoSkGO2fbeINw6U23GsLSiaOsHYVSEPwlJbR2EZ515tqPDJcRPvDBYSdv2Wy00N7DPqhI3';
