@@ -90,7 +90,10 @@
         <a href="#apply" class="hover:text-indigo-600">Apply now</a>
       </nav>
 
-      <a href="#apply" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Join our team</a>
+      <div class="flex items-center gap-3">
+        <a href="#apply" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white text-sm font-semibold shadow-soft hover:bg-green-700 transition-colors">Join our team</a>
+        <a href="dashboard.html" class="inline-flex items-center gap-2 rounded-xl border-2 border-slate-300 px-4 py-2 text-slate-700 text-sm font-semibold hover:border-slate-400 hover:bg-slate-50 transition-colors">Sign In</a>
+      </div>
     </div>
 
     <!-- Mobile Layout -->
@@ -108,8 +111,9 @@
         </button>
       </div>
 
-      <div class="mobile-header-row-2 flex justify-center">
+      <div class="mobile-header-row-2 flex justify-center gap-3">
         <a href="#apply" class="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Join our team</a>
+        <a href="dashboard.html" class="inline-flex items-center gap-2 rounded-xl border-2 border-slate-300 px-4 py-2 text-slate-700 text-sm font-semibold">Sign In</a>
       </div>
     </div>
 
@@ -548,7 +552,7 @@
         <a href="index.html" class="hover:text-slate-900">For Customers</a>
         <a href="privacy.html" class="hover:text-slate-900">Privacy</a>
         <a href="terms.html" class="hover:text-slate-900">Terms</a>
-        <a href="mailto:info@sendahandyman.com" class="hover:text-slate-900">info@sendahandyman.com</a>
+        <a href="mailto:careers@sendahandyman.com" class="hover:text-slate-900">careers@sendahandyman.com</a>
       </div>
     </div>
   </div>
@@ -612,7 +616,7 @@
           licenses: document.getElementById('licenses').value || 'None',
           references: document.getElementById('references').value || 'Not provided',
           referral_source: document.getElementById('referralSource').value || 'Not specified',
-          notification_email: 'info@sendahandyman.com'
+          notification_email: 'careers@sendahandyman.com'
       };
 
       console.log('Handyman application submitted:', formData);
@@ -639,7 +643,7 @@
           }
       } catch (error) {
           console.error('❌ Application submission error:', error);
-          alert('There was an error submitting your application. Please try again or email info@sendahandyman.com directly.');
+          alert('There was an error submitting your application. Please try again or email careers@sendahandyman.com directly.');
       } finally {
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit Application';
