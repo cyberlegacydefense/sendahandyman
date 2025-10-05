@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Handyman Dashboard - SendAHandyman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; }
+  </style>
+</head>
+<body class="bg-slate-50">
+
+<!-- Login Page -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl p-8 shadow-soft border border-slate-100 w-full max-w-md">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold mb-2">Handyman Portal</h1>
+      <p class="text-slate-600">Sign in to access your dashboard</p>
+    </div>
+
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-1">Email</label>
+        <input type="email" id="loginEmail" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Password</label>
+        <input type="password" id="loginPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+      </div>
+      <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+        Sign In
+      </button>
+      <div id="loginError" class="hidden text-sm text-red-600 text-center"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboardPage" class="hidden min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <h1 class="text-xl font-bold">SendAHandyman Dashboard</h1>
+        </div>
+        <div class="flex items-center gap-4">
+          <span id="handymanName" class="text-sm font-semibold text-slate-700"></span>
+          <button id="logoutBtn" class="text-sm text-slate-600 hover:text-slate-900">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4">
+      <nav class="flex gap-8">
+        <button class="tab-btn py-4 font-semibold text-sm tab-active" data-tab="overview">Overview</button>
+        <button class="tab-btn py-4 font-semibold text-sm" data-tab="tasks">Current Tasks</button>
+        <button class="tab-btn py-4 font-semibold text-sm" data-tab="history">Task History</button>
+        <button class="tab-btn py-4 font-semibold text-sm" data-tab="earnings">Earnings</button>
+        <button class="tab-btn py-4 font-semibold text-sm" data-tab="profile">Profile</button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Overview Tab -->
+    <div id="overviewTab" class="tab-content">
+      <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Active Tasks</div>
+          <div id="activeTasksCount" class="text-3xl font-bold text-indigo-600">0</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Completed This Month</div>
+          <div id="completedCount" class="text-3xl font-bold text-green-600">0</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Earned This Month</div>
+          <div id="earnedMonth" class="text-3xl font-bold text-green-600">$0</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Payment Pending</div>
+          <div id="pendingAmount" class="text-3xl font-bold text-amber-600">$0</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <h3 class="text-lg font-bold mb-4">Upcoming Tasks</h3>
+        <div id="upcomingTasksList" class="space-y-3">
+          <p class="text-slate-500 text-sm">No upcoming tasks</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Tasks Tab -->
+    <div id="tasksTab" class="tab-content hidden">
+      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <h3 class="text-lg font-bold mb-4">Current Tasks</h3>
+        <div id="currentTasksList" class="space-y-4">
+          <p class="text-slate-500 text-sm">No current tasks</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task History Tab -->
+    <div id="historyTab" class="tab-content hidden">
+      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <h3 class="text-lg font-bold mb-4">Completed Tasks</h3>
+        <div id="historyTasksList" class="space-y-4">
+          <p class="text-slate-500 text-sm">No completed tasks</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Earnings Tab -->
+    <div id="earningsTab" class="tab-content hidden">
+      <div class="grid md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Total Earned</div>
+          <div id="totalEarned" class="text-3xl font-bold text-green-600">$0</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Paid Out</div>
+          <div id="totalPaid" class="text-3xl font-bold text-indigo-600">$0</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-sm font-semibold mb-1">Awaiting Payment</div>
+          <div id="awaitingPayment" class="text-3xl font-bold text-amber-600">$0</div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <h3 class="text-lg font-bold mb-4">Payment History</h3>
+        <div id="paymentHistoryList" class="space-y-3">
+          <p class="text-slate-500 text-sm">No payment history</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div id="profileTab" class="tab-content hidden">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Profile Information</h3>
+          <form id="profileForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">Full Name</label>
+              <input type="text" id="profileName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Phone</label>
+              <input type="tel" id="profilePhone" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">City</label>
+              <input type="text" id="profileCity" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">ZIP Code</label>
+              <input type="text" id="profileZip" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Bio</label>
+              <textarea id="profileBio" rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
+            </div>
+            <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+              Save Profile
+            </button>
+            <div id="profileSuccess" class="hidden text-sm text-green-600 text-center">Profile updated successfully!</div>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Change Password</h3>
+          <form id="passwordForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1">New Password</label>
+              <input type="password" id="newPassword" required minlength="6" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Confirm Password</label>
+              <input type="password" id="confirmPassword" required minlength="6" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <button type="submit" class="w-full rounded-xl bg-slate-900 text-white px-4 py-3 font-semibold hover:bg-slate-800 transition-colors">
+              Update Password
+            </button>
+            <div id="passwordError" class="hidden text-sm text-red-600 text-center"></div>
+            <div id="passwordSuccess" class="hidden text-sm text-green-600 text-center">Password updated successfully!</div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // CONFIGURATION - Replace with your Supabase credentials
+  const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
+
+  // Initialize Supabase
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentHandyman = null;
+
+  // Check authentication on load
+  async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await loadHandymanData(session.user.id);
+      showDashboard();
+    } else {
+      showLogin();
+    }
+  }
+
+  // Show/hide pages
+  function showLogin() {
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('dashboardPage').classList.add('hidden');
+  }
+
+  function showDashboard() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('dashboardPage').classList.remove('hidden');
+  }
+
+  // Login
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      document.getElementById('loginError').textContent = error.message;
+      document.getElementById('loginError').classList.remove('hidden');
+    } else {
+      await loadHandymanData(data.user.id);
+      showDashboard();
+    }
+  });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    showLogin();
+  });
+
+  // Load handyman data
+  async function loadHandymanData(userId) {
+    const { data, error } = await supabase
+      .from('handymen')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (data) {
+      currentHandyman = data;
+      document.getElementById('handymanName').textContent = data.full_name;
+      await loadDashboardData();
+    }
+  }
+
+  // Load all dashboard data
+  async function loadDashboardData() {
+    await Promise.all([
+      loadOverviewStats(),
+      loadCurrentTasks(),
+      loadTaskHistory(),
+      loadEarnings(),
+      loadProfile()
+    ]);
+  }
+
+  // Load overview stats
+  async function loadOverviewStats() {
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('handyman_id', currentHandyman.id);
+
+    const activeTasks = tasks?.filter(t => t.status === 'pending' || t.status === 'in_progress') || [];
+    const thisMonth = new Date();
+    thisMonth.setDate(1);
+    const completedThisMonth = tasks?.filter(t =>
+      t.status === 'completed' && new Date(t.completed_at) >= thisMonth
+    ) || [];
+
+    document.getElementById('activeTasksCount').textContent = activeTasks.length;
+    document.getElementById('completedCount').textContent = completedThisMonth.length;
+
+    const earnedThisMonth = completedThisMonth.reduce((sum, t) => sum + (parseFloat(t.total_amount) || 0), 0);
+    document.getElementById('earnedMonth').textContent = '$' + earnedThisMonth.toFixed(0);
+
+    const { data: payments } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('handyman_id', currentHandyman.id)
+      .eq('status', 'pending');
+
+    const pending = payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
+    document.getElementById('pendingAmount').textContent = '$' + pending.toFixed(0);
+
+    // Upcoming tasks
+    const upcoming = activeTasks.slice(0, 5);
+    const upcomingHtml = upcoming.length > 0 ? upcoming.map(task => `
+      <div class="border-b border-slate-100 pb-3">
+        <div class="font-semibold">${task.task_category}</div>
+        <div class="text-sm text-slate-600">${task.customer_name} • ${task.scheduled_date || 'Not scheduled'}</div>
+      </div>
+    `).join('') : '<p class="text-slate-500 text-sm">No upcoming tasks</p>';
+
+    document.getElementById('upcomingTasksList').innerHTML = upcomingHtml;
+  }
+
+  // Load current tasks
+  async function loadCurrentTasks() {
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('handyman_id', currentHandyman.id)
+      .in('status', ['pending', 'in_progress'])
+      .order('scheduled_date', { ascending: true });
+
+    const tasksHtml = tasks?.length > 0 ? tasks.map(task => `
+      <div class="border border-slate-200 rounded-lg p-4">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <div class="font-bold text-lg">${task.task_category}</div>
+            <div class="text-sm text-slate-600">Task ID: ${task.task_id}</div>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold ${task.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">
+            ${task.status === 'in_progress' ? 'In Progress' : 'Pending'}
+          </span>
+        </div>
+        <div class="space-y-1 text-sm">
+          <div><strong>Customer:</strong> ${task.customer_name}</div>
+          <div><strong>Phone:</strong> ${task.customer_phone || 'N/A'}</div>
+          <div><strong>Address:</strong> ${task.customer_address || 'N/A'}</div>
+          <div><strong>Scheduled:</strong> ${task.scheduled_date || 'TBD'} ${task.time_window || ''}</div>
+          <div><strong>Estimated:</strong> ${task.estimated_hours || 0} hours • $${task.total_amount || 0}</div>
+        </div>
+        ${task.task_description ? `<div class="mt-2 text-sm text-slate-600">${task.task_description}</div>` : ''}
+      </div>
+    `).join('') : '<p class="text-slate-500 text-sm">No current tasks</p>';
+
+    document.getElementById('currentTasksList').innerHTML = tasksHtml;
+  }
+
+  // Load task history
+  async function loadTaskHistory() {
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('handyman_id', currentHandyman.id)
+      .eq('status', 'completed')
+      .order('completed_at', { ascending: false })
+      .limit(20);
+
+    const historyHtml = tasks?.length > 0 ? tasks.map(task => `
+      <div class="border border-slate-200 rounded-lg p-4">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <div class="font-bold">${task.task_category}</div>
+            <div class="text-sm text-slate-600">Completed: ${new Date(task.completed_at).toLocaleDateString()}</div>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Completed</span>
+        </div>
+        <div class="text-sm space-y-1">
+          <div><strong>Customer:</strong> ${task.customer_name}</div>
+          <div><strong>Hours:</strong> ${task.actual_hours || task.estimated_hours || 0}</div>
+          <div><strong>Amount:</strong> $${task.total_amount || 0}</div>
+        </div>
+      </div>
+    `).join('') : '<p class="text-slate-500 text-sm">No completed tasks</p>';
+
+    document.getElementById('historyTasksList').innerHTML = historyHtml;
+  }
+
+  // Load earnings
+  async function loadEarnings() {
+    const { data: payments } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('handyman_id', currentHandyman.id)
+      .order('created_at', { ascending: false });
+
+    const totalEarned = payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
+    const totalPaid = payments?.filter(p => p.status === 'paid').reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
+    const awaiting = totalEarned - totalPaid;
+
+    document.getElementById('totalEarned').textContent = '$' + totalEarned.toFixed(0);
+    document.getElementById('totalPaid').textContent = '$' + totalPaid.toFixed(0);
+    document.getElementById('awaitingPayment').textContent = '$' + awaiting.toFixed(0);
+
+    const paymentsHtml = payments?.length > 0 ? payments.map(payment => `
+      <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+        <div>
+          <div class="font-semibold">$${parseFloat(payment.amount).toFixed(2)}</div>
+          <div class="text-xs text-slate-600">${new Date(payment.created_at).toLocaleDateString()}</div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-semibold ${payment.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+          ${payment.status === 'paid' ? 'Paid' : 'Pending'}
+        </span>
+      </div>
+    `).join('') : '<p class="text-slate-500 text-sm">No payment history</p>';
+
+    document.getElementById('paymentHistoryList').innerHTML = paymentsHtml;
+  }
+
+  // Load profile
+  async function loadProfile() {
+    if (!currentHandyman) return;
+
+    document.getElementById('profileName').value = currentHandyman.full_name || '';
+    document.getElementById('profilePhone').value = currentHandyman.phone || '';
+    document.getElementById('profileCity').value = currentHandyman.city || '';
+    document.getElementById('profileZip').value = currentHandyman.zip || '';
+    document.getElementById('profileBio').value = currentHandyman.bio || '';
+  }
+
+  // Update profile
+  document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const { error } = await supabase
+      .from('handymen')
+      .update({
+        full_name: document.getElementById('profileName').value,
+        phone: document.getElementById('profilePhone').value,
+        city: document.getElementById('profileCity').value,
+        zip: document.getElementById('profileZip').value,
+        bio: document.getElementById('profileBio').value,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', currentHandyman.id);
+
+    if (!error) {
+      document.getElementById('profileSuccess').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('profileSuccess').classList.add('hidden');
+      }, 3000);
+      await loadHandymanData((await supabase.auth.getUser()).data.user.id);
+    }
+  });
+
+  // Change password
+  document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const newPass = document.getElementById('newPassword').value;
+    const confirmPass = document.getElementById('confirmPassword').value;
+
+    if (newPass !== confirmPass) {
+      document.getElementById('passwordError').textContent = 'Passwords do not match';
+      document.getElementById('passwordError').classList.remove('hidden');
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPass });
+
+    if (error) {
+      document.getElementById('passwordError').textContent = error.message;
+      document.getElementById('passwordError').classList.remove('hidden');
+    } else {
+      document.getElementById('passwordError').classList.add('hidden');
+      document.getElementById('passwordSuccess').classList.remove('hidden');
+      document.getElementById('passwordForm').reset();
+      setTimeout(() => {
+        document.getElementById('passwordSuccess').classList.add('hidden');
+      }, 3000);
+    }
+  });
+
+  // Tab navigation
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active'));
+      btn.classList.add('tab-active');
+
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+      document.getElementById(tab + 'Tab').classList.remove('hidden');
+    });
+  });
+
+  // Initialize
+  checkAuth();
+</script>
+
+</body>
+</html>
