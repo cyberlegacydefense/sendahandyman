@@ -1180,7 +1180,7 @@
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2">
             <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
-            <span>© <span id="year"></span> SendAHandyman v<span id="version"></span></span>
+            <span>© <span id="year"></span> SendAHandyman v 1.5.6<span id="version"></span></span>
         </div>
         <div class="flex items-center gap-4">
             <a href="privacy.html" class="hover:text-slate-900">Privacy</a>
@@ -2700,10 +2700,16 @@
     // Event Listeners
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 DOM Content Loaded - Initializing app...');
+        console.log('📊 App Version:', APP_VERSION);
 
         // Populate time window dropdown with only available slots
         function populateTimeWindows() {
             const select = document.getElementById('taskWindow');
+            if (!select) {
+                console.error('❌ taskWindow select element not found');
+                return;
+            }
+
             const availableWindows = getAvailableTimeWindows();
 
             select.innerHTML = '<option value="flexible">I\'m flexible (best value)</option>';
@@ -2721,14 +2727,24 @@
             });
 
             console.log('⏰ Available time windows:', availableWindows);
+            console.log('⏰ Dropdown populated with', select.options.length, 'options');
         }
 
-        populateTimeWindows();
-        setInterval(populateTimeWindows, 60000);
+        try {
+            populateTimeWindows();
+            setInterval(populateTimeWindows, 60000);
+        } catch (error) {
+            console.error('❌ Error populating time windows:', error);
+        }
 
         // Setup future date picker constraints
         function setupDatePicker() {
             const dateInput = document.getElementById('futureDate');
+            if (!dateInput) {
+                console.error('❌ futureDate input not found');
+                return;
+            }
+
             const today = new Date();
             const minDate = new Date(today);
             minDate.setDate(minDate.getDate() + 2);
@@ -2741,7 +2757,11 @@
             console.log('📅 Date picker configured: min=', dateInput.min, 'max=', dateInput.max);
         }
 
-        setupDatePicker();
+        try {
+            setupDatePicker();
+        } catch (error) {
+            console.error('❌ Error setting up date picker:', error);
+        }
 
         initializeStripe();
 
@@ -2749,75 +2769,150 @@
 
         initializeMobileMenu();
 
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                const taskKey = card.getAttribute('data-task');
-                const details = card.querySelector('.service-details');
-                const icon = card.querySelector('.expand-icon');
+        // Initialize service cards with better error handling
+        const serviceCards = document.querySelectorAll('.service-card');
+        console.log('🎴 Found', serviceCards.length, 'service cards');
 
-                document.querySelectorAll('.service-card').forEach(otherCard => {
-                    if (otherCard !== card) {
-                        const otherDetails = otherCard.querySelector('.service-details');
-                        const otherIcon = otherCard.querySelector('.expand-icon');
-                        otherDetails.classList.add('hidden');
-                        otherIcon.style.transform = 'rotate(0deg)';
+        document.querySelectorAll('.service-card').forEach(card => {
+            const header = card.querySelector('.service-header');
+            if (header) {
+                header.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const taskKey = card.getAttribute('data-task');
+                    console.log('🎯 Service card clicked:', taskKey);
+
+                    const details = card.querySelector('.service-details');
+                    const icon = card.querySelector('.expand-icon');
+
+                    // Close other cards
+                    document.querySelectorAll('.service-card').forEach(otherCard => {
+                        if (otherCard !== card) {
+                            const otherDetails = otherCard.querySelector('.service-details');
+                            const otherIcon = otherCard.querySelector('.expand-icon');
+                            if (otherDetails) otherDetails.classList.add('hidden');
+                            if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
+                        }
+                    });
+
+                    // Toggle current card
+                    if (details && icon) {
+                        if (details.classList.contains('hidden')) {
+                            details.classList.remove('hidden');
+                            icon.style.transform = 'rotate(180deg)';
+
+                            // Auto-populate the task dropdown
+                            const taskDropdown = document.getElementById('taskCategory');
+                            if (taskDropdown) {
+                                taskDropdown.value = taskKey;
+                                console.log('✅ Task dropdown set to:', taskKey);
+                            }
+                            showTaskQuestions(taskKey);
+
+                            // Scroll to booking form
+                            setTimeout(() => {
+                                const bookSection = document.getElementById('book');
+                                if (bookSection) {
+                                    bookSection.scrollIntoView({ behavior: 'smooth' });
+                                }
+                            }, 300);
+                        } else {
+                            details.classList.add('hidden');
+                            icon.style.transform = 'rotate(0deg)';
+                        }
                     }
                 });
-
-                if (details.classList.contains('hidden')) {
-                    details.classList.remove('hidden');
-                    icon.style.transform = 'rotate(180deg)';
-
-                    document.getElementById('taskCategory').value = taskKey;
-                    showTaskQuestions(taskKey);
-
-                    setTimeout(() => {
-                        document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
-                    }, 500);
-                } else {
-                    details.classList.add('hidden');
-                    icon.style.transform = 'rotate(0deg)';
-                }
-            });
-        });
-
-        document.getElementById('taskCategory').addEventListener('change', (e) => {
-            const taskKey = e.target.value;
-            if (taskKey) {
-                showTaskQuestions(taskKey);
+                console.log('✅ Event listener added to service card:', card.getAttribute('data-task'));
             } else {
-                document.getElementById('taskQuestions').classList.add('hidden');
+                console.warn('⚠️ Service header not found for card:', card.getAttribute('data-task'));
             }
         });
 
+        const taskCategoryDropdown = document.getElementById('taskCategory');
+        if (taskCategoryDropdown) {
+            taskCategoryDropdown.addEventListener('change', (e) => {
+                const taskKey = e.target.value;
+                console.log('📝 Task category changed to:', taskKey);
+                if (taskKey) {
+                    showTaskQuestions(taskKey);
+                } else {
+                    document.getElementById('taskQuestions').classList.add('hidden');
+                }
+            });
+            console.log('✅ Task category dropdown listener added');
+        } else {
+            console.error('❌ Task category dropdown not found');
+        }
+
         console.log('✅ Service selection system initialized');
 
-        document.getElementById('taskPhotos').addEventListener('change', (e) => {
-            const thumbs = document.getElementById('photoThumbs');
-            thumbs.innerHTML = '';
-            [...e.target.files].slice(0, 5).forEach(file => {
-                const url = URL.createObjectURL(file);
-                const img = document.createElement('img');
-                img.src = url;
-                img.className = 'h-16 w-16 object-cover rounded-lg border';
-                thumbs.appendChild(img);
+        const photoInput = document.getElementById('taskPhotos');
+        if (photoInput) {
+            photoInput.addEventListener('change', (e) => {
+                const thumbs = document.getElementById('photoThumbs');
+                if (thumbs) {
+                    thumbs.innerHTML = '';
+                    [...e.target.files].slice(0, 5).forEach(file => {
+                        const url = URL.createObjectURL(file);
+                        const img = document.createElement('img');
+                        img.src = url;
+                        img.className = 'h-16 w-16 object-cover rounded-lg border';
+                        thumbs.appendChild(img);
+                    });
+                }
             });
-        });
+            console.log('✅ Photo upload listener added');
+        } else {
+            console.error('❌ Photo input not found');
+        }
 
-        document.getElementById('getEstimateBtn').addEventListener('click', generateEstimate);
-        document.getElementById('reserveBtn').addEventListener('click', showPaymentModal);
-        document.getElementById('paymentForm').addEventListener('submit', processPayment);
+        const getEstimateBtn = document.getElementById('getEstimateBtn');
+        if (getEstimateBtn) {
+            getEstimateBtn.addEventListener('click', generateEstimate);
+            console.log('✅ Get estimate button listener added');
+        } else {
+            console.error('❌ Get estimate button not found');
+        }
 
-        document.getElementById('closePayment').addEventListener('click', () => {
-            document.getElementById('paymentModal').classList.add('hidden');
-        });
+        const reserveBtn = document.getElementById('reserveBtn');
+        if (reserveBtn) {
+            reserveBtn.addEventListener('click', showPaymentModal);
+            console.log('✅ Reserve button listener added');
+        } else {
+            console.error('❌ Reserve button not found');
+        }
 
-        document.getElementById('taskInfoForm').addEventListener('submit', submitTaskInfo);
+        const paymentForm = document.getElementById('paymentForm');
+        if (paymentForm) {
+            paymentForm.addEventListener('submit', processPayment);
+            console.log('✅ Payment form listener added');
+        } else {
+            console.error('❌ Payment form not found');
+        }
 
-        document.getElementById('closeFinalSuccess').addEventListener('click', () => {
-            document.getElementById('finalSuccessModal').classList.add('hidden');
-            location.reload();
-        });
+        const closePaymentBtn = document.getElementById('closePayment');
+        if (closePaymentBtn) {
+            closePaymentBtn.addEventListener('click', () => {
+                document.getElementById('paymentModal').classList.add('hidden');
+            });
+            console.log('✅ Close payment button listener added');
+        }
+
+        const taskInfoForm = document.getElementById('taskInfoForm');
+        if (taskInfoForm) {
+            taskInfoForm.addEventListener('submit', submitTaskInfo);
+            console.log('✅ Task info form listener added');
+        } else {
+            console.error('❌ Task info form not found');
+        }
+
+        const closeFinalSuccessBtn = document.getElementById('closeFinalSuccess');
+        if (closeFinalSuccessBtn) {
+            closeFinalSuccessBtn.addEventListener('click', () => {
+                document.getElementById('finalSuccessModal').classList.add('hidden');
+                location.reload();
+            });
+            console.log('✅ Close final success button listener added');
+        }
 
         document.getElementById('year').textContent = new Date().getFullYear();
         document.getElementById('version').textContent = APP_VERSION;
