@@ -910,9 +910,15 @@
                 <div>
                     <label class="text-sm font-semibold">Preferred timing</label>
                     <select id="taskWindow" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
-                        <option value="flexible">I'm flexible (lowest price)</option>
+                        <option value="flexible">I'm flexible (best value)</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="mt-4">
+                <label class="text-sm font-semibold">Or select a future date (up to 2 weeks) - 15% discount!</label>
+                <input type="date" id="futureDate" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
+                <p class="text-xs text-slate-500 mt-1">Select a date 2-14 days in the future for best savings</p>
             </div>
 
             <!-- Dynamic Task-Specific Questions -->
@@ -967,7 +973,7 @@
 
             <div id="flexibleNotice" class="hidden mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                 <p class="text-sm text-green-700">
-                    💡 <strong>Great choice!</strong> You selected "I'm flexible" so we've automatically found the best value timing for you with an extra 15% discount.
+                    💡 <strong>Great choice!</strong> You selected "I'm flexible" so we've automatically found the best value timing for you.
                 </p>
             </div>
 
@@ -1037,6 +1043,9 @@
                     <div><strong>Task:</strong> <span id="summaryTask">—</span></div>
                     <div><strong>Window:</strong> <span id="summaryWindow">—</span></div>
                     <div><strong>Description:</strong> <span id="summaryDescription">—</span></div>
+                    <div class="pt-2 mt-2 border-t border-slate-200">
+                        <strong>Amount Paid:</strong> <span id="summaryAmount" class="text-green-600 font-bold text-lg">—</span>
+                    </div>
                 </div>
             </div>
 
@@ -1044,6 +1053,7 @@
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Complete Property Address *</label>
                     <textarea id="propertyAddress" rows="3" placeholder="123 Main St, Unit 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <p class="text-xs text-slate-500 mt-1">Include street number, name, city, and ZIP code</p>
                 </div>
 
                 <div>
@@ -1090,6 +1100,10 @@
             <div class="mt-3 p-2 bg-white rounded border">
                 <div class="text-xs text-slate-500">Your Task ID</div>
                 <div id="finalTaskId" class="font-mono text-sm font-semibold text-indigo-600">—</div>
+            </div>
+            <div class="mt-3 p-2 bg-white rounded border">
+                <div class="text-xs text-slate-500">Amount Paid</div>
+                <div id="finalPaidAmount" class="text-lg font-bold text-green-600">—</div>
             </div>
             <p class="text-sm text-slate-600 mt-2">
                 You'll receive a text message with your technician's details and estimated arrival time within the next 15 minutes.
@@ -1192,32 +1206,55 @@
     let paymentIntentId = null;
     let paymentElementReady = false;
 
-    const APP_VERSION = "1.5.1";
+    const APP_VERSION = "2.0.0";
 
     // Stripe Configuration
-    const STRIPE_PUBLISHABLE_KEY = 'pk_live_51Rz41zHQ4TkcNcqv0IXVWGjAjLo8EoSkGO2fbeINw6U23GsLSiaOsHYVSEPwlJbR2EZ515tqPDJcRPvDBYSdv2Wy00N7DPqhI3';
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
     let stripe, elements, paymentElement;
 
+    // NEW PRICING MODEL
     const RATE = 80;
-    const PREMIUM_SAMEDAY = 0.15;
-    const PREMIUM_EVENING = 0.10;
+    const PREMIUM_CURRENT_BLOCK = 0.30;
+    const PREMIUM_NEXT_BLOCK = 0.20;
+    const PREMIUM_EVENING_BLOCK = 0.35;
     const PREMIUM_RUSH = 0.10;
-    const PREMIUM_SOONER = 0.20;
-    const DISCOUNT_LATER = 0.10;
-    const DISCOUNT_FLEXIBLE = 0.15;
+    const DISCOUNT_FUTURE = 0.15;
+
+    const TIME_WINDOWS = {
+        today_am: { label: "Today (8AM-12PM)", start: 8, end: 12 },
+        today_pm: { label: "Today (12PM-4PM)", start: 12, end: 16 },
+        today_eve: { label: "Today (4PM-8PM)", start: 16, end: 20 },
+        tomorrow_am: { label: "Tomorrow (8AM-12PM)", start: 8, end: 12 },
+        tomorrow_pm: { label: "Tomorrow (12PM-4PM)", start: 12, end: 16 },
+        tomorrow_eve: { label: "Tomorrow (4PM-8PM)", start: 16, end: 20 }
+    };
+
+    // Function to get current time block
+    function getCurrentBlock() {
+        const now = new Date();
+        const hour = now.getHours();
+
+        if (hour >= 8 && hour < 12) return 'today_am';
+        if (hour >= 12 && hour < 16) return 'today_pm';
+        if (hour >= 16 && hour < 20) return 'today_eve';
+        return null; // Outside service hours
+    }
+
+    // Function to check if a block is in the past
+    function isBlockInPast(blockKey) {
+        const now = new Date();
+        const hour = now.getHours();
+
+        if (blockKey === 'today_am' && hour >= 12) return true;
+        if (blockKey === 'today_pm' && hour >= 16) return true;
+        if (blockKey === 'today_eve' && hour >= 20) return true;
+
+        return false;
+    }
 
     // Function to determine if a time window is in the future
     function isTimeWindowAvailable(windowKey) {
-        const now = new Date();
-        const currentHour = now.getHours();
-
-        if (windowKey.startsWith('today_')) {
-            if (windowKey === 'today_am' && currentHour >= 12) return false;
-            if (windowKey === 'today_pm' && currentHour >= 16) return false;
-            if (windowKey === 'today_eve' && currentHour >= 20) return false;
-        }
-
-        return true;
+        return !isBlockInPast(windowKey);
     }
 
     // Function to get available time windows
@@ -1533,13 +1570,52 @@
         minor_repairs: { hours: 1.5, label: "Minor repairs", questions: [] }
     };
 
-    const TIME_WINDOWS = {
-        today_am: "Today (8–12)",
-        today_pm: "Today (12–4)",
-        today_eve: "Today (4–8)",
-        tomorrow_am: "Tomorrow (8–12)",
-        tomorrow_pm: "Tomorrow (12–4)"
-    };
+    // Function to validate property address
+    function validatePropertyAddress(address) {
+        if (!address || address.trim().length < 10) {
+            return {
+                valid: false,
+                message: 'Please enter a complete address (minimum 10 characters)'
+            };
+        }
+
+        const addressLower = address.toLowerCase();
+
+        // Check for street number
+        const hasNumber = /\d+/.test(address);
+        if (!hasNumber) {
+            return {
+                valid: false,
+                message: 'Address must include a street number'
+            };
+        }
+
+        // Check for Florida cities or zip code
+        const floridaCities = ['boca raton', 'delray beach', 'boynton beach', 'fort lauderdale',
+                               'hollywood', 'aventura', 'miami', 'coral gables', 'kendall',
+                               'palm beach', 'west palm beach', 'pompano'];
+        const hasCity = floridaCities.some(city => addressLower.includes(city));
+        const hasZip = /\b33\d{3}\b|\b34\d{3}\b/.test(address);
+
+        if (!hasCity && !hasZip) {
+            return {
+                valid: false,
+                message: 'Please include city name or ZIP code (we serve South Florida)'
+            };
+        }
+
+        // Check for common address components
+        const hasStreetType = /(street|st|avenue|ave|road|rd|drive|dr|lane|ln|boulevard|blvd|way|court|ct|circle|cir|place|pl)/i.test(address);
+
+        if (!hasStreetType) {
+            return {
+                valid: false,
+                message: 'Please include street type (St, Ave, Rd, etc.)'
+            };
+        }
+
+        return { valid: true };
+    }
 
     function debugPricingFlow(step, data) {
         console.log(`🔍 PRICING DEBUG [${step}]:`, {
@@ -1740,32 +1816,60 @@
         console.log('Current add-ons total:', addons);
     }
 
-    function calculatePricing(hours, window, rush, addons = 0) {
+    function calculatePricing(hours, window, rush, addons = 0, selectedDate = null) {
         const base = hours * RATE;
         let premiums = [];
         let total = base + addons;
 
-        const sameDay = window.startsWith('today');
-        const evening = window.includes('eve');
+        const currentBlock = getCurrentBlock();
+        const isToday = window.startsWith('today');
+        const isTomorrow = window.startsWith('tomorrow');
+        const isFuture = selectedDate !== null;
+        const isEveningBlock = window.includes('eve');
 
-        if (sameDay) {
-            const premium = base * PREMIUM_SAMEDAY;
-            premiums.push({ label: 'Same-day premium (15%)', amount: premium });
-            total += premium;
+        // Determine pricing based on timing
+        if (isFuture) {
+            // Future dates (2-14 days): Base - 15%
+            const discount = base * DISCOUNT_FUTURE;
+            premiums.push({ label: 'Future booking discount (-15%)', amount: -discount });
+            total -= discount;
+        } else if (isToday) {
+            // TODAY pricing logic
+            if (isEveningBlock) {
+                // Block 3 (4-8pm) ALWAYS gets +35%
+                const premium = base * PREMIUM_EVENING_BLOCK;
+                premiums.push({ label: 'Evening block premium (4-8PM, +35%)', amount: premium });
+                total += premium;
+            } else if (window === currentBlock) {
+                // Current block: Base + 30%
+                const premium = base * PREMIUM_CURRENT_BLOCK;
+                premiums.push({ label: 'Current time block premium (+30%)', amount: premium });
+                total += premium;
+            } else {
+                // Next block (not evening): Base + 20%
+                const premium = base * PREMIUM_NEXT_BLOCK;
+                premiums.push({ label: 'Next available block premium (+20%)', amount: premium });
+                total += premium;
+            }
+        } else if (isTomorrow) {
+            // TOMORROW pricing logic
+            if (isEveningBlock) {
+                // Tomorrow evening block: Base + 35%
+                const premium = base * PREMIUM_EVENING_BLOCK;
+                premiums.push({ label: 'Evening block premium (4-8PM, +35%)', amount: premium });
+                total += premium;
+            }
+            // Tomorrow Blocks 1-2: Base price (no premium added)
         }
 
-        if (evening) {
-            const premium = base * PREMIUM_EVENING;
-            premiums.push({ label: 'Evening window premium (10%)', amount: premium });
-            total += premium;
-        }
-
+        // Add rush premium if selected
         if (rush) {
             const premium = base * PREMIUM_RUSH;
-            premiums.push({ label: 'Optional rush (10%)', amount: premium });
+            premiums.push({ label: 'Optional rush service (+10%)', amount: premium });
             total += premium;
         }
 
+        // Add task-specific add-ons
         if (addons > 0) {
             premiums.push({ label: 'Task-specific add-ons', amount: addons });
         }
@@ -1776,6 +1880,8 @@
     function saveFormData() {
         console.log('💾 Saving form data...');
 
+        const futureDateInput = document.getElementById('futureDate').value;
+
         formData = {
             name: document.getElementById('customerName').value,
             phone: document.getElementById('customerPhone').value,
@@ -1784,6 +1890,7 @@
             address: document.getElementById('customerAddress').value,
             category: document.getElementById('taskCategory').value,
             window: document.getElementById('taskWindow').value,
+            futureDate: futureDateInput || null,
             description: document.getElementById('taskDescription').value,
             rush: document.getElementById('rushOption').checked
         };
@@ -1859,6 +1966,22 @@
                 return;
             }
 
+            // Validate future date if selected
+            if (data.futureDate) {
+                const selectedDate = new Date(data.futureDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const maxDate = new Date(today);
+                maxDate.setDate(maxDate.getDate() + 14);
+                const minDate = new Date(today);
+                minDate.setDate(minDate.getDate() + 2);
+
+                if (selectedDate < minDate || selectedDate > maxDate) {
+                    alert('Please select a date between 2 and 14 days in the future');
+                    return;
+                }
+            }
+
             console.log('✅ Validation passed, starting progress animation...');
             showEstimateProgress();
 
@@ -1873,6 +1996,7 @@
                 window: data.window,
                 rush: data.rush,
                 addons: addons,
+                futureDate: data.futureDate,
                 name: data.name,
                 phone: data.phone,
                 email: data.email,
@@ -1898,13 +2022,14 @@
             const aiResult = await response.json();
             console.log('📊 AI scope result:', aiResult);
 
-            const pricingOptions = generatePricingOptions(hours, data.window, data.rush, addons);
+            const pricingOptions = generatePricingOptions(hours, data.window, data.rush, addons, data.futureDate);
             console.log('💰 Generated pricing options:', pricingOptions);
 
             estimateData = {
                 ...aiResult,
                 hours,
-                pricingOptions
+                pricingOptions,
+                futureDate: data.futureDate
             };
 
             console.log('✅ Estimate data stored:', estimateData);
@@ -1922,119 +2047,113 @@
         }
     }
 
-    function generatePricingOptions(hours, selectedWindow, rush, addons = 0) {
+    function generatePricingOptions(hours, selectedWindow, rush, addons = 0, selectedDate = null) {
         const options = [];
         const availableWindows = getAvailableTimeWindows();
 
-        if (selectedWindow === 'flexible') {
-            let cheapestWindow = null;
-            let cheapestPrice = Infinity;
-
+        // If future date selected, only show future pricing
+        if (selectedDate) {
             availableWindows.forEach(window => {
-                const pricing = calculatePricing(hours, window, rush, addons);
-                if (pricing.total < cheapestPrice) {
-                    cheapestPrice = pricing.total;
-                    cheapestWindow = window;
-                }
+                const pricing = calculatePricing(hours, window, rush, addons, selectedDate);
+                options.push({
+                    type: 'future',
+                    window: window,
+                    windowLabel: TIME_WINDOWS[window].label + ' (Future Date)',
+                    pricing: pricing,
+                    badge: 'Future Booking',
+                    badgeClass: 'discount',
+                    selectedDate: selectedDate
+                });
             });
+            return options;
+        }
 
-            const flexiblePricing = calculatePricing(hours, cheapestWindow, rush, addons);
-            const flexibleTotal = flexiblePricing.total * (1 - DISCOUNT_FLEXIBLE);
+        // If flexible option selected, find best value (tomorrow non-evening)
+        if (selectedWindow === 'flexible') {
+            // Prefer tomorrow morning (best value)
+            const flexibleWindow = 'tomorrow_am';
+            const pricing = calculatePricing(hours, flexibleWindow, rush, addons);
 
             options.push({
                 type: 'flexible',
-                window: cheapestWindow,
-                windowLabel: 'Flexible - ' + TIME_WINDOWS[cheapestWindow],
-                pricing: {
-                    ...flexiblePricing,
-                    total: flexibleTotal,
-                    premiums: [...flexiblePricing.premiums, { label: 'Flexible timing discount (-15%)', amount: -flexiblePricing.total * DISCOUNT_FLEXIBLE }]
-                },
+                window: flexibleWindow,
+                windowLabel: 'Tomorrow Morning (8AM-12PM) - Best Value',
+                pricing: pricing,
                 badge: 'Best Value',
                 badgeClass: 'discount'
             });
 
-            let count = 0;
-            availableWindows.forEach(window => {
-                if (window !== cheapestWindow && count < 2) {
-                    const pricing = calculatePricing(hours, window, rush, addons);
-                    options.push({
-                        type: 'alternative',
-                        window: window,
-                        windowLabel: TIME_WINDOWS[window],
-                        pricing: pricing,
-                        badge: 'Alternative',
-                        badgeClass: 'selected'
-                    });
-                    count++;
-                }
-            });
+            // Add other tomorrow options
+            if (availableWindows.includes('tomorrow_pm')) {
+                const pmPricing = calculatePricing(hours, 'tomorrow_pm', rush, addons);
+                options.push({
+                    type: 'alternative',
+                    window: 'tomorrow_pm',
+                    windowLabel: TIME_WINDOWS['tomorrow_pm'].label,
+                    pricing: pmPricing,
+                    badge: 'Good Value',
+                    badgeClass: 'selected'
+                });
+            }
+
+            // Add tomorrow evening if available
+            if (availableWindows.includes('tomorrow_eve')) {
+                const evePricing = calculatePricing(hours, 'tomorrow_eve', rush, addons);
+                options.push({
+                    type: 'alternative',
+                    window: 'tomorrow_eve',
+                    windowLabel: TIME_WINDOWS['tomorrow_eve'].label,
+                    pricing: evePricing,
+                    badge: 'Evening',
+                    badgeClass: 'premium'
+                });
+            }
 
             return options;
         }
 
-        if (!isTimeWindowAvailable(selectedWindow)) {
-            console.warn('Selected window no longer available, using flexible');
-            return generatePricingOptions(hours, 'flexible', rush, addons);
-        }
+        // Show all available windows with appropriate pricing
+        availableWindows.forEach(window => {
+            const pricing = calculatePricing(hours, window, rush, addons);
+            const isSelected = window === selectedWindow;
 
-        const selectedIndex = availableWindows.indexOf(selectedWindow);
-        const selectedPricing = calculatePricing(hours, selectedWindow, rush, addons);
+            let badge, badgeClass, type;
 
-        if (selectedIndex > 0) {
-            const soonerWindow = availableWindows[selectedIndex - 1];
-            if (isTimeWindowAvailable(soonerWindow)) {
-                const soonerPricing = calculatePricing(hours, soonerWindow, rush, addons);
-                const soonerTotal = soonerPricing.total * (1 + PREMIUM_SOONER);
-                options.push({
-                    type: 'sooner',
-                    window: soonerWindow,
-                    windowLabel: TIME_WINDOWS[soonerWindow],
-                    pricing: {
-                        ...soonerPricing,
-                        total: soonerTotal,
-                        premiums: [...soonerPricing.premiums, { label: 'Sooner premium (20%)', amount: soonerPricing.total * PREMIUM_SOONER }]
-                    },
-                    badge: 'Premium',
-                    badgeClass: 'premium'
-                });
+            if (window.startsWith('today')) {
+                badge = 'Today';
+                badgeClass = 'premium';
+                type = 'today';
+            } else if (window.includes('eve')) {
+                badge = 'Evening';
+                badgeClass = 'premium';
+                type = 'evening';
+            } else {
+                badge = 'Tomorrow';
+                badgeClass = 'selected';
+                type = 'tomorrow';
             }
-        }
 
-        options.push({
-            type: 'selected',
-            window: selectedWindow,
-            windowLabel: TIME_WINDOWS[selectedWindow],
-            pricing: selectedPricing,
-            badge: 'Your Choice',
-            badgeClass: 'selected'
+            if (isSelected) {
+                badge = 'Selected';
+            }
+
+            options.push({
+                type: type,
+                window: window,
+                windowLabel: TIME_WINDOWS[window].label,
+                pricing: pricing,
+                badge: badge,
+                badgeClass: badgeClass
+            });
         });
-
-        if (selectedIndex < availableWindows.length - 1) {
-            const laterWindow = availableWindows[selectedIndex + 1];
-            if (isTimeWindowAvailable(laterWindow)) {
-                const laterPricing = calculatePricing(hours, laterWindow, rush, addons);
-                const laterTotal = laterPricing.total * (1 - DISCOUNT_LATER);
-                options.push({
-                    type: 'later',
-                    window: laterWindow,
-                    windowLabel: TIME_WINDOWS[laterWindow],
-                    pricing: {
-                        ...laterPricing,
-                        total: laterTotal,
-                        premiums: [...laterPricing.premiums, { label: 'Later discount (-10%)', amount: -laterPricing.total * DISCOUNT_LATER }]
-                    },
-                    badge: 'Save',
-                    badgeClass: 'discount'
-                });
-            }
-        }
 
         return options;
     }
 
     function showEstimatePanel(estimate) {
         const isFlexible = formData.window === 'flexible';
+        const isFuture = formData.futureDate !== null;
+
         const flexibleNotice = document.getElementById('flexibleNotice');
         if (isFlexible) {
             flexibleNotice.classList.remove('hidden');
@@ -2051,6 +2170,17 @@
             optionCard.dataset.optionType = option.type;
             optionCard.dataset.window = option.window;
 
+            // Show pricing breakdown
+            let breakdownHTML = '';
+            if (option.pricing.premiums && option.pricing.premiums.length > 0) {
+                breakdownHTML = '<div class="text-xs text-slate-500 mt-2">';
+                option.pricing.premiums.forEach(premium => {
+                    const sign = premium.amount >= 0 ? '+' : '';
+                    breakdownHTML += `<div>${premium.label}: ${sign}$${Math.abs(premium.amount).toFixed(0)}</div>`;
+                });
+                breakdownHTML += '</div>';
+            }
+
             optionCard.innerHTML = `
                 <div class="pricing-badge ${option.badgeClass}">${option.badge}</div>
                 <div class="flex items-center justify-between">
@@ -2060,9 +2190,9 @@
                     </div>
                     <div class="text-right">
                         <div class="text-2xl font-bold">$${option.pricing.total.toFixed(0)}</div>
-                        ${option.type !== 'selected' && option.type !== 'flexible' ? `<div class="text-sm text-slate-500">vs $${estimate.pricingOptions.find(o => o.type === 'selected' || o.type === 'flexible').pricing.total.toFixed(0)}</div>` : ''}
                     </div>
                 </div>
+                ${breakdownHTML}
             `;
 
             optionCard.addEventListener('click', () => selectPricingOption(option, optionCard));
@@ -2111,32 +2241,34 @@
             return;
         }
 
-        const currentAddons = calculateAddons(formData.category);
-        const hours = TASKS[formData.category]?.hours || 1.5;
-        const updatedPricing = calculatePricing(hours, selectedPricingOption.window, formData.rush, currentAddons);
+        // CRITICAL: Use the exact pricing from the selected option, do not recalculate
+        const finalAmount = selectedPricingOption.pricing.total;
 
-        selectedPricingOption.pricing = updatedPricing;
-        debugPricingFlow('PAYMENT_MODAL_OPENED', updatedPricing);
+        debugPricingFlow('PAYMENT_MODAL_OPENED', {
+            selectedOption: selectedPricingOption,
+            finalAmount: finalAmount
+        });
 
-        document.getElementById('paymentAmount').textContent = '$' + updatedPricing.total.toFixed(0);
+        document.getElementById('paymentAmount').textContent = '$' + finalAmount.toFixed(0);
         document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
         document.getElementById('paymentModal').classList.remove('hidden');
 
         paymentElementReady = false;
 
         try {
-            console.log('🔄 Setting up payment intent...');
+            console.log('🔄 Setting up payment intent for amount:', finalAmount);
             const response = await fetch('/.netlify/functions/create-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: updatedPricing.total,
+                    amount: finalAmount,
                     customer_info: formData,
                     job_details: {
                         category: formData.category,
                         window: selectedPricingOption.window,
                         hours: estimateData.hours,
-                        selected_option_type: selectedPricingOption.type
+                        selected_option_type: selectedPricingOption.type,
+                        futureDate: formData.futureDate
                     }
                 })
             });
@@ -2257,6 +2389,8 @@
         const taskId = generateTaskId();
         window.currentTaskId = taskId;
 
+        const paidAmount = selectedPricingOption.pricing.total;
+
         document.getElementById('summaryTaskId').textContent = taskId;
         document.getElementById('summaryName').textContent = formData.name;
         document.getElementById('summaryPhone').textContent = formData.phone;
@@ -2264,6 +2398,7 @@
         document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
         document.getElementById('summaryWindow').textContent = selectedPricingOption.windowLabel;
         document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
+        document.getElementById('summaryAmount').textContent = '$' + paidAmount.toFixed(2);
 
         document.getElementById('contactPhone').value = formData.phone;
         document.getElementById('taskInfoModal').classList.remove('hidden');
@@ -2271,6 +2406,16 @@
 
     async function submitTaskInfo(event) {
         event.preventDefault();
+
+        const propertyAddress = document.getElementById('propertyAddress').value;
+
+        // Validate property address
+        const addressValidation = validatePropertyAddress(propertyAddress);
+        if (!addressValidation.valid) {
+            alert('Address Error: ' + addressValidation.message);
+            document.getElementById('propertyAddress').focus();
+            return;
+        }
 
         const submitBtn = event.target.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
@@ -2299,7 +2444,7 @@
             address: currentFormData.address || '',
             description: currentFormData.description || '',
             rush: currentFormData.rush || false,
-            property_address: document.getElementById('propertyAddress').value,
+            property_address: propertyAddress,
             contact_phone: document.getElementById('contactPhone').value,
             access_details: document.getElementById('accessDetails').value || '',
             pets_and_special: document.getElementById('petsAndSpecial').value || '',
@@ -2323,7 +2468,7 @@
                 rush: currentFormData.rush || false
             },
             task_info: {
-                property_address: document.getElementById('propertyAddress').value,
+                property_address: propertyAddress,
                 contact_phone: document.getElementById('contactPhone').value,
                 access_details: document.getElementById('accessDetails').value || '',
                 pets_and_special: document.getElementById('petsAndSpecial').value || '',
@@ -2343,7 +2488,7 @@
                 customer_phone: completeJobData.phone,
                 task_id: taskId,
                 service_name: TASKS[completeJobData.category]?.label,
-                time_window: TIME_WINDOWS[completeJobData.window],
+                time_window: TIME_WINDOWS[completeJobData.window]?.label || completeJobData.window,
                 total_amount: selectedPricingOption.pricing.total.toFixed(0)
             });
         } catch (smsError) {
@@ -2372,6 +2517,7 @@
         }
 
         document.getElementById('finalTaskId').textContent = taskId;
+        document.getElementById('finalPaidAmount').textContent = ' + selectedPricingOption.pricing.total.toFixed(2);
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
@@ -2560,7 +2706,7 @@
             const select = document.getElementById('taskWindow');
             const availableWindows = getAvailableTimeWindows();
 
-            select.innerHTML = '<option value="flexible">I\'m flexible (lowest price)</option>';
+            select.innerHTML = '<option value="flexible">I\'m flexible (best value)</option>';
 
             const separator = document.createElement('option');
             separator.disabled = true;
@@ -2570,7 +2716,7 @@
             availableWindows.forEach(windowKey => {
                 const option = document.createElement('option');
                 option.value = windowKey;
-                option.textContent = TIME_WINDOWS[windowKey];
+                option.textContent = TIME_WINDOWS[windowKey].label;
                 select.appendChild(option);
             });
 
@@ -2579,6 +2725,23 @@
 
         populateTimeWindows();
         setInterval(populateTimeWindows, 60000);
+
+        // Setup future date picker constraints
+        function setupDatePicker() {
+            const dateInput = document.getElementById('futureDate');
+            const today = new Date();
+            const minDate = new Date(today);
+            minDate.setDate(minDate.getDate() + 2);
+            const maxDate = new Date(today);
+            maxDate.setDate(maxDate.getDate() + 14);
+
+            dateInput.min = minDate.toISOString().split('T')[0];
+            dateInput.max = maxDate.toISOString().split('T')[0];
+
+            console.log('📅 Date picker configured: min=', dateInput.min, 'max=', dateInput.max);
+        }
+
+        setupDatePicker();
 
         initializeStripe();
 
