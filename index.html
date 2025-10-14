@@ -1180,7 +1180,7 @@
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2">
             <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
-            <span>© <span id="year"></span> SendAHandyman v 1.5.7<span id="version"></span></span>
+            <span>© <span id="year"></span> SendAHandyman v1.6.0<span id="version"></span></span>
         </div>
         <div class="flex items-center gap-4">
             <a href="privacy.html" class="hover:text-slate-900">Privacy</a>
@@ -2558,7 +2558,7 @@
         }
 
         document.getElementById('finalTaskId').textContent = taskId;
-        document.getElementById('finalPaidAmount').textContent = ' + selectedPricingOption.pricing.total.toFixed(2);
+        document.getElementById('finalPaidAmount').textContent = '$' + selectedPricingOption.pricing.total.toFixed(2);
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
