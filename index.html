@@ -1180,7 +1180,7 @@
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2">
             <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
-            <span>© <span id="year"></span> SendAHandyman v1.6.0<span id="version"></span></span>
+            <span>© <span id="year"></span> SendAHandyman v1.6.1<span id="version"></span></span>
         </div>
         <div class="flex items-center gap-4">
             <a href="privacy.html" class="hover:text-slate-900">Privacy</a>
@@ -2247,131 +2247,108 @@
         console.log('✅ Selected pricing option:', selectedPricingOption);
     }
 
-    async function showPaymentModal() {
-        if (!selectedPricingOption) {
-            alert('Please select a pricing option first');
-            return;
-        }
+async function showPaymentModal() {
+    if (!selectedPricingOption) {
+        alert('Please select a pricing option first');
+        return;
+    }
 
-        if (!stripe) {
-            alert('Payment system is still loading. Please try again in a moment.');
-            return;
-        }
+    if (!stripe) {
+        alert('Payment system is still loading. Please try again in a moment.');
+        return;
+    }
 
-        // CRITICAL: Use the exact pricing from the selected option, do not recalculate
-        const finalAmount = selectedPricingOption.pricing.total;
+    const finalAmount = selectedPricingOption.pricing.total;
 
-        debugPricingFlow('PAYMENT_MODAL_OPENED', {
-            selectedOption: selectedPricingOption,
-            finalAmount: finalAmount
+    debugPricingFlow('PAYMENT_MODAL_OPENED', {
+        selectedOption: selectedPricingOption,
+        finalAmount: finalAmount
+    });
+
+    document.getElementById('paymentAmount').textContent = '$' + finalAmount.toFixed(0);
+    document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
+    document.getElementById('paymentModal').classList.remove('hidden');
+
+    paymentElementReady = false;
+
+    try {
+        console.log('🔄 Setting up payment intent...');
+
+        const response = await fetch('/.netlify/functions/create-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                amount: finalAmount,
+                customer_info: formData,
+                job_details: {
+                    category: formData.category,
+                    window: selectedPricingOption.window,
+                    hours: estimateData.hours,
+                    selected_option_type: selectedPricingOption.type,
+                    futureDate: formData.futureDate
+                }
+            })
         });
 
-        document.getElementById('paymentAmount').textContent = '$' + finalAmount.toFixed(0);
-        document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
-        document.getElementById('paymentModal').classList.remove('hidden');
+        if (!response.ok) {
+            throw new Error('Payment setup failed');
+        }
 
-        // Clean up any existing payment element
+        const result = await response.json();
+        paymentIntentId = result.payment_intent_id;
+
+        console.log('💳 Initializing Stripe Elements...');
+
+        // Simple unmount if exists
         if (paymentElement) {
             try {
-                paymentElement.destroy();
-                paymentElement = null;
+                paymentElement.unmount();
             } catch (e) {
-                console.log('Payment element cleanup:', e.message);
+                console.log('Previous payment element unmount warning (safe to ignore):', e.message);
             }
         }
-        if (elements) {
-            elements = null;
-        }
 
-        paymentElementReady = false;
-        paymentIntentId = null;
-
-        try {
-            console.log('🔄 Creating new payment intent for amount:', finalAmount);
-            const response = await fetch('/.netlify/functions/create-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: finalAmount,
-                    customer_info: formData,
-                    job_details: {
-                        category: formData.category,
-                        window: selectedPricingOption.window,
-                        hours: estimateData.hours,
-                        selected_option_type: selectedPricingOption.type,
-                        futureDate: formData.futureDate
-                    }
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Payment setup failed');
+        elements = stripe.elements({
+            clientSecret: result.client_secret,
+            appearance: {
+                theme: 'stripe'
             }
+        });
 
-            const result = await response.json();
-            paymentIntentId = result.payment_intent_id;
+        paymentElement = elements.create('payment', {
+            layout: 'tabs'
+        });
 
-            console.log('💳 Initializing Stripe Elements with client secret...');
-
-            elements = stripe.elements({
-                clientSecret: result.client_secret,
-                appearance: {
-                    theme: 'stripe',
-                    variables: {
-                        colorPrimary: '#4f46e5',
-                    }
-                }
-            });
-
-            paymentElement = elements.create('payment', {
-                layout: 'tabs'
-            });
-
-            const paymentElementContainer = document.getElementById('stripe-payment-element');
-            paymentElementContainer.innerHTML = ''; // Clear any previous content
-
+        await new Promise((resolve, reject) => {
             paymentElement.mount('#stripe-payment-element');
 
-            // Wait for the element to be ready
-            await new Promise((resolve, reject) => {
-                let resolved = false;
-
-                paymentElement.on('ready', () => {
-                    if (!resolved) {
-                        console.log('✅ Payment element mounted and ready');
-                        paymentElementReady = true;
-                        resolved = true;
-                        resolve();
-                    }
-                });
-
-                paymentElement.on('loaderror', (error) => {
-                    if (!resolved) {
-                        console.error('❌ Payment element load error:', error);
-                        resolved = true;
-                        reject(error);
-                    }
-                });
-
-                // Timeout fallback
-                setTimeout(() => {
-                    if (!resolved) {
-                        console.log('⚠️ Payment element ready timeout');
-                        resolved = true;
-                        reject(new Error('Payment element failed to load'));
-                    }
-                }, 10000);
+            paymentElement.on('ready', () => {
+                console.log('✅ Payment element ready');
+                paymentElementReady = true;
+                resolve();
             });
 
-        } catch (error) {
-            console.error('❌ Payment setup error:', error);
-            const messageEl = document.getElementById('paymentMessage');
-            messageEl.textContent = 'Payment setup failed: ' + error.message + '. Please try again or contact support.';
-            messageEl.classList.remove('hidden');
-            messageEl.className = 'mt-4 text-sm text-red-600';
-        }
+            paymentElement.on('error', (error) => {
+                console.error('❌ Payment element error:', error);
+                reject(error);
+            });
+
+            setTimeout(() => {
+                if (!paymentElementReady) {
+                    console.log('⚠️ Payment element ready timeout, assuming mounted');
+                    paymentElementReady = true;
+                }
+                resolve();
+            }, 3000);
+        });
+
+    } catch (error) {
+        console.error('❌ Payment setup error:', error);
+        document.getElementById('paymentMessage').textContent = 'Payment setup failed. Please try again.';
+        document.getElementById('paymentMessage').classList.remove('hidden');
+        document.getElementById('paymentMessage').className = 'mt-4 text-sm text-red-600';
     }
+}
 
     async function processPayment(event) {
         event.preventDefault();
