@@ -2517,7 +2517,7 @@
         }
 
         document.getElementById('finalTaskId').textContent = taskId;
-        document.getElementById('finalPaidAmount').textContent = ' + selectedPricingOption.pricing.total.toFixed(2);
+        document.getElementById('finalPaidAmount').textContent = '$' + selectedPricingOption.pricing.total.toFixed(2);
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
