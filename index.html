@@ -802,8 +802,8 @@
                 <div class="service-header p-4">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="font-semibold text-lg">🔧 General Handyman (2+ hours)</h3>
-                            <p class="text-sm text-slate-600">~2.5 hr minimum • Starting at $200</p>
+                            <h3 class="font-semibold text-lg">🔧 General Handyman (3+ hours)</h3>
+                            <p class="text-sm text-slate-600">~3 hr minimum • Starting at $240</p>
                         </div>
                         <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
                     </div>
@@ -814,7 +814,7 @@
                             <div>
                                 <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
                                 <ul class="text-sm space-y-1 text-slate-700">
-                                    <li>• 2.5-hour minimum for general repairs & tasks</li>
+                                    <li>• 3-hour minimum for general repairs & tasks</li>
                                     <li>• Basic tools and hardware</li>
                                     <li>• Multiple small tasks or one larger project</li>
                                     <li>• Troubleshooting and problem-solving</li>
@@ -903,8 +903,7 @@
                         <option value="appliance_hookup">Appliance hookup (W/D/DW)</option>
                         <option value="furniture_assembly">Furniture assembly (small–medium)</option>
                         <option value="closet_organizer">Closet organizer install</option>
-                        <option value="general_handyman">General handyman (2+ hours)</option>
-                        <option value="minor_repairs">Minor repairs</option>
+                        <option value="general_handyman">General handyman (3+ hours)</option>
                     </select>
                 </div>
                 <div>
@@ -1180,7 +1179,7 @@
     <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
         <div class="flex items-center gap-2">
             <img src="/images/helpinghands_logo.png" alt="Helping Hands Logo" class="h-8 w-auto">
-            <span>© <span id="year"></span> SendAHandyman v<span id="version"></span></span>
+            <span>© <span id="year"></span> SendAHandyman v1<span id="version"></span></span>
         </div>
         <div class="flex items-center gap-4">
             <a href="privacy.html" class="hover:text-slate-900">Privacy</a>
@@ -1535,8 +1534,8 @@
             ]
         },
         general_handyman: {
-            hours: 2.5,
-            label: "General Handyman (2+ hours)",
+            hours: 3,
+            label: "General Handyman (3+ hours)",
             questions: [
                 {
                     id: 'task_complexity',
@@ -2530,7 +2529,7 @@
         document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
         document.getElementById('summaryWindow').textContent = selectedPricingOption.windowLabel;
         document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
-        document.getElementById('summaryAmount').textContent = ' + paidAmount.toFixed(2);
+        document.getElementById('summaryAmount').textContent = '$' + paidAmount.toFixed(2);
 
         document.getElementById('contactPhone').value = formData.phone;
         document.getElementById('taskInfoModal').classList.remove('hidden');
