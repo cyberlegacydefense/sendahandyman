@@ -33,6 +33,7 @@
         }
         .pricing-option {
             transition: all 0.2s ease;
+            margin-bottom: 0.75rem;
         }
         .pricing-option:hover {
             transform: translateY(-2px);
@@ -827,9 +828,16 @@
                 </div>
             </div>
             <div class="mt-4">
-                <label class="text-sm font-semibold">Or select a future date (up to 2 weeks) - 15% discount!</label>
+                <label class="text-sm font-semibold">Or select a future week date (up to 2 weeks) - 15% discount!</label>
                 <input type="date" id="futureDate" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
-                <p class="text-xs text-slate-500 mt-1">Select a date 2-14 days in the future for best savings (Sundays not available, Saturdays 8AM-12PM only with 30% premium)</p>
+                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                    <div class="font-semibold mb-1">📅 Booking Calendar Rules:</div>
+                    <div class="grid grid-cols-1 gap-1">
+                        <div>✅ <strong>Mon-Fri:</strong> All time slots available with 15% discount</div>
+                        <div>⚠️ <strong>Saturday:</strong> Only 8AM-12PM available with 30% premium (no discount)</div>
+                        <div>🚫 <strong>Sunday:</strong> Not available (will be blocked if attempted)</div>
+                    </div>
+                </div>
             </div>
             <div id="taskQuestions" class="mt-4 hidden">
                 <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -1080,7 +1088,7 @@
     let selectedPricingOption = null;
     let paymentIntentId = null;
     let paymentElementReady = false;
-    const APP_VERSION = "2.0.3";
+    const APP_VERSION = "2.0.5";
     const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
     let stripe, elements, paymentElement;
     const RATE = 80;
@@ -1728,14 +1736,35 @@
             bookingDate = new Date(selectedDate);
         }
         const isBookingSaturday = bookingDate && isSaturday(bookingDate);
+
+        // Debug logging for Saturday pricing
+        if (isBookingSaturday && isFuture) {
+            console.log('🔍 Saturday Future Booking Detected:', {
+                date: bookingDate.toDateString(),
+                basePrice: base,
+                expectedPremium: base * PREMIUM_SATURDAY,
+                shouldNotHaveDiscount: true
+            });
+        }
+
         if (isFuture) {
-            const discount = base * DISCOUNT_FUTURE;
-            premiums.push({ label: 'Future booking discount (-15%)', amount: -discount });
-            total -= discount;
-            if (isBookingSaturday) {
+            // CRITICAL: Evening blocks NEVER get discounts - always +35% premium
+            if (isEveningBlock) {
+                const premium = base * PREMIUM_EVENING_BLOCK;
+                premiums.push({ label: 'Evening block premium (4-8PM, +35%)', amount: premium });
+                total += premium;
+                console.log('🌙 Evening block detected for future date - applying +35% premium (NO discount)');
+            }
+            // For future bookings, Saturday gets +30% premium INSTEAD of -15% discount
+            else if (isBookingSaturday) {
                 const satPremium = base * PREMIUM_SATURDAY;
                 premiums.push({ label: 'Saturday service premium (+30%)', amount: satPremium });
                 total += satPremium;
+            } else {
+                // Only apply 15% discount for non-Saturday, non-evening future bookings
+                const discount = base * DISCOUNT_FUTURE;
+                premiums.push({ label: 'Future booking discount (-15%)', amount: -discount });
+                total -= discount;
             }
         } else if (isToday) {
             if (isBookingSaturday) {
@@ -1904,6 +1933,8 @@
             console.log('📊 AI scope result:', aiResult);
             const pricingOptions = generatePricingOptions(hours, data.window, data.rush, addons, data.futureDate);
             console.log('💰 Generated pricing options:', pricingOptions);
+            console.log('📊 Future date selected:', data.futureDate);
+            console.log('🔢 Number of options:', pricingOptions.length);
             estimateData = {
                 ...aiResult,
                 hours,
@@ -1926,40 +1957,144 @@
     function generatePricingOptions(hours, selectedWindow, rush, addons = 0, selectedDate = null) {
         const options = [];
         const availableWindows = getAvailableTimeWindows();
+
         if (selectedDate) {
             const dateObj = new Date(selectedDate + 'T00:00:00');
+
             if (isSunday(dateObj)) {
                 alert('Sunday bookings are not available. Please select a different date.');
                 return [];
             }
-            const formattedDate = dateObj.toLocaleDateString('en-US', {
+
+            const isSelectedSaturday = isSaturday(dateObj);
+
+            // Calculate day before and day after
+            const dayBefore = new Date(dateObj);
+            dayBefore.setDate(dayBefore.getDate() - 1);
+            let dayAfter = new Date(dateObj);
+            dayAfter.setDate(dayAfter.getDate() + 1);
+
+            // Skip Sunday for day after
+            if (isSunday(dayAfter)) {
+                dayAfter.setDate(dayAfter.getDate() + 1); // Move to Monday
+            }
+
+            const formattedDateBefore = dayBefore.toLocaleDateString('en-US', {
                 weekday: 'short',
                 month: 'short',
                 day: 'numeric'
             });
-            const isSelectedSaturday = isSaturday(dateObj);
-            const futureTimeBlocks = isSelectedSaturday
-                ? [{ key: 'morning', label: '8AM-12PM', start: 8, end: 12 }]
-                : [
-                    { key: 'morning', label: '8AM-12PM', start: 8, end: 12 },
-                    { key: 'afternoon', label: '12PM-4PM', start: 12, end: 16 },
-                    { key: 'evening', label: '4PM-8PM', start: 16, end: 20 }
-                  ];
-            futureTimeBlocks.forEach(block => {
-                const pricing = calculatePricing(hours, 'tomorrow_am', rush, addons, selectedDate);
-                options.push({
-                    type: 'future',
-                    window: `future_${block.key}`,
-                    windowLabel: `${formattedDate} (${block.label})${isSelectedSaturday ? ' - Saturday Only' : ''}`,
-                    pricing: pricing,
-                    badge: isSelectedSaturday ? 'Saturday' : 'Future Booking',
-                    badgeClass: isSelectedSaturday ? 'premium' : 'discount',
-                    selectedDate: selectedDate,
-                    timeBlock: block
-                });
+
+            const formattedDateSelected = dateObj.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
             });
+
+            const formattedDateAfter = dayAfter.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+
+            const isDayBeforeSaturday = isSaturday(dayBefore);
+            const isDayAfterSaturday = isSaturday(dayAfter);
+
+            // Helper function to get time block label
+            const getTimeBlockLabel = (blockKey) => {
+                if (blockKey === 'morning') return '8AM-12PM';
+                if (blockKey === 'afternoon') return '12PM-4PM';
+                if (blockKey === 'evening') return '4PM-8PM';
+                return '';
+            };
+
+            // Helper function to create pricing option
+            const createOption = (date, block, dateLabel, sectionType, isSat) => {
+                const dateString = date.toISOString().split('T')[0];
+                // Pass correct window identifier for evening blocks
+                const windowIdentifier = block.key === 'evening' ? 'tomorrow_eve' : 'tomorrow_am';
+                const pricing = calculatePricing(hours, windowIdentifier, rush, addons, dateString);
+
+                let badge, badgeClass;
+                if (block.key === 'evening') {
+                    badge = 'Evening +35%';
+                    badgeClass = 'premium';
+                } else if (isSat) {
+                    badge = 'Saturday +30%';
+                    badgeClass = 'premium';
+                } else {
+                    badge = 'Future -15%';
+                    badgeClass = 'discount';
+                }
+
+                return {
+                    type: 'future',
+                    window: `future_${date.getTime()}_${block.key}`,
+                    windowLabel: `${dateLabel} (${block.label})`,
+                    pricing: pricing,
+                    badge: badge,
+                    badgeClass: badgeClass,
+                    selectedDate: dateString,
+                    timeBlock: block,
+                    sectionType: sectionType
+                };
+            };
+
+            const allTimeBlocks = [
+                { key: 'morning', label: '8AM-12PM', start: 8, end: 12 },
+                { key: 'afternoon', label: '12PM-4PM', start: 12, end: 16 },
+                { key: 'evening', label: '4PM-8PM', start: 16, end: 20 }
+            ];
+
+            // DAY BEFORE OPTIONS (all 3 time slots unless Saturday)
+            const dayBeforeBlocks = isDayBeforeSaturday ? [allTimeBlocks[0]] : allTimeBlocks;
+            dayBeforeBlocks.forEach(block => {
+                options.push(createOption(
+                    dayBefore,
+                    block,
+                    formattedDateBefore,
+                    'Day Before (Better Value)',
+                    isDayBeforeSaturday
+                ));
+            });
+
+            // SELECTED DATE OPTIONS (all available time slots, or skip if Saturday)
+            if (!isSelectedSaturday) {
+                allTimeBlocks.forEach(block => {
+                    options.push(createOption(
+                        dateObj,
+                        block,
+                        formattedDateSelected,
+                        'Your Selected Date',
+                        false
+                    ));
+                });
+            } else {
+                // For Saturday, only show morning slot
+                options.push(createOption(
+                    dateObj,
+                    allTimeBlocks[0],
+                    formattedDateSelected,
+                    'Your Selected Date (Saturday)',
+                    true
+                ));
+            }
+
+            // DAY AFTER OPTIONS (all 3 time slots unless Saturday)
+            const dayAfterBlocks = isDayAfterSaturday ? [allTimeBlocks[0]] : allTimeBlocks;
+            dayAfterBlocks.forEach(block => {
+                options.push(createOption(
+                    dayAfter,
+                    block,
+                    formattedDateAfter,
+                    'Day After (Better Value)',
+                    isDayAfterSaturday
+                ));
+            });
+
             return options;
         }
+
         if (selectedWindow === 'flexible') {
             const now = new Date();
             const tomorrow = new Date(now);
@@ -2009,6 +2144,7 @@
             });
             return options;
         }
+
         availableWindows.forEach(window => {
             const pricing = calculatePricing(hours, window, rush, addons);
             const isSelected = window === selectedWindow;
@@ -2055,51 +2191,133 @@
 
     function showEstimatePanel(estimate) {
         const isFlexible = formData.window === 'flexible';
+        const hasFutureDate = formData.futureDate !== null && formData.futureDate !== '';
+
         const flexibleNotice = document.getElementById('flexibleNotice');
+        const futureDateNotice = document.getElementById('futureDateNotice');
+
         if (isFlexible) {
             flexibleNotice.classList.remove('hidden');
+            futureDateNotice.classList.add('hidden');
+        } else if (hasFutureDate) {
+            flexibleNotice.classList.add('hidden');
+            futureDateNotice.classList.remove('hidden');
         } else {
             flexibleNotice.classList.add('hidden');
+            futureDateNotice.classList.add('hidden');
         }
+
         const optionsContainer = document.getElementById('pricingOptions');
         optionsContainer.innerHTML = '';
-        estimate.pricingOptions.forEach((option, index) => {
-            const optionCard = document.createElement('div');
-            optionCard.className = 'pricing-option relative border-2 border-slate-200 rounded-xl p-4 cursor-pointer';
-            optionCard.dataset.optionType = option.type;
-            optionCard.dataset.window = option.window;
-            let breakdownHTML = '';
-            if (option.pricing.premiums && option.pricing.premiums.length > 0) {
-                breakdownHTML = '<div class="text-xs text-slate-500 mt-2">';
-                option.pricing.premiums.forEach(premium => {
-                    const sign = premium.amount >= 0 ? '+' : '';
-                    breakdownHTML += `<div>${premium.label}: ${sign}$${Math.abs(premium.amount).toFixed(0)}</div>`;
-                });
-                breakdownHTML += '</div>';
-            }
-            optionCard.innerHTML = `
-                <div class="pricing-badge ${option.badgeClass}">${option.badge}</div>
-                <div class="flex items-center justify-between">
-                    <div>
-                        <div class="font-semibold text-lg">${option.windowLabel}</div>
-                        <div class="text-sm text-slate-600">${estimate.hours.toFixed(1)} hours estimated</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold">$${option.pricing.total.toFixed(0)}</div>
-                    </div>
-                </div>
-                ${breakdownHTML}
-            `;
-            optionCard.addEventListener('click', () => selectPricingOption(option, optionCard));
-            optionsContainer.appendChild(optionCard);
-            if (index === 0) {
-                setTimeout(() => selectPricingOption(option, optionCard), 100);
-            }
-        });
+
+        // Group options by section if they have sectionType
+        const hasSections = estimate.pricingOptions.some(opt => opt.sectionType);
+
+        if (hasSections) {
+            // Group by section
+            const sections = {};
+            estimate.pricingOptions.forEach(option => {
+                const sectionName = option.sectionType || 'Other';
+                if (!sections[sectionName]) {
+                    sections[sectionName] = [];
+                }
+                sections[sectionName].push(option);
+            });
+
+            // Define section order
+            const sectionOrder = ['Day Before (Better Value)', 'Your Selected Date', 'Your Selected Date (Saturday)', 'Day After (Better Value)'];
+
+            sectionOrder.forEach(sectionName => {
+                if (sections[sectionName]) {
+                    // Add section divider (except for first section)
+                    if (optionsContainer.children.length > 0) {
+                        const divider = document.createElement('div');
+                        divider.className = 'section-divider';
+                        optionsContainer.appendChild(divider);
+                    }
+
+                    // Add section header
+                    const sectionHeader = document.createElement('div');
+                    sectionHeader.className = 'section-header-wrapper';
+
+                    let headerClass = 'text-base font-bold';
+                    let icon = '';
+                    let description = '';
+
+                    if (sectionName.includes('Better Value')) {
+                        headerClass += ' text-green-700';
+                        icon = '💰 ';
+                        description = '<span class="text-xs font-normal text-green-600 ml-2">(Save money with these options)</span>';
+                    } else if (sectionName.includes('Saturday')) {
+                        headerClass += ' text-orange-700';
+                        icon = '📅 ';
+                        description = '<span class="text-xs font-normal text-orange-600 ml-2">(Premium pricing applies)</span>';
+                    } else {
+                        headerClass += ' text-indigo-700';
+                        icon = '📌 ';
+                    }
+
+                    sectionHeader.innerHTML = `<div class="${headerClass}">${icon}${sectionName}${description}</div>`;
+                    optionsContainer.appendChild(sectionHeader);
+
+                    // Add options for this section
+                    sections[sectionName].forEach((option, index) => {
+                        const optionCard = createPricingOptionCard(option, estimate.hours, index === 0 && sectionName === 'Your Selected Date');
+                        optionsContainer.appendChild(optionCard);
+                    });
+                }
+            });
+        } else {
+            // No sections - display normally
+            estimate.pricingOptions.forEach((option, index) => {
+                const optionCard = createPricingOptionCard(option, estimate.hours, index === 0);
+                optionsContainer.appendChild(optionCard);
+            });
+        }
+
         document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
         document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
         document.getElementById('estimatePanel').classList.remove('hidden');
         document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function createPricingOptionCard(option, hours, autoSelect) {
+        const optionCard = document.createElement('div');
+        optionCard.className = 'pricing-option relative border-2 border-slate-200 rounded-xl p-4 cursor-pointer';
+        optionCard.dataset.optionType = option.type;
+        optionCard.dataset.window = option.window;
+
+        let breakdownHTML = '';
+        if (option.pricing.premiums && option.pricing.premiums.length > 0) {
+            breakdownHTML = '<div class="text-xs text-slate-500 mt-2">';
+            option.pricing.premiums.forEach(premium => {
+                const sign = premium.amount >= 0 ? '+' : '';
+                breakdownHTML += `<div>${premium.label}: ${sign}${Math.abs(premium.amount).toFixed(0)}</div>`;
+            });
+            breakdownHTML += '</div>';
+        }
+
+        optionCard.innerHTML = `
+            <div class="pricing-badge ${option.badgeClass}">${option.badge}</div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="font-semibold text-lg">${option.windowLabel}</div>
+                    <div class="text-sm text-slate-600">${hours.toFixed(1)} hours estimated</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-2xl font-bold">${option.pricing.total.toFixed(0)}</div>
+                </div>
+            </div>
+            ${breakdownHTML}
+        `;
+
+        optionCard.addEventListener('click', () => selectPricingOption(option, optionCard));
+
+        if (autoSelect) {
+            setTimeout(() => selectPricingOption(option, optionCard), 100);
+        }
+
+        return optionCard;
     }
 
     function selectPricingOption(option, cardElement) {
@@ -2673,24 +2891,34 @@
             maxDate.setDate(maxDate.getDate() + 14);
             dateInput.min = minDate.toISOString().split('T')[0];
             dateInput.max = maxDate.toISOString().split('T')[0];
+
+            // Improved validation with clearer messages
             dateInput.addEventListener('change', function(e) {
+                if (!e.target.value) return;
+
                 const selectedDate = new Date(e.target.value + 'T00:00:00');
+
                 if (isSunday(selectedDate)) {
-                    alert('❌ Sunday bookings are not available. Please select a different date.');
+                    alert('🚫 SUNDAYS NOT AVAILABLE\n\nWe do not offer service on Sundays. Please select Monday-Saturday.');
                     e.target.value = '';
                     return;
                 }
+
                 if (isSaturday(selectedDate)) {
-                    alert('ℹ️ Saturday bookings are available only for 8AM-12PM time slot with a 30% premium.');
+                    alert('📅 SATURDAY BOOKING NOTICE\n\n• Only 8AM-12PM time slot available\n• 30% Saturday premium applies\n• NO 15% future booking discount\n\nNet result: +30% premium for Saturday service');
                 }
             });
+
+            // Also block on input to prevent Sunday selection
             dateInput.addEventListener('input', function(e) {
+                if (!e.target.value) return;
                 const selectedDate = new Date(e.target.value + 'T00:00:00');
                 if (isSunday(selectedDate)) {
                     e.target.value = '';
                 }
             });
-            console.log('📅 Date picker configured: min=', dateInput.min, 'max=', dateInput.max, '(Sundays blocked)');
+
+            console.log('📅 Date picker configured: min=', dateInput.min, 'max=', dateInput.max, '(Sundays blocked, Saturdays +30%)');
         }
         try {
             setupDatePicker();
