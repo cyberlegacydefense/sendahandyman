@@ -2598,7 +2598,7 @@
         document.getElementById('summaryTask').textContent = TASKS[formData.category]?.label || formData.category;
         document.getElementById('summaryWindow').textContent = selectedPricingOption.windowLabel;
         document.getElementById('summaryDescription').textContent = formData.description || 'None provided';
-        document.getElementById('summaryAmount').textContent = ' + paidAmount.toFixed(2);
+        document.getElementById('summaryAmount').textContent = '$' + paidAmount.toFixed(2);
         document.getElementById('contactPhone').value = formData.phone;
         document.getElementById('taskInfoModal').classList.remove('hidden');
     }
@@ -2703,7 +2703,7 @@
             console.error('❌ Notification error:', error);
         }
         document.getElementById('finalTaskId').textContent = taskId;
-        document.getElementById('finalPaidAmount').textContent = ' + selectedPricingOption.pricing.total.toFixed(2);
+        document.getElementById('finalPaidAmount').textContent = '$' + selectedPricingOption.pricing.total.toFixed(2);
         document.getElementById('taskInfoModal').classList.add('hidden');
         document.getElementById('finalSuccessModal').classList.remove('hidden');
     }
