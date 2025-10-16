@@ -1088,7 +1088,7 @@
     let selectedPricingOption = null;
     let paymentIntentId = null;
     let paymentElementReady = false;
-    const APP_VERSION = "2.0.5";
+    const APP_VERSION = "2.0.6";
     const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
     let stripe, elements, paymentElement;
     const RATE = 80;
@@ -1733,17 +1733,21 @@
             bookingDate = new Date(now);
             bookingDate.setDate(bookingDate.getDate() + 2);
         } else if (isFuture && selectedDate) {
-            bookingDate = new Date(selectedDate);
+            bookingDate = new Date(selectedDate + 'T00:00:00');
         }
         const isBookingSaturday = bookingDate && isSaturday(bookingDate);
 
-        // Debug logging for Saturday pricing
-        if (isBookingSaturday && isFuture) {
-            console.log('🔍 Saturday Future Booking Detected:', {
-                date: bookingDate.toDateString(),
+        // ENHANCED DEBUG LOGGING
+        if (isFuture) {
+            console.log('🔍 PRICING CALCULATION:', {
+                selectedDate: selectedDate,
+                bookingDate: bookingDate ? bookingDate.toDateString() : 'null',
+                dayOfWeek: bookingDate ? bookingDate.getDay() : 'null',
+                isBookingSaturday: isBookingSaturday,
+                isEveningBlock: isEveningBlock,
+                window: window,
                 basePrice: base,
-                expectedPremium: base * PREMIUM_SATURDAY,
-                shouldNotHaveDiscount: true
+                hours: hours
             });
         }
 
@@ -1753,18 +1757,20 @@
                 const premium = base * PREMIUM_EVENING_BLOCK;
                 premiums.push({ label: 'Evening block premium (4-8PM, +35%)', amount: premium });
                 total += premium;
-                console.log('🌙 Evening block detected for future date - applying +35% premium (NO discount)');
+                console.log('🌙 Evening block: base=' + base + ', premium=' + premium + ', total=' + total);
             }
             // For future bookings, Saturday gets +30% premium INSTEAD of -15% discount
             else if (isBookingSaturday) {
                 const satPremium = base * PREMIUM_SATURDAY;
                 premiums.push({ label: 'Saturday service premium (+30%)', amount: satPremium });
                 total += satPremium;
+                console.log('📅 Saturday detected: base=' + base + ', premium=' + satPremium + ', total=' + total);
             } else {
                 // Only apply 15% discount for non-Saturday, non-evening future bookings
                 const discount = base * DISCOUNT_FUTURE;
                 premiums.push({ label: 'Future booking discount (-15%)', amount: -discount });
                 total -= discount;
+                console.log('💰 Future discount: base=' + base + ', discount=' + discount + ', total=' + total);
             }
         } else if (isToday) {
             if (isBookingSaturday) {
@@ -2011,9 +2017,28 @@
             // Helper function to create pricing option
             const createOption = (date, block, dateLabel, sectionType, isSat) => {
                 const dateString = date.toISOString().split('T')[0];
-                // Pass correct window identifier for evening blocks
-                const windowIdentifier = block.key === 'evening' ? 'tomorrow_eve' : 'tomorrow_am';
+                // Pass correct window identifier to properly calculate pricing
+                let windowIdentifier;
+                if (block.key === 'evening') {
+                    windowIdentifier = 'tomorrow_eve'; // This will trigger evening premium
+                } else if (block.key === 'afternoon') {
+                    windowIdentifier = 'tomorrow_pm';
+                } else {
+                    windowIdentifier = 'tomorrow_am';
+                }
+
+                // CRITICAL: Calculate pricing with the selected date to properly identify Saturday
                 const pricing = calculatePricing(hours, windowIdentifier, rush, addons, dateString);
+
+                console.log('💰 Creating option:', {
+                    date: dateString,
+                    block: block.key,
+                    isSaturday: isSat,
+                    window: windowIdentifier,
+                    basePrice: pricing.base,
+                    totalPrice: pricing.total,
+                    premiums: pricing.premiums
+                });
 
                 let badge, badgeClass;
                 if (block.key === 'evening') {
@@ -2900,31 +2925,55 @@
             dateInput.min = minDate.toISOString().split('T')[0];
             dateInput.max = maxDate.toISOString().split('T')[0];
 
-            // Improved validation with clearer messages
-            dateInput.addEventListener('change', function(e) {
-                if (!e.target.value) return;
+            // Add warning div below date input if it doesn't exist
+            let warningDiv = document.getElementById('datePickerWarning');
+            if (!warningDiv) {
+                warningDiv = document.createElement('div');
+                warningDiv.id = 'datePickerWarning';
+                warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 date-warning';
+                dateInput.parentNode.appendChild(warningDiv);
+            }
 
-                const selectedDate = new Date(e.target.value + 'T00:00:00');
-
-                if (isSunday(selectedDate)) {
-                    alert('🚫 SUNDAYS NOT AVAILABLE\n\nWe do not offer service on Sundays. Please select Monday-Saturday.');
-                    e.target.value = '';
+            // Improved validation with visual feedback
+            const validateDate = (e) => {
+                if (!e.target.value) {
+                    warningDiv.classList.add('hidden');
+                    dateInput.classList.remove('has-sunday-warning');
                     return;
                 }
 
-                if (isSaturday(selectedDate)) {
-                    alert('📅 SATURDAY BOOKING NOTICE\n\n• Only 8AM-12PM time slot available\n• 30% Saturday premium applies\n• NO 15% future booking discount\n\nNet result: +30% premium for Saturday service');
-                }
-            });
-
-            // Also block on input to prevent Sunday selection
-            dateInput.addEventListener('input', function(e) {
-                if (!e.target.value) return;
                 const selectedDate = new Date(e.target.value + 'T00:00:00');
+
                 if (isSunday(selectedDate)) {
+                    warningDiv.textContent = '🚫 SUNDAYS ARE NOT AVAILABLE - Please select Monday-Saturday';
+                    warningDiv.classList.remove('hidden');
+                    dateInput.classList.add('has-sunday-warning');
                     e.target.value = '';
+
+                    setTimeout(() => {
+                        alert('🚫 SUNDAYS NOT AVAILABLE\n\nWe do not offer service on Sundays. Please select Monday-Saturday.');
+                    }, 100);
+                    return;
                 }
-            });
+
+                warningDiv.classList.add('hidden');
+                dateInput.classList.remove('has-sunday-warning');
+
+                if (isSaturday(selectedDate)) {
+                    warningDiv.textContent = '📅 SATURDAY: Only 8AM-12PM available • 30% premium (no discount)';
+                    warningDiv.classList.remove('hidden');
+                    warningDiv.className = 'mt-2 p-2 bg-orange-50 border border-orange-200 rounded-lg text-xs text-orange-700 date-warning';
+
+                    setTimeout(() => {
+                        alert('📅 SATURDAY BOOKING NOTICE\n\n• Only 8AM-12PM time slot available\n• 30% Saturday premium applies\n• NO 15% future booking discount\n\nNet result: +30% premium for Saturday service');
+                    }, 100);
+                } else {
+                    warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 date-warning';
+                }
+            };
+
+            dateInput.addEventListener('change', validateDate);
+            dateInput.addEventListener('input', validateDate);
 
             console.log('📅 Date picker configured: min=', dateInput.min, 'max=', dateInput.max, '(Sundays blocked, Saturdays +30%)');
         }
