@@ -828,12 +828,12 @@
                 </div>
             </div>
             <div class="mt-4">
-                <label class="text-sm font-semibold">Or select a future week date (up to 2 weeks) - 15% discount!</label>
+                <label class="text-sm font-semibold">Or select a future week date (up to 2 weeks) - 10% discount!</label>
                 <input type="date" id="futureDate" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
                 <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
                     <div class="font-semibold mb-1">📅 Booking Calendar Rules:</div>
                     <div class="grid grid-cols-1 gap-1">
-                        <div>✅ <strong>Mon-Fri:</strong> All time slots available with 15% discount</div>
+                        <div>✅ <strong>Mon-Fri:</strong> All time slots available with 10% discount</div>
                         <div>⚠️ <strong>Saturday:</strong> Only 8AM-12PM available with 30% premium (no discount)</div>
                         <div>🚫 <strong>Sunday:</strong> Not available (will be blocked if attempted)</div>
                     </div>
@@ -1089,7 +1089,7 @@
     let selectedPricingOption = null;
     let paymentIntentId = null;
     let paymentElementReady = false;
-    const APP_VERSION = "2.0.7";
+    const APP_VERSION = "2.0.8";
     const STRIPE_PUBLISHABLE_KEY = 'pk_test_51Rz41zHQ4TkcNcqvEebLo8rN5MmgInckOQSG6tuZa4XoN6czEXbxK8FtXcJqEu9RbkHclHxRhXRHVRAxDJ2q6PtD00KbGASb91';
     let stripe, elements, paymentElement;
     const RATE = 80;
@@ -1097,7 +1097,7 @@
     const PREMIUM_NEXT_BLOCK = 0.20;
     const PREMIUM_EVENING_BLOCK = 0.35;
     const PREMIUM_SATURDAY = 0.30;
-    const DISCOUNT_FUTURE = 0.15;
+    const DISCOUNT_FUTURE = 0.10;
     const TIME_WINDOWS = {
         today_am: { label: "Today (8AM-12PM)", start: 8, end: 12 },
         today_pm: { label: "Today (12PM-4PM)", start: 12, end: 16 },
@@ -1725,7 +1725,6 @@
         const now = new Date();
         let bookingDate;
 
-        // FIXED: Check isFuture FIRST to use selected date correctly
         if (isFuture && selectedDate) {
             bookingDate = new Date(selectedDate + 'T00:00:00');
         } else if (isToday) {
@@ -1767,7 +1766,7 @@
                 console.log('📅 Saturday detected: base=' + base + ', premium=' + satPremium + ', total=' + total);
             } else {
                 const discount = base * DISCOUNT_FUTURE;
-                premiums.push({ label: 'Future booking discount (-15%)', amount: -discount });
+                premiums.push({ label: 'Future booking discount (-10%)', amount: -discount });
                 total -= discount;
                 console.log('💰 Future discount: base=' + base + ', discount=' + discount + ', total=' + total);
             }
@@ -1970,6 +1969,11 @@
 
             const dayBefore = new Date(dateObj);
             dayBefore.setDate(dayBefore.getDate() - 1);
+
+            if (isSunday(dayBefore)) {
+                dayBefore.setDate(dayBefore.getDate() - 1);
+            }
+
             let dayAfter = new Date(dateObj);
             dayAfter.setDate(dayAfter.getDate() + 1);
 
@@ -2036,7 +2040,7 @@
                     badge = 'Saturday +30%';
                     badgeClass = 'premium';
                 } else {
-                    badge = 'Future -15%';
+                    badge = 'Future -10%';
                     badgeClass = 'discount';
                 }
 
@@ -2110,27 +2114,30 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             let flexibleWindow;
             let flexibleLabel;
+
             if (isSunday(tomorrow)) {
                 flexibleWindow = 'monday_am';
                 flexibleLabel = 'Monday Morning (8AM-12PM) - Best Value';
             }
             else if (isSaturday(tomorrow)) {
-                flexibleWindow = 'tomorrow_am';
-                flexibleLabel = 'Tomorrow Morning (8AM-12PM) - Saturday';
+                flexibleWindow = 'monday_am';
+                flexibleLabel = 'Monday Morning (8AM-12PM) - Best Value';
             }
             else {
                 flexibleWindow = 'tomorrow_am';
                 flexibleLabel = 'Tomorrow Morning (8AM-12PM) - Best Value';
             }
+
             const pricing = calculatePricing(hours, flexibleWindow, rush, addons);
             options.push({
                 type: 'flexible',
                 window: flexibleWindow,
                 windowLabel: flexibleLabel,
                 pricing: pricing,
-                badge: isSaturday(tomorrow) ? 'Saturday' : 'Best Value',
-                badgeClass: isSaturday(tomorrow) ? 'premium' : 'discount'
+                badge: 'Best Value',
+                badgeClass: 'discount'
             });
+
             availableWindows.forEach(window => {
                 if (window !== flexibleWindow && !window.includes('today')) {
                     const altPricing = calculatePricing(hours, window, rush, addons);
@@ -2146,7 +2153,7 @@
                         window: window,
                         windowLabel: TIME_WINDOWS[window].label,
                         pricing: altPricing,
-                        badge: isAltSaturday ? 'Saturday' : 'Good Value',
+                        badge: isAltSaturday ? 'Saturday' : 'Alternative',
                         badgeClass: isAltSaturday ? 'premium' : 'selected'
                     });
                 }
@@ -2195,6 +2202,27 @@
                 badgeClass: badgeClass
             });
         });
+
+        if (options.length === 1 && options[0].window === 'tomorrow_am') {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            if (isSaturday(tomorrow)) {
+                ['monday_am', 'monday_pm', 'monday_eve'].forEach(mondayWindow => {
+                    const mondayPricing = calculatePricing(hours, mondayWindow, rush, addons);
+                    options.push({
+                        type: 'monday',
+                        window: mondayWindow,
+                        windowLabel: TIME_WINDOWS[mondayWindow].label,
+                        pricing: mondayPricing,
+                        badge: 'Alternative',
+                        badgeClass: 'selected'
+                    });
+                });
+            }
+        }
+
         return options;
     }
 
@@ -2932,7 +2960,7 @@
                     warningDiv.className = 'mt-2 p-2 bg-orange-50 border border-orange-200 rounded-lg text-xs text-orange-700 date-warning';
 
                     setTimeout(() => {
-                        alert('📅 SATURDAY BOOKING NOTICE\n\n• Only 8AM-12PM time slot available\n• 30% Saturday premium applies\n• NO 15% future booking discount\n\nNet result: +30% premium for Saturday service');
+                        alert('📅 SATURDAY BOOKING NOTICE\n\n• Only 8AM-12PM time slot available\n• 30% Saturday premium applies\n• NO 10% future booking discount\n\nNet result: +30% premium for Saturday service');
                     }, 100);
                 } else {
                     warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 date-warning';
