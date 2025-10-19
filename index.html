@@ -393,7 +393,7 @@
                                 <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
                                 <ul class="text-sm space-y-1 text-slate-700">
                                     <li>• +$40: Mounting on brick, concrete, or over fireplace</li>
-                                    <li>• +$25: TVs larger than 65"</li>
+                                    <li>• +$50: TVs larger than 65"</li>
                                     <li>• New outlet/electrical work not included</li>
                                 </ul>
                             </div>
@@ -1198,7 +1198,7 @@
                     label: 'What size is your TV?',
                     options: [
                         { value: 'standard', label: '32-65 inches', addon: 0 },
-                        { value: 'large', label: 'Larger than 65 inches', addon: 25 }
+                        { value: 'large', label: 'Larger than 65 inches', addon: 50 }
                     ]
                 },
                 {
@@ -1260,8 +1260,8 @@
                     label: 'Type of fixture?',
                     options: [
                         { value: 'standard', label: 'Standard light fixture', addon: 0 },
-                        { value: 'small_chandelier', label: 'Chandelier (under 25 lbs)', addon: 0 },
-                        { value: 'heavy_chandelier', label: 'Heavy chandelier (over 25 lbs)', addon: 40 }
+                        { value: 'small_chandelier', label: 'Chandelier (under 25 lbs)', addon: 100 },
+                        { value: 'heavy_chandelier', label: 'Heavy chandelier (over 25 lbs)', addon: 200 }
                     ]
                 },
                 {
@@ -2113,29 +2113,40 @@
             const tomorrow = new Date(now);
             tomorrow.setDate(tomorrow.getDate() + 1);
             let flexibleWindow;
-            let flexibleLabel;
+            let flexibleDate;
 
             if (isSunday(tomorrow)) {
                 flexibleWindow = 'monday_am';
-                flexibleLabel = 'Monday Morning (8AM-12PM) - Best Value';
+                const daysUntilMonday = (8 - now.getDay()) % 7;
+                flexibleDate = new Date(now);
+                flexibleDate.setDate(flexibleDate.getDate() + (daysUntilMonday === 0 ? 7 : daysUntilMonday));
             }
             else if (isSaturday(tomorrow)) {
                 flexibleWindow = 'monday_am';
-                flexibleLabel = 'Monday Morning (8AM-12PM) - Best Value';
+                const daysUntilMonday = (8 - now.getDay()) % 7;
+                flexibleDate = new Date(now);
+                flexibleDate.setDate(flexibleDate.getDate() + (daysUntilMonday === 0 ? 7 : daysUntilMonday));
             }
             else {
                 flexibleWindow = 'tomorrow_am';
-                flexibleLabel = 'Tomorrow Morning (8AM-12PM) - Best Value';
+                flexibleDate = tomorrow;
             }
+
+            const formattedFlexDate = flexibleDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
 
             const pricing = calculatePricing(hours, flexibleWindow, rush, addons);
             options.push({
                 type: 'flexible',
                 window: flexibleWindow,
-                windowLabel: flexibleLabel,
+                windowLabel: `${formattedFlexDate} (8AM-12PM) - Best Value`,
                 pricing: pricing,
                 badge: 'Best Value',
-                badgeClass: 'discount'
+                badgeClass: 'discount',
+                sortDate: flexibleDate.getTime()
             });
 
             availableWindows.forEach(window => {
@@ -2145,19 +2156,32 @@
                     if (window.startsWith('tomorrow')) {
                         windowDate.setDate(windowDate.getDate() + 1);
                     } else if (window.startsWith('monday')) {
-                        windowDate.setDate(windowDate.getDate() + 2);
+                        const daysUntilMonday = (8 - now.getDay()) % 7;
+                        windowDate.setDate(windowDate.getDate() + (daysUntilMonday === 0 ? 7 : daysUntilMonday));
                     }
+
+                    const formattedAltDate = windowDate.toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+
+                    const timeOnly = TIME_WINDOWS[window].label.match(/\((.*)\)/)?.[1] || TIME_WINDOWS[window].label;
                     const isAltSaturday = isSaturday(windowDate);
                     options.push({
                         type: 'alternative',
                         window: window,
-                        windowLabel: TIME_WINDOWS[window].label,
+                        windowLabel: `${formattedAltDate} (${timeOnly})`,
                         pricing: altPricing,
                         badge: isAltSaturday ? 'Saturday' : 'Alternative',
-                        badgeClass: isAltSaturday ? 'premium' : 'selected'
+                        badgeClass: isAltSaturday ? 'premium' : 'selected',
+                        sortDate: windowDate.getTime()
                     });
                 }
             });
+
+            // Sort options chronologically
+            options.sort((a, b) => a.sortDate - b.sortDate);
             return options;
         }
 
@@ -2169,8 +2193,18 @@
             if (window.startsWith('tomorrow')) {
                 windowDate.setDate(windowDate.getDate() + 1);
             } else if (window.startsWith('monday')) {
-                windowDate.setDate(windowDate.getDate() + 2);
+                // Find next Monday
+                const daysUntilMonday = (8 - now.getDay()) % 7;
+                windowDate.setDate(windowDate.getDate() + (daysUntilMonday === 0 ? 7 : daysUntilMonday));
             }
+
+            // Format date for display
+            const formattedDate = windowDate.toLocaleDateString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric'
+            });
+
             const isWindowSaturday = isSaturday(windowDate);
             let badge, badgeClass, type;
             if (window.startsWith('today')) {
@@ -2193,13 +2227,19 @@
             if (isSelected) {
                 badge = 'Selected';
             }
+
+            // Update label to include date
+            const timeOnly = TIME_WINDOWS[window].label.match(/\((.*)\)/)?.[1] || TIME_WINDOWS[window].label;
+            const updatedLabel = `${formattedDate} (${timeOnly})`;
+
             options.push({
                 type: type,
                 window: window,
-                windowLabel: TIME_WINDOWS[window].label,
+                windowLabel: updatedLabel,
                 pricing: pricing,
                 badge: badge,
-                badgeClass: badgeClass
+                badgeClass: badgeClass,
+                sortDate: windowDate.getTime() // Add sort key
             });
         });
 
@@ -2209,20 +2249,34 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
 
             if (isSaturday(tomorrow)) {
+                const mondayDate = new Date(now);
+                const daysUntilMonday = (8 - now.getDay()) % 7;
+                mondayDate.setDate(mondayDate.getDate() + (daysUntilMonday === 0 ? 7 : daysUntilMonday));
+
+                const formattedMondayDate = mondayDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
                 ['monday_am', 'monday_pm', 'monday_eve'].forEach(mondayWindow => {
                     const mondayPricing = calculatePricing(hours, mondayWindow, rush, addons);
+                    const timeOnly = TIME_WINDOWS[mondayWindow].label.match(/\((.*)\)/)?.[1] || TIME_WINDOWS[mondayWindow].label;
                     options.push({
                         type: 'monday',
                         window: mondayWindow,
-                        windowLabel: TIME_WINDOWS[mondayWindow].label,
+                        windowLabel: `${formattedMondayDate} (${timeOnly})`,
                         pricing: mondayPricing,
                         badge: 'Alternative',
-                        badgeClass: 'selected'
+                        badgeClass: 'selected',
+                        sortDate: mondayDate.getTime()
                     });
                 });
             }
         }
 
+        // Sort options chronologically
+        options.sort((a, b) => a.sortDate - b.sortDate);
         return options;
     }
 
@@ -2335,7 +2389,7 @@
                     <div class="text-sm text-slate-600">${hours.toFixed(1)} hours estimated</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-2xl font-bold">${option.pricing.total.toFixed(0)}</div>
+                    <div class="text-2xl font-bold">$${option.pricing.total.toFixed(0)}</div>
                 </div>
             </div>
             ${breakdownHTML}
