@@ -11,7 +11,7 @@ const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
-const handler = async (event, context) => {
+const reminderHandler = async (event, context) => {
   console.log('🔄 Scheduled reminders function started at:', new Date().toISOString());
 
   try {
@@ -281,4 +281,4 @@ async function sendSMS(phoneNumber, message) {
 }
 
 // Export the scheduled function
-export const scheduledReminders = schedule("*/15 * * * *", handler);
+export const handler = schedule("*/15 * * * *", reminderHandler);
