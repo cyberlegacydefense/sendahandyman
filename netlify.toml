@@ -5,19 +5,6 @@ functions = "netlify/functions"
 [functions."*"]
   timeout = 30
 
-# Scheduled function configuration for automated reminders
-[[plugins]]
-  package = "@netlify/plugin-scheduled-functions"
-
-  [plugins.inputs]
-    # Run every 15 minutes: "*/15 * * * *"
-    # Format: minute hour day month day-of-week
-    schedule = "*/15 * * * *"
-
-    # Configure which function to run
-    [plugins.inputs.functions]
-      scheduled-reminders = "*/15 * * * *"
-
 [[headers]]
 for = "/*"
 [headers.values]

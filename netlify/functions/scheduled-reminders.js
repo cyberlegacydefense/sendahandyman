@@ -3,6 +3,7 @@
 // Runs every 15 minutes via Netlify scheduled function
 
 import { createClient } from '@supabase/supabase-js';
+import { schedule } from '@netlify/functions';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
@@ -10,7 +11,7 @@ const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
-export const handler = async (event, context) => {
+const handler = async (event, context) => {
   console.log('🔄 Scheduled reminders function started at:', new Date().toISOString());
 
   try {
@@ -278,3 +279,6 @@ async function sendSMS(phoneNumber, message) {
     };
   }
 }
+
+// Export the scheduled function
+export const scheduledReminders = schedule("*/15 * * * *", handler);
