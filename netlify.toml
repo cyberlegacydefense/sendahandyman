@@ -1,8 +1,8 @@
 [build]
 functions = "netlify/functions"
 
-[functions]
-  # Standard function timeout
+# Function-specific configuration
+[functions."*"]
   timeout = 30
 
 # Scheduled function configuration for automated reminders
