@@ -463,7 +463,7 @@
                             <div>
                                 <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
                                 <ul class="text-sm space-y-1 text-slate-700">
-                                    <li>• +$40: Chandeliers over 25 lbs</li>
+                                    <li>• +$200: Chandeliers over 25 lbs</li>
                                     <li>• +$30: Ceiling over 10 ft</li>
                                     <li>• Structural bracing or rewiring not included</li>
                                 </ul>
@@ -2626,11 +2626,20 @@
             if (error) {
                 throw new Error(error.message);
             }
-            if (paymentIntent && paymentIntent.status === 'succeeded') {
-                console.log('✅ Payment successful:', paymentIntent.id);
+            // 🔐 AUTHORIZATION HOLD FLOW: Check for 'requires_capture' status
+            // This means funds are authorized (held) on customer's card but NOT captured yet
+            if (paymentIntent && (paymentIntent.status === 'requires_capture' || paymentIntent.status === 'succeeded')) {
+                console.log('✅ Payment authorization successful:', paymentIntent.id, 'Status:', paymentIntent.status);
+
+                if (paymentIntent.status === 'requires_capture') {
+                    console.log('💳 Funds authorized and held on customer card (48hr hold)');
+                } else {
+                    console.log('💳 Payment completed immediately (no hold needed)');
+                }
+
                 paymentIntentId = paymentIntent.id;
                 document.getElementById('paymentModal').classList.add('hidden');
-                showTaskInfoModal();
+                showTaskInfoModal(); // This will create the task and trigger notifications
             } else if (paymentIntent && paymentIntent.status === 'requires_action') {
                 console.log('⏳ Payment requires additional authentication');
                 btnText.textContent = 'Authenticating...';

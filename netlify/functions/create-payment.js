@@ -22,10 +22,11 @@ export const handler = async (event, context) => {
       };
     }
 
-    // Create payment intent
+    // Create payment intent with AUTHORIZATION HOLD (manual capture)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency,
+      capture_method: 'manual', // 🔐 AUTHORIZATION HOLD - funds held but not captured
       automatic_payment_methods: {
         enabled: true,
       },

@@ -176,7 +176,7 @@
               <textarea id="profileBio" rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
             </div>
             <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
-              Save Profile
+              Save Changes
             </button>
             <div id="profileSuccess" class="hidden text-sm text-green-600 text-center">Profile updated successfully!</div>
           </form>
@@ -187,13 +187,13 @@
           <form id="passwordForm" class="space-y-4">
             <div>
               <label class="block text-sm font-semibold mb-1">New Password</label>
-              <input type="password" id="newPassword" required minlength="6" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              <input type="password" id="newPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
             <div>
               <label class="block text-sm font-semibold mb-1">Confirm Password</label>
-              <input type="password" id="confirmPassword" required minlength="6" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              <input type="password" id="confirmPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
-            <button type="submit" class="w-full rounded-xl bg-slate-900 text-white px-4 py-3 font-semibold hover:bg-slate-800 transition-colors">
+            <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
               Update Password
             </button>
             <div id="passwordError" class="hidden text-sm text-red-600 text-center"></div>
@@ -207,58 +207,53 @@
 </div>
 
 <script>
-  // CONFIGURATION - Replace with your Supabase credentials
-  const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
+  // Supabase config
+  const SUPABASE_URL = 'https://SendaHandyman.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
-
-  // Initialize Supabase
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentHandyman = null;
 
-  // Check authentication on load
+  // Check authentication
   async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      await loadHandymanData(session.user.id);
-      showDashboard();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      await loadHandymanData(user.id);
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('dashboardPage').classList.remove('hidden');
     } else {
-      showLogin();
+      document.getElementById('loginPage').classList.remove('hidden');
+      document.getElementById('dashboardPage').classList.add('hidden');
     }
-  }
-
-  // Show/hide pages
-  function showLogin() {
-    document.getElementById('loginPage').classList.remove('hidden');
-    document.getElementById('dashboardPage').classList.add('hidden');
-  }
-
-  function showDashboard() {
-    document.getElementById('loginPage').classList.add('hidden');
-    document.getElementById('dashboardPage').classList.remove('hidden');
   }
 
   // Login
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
 
     if (error) {
       document.getElementById('loginError').textContent = error.message;
       document.getElementById('loginError').classList.remove('hidden');
     } else {
       await loadHandymanData(data.user.id);
-      showDashboard();
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('dashboardPage').classList.remove('hidden');
     }
   });
 
   // Logout
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await supabase.auth.signOut();
-    showLogin();
+    location.reload();
   });
 
   // Load handyman data
@@ -266,66 +261,253 @@
     const { data, error } = await supabase
       .from('handymen')
       .select('*')
-      .eq('user_id', userId)
+      .eq('auth_user_id', userId)
       .single();
 
-    if (data) {
+    if (!error && data) {
       currentHandyman = data;
-      document.getElementById('handymanName').textContent = data.full_name;
-      await loadDashboardData();
+      document.getElementById('handymanName').textContent = data.full_name || 'Handyman';
+      await loadDashboard();
     }
   }
 
-  // Load all dashboard data
-  async function loadDashboardData() {
-    await Promise.all([
-      loadOverviewStats(),
-      loadCurrentTasks(),
-      loadTaskHistory(),
-      loadEarnings(),
-      loadProfile()
-    ]);
+  // Load dashboard
+  async function loadDashboard() {
+    await loadOverview();
+    await loadUpcomingTasks();
+    await loadCurrentTasks();
+    await loadTaskHistory();
+    await loadEarnings();
+    await loadProfile();
   }
 
   // Load overview stats
-  async function loadOverviewStats() {
+  async function loadOverview() {
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id);
 
-    const activeTasks = tasks?.filter(t => t.status === 'pending' || t.status === 'in_progress') || [];
-    const thisMonth = new Date();
-    thisMonth.setDate(1);
+    const activeTasks = tasks?.filter(t => ['pending', 'en_route', 'in_progress'].includes(t.status)).length || 0;
+
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
     const completedThisMonth = tasks?.filter(t =>
-      t.status === 'completed' && new Date(t.completed_at) >= thisMonth
-    ) || [];
+      t.status === 'completed' &&
+      new Date(t.completed_at) >= startOfMonth
+    ).length || 0;
 
-    document.getElementById('activeTasksCount').textContent = activeTasks.length;
-    document.getElementById('completedCount').textContent = completedThisMonth.length;
+    const earnedThisMonth = tasks?.filter(t =>
+      t.status === 'completed' &&
+      new Date(t.completed_at) >= startOfMonth
+    ).reduce((sum, t) => sum + parseFloat(t.total_amount || 0), 0) || 0;
 
-    const earnedThisMonth = completedThisMonth.reduce((sum, t) => sum + (parseFloat(t.total_amount) || 0), 0);
+    const pendingAmount = tasks?.filter(t =>
+      ['pending_review', 'awaiting_client_approval'].includes(t.status)
+    ).reduce((sum, t) => sum + parseFloat(t.total_amount || 0), 0) || 0;
+
+    document.getElementById('activeTasksCount').textContent = activeTasks;
+    document.getElementById('completedCount').textContent = completedThisMonth;
     document.getElementById('earnedMonth').textContent = '$' + earnedThisMonth.toFixed(0);
+    document.getElementById('pendingAmount').textContent = '$' + pendingAmount.toFixed(0);
+  }
 
-    const { data: payments } = await supabase
-      .from('payments')
+  // Load upcoming tasks
+  async function loadUpcomingTasks() {
+    const { data: tasks } = await supabase
+      .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
-      .eq('status', 'pending');
+      .eq('status', 'pending')
+      .order('scheduled_date', { ascending: true })
+      .limit(5);
 
-    const pending = payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
-    document.getElementById('pendingAmount').textContent = '$' + pending.toFixed(0);
-
-    // Upcoming tasks
-    const upcoming = activeTasks.slice(0, 5);
-    const upcomingHtml = upcoming.length > 0 ? upcoming.map(task => `
-      <div class="border-b border-slate-100 pb-3">
+    const upcomingHtml = tasks?.length > 0 ? tasks.map(task => `
+      <div class="border-b border-slate-100 pb-2">
         <div class="font-semibold">${task.task_category}</div>
-        <div class="text-sm text-slate-600">${task.customer_name} • ${task.scheduled_date || 'Not scheduled'}</div>
+        <div class="text-xs text-slate-600">${task.scheduled_date || 'TBD'} • ${task.customer_name}</div>
       </div>
     `).join('') : '<p class="text-slate-500 text-sm">No upcoming tasks</p>';
 
     document.getElementById('upcomingTasksList').innerHTML = upcomingHtml;
+  }
+
+  // Mark as en route
+  async function markEnRoute(taskId) {
+    // Get GPS location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { error } = await supabase
+          .from('tasks')
+          .update({
+            status: 'en_route',
+            en_route_at: new Date().toISOString(),
+            gps_lat: position.coords.latitude,
+            gps_lng: position.coords.longitude
+          })
+          .eq('id', taskId);
+
+        if (!error) {
+          alert('✅ Marked as en route!');
+          location.reload();
+        } else {
+          alert('Failed to update status. Please try again.');
+        }
+      }, (error) => {
+        console.error('GPS error:', error);
+        alert('Unable to get GPS location. Please enable location services.');
+      });
+    } else {
+      alert('Geolocation is not supported by this browser.');
+    }
+  }
+
+  // Start task
+  async function startTask(taskId) {
+    const { error } = await supabase
+      .from('tasks')
+      .update({
+        status: 'in_progress',
+        task_started_at: new Date().toISOString()
+      })
+      .eq('id', taskId);
+
+    if (!error) {
+      alert('✅ Task started!');
+      location.reload();
+    } else {
+      alert('Failed to start task. Please try again.');
+    }
+  }
+
+  // Complete task
+  async function completeTask(taskId) {
+    // Show modal to upload photos and enter actual hours
+    const modal = `
+      <div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 max-w-md w-full">
+          <h3 class="text-xl font-bold mb-4">Complete Task</h3>
+
+          <label class="block mb-2 font-semibold">Actual Hours Worked</label>
+          <input type="number" id="actualHours" step="0.5" min="0.5"
+                 class="w-full border rounded px-3 py-2 mb-4" required>
+
+          <label class="block mb-2 font-semibold">Upload Completion Photos (Optional)</label>
+          <input type="file" id="completionPhotos" accept="image/*" multiple
+                 class="w-full border rounded px-3 py-2 mb-4">
+
+          <div class="flex gap-2">
+            <button onclick="submitCompletion('${taskId}')"
+                    class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+              Submit
+            </button>
+            <button onclick="closeModal()"
+                    class="flex-1 bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modal);
+  }
+
+  // ✨ UPDATED: Submit completion with approval logic
+  async function submitCompletion(taskId) {
+    const actualHours = document.getElementById('actualHours').value;
+    const photos = document.getElementById('completionPhotos').files;
+
+    if (!actualHours || parseFloat(actualHours) <= 0) {
+      alert('Please enter valid hours worked');
+      return;
+    }
+
+    try {
+      // Fetch task with handyman details for approval logic
+      const { data: task, error: fetchError } = await supabase
+        .from('tasks')
+        .select('*, handymen!tasks_handyman_id_fkey(*)')
+        .eq('id', taskId)
+        .single();
+
+      if (fetchError) {
+        throw new Error('Failed to fetch task details');
+      }
+
+      // 🎯 APPROVAL LOGIC - Determines single-side vs two-side approval
+      const requiresTwoSideApproval = (task) => {
+        const handyman = task.handymen;
+
+        // Two-side approval required if ANY of these conditions are true:
+        return (
+          task.total_amount > 500 ||                                    // High-value jobs
+          (handyman.total_completed_tasks || 0) < 10 ||                 // New handymen
+          (handyman.average_rating && handyman.average_rating < 4.0) || // Low-rated handymen
+          task.property_type === 'commercial'                           // Commercial properties
+        );
+      };
+
+      const needsTwoSide = requiresTwoSideApproval(task);
+      const newStatus = needsTwoSide ? 'awaiting_client_approval' : 'pending_review';
+
+      // Upload photos to Supabase Storage (if any)
+      let photoUrls = [];
+      if (photos.length > 0) {
+        for (let i = 0; i < photos.length; i++) {
+          const fileName = `${taskId}_completion_${Date.now()}_${i}.jpg`;
+          const { data, error } = await supabase.storage
+            .from('task-photos')
+            .upload(fileName, photos[i]);
+
+          if (!error) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('task-photos')
+              .getPublicUrl(fileName);
+            photoUrls.push(publicUrl);
+          }
+        }
+      }
+
+      // Update task with appropriate status
+      const { error: updateError } = await supabase
+        .from('tasks')
+        .update({
+          status: newStatus,
+          actual_hours: parseFloat(actualHours),
+          completion_requested_at: new Date().toISOString(),
+          completion_photo_urls: photoUrls
+        })
+        .eq('id', taskId);
+
+      if (updateError) {
+        throw new Error('Failed to update task');
+      }
+
+      // Show appropriate success message
+      if (needsTwoSide) {
+        alert('✅ Submitted for client approval!\n\nThe client will review and approve before payment is processed.');
+      } else {
+        alert('✅ Task complete! Payment will be processed automatically in 24 hours.');
+      }
+
+      closeModal();
+      location.reload();
+
+    } catch (error) {
+      console.error('Completion error:', error);
+      alert('❌ Error: ' + error.message);
+    }
+  }
+
+  // Close modal
+  function closeModal() {
+    const modal = document.getElementById('completionModal');
+    if (modal) {
+      modal.remove();
+    }
   }
 
   // Load current tasks
@@ -334,30 +516,72 @@
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
-      .in('status', ['pending', 'in_progress'])
+      .in('status', ['pending', 'en_route', 'in_progress'])
       .order('scheduled_date', { ascending: true });
 
-    const tasksHtml = tasks?.length > 0 ? tasks.map(task => `
-      <div class="border border-slate-200 rounded-lg p-4">
-        <div class="flex items-start justify-between mb-2">
-          <div>
-            <div class="font-bold text-lg">${task.task_category}</div>
-            <div class="text-sm text-slate-600">Task ID: ${task.task_id}</div>
+    const tasksHtml = tasks?.length > 0 ? tasks.map(task => {
+      // Check if task is within 2 hours of scheduled time
+      const isWithin2Hours = () => {
+        if (!task.scheduled_date || !task.time_window) return false;
+        const scheduledDateTime = new Date(task.scheduled_date + ' ' + task.time_window.split('-')[0]);
+        const now = new Date();
+        const diffInHours = (scheduledDateTime - now) / (1000 * 60 * 60);
+        return diffInHours <= 2 && diffInHours >= 0;
+      };
+
+      // Determine button to show based on status
+      let actionButton = '';
+      if (task.status === 'pending' && isWithin2Hours()) {
+        actionButton = `
+          <button onclick="markEnRoute('${task.id}')"
+                  class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold">
+            🚗 Mark En Route
+          </button>`;
+      } else if (task.status === 'en_route') {
+        actionButton = `
+          <button onclick="startTask('${task.id}')"
+                  class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold">
+            ▶️ Start Task
+          </button>`;
+      } else if (task.status === 'in_progress') {
+        actionButton = `
+          <button onclick="completeTask('${task.id}')"
+                  class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold">
+            ✅ Complete Task
+          </button>`;
+      }
+
+      // Get status display
+      const statusConfig = {
+        'pending': { class: 'bg-amber-100 text-amber-700', label: 'Pending' },
+        'en_route': { class: 'bg-blue-100 text-blue-700', label: 'En Route' },
+        'in_progress': { class: 'bg-green-100 text-green-700', label: 'In Progress' }
+      };
+      const status = statusConfig[task.status] || statusConfig['pending'];
+
+      return `
+        <div class="border border-slate-200 rounded-lg p-4">
+          <div class="flex items-start justify-between mb-2">
+            <div>
+              <div class="font-bold text-lg">${task.task_category}</div>
+              <div class="text-sm text-slate-600">Task ID: ${task.task_id}</div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold ${status.class}">
+              ${status.label}
+            </span>
           </div>
-          <span class="px-3 py-1 rounded-full text-xs font-semibold ${task.status === 'in_progress' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}">
-            ${task.status === 'in_progress' ? 'In Progress' : 'Pending'}
-          </span>
+          <div class="space-y-1 text-sm">
+            <div><strong>Customer:</strong> ${task.customer_name}</div>
+            <div><strong>Phone:</strong> ${task.customer_phone || 'N/A'}</div>
+            <div><strong>Address:</strong> ${task.customer_address || 'N/A'}</div>
+            <div><strong>Scheduled:</strong> ${task.scheduled_date || 'TBD'} ${task.time_window || ''}</div>
+            <div><strong>Estimated:</strong> ${task.estimated_hours || 0} hours • $${task.total_amount || 0}</div>
+          </div>
+          ${task.task_description ? `<div class="mt-2 text-sm text-slate-600">${task.task_description}</div>` : ''}
+          ${actionButton ? `<div class="mt-4">${actionButton}</div>` : ''}
         </div>
-        <div class="space-y-1 text-sm">
-          <div><strong>Customer:</strong> ${task.customer_name}</div>
-          <div><strong>Phone:</strong> ${task.customer_phone || 'N/A'}</div>
-          <div><strong>Address:</strong> ${task.customer_address || 'N/A'}</div>
-          <div><strong>Scheduled:</strong> ${task.scheduled_date || 'TBD'} ${task.time_window || ''}</div>
-          <div><strong>Estimated:</strong> ${task.estimated_hours || 0} hours • $${task.total_amount || 0}</div>
-        </div>
-        ${task.task_description ? `<div class="mt-2 text-sm text-slate-600">${task.task_description}</div>` : ''}
-      </div>
-    `).join('') : '<p class="text-slate-500 text-sm">No current tasks</p>';
+      `;
+    }).join('') : '<p class="text-slate-500 text-sm">No current tasks</p>';
 
     document.getElementById('currentTasksList').innerHTML = tasksHtml;
   }

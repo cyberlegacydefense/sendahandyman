@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Cancel Task - SendAHandyman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<div class="max-w-2xl mx-auto p-8">
+  <div class="bg-white rounded-2xl p-8 shadow-lg">
+    <h1 class="text-3xl font-bold mb-6">Cancel Your Task</h1>
+
+    <form id="cancelForm" class="space-y-4">
+      <div>
+        <label class="block font-semibold mb-2">Task ID</label>
+        <input type="text" id="taskId" required
+               placeholder="TASK-12345"
+               class="w-full border rounded-lg px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Email Address</label>
+        <input type="email" id="email" required
+               placeholder="your@email.com"
+               class="w-full border rounded-lg px-4 py-2">
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Reason for Cancellation</label>
+        <select id="reason" required class="w-full border rounded-lg px-4 py-2">
+          <option value="">Select reason...</option>
+          <option value="Plans changed">Plans changed</option>
+          <option value="Found another service">Found another service</option>
+          <option value="Too expensive">Too expensive</option>
+          <option value="Scheduling conflict">Scheduling conflict</option>
+          <option value="No longer needed">No longer needed</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div id="policyInfo" class="bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
+        <h3 class="font-bold mb-2">Cancellation Policy</h3>
+        <p id="policyText" class="text-sm"></p>
+      </div>
+
+      <button type="submit"
+              class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700">
+        Cancel Task
+      </button>
+    </form>
+
+    <div id="result" class="hidden mt-6"></div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('cancelForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const button = e.target.querySelector('button');
+    button.disabled = true;
+    button.textContent = 'Processing...';
+
+    const response = await fetch(
+      'https://your-project-ref.supabase.co/functions/v1/handle-cancellation',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_id: document.getElementById('taskId').value,
+          customer_email: document.getElementById('email').value,
+          cancellation_reason: document.getElementById('reason').value
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.classList.remove('hidden');
+
+    if (result.success) {
+      resultDiv.innerHTML = `
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h3 class="font-bold text-green-800 mb-2">✅ Cancellation Successful</h3>
+          <p class="text-sm">${result.refund_message}</p>
+          <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Policy Applied:</strong> ${result.cancellation.policy}</p>
+            ${result.cancellation.refund_amount > 0 ?
+              `<p><strong>Refund:</strong> $${result.cancellation.refund_amount.toFixed(2)}</p>` : ''}
+          </div>
+        </div>
+      `;
+      document.getElementById('cancelForm').reset();
+    } else {
+      resultDiv.innerHTML = `
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 class="font-bold text-red-800 mb-2">❌ ${result.error}</h3>
+          <p class="text-sm">${result.message || ''}</p>
+        </div>
+      `;
+    }
+
+    button.disabled = false;
+    button.textContent = 'Cancel Task';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Review Your Service - SendAHandyman</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50">
+<div class="max-w-2xl mx-auto p-8">
+  <div class="bg-white rounded-2xl p-8 shadow-lg">
+    <h1 class="text-3xl font-bold mb-2">How was your service?</h1>
+    <p class="text-gray-600 mb-6">Your feedback helps us improve!</p>
+
+    <form id="reviewForm" class="space-y-6">
+      <div>
+        <label class="block font-semibold mb-3">Rating</label>
+        <div class="flex gap-2" id="stars">
+          <button type="button" data-rating="1" class="star text-4xl">⭐</button>
+          <button type="button" data-rating="2" class="star text-4xl">⭐</button>
+          <button type="button" data-rating="3" class="star text-4xl">⭐</button>
+          <button type="button" data-rating="4" class="star text-4xl">⭐</button>
+          <button type="button" data-rating="5" class="star text-4xl">⭐</button>
+        </div>
+        <input type="hidden" id="rating" required>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Tell us more (optional)</label>
+        <textarea id="reviewText" rows="4"
+                  class="w-full border rounded-lg px-4 py-2"
+                  placeholder="What did you like? Any areas for improvement?"></textarea>
+      </div>
+
+      <div>
+        <label class="block font-semibold mb-2">Would you recommend us?</label>
+        <div class="flex gap-4">
+          <label class="flex items-center">
+            <input type="radio" name="recommend" value="yes" class="mr-2">
+            Yes
+          </label>
+          <label class="flex items-center">
+            <input type="radio" name="recommend" value="no" class="mr-2">
+            No
+          </label>
+        </div>
+      </div>
+
+      <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+        <p class="text-sm">💰 <strong>Get $5 credit</strong> toward your next service when you submit your review!</p>
+      </div>
+
+      <button type="submit"
+              class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700">
+        Submit Review
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Get task_id from URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const taskId = urlParams.get('task_id');
+
+  // Star rating
+  let selectedRating = 0;
+  document.querySelectorAll('.star').forEach(star => {
+    star.addEventListener('click', (e) => {
+      selectedRating = parseInt(e.target.dataset.rating);
+      document.getElementById('rating').value = selectedRating;
+      updateStars(selectedRating);
+    });
+  });
+
+  function updateStars(rating) {
+    document.querySelectorAll('.star').forEach((star, index) => {
+      star.style.opacity = index < rating ? '1' : '0.3';
+    });
+  }
+
+  // Submit review
+  document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!selectedRating) {
+      alert('Please select a rating');
+      return;
+    }
+
+    // Submit to Supabase
+    const supabase = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+
+    const { error } = await supabase
+      .from('task_reviews')
+      .insert({
+        task_id: taskId,
+        rating: selectedRating,
+        review_text: document.getElementById('reviewText').value,
+        would_recommend: document.querySelector('input[name="recommend"]:checked')?.value === 'yes',
+        response_method: 'portal'
+      });
+
+    if (!error) {
+      alert('✅ Thank you for your review! Your $5 credit has been applied.');
+      window.location.href = '/';
+    }
+  });
+</script>
+</body>
+</html>

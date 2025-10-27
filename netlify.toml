@@ -1,8 +1,32 @@
 [build]
 functions = "netlify/functions"
 
+[functions]
+  # Standard function timeout
+  timeout = 30
+
+# Scheduled function configuration for automated reminders
+[[plugins]]
+  package = "@netlify/plugin-scheduled-functions"
+
+  [plugins.inputs]
+    # Run every 15 minutes: "*/15 * * * *"
+    # Format: minute hour day month day-of-week
+    schedule = "*/15 * * * *"
+
+    # Configure which function to run
+    [plugins.inputs.functions]
+      scheduled-reminders = "*/15 * * * *"
+
 [[headers]]
 for = "/*"
 [headers.values]
 X-Frame-Options = "SAMEORIGIN"
 X-Content-Type-Options = "nosniff"
+
+# Environment variables needed for scheduled reminders:
+# SUPABASE_URL=your_supabase_url
+# SUPABASE_ANON_KEY=your_supabase_anon_key
+# TWILIO_ACCOUNT_SID=your_twilio_account_sid
+# TWILIO_AUTH_TOKEN=your_twilio_auth_token
+# TWILIO_PHONE_NUMBER=your_twilio_phone_number
