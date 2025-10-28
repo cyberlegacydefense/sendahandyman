@@ -333,7 +333,7 @@
     const { data, error } = await supabase
       .from('handymen')
       .select('*')
-      .eq('auth_user_id', userId)
+      .eq('user_id', userId)
       .single();
 
     if (!error && data) {
