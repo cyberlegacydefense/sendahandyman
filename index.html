@@ -2628,13 +2628,22 @@
             }
             // 🔐 AUTHORIZATION HOLD FLOW: Check for 'requires_capture' status
             // This means funds are authorized (held) on customer's card but NOT captured yet
+            console.log('🔍 Payment Intent Status Debug:', {
+                id: paymentIntent?.id,
+                status: paymentIntent?.status,
+                amount: paymentIntent?.amount,
+                capture_method: paymentIntent?.capture_method,
+                charges: paymentIntent?.charges?.data?.[0]?.captured
+            });
+
             if (paymentIntent && (paymentIntent.status === 'requires_capture' || paymentIntent.status === 'succeeded')) {
                 console.log('✅ Payment authorization successful:', paymentIntent.id, 'Status:', paymentIntent.status);
 
                 if (paymentIntent.status === 'requires_capture') {
-                    console.log('💳 Funds authorized and held on customer card (48hr hold)');
-                } else {
-                    console.log('💳 Payment completed immediately (no hold needed)');
+                    console.log('💳 ✅ CORRECT: Funds authorized and held on customer card (48hr hold)');
+                } else if (paymentIntent.status === 'succeeded') {
+                    console.log('💳 ❌ WARNING: Payment completed immediately - authorization hold may have failed!');
+                    console.log('💳 Expected: requires_capture, Got: succeeded');
                 }
 
                 paymentIntentId = paymentIntent.id;
@@ -2758,6 +2767,30 @@
             },
             amount: selectedPricingOption.pricing.total
         };
+        // 🗄️ STEP 1: Create task in database
+        try {
+            const taskResponse = await fetch('/.netlify/functions/create-task', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(completeJobData)
+            });
+
+            if (!taskResponse.ok) {
+                const errorData = await taskResponse.json();
+                throw new Error(`Task creation failed: ${errorData.detail || 'Unknown error'}`);
+            }
+
+            const taskResult = await taskResponse.json();
+            console.log('✅ Task created in database:', taskResult.task_id);
+        } catch (taskError) {
+            console.error('❌ Task creation failed:', taskError);
+            alert('Failed to create task in database. Please contact support.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = '🚀 Dispatch Handyman';
+            return;
+        }
+
+        // 📱 STEP 2: Send SMS notification
         try {
             await sendSMSNotification('booking_confirmation', {
                 customer_phone: completeJobData.phone,
@@ -2769,6 +2802,8 @@
         } catch (smsError) {
             console.log('📱 SMS failed but continuing:', smsError);
         }
+
+        // 📧 STEP 3: Send Zapier notification
         try {
             await sendZapierNotification(completeJobData);
         } catch (zapierError) {
