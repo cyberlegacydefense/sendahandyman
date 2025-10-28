@@ -1,10 +1,12 @@
 {
   "name": "sendahandyman",
   "version": "1.9.0",
+  "description": "SendAHandyman platform with handyman dashboard and AI-powered expert advice",
   "private": true,
   "scripts": {
     "dev": "netlify dev",
-    "build": "echo 'No build process needed'"
+    "build": "echo 'No build process needed'",
+    "deploy": "netlify deploy --prod"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.76.1",
@@ -16,5 +18,8 @@
   "devDependencies": {
     "@netlify/functions": "^5.0.1",
     "netlify-cli": "^17.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -10,13 +10,22 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .shadow-md{box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06)}
     .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; }
+    .progress-step.active { background: #4f46e5; color: white; }
+    .progress-step.completed { background: #10b981; color: white; }
+    .schedule-cell { cursor: pointer; transition: all 0.2s; }
+    .schedule-cell:hover { background: #e0e7ff; }
+    .schedule-cell.selected { background: #4f46e5; color: white; }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
   </style>
 </head>
 <body class="bg-slate-50">
@@ -57,7 +66,668 @@
   </div>
 </div>
 
-<!-- Dashboard -->
+<!-- Onboarding Wizard -->
+<div id="onboardingWizard" class="hidden min-h-screen bg-slate-50">
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    <!-- Progress Bar -->
+    <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Complete Your Profile</h2>
+        <span id="onboardingProgress" class="text-sm font-semibold text-indigo-600">Step 1 of 9</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="progress-step active flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">1</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">2</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">3</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">4</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">5</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">6</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">7</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">8</div>
+        <div class="flex-1 h-2 bg-slate-200 rounded"></div>
+        <div class="progress-step flex items-center justify-center w-10 h-10 rounded-full bg-slate-200 text-sm font-bold">9</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Personal & Identity Verification -->
+    <div id="step1" class="onboarding-step bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Personal & Identity Verification</h3>
+      <p class="text-slate-600 mb-6">We need to verify your identity for insurance and payment purposes.</p>
+
+      <form id="step1Form" class="space-y-6">
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1">Full Legal Name *</label>
+            <input type="text" id="legalName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Date of Birth *</label>
+            <input type="date" id="dob" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1">Social Security Number (SSN) *</label>
+            <input type="text" id="ssn" required maxlength="11" placeholder="XXX-XX-XXXX" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            <p class="text-xs text-slate-500 mt-1">Required for 1099 tax reporting</p>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">Driver's License / State ID Number *</label>
+            <input type="text" id="idNumber" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">Upload Government-Issued ID *</label>
+          <input type="file" id="govId" accept="image/*,.pdf" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+          <p class="text-xs text-slate-500 mt-1">Driver's license, passport, or state ID. Both sides if applicable.</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">Profile Photo *</label>
+          <input type="file" id="profilePhoto" accept="image/*" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+          <p class="text-xs text-slate-500 mt-1">Professional headshot for your profile</p>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 2: Licensing & Insurance -->
+    <div id="step2" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Licensing & Insurance</h3>
+      <p class="text-slate-600 mb-6">Depending on your services, you may need specific licenses and insurance.</p>
+
+      <form id="step2Form" class="space-y-6">
+        <div>
+          <label class="block text-sm font-semibold mb-3">Do you have any trade licenses?</label>
+          <div class="space-y-3" id="licenseContainer">
+            <div class="border border-slate-200 rounded-lg p-4">
+              <div class="grid md:grid-cols-3 gap-3">
+                <input type="text" placeholder="License Type (e.g., Electrician)" class="license-type rounded-lg border border-slate-200 px-3 py-2" />
+                <input type="text" placeholder="License Number" class="license-number rounded-lg border border-slate-200 px-3 py-2" />
+                <input type="date" placeholder="Expiration Date" class="license-expiry rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+              <input type="file" accept="image/*,.pdf" class="license-file w-full rounded-lg border border-slate-200 px-3 py-2 mt-2" />
+            </div>
+          </div>
+          <button type="button" id="addLicense" class="mt-2 text-sm text-indigo-600 hover:text-indigo-700 font-semibold">+ Add Another License</button>
+        </div>
+
+        <div class="border-t border-slate-200 pt-6">
+          <label class="block text-sm font-semibold mb-3">General Liability Insurance *</label>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium mb-1">Insurance Status *</label>
+              <select id="insuranceStatus" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select Status</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="inactive">Not Yet Obtained</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">Insurance Provider</label>
+              <input type="text" id="insuranceProvider" class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="Company name" />
+            </div>
+          </div>
+          <div class="mt-3">
+            <label class="block text-xs font-medium mb-1">Upload Proof of Insurance</label>
+            <input type="file" id="insuranceProof" accept="image/*,.pdf" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            <p class="text-xs text-slate-500 mt-1">Certificate of Insurance showing minimum $1M coverage</p>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="complianceAck" required class="mt-1" />
+            <label for="complianceAck" class="text-sm">
+              I acknowledge that I am responsible for obtaining and maintaining all required licenses, permits, and insurance for the services I provide. I understand that SendAHandyman may verify these credentials at any time.
+            </label>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 3: Tools, Equipment & Vehicle -->
+    <div id="step3" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Tools, Equipment & Vehicle</h3>
+      <p class="text-slate-600 mb-6">Confirm you have the necessary resources to complete jobs professionally.</p>
+
+      <form id="step3Form" class="space-y-4">
+        <div class="space-y-3">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
+            <input type="checkbox" id="hasVehicle" required class="w-5 h-5" />
+            <label for="hasVehicle" class="flex-1">
+              <div class="font-semibold">Reliable Transportation</div>
+              <div class="text-sm text-slate-600">I have a reliable vehicle to travel to job sites</div>
+            </label>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
+            <input type="checkbox" id="hasTools" required class="w-5 h-5" />
+            <label for="hasTools" class="flex-1">
+              <div class="font-semibold">Essential Toolkit</div>
+              <div class="text-sm text-slate-600">I own basic hand tools and power tools needed for standard handyman tasks</div>
+            </label>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
+            <input type="checkbox" id="hasSmartphone" required class="w-5 h-5" />
+            <label for="hasSmartphone" class="flex-1">
+              <div class="font-semibold">Smartphone</div>
+              <div class="text-sm text-slate-600">I have a smartphone to receive job notifications, take photos, and use GPS</div>
+            </label>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
+            <input type="checkbox" id="hasPPE" required class="w-5 h-5" />
+            <label for="hasPPE" class="flex-1">
+              <div class="font-semibold">Personal Protective Equipment (PPE)</div>
+              <div class="text-sm text-slate-600">I have safety glasses, gloves, and other PPE as needed</div>
+            </label>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 flex items-center gap-3">
+            <input type="checkbox" id="hasLadder" class="w-5 h-5" />
+            <label for="hasLadder" class="flex-1">
+              <div class="font-semibold">Ladder (Optional but Recommended)</div>
+              <div class="text-sm text-slate-600">I have a sturdy ladder for reaching high areas</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-6">
+          <label class="block text-sm font-semibold mb-2">Additional Equipment or Specializations</label>
+          <textarea id="additionalEquipment" rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="List any specialized tools, equipment, or certifications you have..."></textarea>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 4: Platform & Technology Setup -->
+    <div id="step4" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Platform & Technology Setup</h3>
+      <p class="text-slate-600 mb-6">Review platform policies and complete your profile setup.</p>
+
+      <form id="step4Form" class="space-y-6">
+        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+          <h4 class="font-bold mb-3">📋 SendAHandyman Service Agreement</h4>
+          <div class="bg-white rounded-lg p-4 max-h-64 overflow-y-auto text-sm border border-indigo-100 mb-4">
+            <p class="mb-3"><strong>Independent Contractor Relationship:</strong> You are an independent contractor, not an employee. You control when and how you work.</p>
+            <p class="mb-3"><strong>Payment Terms:</strong> You receive 70% of the customer payment. SendAHandyman retains 30% as a platform fee. Payments are processed weekly via direct deposit.</p>
+            <p class="mb-3"><strong>Job Acceptance:</strong> You may accept or decline jobs at your discretion. However, consistent declining may affect your ranking and job offers.</p>
+            <p class="mb-3"><strong>Quality Standards:</strong> All work must meet professional standards. Jobs must be completed as described. Photo documentation is required before and after.</p>
+            <p class="mb-3"><strong>Customer Communication:</strong> All customer communication must be professional and courteous. No solicitation of off-platform business.</p>
+            <p class="mb-3"><strong>Cancellation Policy:</strong> Jobs must be completed as scheduled. Cancellations within 24 hours may result in penalties.</p>
+            <p><strong>Termination:</strong> Either party may terminate this agreement at any time with written notice.</p>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeServiceTerms" required class="mt-1" />
+            <label for="agreeServiceTerms" class="text-sm">I have read and agree to the SendAHandyman Service Agreement *</label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">Profile Completion</label>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium mb-1">Professional Bio *</label>
+              <textarea id="profileBioSetup" required rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="Describe your experience, specialties, and what makes you a great handyman..."></textarea>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium mb-1">Hourly Rate *</label>
+                <input type="number" id="hourlyRate" required min="25" max="150" class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="$65" />
+                <p class="text-xs text-slate-500 mt-1">Recommended: $55-$85/hr</p>
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1">Years of Experience *</label>
+                <input type="number" id="yearsExp" required min="0" max="50" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 5: Compliance & Brand Standards -->
+    <div id="step5" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Compliance & Brand Standards</h3>
+      <p class="text-slate-600 mb-6">Understanding our brand standards ensures consistent, professional service.</p>
+
+      <form id="step5Form" class="space-y-6">
+        <div class="space-y-4">
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <h4 class="font-bold mb-2">👔 Professional Dress Code</h4>
+            <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside">
+              <li>Clean, professional work clothes (polo shirts preferred)</li>
+              <li>Closed-toe work shoes or boots</li>
+              <li>No offensive graphics, excessive logos, or torn clothing</li>
+              <li>Personal hygiene maintained at all times</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <h4 class="font-bold mb-2">💬 Communication Standards</h4>
+            <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside">
+              <li>Respond to job offers within 30 minutes</li>
+              <li>Arrive within scheduled time window</li>
+              <li>Call customer 15 minutes before arrival</li>
+              <li>Professional, courteous language at all times</li>
+              <li>No discussion of pricing or payment with customers</li>
+            </ul>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <h4 class="font-bold mb-2">📸 Photo Documentation Requirements</h4>
+            <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside">
+              <li>Before photos: Document initial conditions</li>
+              <li>After photos: Show completed work</li>
+              <li>Issue photos: Document any problems or additional needs</li>
+              <li>Photos must be clear, well-lit, and focused</li>
+            </ul>
+          </div>
+
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <h4 class="font-bold mb-2">🚫 No Upselling Policy</h4>
+            <p class="text-sm text-slate-700">Do NOT attempt to upsell additional services or collect payment directly from customers. If additional work is needed, document it in the app and we will create a new booking. Violation of this policy may result in immediate removal from the platform.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeCodeOfConduct" required class="mt-1" />
+            <label for="agreeCodeOfConduct" class="text-sm">I agree to uphold SendAHandyman's Code of Conduct *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeDressCode" required class="mt-1" />
+            <label for="agreeDressCode" class="text-sm">I understand and will follow the dress code standards *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeComm" required class="mt-1" />
+            <label for="agreeComm" class="text-sm">I understand and will meet communication expectations *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreePhotos" required class="mt-1" />
+            <label for="agreePhotos" class="text-sm">I will provide photo documentation as required *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeNoUpsell" required class="mt-1" />
+            <label for="agreeNoUpsell" class="text-sm">I will NOT upsell services or collect direct payment from customers *</label>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 6: Health, Safety & Risk Policy -->
+    <div id="step6" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Health, Safety & Risk Policy</h3>
+      <p class="text-slate-600 mb-6">Your safety and that of our customers is our top priority.</p>
+
+      <form id="step6Form" class="space-y-6">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">⚠️ Safety Training</h4>
+          <div class="space-y-2 text-sm">
+            <p><strong>Personal Safety:</strong> Always wear appropriate PPE. Never attempt work beyond your skill level. Use proper lifting techniques. Maintain three points of contact on ladders.</p>
+            <p><strong>Customer Property:</strong> Use drop cloths and protective coverings. Turn off water/electricity when needed. Report any damage immediately.</p>
+            <p><strong>Electrical Safety:</strong> Only perform electrical work if properly licensed. Turn off breakers before work. Test for live wires.</p>
+            <p><strong>Fall Prevention:</strong> Inspect ladders before use. Never overreach. Use fall protection when required.</p>
+            <p><strong>Tool Safety:</strong> Maintain tools in good condition. Follow manufacturer guidelines. Never bypass safety features.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">📋 Job Hazard Reporting</h4>
+          <p class="text-sm mb-2">You must report the following immediately through the app:</p>
+          <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside">
+            <li>Unsafe working conditions (structural damage, mold, asbestos)</li>
+            <li>Electrical hazards beyond scope of work</li>
+            <li>Gas leaks or carbon monoxide concerns</li>
+            <li>Water damage or active leaks</li>
+            <li>Pest infestations</li>
+            <li>Any situation where work cannot be completed safely</li>
+          </ul>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-2">Emergency Contact Information *</label>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium mb-1">Emergency Contact Name</label>
+              <input type="text" id="emergencyName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">Emergency Contact Phone</label>
+              <input type="tel" id="emergencyPhone" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+          </div>
+          <div class="mt-2">
+            <label class="block text-xs font-medium mb-1">Relationship</label>
+            <input type="text" id="emergencyRelation" required class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="Spouse, Parent, Sibling, etc." />
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeSafety" required class="mt-1" />
+            <label for="agreeSafety" class="text-sm">I have reviewed and understand the safety guidelines *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeReportHazards" required class="mt-1" />
+            <label for="agreeReportHazards" class="text-sm">I will immediately report any safety hazards or unsafe conditions *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeRefuseUnsafe" required class="mt-1" />
+            <label for="agreeRefuseUnsafe" class="text-sm">I understand I have the right to refuse unsafe work *</label>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 7: Tax & Financial Information -->
+    <div id="step7" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Tax & Financial Information</h3>
+      <p class="text-slate-600 mb-6">Set up payment information and understand your tax obligations.</p>
+
+      <form id="step7Form" class="space-y-6">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 class="font-bold mb-2">📝 W-9 Form</h4>
+          <p class="text-sm mb-3">As an independent contractor, you'll receive a 1099-NEC for earnings over $600/year. You're responsible for paying self-employment taxes.</p>
+          <div>
+            <label class="block text-xs font-medium mb-1">Upload Completed W-9 *</label>
+            <input type="file" id="w9Upload" accept=".pdf,.jpg,.jpeg,.png" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            <p class="text-xs text-slate-500 mt-1">Download blank W-9 at <a href="https://www.irs.gov/pub/irs-pdf/fw9.pdf" target="_blank" class="text-indigo-600 hover:underline">irs.gov</a></p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-3">Direct Deposit Information *</label>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium mb-1">Bank Name</label>
+              <input type="text" id="bankName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium mb-1">Routing Number (9 digits)</label>
+                <input type="text" id="routingNumber" required maxlength="9" pattern="[0-9]{9}" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1">Account Number</label>
+                <input type="text" id="accountNumber" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">Confirm Account Number</label>
+              <input type="text" id="accountNumberConfirm" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">Account Type</label>
+              <select id="accountType" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select Type</option>
+                <option value="checking">Checking</option>
+                <option value="savings">Savings</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <h4 class="font-bold mb-2">💰 Payment Schedule</h4>
+          <p class="text-sm">Payments are processed weekly on Fridays for all completed jobs from the previous week. Funds typically arrive in your account within 2-3 business days.</p>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agree1099" required class="mt-1" />
+            <label for="agree1099" class="text-sm">I understand I am an independent contractor and will receive a 1099-NEC *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeTaxes" required class="mt-1" />
+            <label for="agreeTaxes" class="text-sm">I understand I am responsible for my own income taxes and self-employment taxes *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="agreeBankInfo" required class="mt-1" />
+            <label for="agreeBankInfo" class="text-sm">I confirm the bank account information provided is accurate *</label>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 8: Customer Satisfaction & Review Protocol -->
+    <div id="step8" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">Customer Satisfaction & Review Protocol</h3>
+      <p class="text-slate-600 mb-6">Understanding how reviews impact your success on the platform.</p>
+
+      <form id="step8Form" class="space-y-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">⭐ Review Impact on Your Business</h4>
+          <div class="space-y-2 text-sm">
+            <p><strong>Job Ranking:</strong> Higher-rated handymen receive priority job offers. We aim for every handyman to maintain a 4.5+ star average.</p>
+            <p><strong>Customer Trust:</strong> Reviews are public and heavily influence customer decisions. Professional service leads to repeat business.</p>
+            <p><strong>Platform Standing:</strong> Consistent ratings below 4.0 may result in reduced job offers or removal from platform.</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">🔄 Generating Repeat Business</h4>
+          <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside">
+            <li>Arrive on time and communicate proactively</li>
+            <li>Go above and beyond - clean up thoroughly, notice small things</li>
+            <li>Be friendly but professional - customers remember great interactions</li>
+            <li>Document work with quality photos showing before/after</li>
+            <li>Complete jobs efficiently without cutting corners</li>
+            <li>Customers can request you specifically for future jobs</li>
+          </ul>
+        </div>
+
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">🏘️ Community Reputation</h4>
+          <p class="text-sm mb-2">You represent SendAHandyman in the community. Your reputation affects all of us:</p>
+          <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside">
+            <li>Treat every property with respect - you're a guest in their home</li>
+            <li>Park considerately and follow any community rules</li>
+            <li>Keep work areas clean and minimize disruption</li>
+            <li>Negative community feedback affects platform reputation</li>
+            <li>Word-of-mouth referrals drive our growth</li>
+          </ul>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">📉 Addressing Poor Reviews</h4>
+          <p class="text-sm">If you receive a poor review:</p>
+          <ul class="text-sm space-y-1 text-slate-700 list-disc list-inside mt-2">
+            <li>We'll reach out to discuss what happened</li>
+            <li>You can provide your perspective and documentation</li>
+            <li>We may contact the customer for additional context</li>
+            <li>One bad review won't end your partnership, but patterns matter</li>
+            <li>We're here to help you succeed and improve</li>
+          </ul>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="understandReviews" required class="mt-1" />
+            <label for="understandReviews" class="text-sm">I understand how reviews impact my job opportunities and success *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="commitQuality" required class="mt-1" />
+            <label for="commitQuality" class="text-sm">I commit to providing excellent service to earn positive reviews *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="respectCommunity" required class="mt-1" />
+            <label for="respectCommunity" class="text-sm">I will respect customer properties and represent SendAHandyman professionally *</label>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            Next Step →
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 9: First Job Readiness -->
+    <div id="step9" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
+      <h3 class="text-2xl font-bold mb-2">First Job Readiness</h3>
+      <p class="text-slate-600 mb-6">You're almost ready! Let's schedule your welcome call and set your availability.</p>
+
+      <form id="step9Form" class="space-y-6">
+        <div class="gradient-bg text-white rounded-xl p-6">
+          <h4 class="font-bold text-lg mb-3">🎉 Welcome to SendAHandyman!</h4>
+          <p class="mb-4">You've completed the onboarding process. Before you start receiving jobs, we'll schedule a brief welcome call to:</p>
+          <ul class="space-y-2 text-sm">
+            <li>✓ Walk through your first job workflow</li>
+            <li>✓ Answer any remaining questions</li>
+            <li>✓ Review app features and support resources</li>
+            <li>✓ Help you set your service areas and skills</li>
+          </ul>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-3">Preferred Welcome Call Time *</label>
+          <div class="grid md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium mb-1">Date</label>
+              <input type="date" id="welcomeCallDate" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">Time</label>
+              <select id="welcomeCallTime" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                <option value="">Select Time</option>
+                <option value="9am">9:00 AM</option>
+                <option value="10am">10:00 AM</option>
+                <option value="11am">11:00 AM</option>
+                <option value="1pm">1:00 PM</option>
+                <option value="2pm">2:00 PM</option>
+                <option value="3pm">3:00 PM</option>
+                <option value="4pm">4:00 PM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold mb-3">When are you available to start taking jobs? *</label>
+          <select id="availableStart" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+            <option value="">Select Availability</option>
+            <option value="immediately">Immediately after welcome call</option>
+            <option value="1week">Within 1 week</option>
+            <option value="2weeks">Within 2 weeks</option>
+            <option value="1month">Within 1 month</option>
+          </select>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h4 class="font-bold mb-3">📱 Next Steps After Submission</h4>
+          <ol class="space-y-2 text-sm list-decimal list-inside">
+            <li>Our team will review your application (typically 24-48 hours)</li>
+            <li>You'll receive a call to schedule your welcome session</li>
+            <li>After the welcome call, you'll be activated in the system</li>
+            <li>You'll start receiving job notifications based on your skills and areas</li>
+            <li>Your first few jobs may be monitored for quality assurance</li>
+          </ol>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="reviewedWorkflow" required class="mt-1" />
+            <label for="reviewedWorkflow" class="text-sm">I understand the job workflow and notification system *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="readyToStart" required class="mt-1" />
+            <label for="readyToStart" class="text-sm">I am ready to provide excellent service and build my reputation *</label>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="finalAgreement" required class="mt-1" />
+            <label for="finalAgreement" class="text-sm">I confirm all information provided is accurate and complete *</label>
+          </div>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" onclick="prevStep()" class="rounded-xl bg-slate-200 text-slate-700 px-6 py-3 font-semibold hover:bg-slate-300 transition-colors">
+            ← Previous
+          </button>
+          <button type="submit" class="rounded-xl bg-green-600 text-white px-6 py-3 font-semibold hover:bg-green-700 transition-colors">
+            🎉 Complete Onboarding
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Main Dashboard -->
 <div id="dashboardPage" class="hidden min-h-screen">
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
@@ -77,12 +747,13 @@
   <!-- Tabs -->
   <div class="bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4">
-      <nav class="flex gap-8">
-        <button class="tab-btn py-4 font-semibold text-sm tab-active" data-tab="overview">Overview</button>
-        <button class="tab-btn py-4 font-semibold text-sm" data-tab="tasks">Current Tasks</button>
-        <button class="tab-btn py-4 font-semibold text-sm" data-tab="history">Task History</button>
-        <button class="tab-btn py-4 font-semibold text-sm" data-tab="earnings">Earnings</button>
-        <button class="tab-btn py-4 font-semibold text-sm" data-tab="profile">Profile</button>
+      <nav class="flex gap-8 overflow-x-auto">
+        <button class="tab-btn py-4 font-semibold text-sm tab-active whitespace-nowrap" data-tab="overview">Overview</button>
+        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="tasks">Current Tasks</button>
+        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="history">Task History</button>
+        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="earnings">Earnings</button>
+        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="profile">Profile</button>
+        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="expert">💡 Expert Advice</button>
       </nav>
     </div>
   </div>
@@ -108,6 +779,18 @@
         <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
           <div class="text-slate-600 text-sm font-semibold mb-1">Payment Pending</div>
           <div id="pendingAmount" class="text-3xl font-bold text-amber-600">$0</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Monthly Performance</h3>
+          <canvas id="performanceChart" height="200"></canvas>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Service Breakdown</h3>
+          <canvas id="serviceChart" height="200"></canvas>
         </div>
       </div>
 
@@ -164,56 +847,310 @@
       </div>
     </div>
 
-    <!-- Profile Tab -->
+    <!-- Profile Tab (Enhanced) -->
     <div id="profileTab" class="tab-content hidden">
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid gap-6">
+        <!-- Personal Info -->
         <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <h3 class="text-lg font-bold mb-4">Profile Information</h3>
+          <h3 class="text-lg font-bold mb-4">Personal Information</h3>
           <form id="profileForm" class="space-y-4">
-            <div>
-              <label class="block text-sm font-semibold mb-1">Full Name</label>
-              <input type="text" id="profileName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold mb-1">Full Name</label>
+                <input type="text" id="profileName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-1">Phone</label>
+                <input type="tel" id="profilePhone" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-semibold mb-1">City</label>
+                <input type="text" id="profileCity" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-1">ZIP Code</label>
+                <input type="text" id="profileZip" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-1">Hourly Rate</label>
+                <input type="number" id="profileRate" min="25" max="150" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
             </div>
             <div>
-              <label class="block text-sm font-semibold mb-1">Phone</label>
-              <input type="tel" id="profilePhone" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold mb-1">City</label>
-              <input type="text" id="profileCity" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold mb-1">ZIP Code</label>
-              <input type="text" id="profileZip" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold mb-1">Bio</label>
+              <label class="block text-sm font-semibold mb-1">Professional Bio</label>
               <textarea id="profileBio" rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
             </div>
-            <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
               Save Changes
             </button>
-            <div id="profileSuccess" class="hidden text-sm text-green-600 text-center">Profile updated successfully!</div>
+            <div id="profileSuccess" class="hidden text-sm text-green-600">Profile updated successfully!</div>
           </form>
         </div>
 
+        <!-- Skills & Service Areas -->
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Skills & Services</h3>
+          <form id="skillsForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-2">Select Your Skills</label>
+              <div class="grid md:grid-cols-3 gap-3">
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="tv-mounting" />
+                  <span class="text-sm">TV Mounting</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="furniture-assembly" />
+                  <span class="text-sm">Furniture Assembly</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="drywall-repair" />
+                  <span class="text-sm">Drywall Repair</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="door-repair" />
+                  <span class="text-sm">Door Repair</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="painting" />
+                  <span class="text-sm">Painting</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="plumbing" />
+                  <span class="text-sm">Basic Plumbing</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="electrical" />
+                  <span class="text-sm">Basic Electrical</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="flooring" />
+                  <span class="text-sm">Flooring</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="carpentry" />
+                  <span class="text-sm">Carpentry</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="deck-repair" />
+                  <span class="text-sm">Deck Repair</span>
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" class="skill-checkbox" value="pressure-washing" />
+                  <span class="text-sm">Pressure Washing</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">Service Areas</label>
+              <div class="space-y-2">
+                <select id="serviceState" class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                  <option value="">Select State</option>
+                  <option value="FL">Florida</option>
+                </select>
+                <div id="citySelection" class="hidden grid md:grid-cols-3 gap-3 mt-3">
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" class="city-checkbox" value="palm-beach" />
+                    <span class="text-sm">Palm Beach County</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" class="city-checkbox" value="broward" />
+                    <span class="text-sm">Broward County</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" class="city-checkbox" value="miami-dade" />
+                    <span class="text-sm">Miami-Dade County</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+              Save Skills & Areas
+            </button>
+            <div id="skillsSuccess" class="hidden text-sm text-green-600">Skills updated successfully!</div>
+          </form>
+        </div>
+
+        <!-- Weekly Schedule -->
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Weekly Availability</h3>
+          <p class="text-sm text-slate-600 mb-4">Click cells to toggle your availability. Select the hours you're available to work.</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm" id="scheduleTable">
+              <thead>
+              <tr class="border-b border-slate-200">
+                <th class="text-left py-2 px-3">Time</th>
+                <th class="text-center py-2 px-3">Mon</th>
+                <th class="text-center py-2 px-3">Tue</th>
+                <th class="text-center py-2 px-3">Wed</th>
+                <th class="text-center py-2 px-3">Thu</th>
+                <th class="text-center py-2 px-3">Fri</th>
+                <th class="text-center py-2 px-3">Sat</th>
+              </tr>
+              </thead>
+              <tbody id="scheduleBody">
+              <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          <button type="button" id="saveSchedule" class="mt-4 rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+            Save Schedule
+          </button>
+          <div id="scheduleSuccess" class="hidden text-sm text-green-600 mt-2">Schedule updated successfully!</div>
+        </div>
+
+        <!-- Insurance & Licenses -->
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-4">Insurance & Licenses</h3>
+          <form id="insuranceForm" class="space-y-4">
+            <div>
+              <h4 class="font-semibold mb-3">General Liability Insurance</h4>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm mb-1">Status</label>
+                  <select id="editInsuranceStatus" class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm mb-1">Provider</label>
+                  <input type="text" id="editInsuranceProvider" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="block text-sm mb-1">Upload Updated Proof</label>
+                <input type="file" id="editInsuranceProof" accept="image/*,.pdf" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              </div>
+            </div>
+
+            <div class="border-t border-slate-200 pt-4">
+              <h4 class="font-semibold mb-3">Trade Licenses</h4>
+              <div id="editLicenseContainer" class="space-y-3">
+                <!-- Populated by JavaScript -->
+              </div>
+              <button type="button" id="addEditLicense" class="mt-2 text-sm text-indigo-600 hover:text-indigo-700 font-semibold">+ Add License</button>
+            </div>
+
+            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+              Update Insurance & Licenses
+            </button>
+            <div id="insuranceSuccess" class="hidden text-sm text-green-600">Updated successfully!</div>
+          </form>
+        </div>
+
+        <!-- Change Password -->
         <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Change Password</h3>
           <form id="passwordForm" class="space-y-4">
             <div>
               <label class="block text-sm font-semibold mb-1">New Password</label>
-              <input type="password" id="newPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              <input type="password" id="newPassword" required minlength="8" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
             <div>
               <label class="block text-sm font-semibold mb-1">Confirm Password</label>
               <input type="password" id="confirmPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
-            <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
               Update Password
             </button>
-            <div id="passwordError" class="hidden text-sm text-red-600 text-center"></div>
-            <div id="passwordSuccess" class="hidden text-sm text-green-600 text-center">Password updated successfully!</div>
+            <div id="passwordError" class="hidden text-sm text-red-600"></div>
+            <div id="passwordSuccess" class="hidden text-sm text-green-600">Password updated successfully!</div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expert Advice Tab (NEW) -->
+    <div id="expertTab" class="tab-content hidden">
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Canned Prompts -->
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-2">🚀 Quick Business Advice</h3>
+          <p class="text-sm text-slate-600 mb-4">Get instant AI-powered advice on common business challenges</p>
+
+          <div class="space-y-3">
+            <button onclick="askExpert('service-optimization')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+              <div class="font-semibold text-indigo-600">📊 Service Optimization</div>
+              <div class="text-sm text-slate-600 mt-1">How can I improve my efficiency and service quality?</div>
+            </button>
+
+            <button onclick="askExpert('more-bookings')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+              <div class="font-semibold text-indigo-600">📈 Get More Bookings</div>
+              <div class="text-sm text-slate-600 mt-1">Strategies to increase my job volume and visibility</div>
+            </button>
+
+            <button onclick="askExpert('client-retention')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+              <div class="font-semibold text-indigo-600">🔄 Client Retention</div>
+              <div class="text-sm text-slate-600 mt-1">How to turn one-time customers into repeat clients</div>
+            </button>
+
+            <button onclick="askExpert('review-improvement')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+              <div class="font-semibold text-indigo-600">⭐ Improve Reviews</div>
+              <div class="text-sm text-slate-600 mt-1">Tips for consistently earning 5-star reviews</div>
+            </button>
+
+            <button onclick="askExpert('pricing-strategy')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+              <div class="font-semibold text-indigo-600">💰 Pricing Strategy</div>
+              <div class="text-sm text-slate-600 mt-1">Should I raise my rates? How to price my services?</div>
+            </button>
+
+            <button onclick="askExpert('time-management')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+              <div class="font-semibold text-indigo-600">⏰ Time Management</div>
+              <div class="text-sm text-slate-600 mt-1">How to fit more jobs in my schedule efficiently</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Problem Solver -->
+        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+          <h3 class="text-lg font-bold mb-2">💡 Custom Problem Solver</h3>
+          <p class="text-sm text-slate-600 mb-4">Ask anything about your handyman business or specific technical questions</p>
+
+          <form id="expertForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-semibold mb-2">Your Question</label>
+              <textarea id="customQuestion" rows="6" required class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="Examples:
+- How do I install a ceiling fan safely?
+- What's the best way to patch a large drywall hole?
+- How can I expand into new service areas?
+- Tips for dealing with difficult customers?"></textarea>
+            </div>
+
+            <button type="submit" id="askExpertBtn" class="w-full rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+              Get Expert Advice
+            </button>
+          </form>
+
+          <!-- Expert Response -->
+          <div id="expertResponse" class="hidden mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+            <div class="flex items-start gap-3 mb-3">
+              <div class="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 font-bold text-sm">AI</div>
+              <div class="flex-1">
+                <div class="font-semibold mb-1">Expert Advice</div>
+                <div id="expertResponseText" class="text-sm text-slate-700 prose prose-sm max-w-none"></div>
+              </div>
+            </div>
+            <button onclick="closeExpertResponse()" class="text-sm text-indigo-600 hover:text-indigo-700 font-semibold">Ask Another Question</button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="expertLoading" class="hidden mt-6 text-center py-8">
+            <div class="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm text-slate-600 mt-3">Getting expert advice...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Questions -->
+      <div class="mt-6 bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <h3 class="text-lg font-bold mb-4">📝 Your Recent Questions</h3>
+        <div id="recentQuestions" class="space-y-3">
+          <p class="text-sm text-slate-500">No questions asked yet. Try asking something above!</p>
         </div>
       </div>
     </div>
@@ -222,50 +1159,22 @@
 </div>
 
 <script>
-  // Supabase config - Load from secure endpoint
-  let supabase = null;
+  // Configuration
+  const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
+  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
 
-  // Initialize Supabase client
+  let supabase;
+  let currentHandyman = null;
+  let currentStep = 1;
+  let scheduleData = {};
+
+  // Initialize Supabase
   async function initializeSupabase() {
-    try {
-      // Try to get config from secure endpoint first
-      const configResponse = await fetch('/.netlify/functions/get-config');
-      if (configResponse.ok) {
-        const config = await configResponse.json();
-        supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
-        console.log('✅ Supabase initialized from secure config');
-        return;
-      }
-    } catch (error) {
-      console.log('⚠️ Secure config not available, using fallback');
-    }
-
-    // Fallback to environment detection
-    const currentHost = window.location.hostname;
-    let SUPABASE_URL, SUPABASE_ANON_KEY;
-
-    if (currentHost.includes('localhost') || currentHost.includes('127.0.0.1')) {
-      // Development environment
-      SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
-      SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
-    } else {
-      // Production environment
-      SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
-      SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
-    }
-
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error('Supabase configuration not found');
-    }
-
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('✅ Supabase initialized with fallback config');
   }
 
-  let currentHandyman = null;
-
-  // Password visibility toggle
-  document.getElementById('togglePassword').addEventListener('click', function() {
+  // Toggle password visibility
+  document.getElementById('togglePassword').addEventListener('click', () => {
     const passwordInput = document.getElementById('loginPassword');
     const eyeIcon = document.getElementById('eyeIcon');
     const eyeSlashIcon = document.getElementById('eyeSlashIcon');
@@ -281,25 +1190,6 @@
     }
   });
 
-  // Check authentication
-  async function checkAuth() {
-    if (!supabase) {
-      console.error('❌ Supabase not initialized');
-      throw new Error('Supabase client not initialized');
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (user) {
-      await loadHandymanData(user.id);
-      document.getElementById('loginPage').classList.add('hidden');
-      document.getElementById('dashboardPage').classList.remove('hidden');
-    } else {
-      document.getElementById('loginPage').classList.remove('hidden');
-      document.getElementById('dashboardPage').classList.add('hidden');
-    }
-  }
-
   // Login
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -307,19 +1197,15 @@
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       document.getElementById('loginError').textContent = error.message;
       document.getElementById('loginError').classList.remove('hidden');
-    } else {
-      await loadHandymanData(data.user.id);
-      document.getElementById('loginPage').classList.add('hidden');
-      document.getElementById('dashboardPage').classList.remove('hidden');
+      return;
     }
+
+    await loadHandymanData(data.user.id);
   });
 
   // Logout
@@ -328,258 +1214,422 @@
     location.reload();
   });
 
+  // Check authentication
+  async function checkAuth() {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      await loadHandymanData(user.id);
+    } else {
+      document.getElementById('loginPage').classList.remove('hidden');
+    }
+  }
+
   // Load handyman data
   async function loadHandymanData(userId) {
-    const { data, error } = await supabase
+    const { data: handyman, error } = await supabase
       .from('handymen')
       .select('*')
       .eq('user_id', userId)
       .single();
 
-    if (!error && data) {
-      currentHandyman = data;
-      document.getElementById('handymanName').textContent = data.full_name || 'Handyman';
-      await loadDashboard();
+    if (error) {
+      console.error('Error loading handyman:', error);
+      return;
+    }
+
+    currentHandyman = handyman;
+    document.getElementById('handymanName').textContent = handyman.full_name || 'Handyman';
+
+    // Check if onboarding is complete
+    if (!handyman.onboarding_completed) {
+      showOnboarding();
+    } else {
+      showDashboard();
     }
   }
 
-  // Load dashboard
-  async function loadDashboard() {
-    await loadOverview();
-    await loadUpcomingTasks();
-    await loadCurrentTasks();
-    await loadTaskHistory();
-    await loadEarnings();
-    await loadProfile();
+  // Show onboarding wizard
+  function showOnboarding() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('onboardingWizard').classList.remove('hidden');
+    currentStep = 1;
+    showStep(1);
   }
 
-  // Load overview stats
-  async function loadOverview() {
+  // Show dashboard
+  function showDashboard() {
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('onboardingWizard').classList.add('hidden');
+    document.getElementById('dashboardPage').classList.remove('hidden');
+
+    // Load all data
+    loadOverviewData();
+    loadCurrentTasks();
+    loadTaskHistory();
+    loadEarnings();
+    loadProfile();
+    initializeSchedule();
+    initializeCharts();
+  }
+
+  // Onboarding navigation
+  function showStep(step) {
+    // Hide all steps
+    document.querySelectorAll('.onboarding-step').forEach(s => s.classList.add('hidden'));
+
+    // Show current step
+    document.getElementById('step' + step).classList.remove('hidden');
+
+    // Update progress
+    document.getElementById('onboardingProgress').textContent = `Step ${step} of 9`;
+
+    // Update progress circles
+    document.querySelectorAll('.progress-step').forEach((circle, index) => {
+      circle.classList.remove('active', 'completed');
+      if (index + 1 < step) {
+        circle.classList.add('completed');
+      } else if (index + 1 === step) {
+        circle.classList.add('active');
+      }
+    });
+
+    currentStep = step;
+  }
+
+  function nextStep() {
+    if (currentStep < 9) {
+      showStep(currentStep + 1);
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 1) {
+      showStep(currentStep - 1);
+    }
+  }
+
+  // Step form handlers
+  document.getElementById('step1Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 1 data to database
+    nextStep();
+  });
+
+  document.getElementById('step2Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 2 data to database
+    nextStep();
+  });
+
+  document.getElementById('step3Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 3 data to database
+    nextStep();
+  });
+
+  document.getElementById('step4Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 4 data to database
+    nextStep();
+  });
+
+  document.getElementById('step5Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 5 data to database
+    nextStep();
+  });
+
+  document.getElementById('step6Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 6 data to database
+    nextStep();
+  });
+
+  document.getElementById('step7Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 7 data to database
+    nextStep();
+  });
+
+  document.getElementById('step8Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // TODO: Save step 8 data to database
+    nextStep();
+  });
+
+  document.getElementById('step9Form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Mark onboarding as complete
+    const { error } = await supabase
+      .from('handymen')
+      .update({
+        onboarding_completed: true,
+        onboarding_completed_at: new Date().toISOString()
+      })
+      .eq('id', currentHandyman.id);
+
+    if (!error) {
+      await loadHandymanData((await supabase.auth.getUser()).data.user.id);
+    }
+  });
+
+  // Add license button
+  document.getElementById('addLicense').addEventListener('click', () => {
+    const container = document.getElementById('licenseContainer');
+    const newLicense = document.createElement('div');
+    newLicense.className = 'border border-slate-200 rounded-lg p-4';
+    newLicense.innerHTML = `
+      <div class="grid md:grid-cols-3 gap-3">
+        <input type="text" placeholder="License Type" class="license-type rounded-lg border border-slate-200 px-3 py-2" />
+        <input type="text" placeholder="License Number" class="license-number rounded-lg border border-slate-200 px-3 py-2" />
+        <input type="date" placeholder="Expiration Date" class="license-expiry rounded-lg border border-slate-200 px-3 py-2" />
+      </div>
+      <input type="file" accept="image/*,.pdf" class="license-file w-full rounded-lg border border-slate-200 px-3 py-2 mt-2" />
+    `;
+    container.appendChild(newLicense);
+  });
+
+  // Service state selector
+  document.getElementById('serviceState').addEventListener('change', (e) => {
+    if (e.target.value === 'FL') {
+      document.getElementById('citySelection').classList.remove('hidden');
+    } else {
+      document.getElementById('citySelection').classList.add('hidden');
+    }
+  });
+
+  // Initialize schedule grid
+  function initializeSchedule() {
+    const tbody = document.getElementById('scheduleBody');
+    tbody.innerHTML = '';
+
+    const hours = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM'];
+    const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+    hours.forEach(hour => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td class="py-2 px-3 border-b border-slate-100">${hour}</td>`;
+
+      days.forEach(day => {
+        const cell = document.createElement('td');
+        cell.className = 'schedule-cell py-2 px-3 border-b border-slate-100 text-center cursor-pointer hover:bg-slate-100';
+        cell.dataset.day = day;
+        cell.dataset.hour = hour;
+
+        cell.addEventListener('click', () => {
+          cell.classList.toggle('selected');
+        });
+
+        row.appendChild(cell);
+      });
+
+      tbody.appendChild(row);
+    });
+  }
+
+  // Save schedule
+  document.getElementById('saveSchedule').addEventListener('click', async () => {
+    const schedule = {};
+    document.querySelectorAll('.schedule-cell.selected').forEach(cell => {
+      const day = cell.dataset.day;
+      const hour = cell.dataset.hour;
+      if (!schedule[day]) schedule[day] = [];
+      schedule[day].push(hour);
+    });
+
+    const { error } = await supabase
+      .from('handymen')
+      .update({
+        schedule: schedule,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', currentHandyman.id);
+
+    if (!error) {
+      document.getElementById('scheduleSuccess').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('scheduleSuccess').classList.add('hidden');
+      }, 3000);
+    }
+  });
+
+  // Initialize charts
+  function initializeCharts() {
+    // Performance chart
+    const perfCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(perfCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Jobs Completed',
+          data: [12, 19, 15, 25, 22, 30],
+          borderColor: '#4f46e5',
+          backgroundColor: 'rgba(79, 70, 229, 0.1)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    // Service breakdown chart
+    const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+    new Chart(serviceCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['TV Mounting', 'Furniture', 'Drywall', 'Painting', 'Other'],
+        datasets: [{
+          data: [30, 25, 20, 15, 10],
+          backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#6b7280']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  }
+
+  // Claude API Expert Advice
+  async function askExpert(promptType) {
+    const prompts = {
+      'service-optimization': `Based on my handyman profile and task history, provide specific recommendations to improve my service efficiency and quality. Include tips on time management, tool organization, and workflow optimization.`,
+      'more-bookings': `Analyze my profile and suggest strategies to increase my booking volume. Consider my current skills, service areas, pricing, and availability. Provide actionable steps I can take this week.`,
+      'client-retention': `How can I turn one-time customers into repeat clients? Provide specific strategies for follow-up, building relationships, and creating a memorable service experience.`,
+      'review-improvement': `Give me a detailed guide on consistently earning 5-star reviews. Include communication tips, service delivery best practices, and how to handle difficult situations professionally.`,
+      'pricing-strategy': `Analyze my current hourly rate of $${currentHandyman.hourly_rate || 65} and help me understand if I should adjust my pricing. Consider market rates, my experience level, and value proposition.`,
+      'time-management': `Help me optimize my schedule to fit more jobs without sacrificing quality. Include strategies for route planning, time estimation, and minimizing downtime between jobs.`
+    };
+
+    const question = prompts[promptType];
+    await getClaudeAdvice(question);
+  }
+
+  async function getClaudeAdvice(question) {
+    document.getElementById('expertLoading').classList.remove('hidden');
+    document.getElementById('expertResponse').classList.add('hidden');
+
+    try {
+      // Call Netlify function instead of Claude API directly
+      const response = await fetch('/.netlify/functions/expert-advice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          question: question,
+          handymanProfile: {
+            id: currentHandyman.id,
+            full_name: currentHandyman.full_name,
+            hourly_rate: currentHandyman.hourly_rate,
+            years_experience: currentHandyman.years_experience,
+            city: currentHandyman.city,
+            zip: currentHandyman.zip,
+            skills: currentHandyman.skills,
+            average_rating: currentHandyman.average_rating
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to get advice');
+      }
+
+      const data = await response.json();
+      const advice = data.advice;
+
+      document.getElementById('expertResponseText').textContent = advice;
+      document.getElementById('expertLoading').classList.add('hidden');
+      document.getElementById('expertResponse').classList.remove('hidden');
+
+      // Save to recent questions
+      saveRecentQuestion(question, advice);
+    } catch (error) {
+      console.error('Error getting advice:', error);
+      document.getElementById('expertResponseText').textContent = 'Sorry, there was an error getting advice. Please try again. Error: ' + error.message;
+      document.getElementById('expertLoading').classList.add('hidden');
+      document.getElementById('expertResponse').classList.remove('hidden');
+    }
+  }
+
+  // Custom expert question
+  document.getElementById('expertForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = document.getElementById('customQuestion').value;
+    await getClaudeAdvice(question);
+  });
+
+  function closeExpertResponse() {
+    document.getElementById('expertResponse').classList.add('hidden');
+    document.getElementById('customQuestion').value = '';
+  }
+
+  function saveRecentQuestion(question, answer) {
+    // TODO: Save to database or local storage
+    const container = document.getElementById('recentQuestions');
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'border-b border-slate-200 pb-3';
+    questionDiv.innerHTML = `
+      <div class="text-sm font-semibold">${question.substring(0, 100)}...</div>
+      <div class="text-xs text-slate-500 mt-1">${new Date().toLocaleString()}</div>
+    `;
+    container.prepend(questionDiv);
+  }
+
+  // Load overview data
+  async function loadOverviewData() {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id);
 
-    const activeTasks = tasks?.filter(t => ['pending', 'en_route', 'in_progress'].includes(t.status)).length || 0;
-
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
-
+    const activeTasks = tasks?.filter(t => ['assigned', 'in_progress'].includes(t.status)).length || 0;
     const completedThisMonth = tasks?.filter(t =>
       t.status === 'completed' &&
-      new Date(t.completed_at) >= startOfMonth
+      new Date(t.completed_at) >= firstDay
     ).length || 0;
 
     const earnedThisMonth = tasks?.filter(t =>
       t.status === 'completed' &&
-      new Date(t.completed_at) >= startOfMonth
-    ).reduce((sum, t) => sum + parseFloat(t.total_amount || 0), 0) || 0;
+      new Date(t.completed_at) >= firstDay
+    ).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
 
     const pendingAmount = tasks?.filter(t =>
-      ['pending_review', 'awaiting_client_approval'].includes(t.status)
-    ).reduce((sum, t) => sum + parseFloat(t.total_amount || 0), 0) || 0;
+      t.status === 'completed' && !t.paid
+    ).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
 
     document.getElementById('activeTasksCount').textContent = activeTasks;
     document.getElementById('completedCount').textContent = completedThisMonth;
-    document.getElementById('earnedMonth').textContent = '$' + earnedThisMonth.toFixed(0);
-    document.getElementById('pendingAmount').textContent = '$' + pendingAmount.toFixed(0);
-  }
+    document.getElementById('earnedMonth').textContent = '$' + Math.round(earnedThisMonth);
+    document.getElementById('pendingAmount').textContent = '$' + Math.round(pendingAmount);
 
-  // Load upcoming tasks
-  async function loadUpcomingTasks() {
-    const { data: tasks } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('handyman_id', currentHandyman.id)
-      .eq('status', 'pending')
-      .order('scheduled_date', { ascending: true })
-      .limit(5);
-
-    const upcomingHtml = tasks?.length > 0 ? tasks.map(task => `
-      <div class="border-b border-slate-100 pb-2">
-        <div class="font-semibold">${task.task_category}</div>
-        <div class="text-xs text-slate-600">${task.scheduled_date || 'TBD'} • ${task.customer_name}</div>
+    // Load upcoming tasks
+    const upcomingTasks = tasks?.filter(t => t.status === 'assigned').slice(0, 5) || [];
+    const upcomingHtml = upcomingTasks.length > 0 ? upcomingTasks.map(task => `
+      <div class="border border-slate-200 rounded-lg p-3">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="font-semibold">${task.task_category}</div>
+            <div class="text-sm text-slate-600">${task.scheduled_date || 'TBD'} • ${task.customer_name}</div>
+          </div>
+          <span class="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Upcoming</span>
+        </div>
       </div>
     `).join('') : '<p class="text-slate-500 text-sm">No upcoming tasks</p>';
 
     document.getElementById('upcomingTasksList').innerHTML = upcomingHtml;
-  }
-
-  // Mark as en route
-  async function markEnRoute(taskId) {
-    // Get GPS location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const { error } = await supabase
-          .from('tasks')
-          .update({
-            status: 'en_route',
-            en_route_at: new Date().toISOString(),
-            gps_lat: position.coords.latitude,
-            gps_lng: position.coords.longitude
-          })
-          .eq('id', taskId);
-
-        if (!error) {
-          alert('✅ Marked as en route!');
-          location.reload();
-        } else {
-          alert('Failed to update status. Please try again.');
-        }
-      }, (error) => {
-        console.error('GPS error:', error);
-        alert('Unable to get GPS location. Please enable location services.');
-      });
-    } else {
-      alert('Geolocation is not supported by this browser.');
-    }
-  }
-
-  // Start task
-  async function startTask(taskId) {
-    const { error } = await supabase
-      .from('tasks')
-      .update({
-        status: 'in_progress',
-        task_started_at: new Date().toISOString()
-      })
-      .eq('id', taskId);
-
-    if (!error) {
-      alert('✅ Task started!');
-      location.reload();
-    } else {
-      alert('Failed to start task. Please try again.');
-    }
-  }
-
-  // Complete task
-  async function completeTask(taskId) {
-    // Show modal to upload photos and enter actual hours
-    const modal = `
-      <div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 max-w-md w-full">
-          <h3 class="text-xl font-bold mb-4">Complete Task</h3>
-
-          <label class="block mb-2 font-semibold">Actual Hours Worked</label>
-          <input type="number" id="actualHours" step="0.5" min="0.5"
-                 class="w-full border rounded px-3 py-2 mb-4" required>
-
-          <label class="block mb-2 font-semibold">Upload Completion Photos (Optional)</label>
-          <input type="file" id="completionPhotos" accept="image/*" multiple
-                 class="w-full border rounded px-3 py-2 mb-4">
-
-          <div class="flex gap-2">
-            <button onclick="submitCompletion('${taskId}')"
-                    class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-              Submit
-            </button>
-            <button onclick="closeModal()"
-                    class="flex-1 bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modal);
-  }
-
-  // Submit completion with approval logic
-  async function submitCompletion(taskId) {
-    const actualHours = document.getElementById('actualHours').value;
-    const photos = document.getElementById('completionPhotos').files;
-
-    if (!actualHours || parseFloat(actualHours) <= 0) {
-      alert('Please enter valid hours worked');
-      return;
-    }
-
-    try {
-      // Fetch task with handyman details for approval logic
-      const { data: task, error: fetchError } = await supabase
-        .from('tasks')
-        .select('*, handymen!tasks_handyman_id_fkey(*)')
-        .eq('id', taskId)
-        .single();
-
-      if (fetchError) {
-        throw new Error('Failed to fetch task details');
-      }
-
-      // APPROVAL LOGIC - Determines single-side vs two-side approval
-      const requiresTwoSideApproval = (task) => {
-        const handyman = task.handymen;
-
-        // Two-side approval required if ANY of these conditions are true:
-        return (
-          task.total_amount > 500 ||                                    // High-value jobs
-          (handyman.total_completed_tasks || 0) < 10 ||                 // New handymen
-          (handyman.average_rating && handyman.average_rating < 4.0) || // Low-rated handymen
-          task.property_type === 'commercial'                           // Commercial properties
-        );
-      };
-
-      const needsTwoSide = requiresTwoSideApproval(task);
-      const newStatus = needsTwoSide ? 'awaiting_client_approval' : 'pending_review';
-
-      // Upload photos to Supabase Storage (if any)
-      let photoUrls = [];
-      if (photos.length > 0) {
-        for (let i = 0; i < photos.length; i++) {
-          const fileName = `${taskId}_completion_${Date.now()}_${i}.jpg`;
-          const { data, error } = await supabase.storage
-            .from('task-photos')
-            .upload(fileName, photos[i]);
-
-          if (!error) {
-            const { data: { publicUrl } } = supabase.storage
-              .from('task-photos')
-              .getPublicUrl(fileName);
-            photoUrls.push(publicUrl);
-          }
-        }
-      }
-
-      // Update task with appropriate status
-      const { error: updateError } = await supabase
-        .from('tasks')
-        .update({
-          status: newStatus,
-          actual_hours: parseFloat(actualHours),
-          completion_requested_at: new Date().toISOString(),
-          completion_photo_urls: photoUrls
-        })
-        .eq('id', taskId);
-
-      if (updateError) {
-        throw new Error('Failed to update task');
-      }
-
-      // Show appropriate success message
-      if (needsTwoSide) {
-        alert('✅ Submitted for client approval!\n\nThe client will review and approve before payment is processed.');
-      } else {
-        alert('✅ Task complete! Payment will be processed automatically in 24 hours.');
-      }
-
-      closeModal();
-      location.reload();
-
-    } catch (error) {
-      console.error('Completion error:', error);
-      alert('❌ Error: ' + error.message);
-    }
-  }
-
-  // Close modal
-  function closeModal() {
-    const modal = document.getElementById('completionModal');
-    if (modal) {
-      modal.remove();
-    }
   }
 
   // Load current tasks
@@ -588,69 +1638,30 @@
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
-      .in('status', ['pending', 'en_route', 'in_progress'])
+      .in('status', ['assigned', 'in_progress'])
       .order('scheduled_date', { ascending: true });
 
     const tasksHtml = tasks?.length > 0 ? tasks.map(task => {
-      // Check if task is within 2 hours of scheduled time
-      const isWithin2Hours = () => {
-        if (!task.scheduled_date || !task.time_window) return false;
-        const scheduledDateTime = new Date(task.scheduled_date + ' ' + task.time_window.split('-')[0]);
-        const now = new Date();
-        const diffInHours = (scheduledDateTime - now) / (1000 * 60 * 60);
-        return diffInHours <= 2 && diffInHours >= 0;
+      const statusColors = {
+        'assigned': 'bg-blue-100 text-blue-700',
+        'in_progress': 'bg-amber-100 text-amber-700'
       };
-
-      // Determine button to show based on status
-      let actionButton = '';
-      if (task.status === 'pending' && isWithin2Hours()) {
-        actionButton = `
-          <button onclick="markEnRoute('${task.id}')"
-                  class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold">
-            🚗 Mark En Route
-          </button>`;
-      } else if (task.status === 'en_route') {
-        actionButton = `
-          <button onclick="startTask('${task.id}')"
-                  class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm font-semibold">
-            ▶️ Start Task
-          </button>`;
-      } else if (task.status === 'in_progress') {
-        actionButton = `
-          <button onclick="completeTask('${task.id}')"
-                  class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold">
-            ✅ Complete Task
-          </button>`;
-      }
-
-      // Get status display
-      const statusConfig = {
-        'pending': { class: 'bg-amber-100 text-amber-700', label: 'Pending' },
-        'en_route': { class: 'bg-blue-100 text-blue-700', label: 'En Route' },
-        'in_progress': { class: 'bg-green-100 text-green-700', label: 'In Progress' }
-      };
-      const status = statusConfig[task.status] || statusConfig['pending'];
 
       return `
         <div class="border border-slate-200 rounded-lg p-4">
-          <div class="flex items-start justify-between mb-2">
+          <div class="flex items-start justify-between mb-3">
             <div>
               <div class="font-bold text-lg">${task.task_category}</div>
-              <div class="text-sm text-slate-600">Task ID: ${task.task_id}</div>
+              <div class="text-sm text-slate-600">${task.customer_name}</div>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-semibold ${status.class}">
-              ${status.label}
-            </span>
+            <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusColors[task.status]}">${task.status}</span>
           </div>
           <div class="space-y-1 text-sm">
-            <div><strong>Customer:</strong> ${task.customer_name}</div>
             <div><strong>Phone:</strong> ${task.customer_phone || 'N/A'}</div>
             <div><strong>Address:</strong> ${task.customer_address || 'N/A'}</div>
-            <div><strong>Scheduled:</strong> ${task.scheduled_date || 'TBD'} ${task.time_window || ''}</div>
-            <div><strong>Estimated:</strong> ${task.estimated_hours || 0} hours • $${task.total_amount || 0}</div>
+            <div><strong>Scheduled:</strong> ${task.scheduled_date || 'TBD'}</div>
+            <div><strong>Amount:</strong> $${task.total_amount || 0}</div>
           </div>
-          ${task.task_description ? `<div class="mt-2 text-sm text-slate-600">${task.task_description}</div>` : ''}
-          ${actionButton ? `<div class="mt-4">${actionButton}</div>` : ''}
         </div>
       `;
     }).join('') : '<p class="text-slate-500 text-sm">No current tasks</p>';
@@ -679,7 +1690,6 @@
         </div>
         <div class="text-sm space-y-1">
           <div><strong>Customer:</strong> ${task.customer_name}</div>
-          <div><strong>Hours:</strong> ${task.actual_hours || task.estimated_hours || 0}</div>
           <div><strong>Amount:</strong> $${task.total_amount || 0}</div>
         </div>
       </div>
@@ -690,28 +1700,28 @@
 
   // Load earnings
   async function loadEarnings() {
-    const { data: payments } = await supabase
-      .from('payments')
+    const { data: tasks } = await supabase
+      .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
-      .order('created_at', { ascending: false });
+      .eq('status', 'completed');
 
-    const totalEarned = payments?.reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
-    const totalPaid = payments?.filter(p => p.status === 'paid').reduce((sum, p) => sum + parseFloat(p.amount), 0) || 0;
+    const totalEarned = tasks?.reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
+    const totalPaid = tasks?.filter(t => t.paid).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
     const awaiting = totalEarned - totalPaid;
 
-    document.getElementById('totalEarned').textContent = '$' + totalEarned.toFixed(0);
-    document.getElementById('totalPaid').textContent = '$' + totalPaid.toFixed(0);
-    document.getElementById('awaitingPayment').textContent = '$' + awaiting.toFixed(0);
+    document.getElementById('totalEarned').textContent = '$' + Math.round(totalEarned);
+    document.getElementById('totalPaid').textContent = '$' + Math.round(totalPaid);
+    document.getElementById('awaitingPayment').textContent = '$' + Math.round(awaiting);
 
-    const paymentsHtml = payments?.length > 0 ? payments.map(payment => `
+    const paymentsHtml = tasks?.length > 0 ? tasks.map(task => `
       <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
         <div>
-          <div class="font-semibold">$${parseFloat(payment.amount).toFixed(2)}</div>
-          <div class="text-xs text-slate-600">${new Date(payment.created_at).toLocaleDateString()}</div>
+          <div class="font-semibold">$${(parseFloat(task.total_amount) * 0.7).toFixed(2)}</div>
+          <div class="text-xs text-slate-600">${new Date(task.completed_at).toLocaleDateString()}</div>
         </div>
-        <span class="px-3 py-1 rounded-full text-xs font-semibold ${payment.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
-          ${payment.status === 'paid' ? 'Paid' : 'Pending'}
+        <span class="px-3 py-1 rounded-full text-xs font-semibold ${task.paid ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+          ${task.paid ? 'Paid' : 'Pending'}
         </span>
       </div>
     `).join('') : '<p class="text-slate-500 text-sm">No payment history</p>';
@@ -728,6 +1738,29 @@
     document.getElementById('profileCity').value = currentHandyman.city || '';
     document.getElementById('profileZip').value = currentHandyman.zip || '';
     document.getElementById('profileBio').value = currentHandyman.bio || '';
+    document.getElementById('profileRate').value = currentHandyman.hourly_rate || '';
+
+    // Load skills
+    if (currentHandyman.skills) {
+      document.querySelectorAll('.skill-checkbox').forEach(cb => {
+        cb.checked = currentHandyman.skills.includes(cb.value);
+      });
+    }
+
+    // Load service areas
+    if (currentHandyman.service_areas) {
+      document.getElementById('serviceState').value = 'FL';
+      document.getElementById('citySelection').classList.remove('hidden');
+      document.querySelectorAll('.city-checkbox').forEach(cb => {
+        cb.checked = currentHandyman.service_areas.includes(cb.value);
+      });
+    }
+
+    // Load insurance
+    if (currentHandyman.insurance_status) {
+      document.getElementById('editInsuranceStatus').value = currentHandyman.insurance_status;
+      document.getElementById('editInsuranceProvider').value = currentHandyman.insurance_provider || '';
+    }
   }
 
   // Update profile
@@ -742,6 +1775,7 @@
         city: document.getElementById('profileCity').value,
         zip: document.getElementById('profileZip').value,
         bio: document.getElementById('profileBio').value,
+        hourly_rate: document.getElementById('profileRate').value,
         updated_at: new Date().toISOString()
       })
       .eq('id', currentHandyman.id);
@@ -752,6 +1786,51 @@
         document.getElementById('profileSuccess').classList.add('hidden');
       }, 3000);
       await loadHandymanData((await supabase.auth.getUser()).data.user.id);
+    }
+  });
+
+  // Update skills
+  document.getElementById('skillsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const skills = Array.from(document.querySelectorAll('.skill-checkbox:checked')).map(cb => cb.value);
+    const serviceAreas = Array.from(document.querySelectorAll('.city-checkbox:checked')).map(cb => cb.value);
+
+    const { error } = await supabase
+      .from('handymen')
+      .update({
+        skills: skills,
+        service_areas: serviceAreas,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', currentHandyman.id);
+
+    if (!error) {
+      document.getElementById('skillsSuccess').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('skillsSuccess').classList.add('hidden');
+      }, 3000);
+    }
+  });
+
+  // Update insurance
+  document.getElementById('insuranceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const { error } = await supabase
+      .from('handymen')
+      .update({
+        insurance_status: document.getElementById('editInsuranceStatus').value,
+        insurance_provider: document.getElementById('editInsuranceProvider').value,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', currentHandyman.id);
+
+    if (!error) {
+      document.getElementById('insuranceSuccess').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('insuranceSuccess').classList.add('hidden');
+      }, 3000);
     }
   });
 
@@ -799,18 +1878,15 @@
   // Initialize app
   async function initializeApp() {
     try {
-      console.log('🔄 Initializing dashboard...');
       await initializeSupabase();
-      console.log('🔄 Checking authentication...');
       await checkAuth();
-      console.log('✅ Dashboard initialized successfully');
     } catch (error) {
-      console.error('❌ Dashboard initialization failed:', error);
+      console.error('Initialization error:', error);
       alert('Failed to initialize dashboard. Please refresh the page.');
     }
   }
 
-  // Start initialization
+  // Start
   initializeApp();
 </script>
 
