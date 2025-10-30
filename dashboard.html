@@ -113,15 +113,28 @@
           </div>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-semibold mb-1">Social Security Number (SSN) *</label>
-            <input type="text" id="ssn" required maxlength="11" placeholder="XXX-XX-XXXX" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
-            <p class="text-xs text-slate-500 mt-1">Required for 1099 tax reporting</p>
+        <div>
+          <label class="block text-sm font-semibold mb-2">Tax Identification</label>
+          <div class="flex gap-4 mb-2">
+            <label class="flex items-center gap-2">
+              <input type="radio" name="taxIdType" value="ssn" checked onchange="toggleTaxIdField()" />
+              <span class="text-sm">SSN (Individual)</span>
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="radio" name="taxIdType" value="ein" onchange="toggleTaxIdField()" />
+              <span class="text-sm">EIN (Business/LLC/Corp)</span>
+            </label>
           </div>
-          <div>
-            <label class="block text-sm font-semibold mb-1">Driver's License / State ID Number *</label>
-            <input type="text" id="idNumber" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold mb-1" id="taxIdLabel">Social Security Number (SSN) *</label>
+              <input type="text" id="ssn" required maxlength="11" placeholder="XXX-XX-XXXX" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              <p class="text-xs text-slate-500 mt-1">Required for 1099 tax reporting</p>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1">Driver's License / State ID Number *</label>
+              <input type="text" id="idNumber" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
           </div>
         </div>
 
@@ -284,7 +297,8 @@
           <h4 class="font-bold mb-3">📋 SendAHandyman Service Agreement</h4>
           <div class="bg-white rounded-lg p-4 max-h-64 overflow-y-auto text-sm border border-indigo-100 mb-4">
             <p class="mb-3"><strong>Independent Contractor Relationship:</strong> You are an independent contractor, not an employee. You control when and how you work.</p>
-            <p class="mb-3"><strong>Payment Terms:</strong> You receive 70% of the customer payment. SendAHandyman retains 30% as a platform fee. Payments are processed weekly via direct deposit.</p>
+            <p class="mb-3"><strong>Payment Terms:</strong> You receive 80% of the customer payment. SendAHandyman retains 20% as a platform fee. Payments are processed weekly via direct deposit.</p>
+            <p class="mb-3"><strong>Hourly Rate:</strong> Your base pay is 80% of $80/hour ($64/hour). Additional service fees apply for rush jobs, same-day service, and premium time slots.</p>
             <p class="mb-3"><strong>Job Acceptance:</strong> You may accept or decline jobs at your discretion. However, consistent declining may affect your ranking and job offers.</p>
             <p class="mb-3"><strong>Quality Standards:</strong> All work must meet professional standards. Jobs must be completed as described. Photo documentation is required before and after.</p>
             <p class="mb-3"><strong>Customer Communication:</strong> All customer communication must be professional and courteous. No solicitation of off-platform business.</p>
@@ -490,6 +504,7 @@
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h4 class="font-bold mb-2">📝 W-9 Form</h4>
           <p class="text-sm mb-3">As an independent contractor, you'll receive a 1099-NEC for earnings over $600/year. You're responsible for paying self-employment taxes.</p>
+          <p class="text-sm mb-3 font-semibold text-blue-900">LLC/Corporation Note: If you operate as an LLC or Inc, you'll still need to complete a W-9 with your business EIN. S-Corps and C-Corps may be exempt from 1099 reporting but a W-9 is still required for our records.</p>
           <div>
             <label class="block text-xs font-medium mb-1">Upload Completed W-9 *</label>
             <input type="file" id="w9Upload" accept=".pdf,.jpg,.jpeg,.png" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
@@ -786,11 +801,15 @@
       <div class="grid md:grid-cols-2 gap-6 mb-8">
         <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Monthly Performance</h3>
-          <canvas id="performanceChart" height="200"></canvas>
+          <div style="height: 250px; max-height: 250px;">
+            <canvas id="performanceChart"></canvas>
+          </div>
         </div>
         <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Service Breakdown</h3>
-          <canvas id="serviceChart" height="200"></canvas>
+          <div style="height: 250px; max-height: 250px;">
+            <canvas id="serviceChart"></canvas>
+          </div>
         </div>
       </div>
 
@@ -1309,52 +1328,277 @@
     }
   }
 
+  // Toggle between SSN and EIN input
+  function toggleTaxIdField() {
+    const taxIdType = document.querySelector('input[name="taxIdType"]:checked').value;
+    const label = document.getElementById('taxIdLabel');
+    const input = document.getElementById('ssn');
+
+    if (taxIdType === 'ein') {
+      label.textContent = 'Employer Identification Number (EIN) *';
+      input.placeholder = 'XX-XXXXXXX';
+      input.maxLength = 10;
+    } else {
+      label.textContent = 'Social Security Number (SSN) *';
+      input.placeholder = 'XXX-XX-XXXX';
+      input.maxLength = 11;
+    }
+  }
+
   // Step form handlers
+  // FILE STORAGE NOTES:
+  // All uploaded files (govId, profilePhoto, licenses, insurance, W9, etc.) should be stored in Supabase Storage.
+  // Recommended structure: /handyman-uploads/{handyman_id}/{file_type}/{filename}
+  // Example implementation:
+  // const file = document.getElementById('govId').files[0];
+  // const { data, error } = await supabase.storage
+  //   .from('handyman-documents')
+  //   .upload(`${currentHandyman.id}/gov-id/${file.name}`, file);
+  // Then store the file path in the database column (e.g., gov_id_url)
+
   document.getElementById('step1Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 1 data to database
+
+    const taxIdType = document.querySelector('input[name="taxIdType"]:checked').value;
+
+    // Collect form data
+    const formData = {
+      full_name: document.getElementById('legalName').value,
+      date_of_birth: document.getElementById('dob').value,
+      tax_id_type: taxIdType,
+      tax_id: document.getElementById('ssn').value,
+      drivers_license: document.getElementById('idNumber').value,
+      updated_at: new Date().toISOString()
+    };
+
+    // TODO: Handle file uploads for govId and profilePhoto
+    // Files will need to be uploaded to Supabase Storage
+    // For now, just save the text data
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 1:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step2Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 2 data to database
+
+    // Collect license data
+    const licenses = [];
+    document.querySelectorAll('#licenseContainer > div').forEach(licenseDiv => {
+      const type = licenseDiv.querySelector('.license-type')?.value;
+      const number = licenseDiv.querySelector('.license-number')?.value;
+      const expiry = licenseDiv.querySelector('.license-expiry')?.value;
+      if (type || number) {
+        licenses.push({ type, number, expiry });
+      }
+    });
+
+    // Collect form data
+    const formData = {
+      licenses: licenses.length > 0 ? licenses : null,
+      insurance_status: document.getElementById('insuranceStatus').value,
+      insurance_provider: document.getElementById('insuranceProvider').value || null,
+      updated_at: new Date().toISOString()
+    };
+
+    // TODO: Handle file uploads for license files and insurance proof
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 2:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step3Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 3 data to database
+
+    const formData = {
+      has_vehicle: document.getElementById('hasVehicle').checked,
+      has_tools: document.getElementById('hasTools').checked,
+      has_smartphone: document.getElementById('hasSmartphone').checked,
+      has_ppe: document.getElementById('hasPPE').checked,
+      has_ladder: document.getElementById('hasLadder').checked,
+      additional_equipment: document.getElementById('additionalEquipment').value || null,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 3:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step4Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 4 data to database
+
+    const formData = {
+      agreed_to_service_terms: document.getElementById('agreeServiceTerms').checked,
+      bio: document.getElementById('profileBioSetup').value,
+      hourly_rate: parseFloat(document.getElementById('hourlyRate').value),
+      years_experience: parseInt(document.getElementById('yearsExp').value),
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 4:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step5Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 5 data to database
+
+    const formData = {
+      agreed_code_of_conduct: document.getElementById('agreeCodeOfConduct').checked,
+      agreed_dress_code: document.getElementById('agreeDressCode').checked,
+      agreed_communication_standards: document.getElementById('agreeComm').checked,
+      agreed_photo_documentation: document.getElementById('agreePhotos').checked,
+      agreed_no_upsell: document.getElementById('agreeNoUpsell').checked,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 5:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step6Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 6 data to database
+
+    const formData = {
+      emergency_contact_name: document.getElementById('emergencyName').value,
+      emergency_contact_phone: document.getElementById('emergencyPhone').value,
+      emergency_contact_relation: document.getElementById('emergencyRelation').value,
+      agreed_safety_policy: document.getElementById('agreeSafety').checked,
+      agreed_hazard_reporting: document.getElementById('agreeHazard').checked,
+      agreed_refuse_unsafe: document.getElementById('agreeRefuseUnsafe').checked,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 6:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step7Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 7 data to database
+
+    // Validate account numbers match
+    const accountNum = document.getElementById('accountNumber').value;
+    const confirmAccountNum = document.getElementById('accountNumberConfirm').value;
+    if (accountNum !== confirmAccountNum) {
+      alert('Account numbers do not match. Please verify and try again.');
+      return;
+    }
+
+    const formData = {
+      bank_name: document.getElementById('bankName').value,
+      routing_number: document.getElementById('routingNumber').value,
+      account_number: accountNum,
+      account_type: document.getElementById('accountType').value,
+      agreed_1099: document.getElementById('agree1099').checked,
+      agreed_taxes: document.getElementById('agreeTaxes').checked,
+      agreed_bank_info: document.getElementById('agreeBankInfo').checked,
+      updated_at: new Date().toISOString()
+    };
+
+    // TODO: Handle W-9 file upload
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 7:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
   document.getElementById('step8Form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    // TODO: Save step 8 data to database
+
+    const formData = {
+      agreed_review_policy: document.getElementById('agreeReview').checked,
+      agreed_quality_standards: document.getElementById('agreeQuality').checked,
+      agreed_reputation: document.getElementById('agreeReputation').checked,
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('handymen')
+      .update(formData)
+      .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving step 8:', error);
+      alert('Error saving data: ' + error.message);
+      return;
+    }
+
+    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1604,11 +1848,11 @@
     const earnedThisMonth = tasks?.filter(t =>
       t.status === 'completed' &&
       new Date(t.completed_at) >= firstDay
-    ).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
+    ).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
 
     const pendingAmount = tasks?.filter(t =>
       t.status === 'completed' && !t.paid
-    ).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
+    ).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
 
     document.getElementById('activeTasksCount').textContent = activeTasks;
     document.getElementById('completedCount').textContent = completedThisMonth;
@@ -1706,8 +1950,8 @@
       .eq('handyman_id', currentHandyman.id)
       .eq('status', 'completed');
 
-    const totalEarned = tasks?.reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
-    const totalPaid = tasks?.filter(t => t.paid).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.7), 0) || 0;
+    const totalEarned = tasks?.reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
+    const totalPaid = tasks?.filter(t => t.paid).reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
     const awaiting = totalEarned - totalPaid;
 
     document.getElementById('totalEarned').textContent = '$' + Math.round(totalEarned);
@@ -1717,7 +1961,7 @@
     const paymentsHtml = tasks?.length > 0 ? tasks.map(task => `
       <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
         <div>
-          <div class="font-semibold">$${(parseFloat(task.total_amount) * 0.7).toFixed(2)}</div>
+          <div class="font-semibold">$${(parseFloat(task.total_amount) * 0.8).toFixed(2)}</div>
           <div class="text-xs text-slate-600">${new Date(task.completed_at).toLocaleDateString()}</div>
         </div>
         <span class="px-3 py-1 rounded-full text-xs font-semibold ${task.paid ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
