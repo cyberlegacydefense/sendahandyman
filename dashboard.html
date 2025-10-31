@@ -899,9 +899,6 @@
                   <button type="button" onclick="document.getElementById('newProfilePhoto').click()" class="text-sm text-indigo-600 hover:text-indigo-700 font-semibold">
                     Change Photo
                   </button>
-                  <button type="button" onclick="testProfilePicture()" class="ml-2 text-xs text-blue-600 hover:text-blue-700 font-medium">
-                    Test Load
-                  </button>
                 </div>
               </div>
               <div class="flex-1 space-y-4">
@@ -2258,6 +2255,43 @@
       // Try multiple approaches to load the image
       let imageUrl = currentHandyman.profile_photo_url;
 
+      // Check if this is an expired signed URL and regenerate if needed
+      if (imageUrl.includes('/object/sign/') && imageUrl.includes('token=')) {
+        console.log('Detected signed URL, checking if expired and regenerating...');
+        try {
+          const urlParts = imageUrl.split('/object/sign/handyman-documents/')[1];
+          if (urlParts) {
+            const filePath = urlParts.split('?token=')[0];
+            console.log('Regenerating signed URL for path:', filePath);
+
+            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+              .from('handyman-documents')
+              .createSignedUrl(filePath, 3600);
+
+            if (signedUrlData && !signedUrlError) {
+              imageUrl = signedUrlData.signedUrl;
+              console.log('Using regenerated signed URL:', imageUrl);
+
+              // Add handlers and set image
+              img.onload = function() {
+                console.log('Profile picture loaded successfully with regenerated URL');
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+              };
+              img.onerror = function() {
+                console.error('Even regenerated signed URL failed');
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+              };
+              img.src = imageUrl;
+              return;
+            }
+          }
+        } catch (error) {
+          console.log('Error regenerating signed URL:', error);
+        }
+      }
+
       // If it's a Supabase storage URL, try to get proper access
       if (imageUrl.includes('supabase.co/storage')) {
         try {
@@ -2289,10 +2323,14 @@
               const testImg = new Image();
               testImg.onload = function() {
                 console.log('Public URL works, using it');
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
                 img.src = imageUrl;
               };
               testImg.onerror = function() {
                 console.log('Public URL failed, using signed URL');
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
                 img.src = signedUrlData.signedUrl;
               };
               testImg.src = imageUrl;
@@ -2427,13 +2465,17 @@
     );
 
     if (filePath) {
-      // Get the public URL from Supabase
-      const { data: publicUrlData } = supabase.storage
-        .from('handyman-documents')
-        .getPublicUrl(filePath);
+      // Store the file path in database, not the full URL (since we need signed URLs)
+      // We'll reconstruct the URL when needed
+      const profilePhotoPath = filePath;
+      console.log('Profile photo uploaded, path:', profilePhotoPath);
 
-      const profilePhotoUrl = publicUrlData.publicUrl;
-      console.log('Profile photo uploaded, URL:', profilePhotoUrl);
+      // Get a fresh signed URL for immediate use
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from('handyman-documents')
+        .createSignedUrl(profilePhotoPath, 3600);
+
+      const profilePhotoUrl = signedUrlData?.signedUrl || `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
 
       // Update database
       const { error } = await supabase
@@ -2674,15 +2716,10 @@
             console.log('Signed URL fetch response:', signedResponse.status, signedResponse.statusText);
 
             if (signedResponse.ok) {
-              // Update the database with signed URL and reload
-              await supabase
-                .from('handymen')
-                .update({ profile_photo_url: signedUrlData.signedUrl })
-                .eq('id', currentHandyman.id);
-
+              // Don't store signed URL in database (it expires), just use it temporarily
               currentHandyman.profile_photo_url = signedUrlData.signedUrl;
               loadProfile();
-              console.log('✅ Updated to use signed URL');
+              console.log('✅ Using signed URL (temporary)');
             }
           } else {
             console.log('❌ Signed URL creation failed:', error);
