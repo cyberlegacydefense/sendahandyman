@@ -33,18 +33,18 @@
 <!-- Login Page -->
 <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl p-8 shadow-soft border border-slate-100 w-full max-w-md">
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-bold mb-2">Handyman Portal</h1>
-      <p class="text-slate-600">Sign in to access your dashboard</p>
+    <div class="text-center mb-6 md:mb-8">
+      <h1 class="text-xl md:text-2xl font-bold mb-2">Handyman Portal</h1>
+      <p class="text-sm md:text-base text-slate-600">Sign in to access your dashboard</p>
     </div>
 
     <form id="loginForm" class="space-y-4">
       <div>
-        <label class="block text-sm font-semibold mb-1">Email</label>
+        <label class="block text-xs md:text-sm font-semibold mb-1">Email</label>
         <input type="email" id="loginEmail" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1">Password</label>
+        <label class="block text-xs md:text-sm font-semibold mb-1">Password</label>
         <div class="relative">
           <input type="password" id="loginPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2 pr-10" />
           <button type="button" id="togglePassword" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 focus:outline-none">
@@ -58,7 +58,7 @@
           </button>
         </div>
       </div>
-      <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+      <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-4 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
         Sign In
       </button>
       <div id="loginError" class="hidden text-sm text-red-600 text-center"></div>
@@ -70,9 +70,9 @@
 <div id="onboardingWizard" class="hidden min-h-screen bg-slate-50">
   <div class="max-w-5xl mx-auto px-4 py-8">
     <!-- Progress Bar -->
-    <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100 mb-6">
+    <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100 mb-6">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold">Complete Your Profile</h2>
+        <h2 class="text-lg md:text-xl font-bold">Complete Your Profile</h2>
         <span id="onboardingProgress" class="text-sm font-semibold text-indigo-600">Step 1 of 9</span>
       </div>
       <div class="flex items-center gap-2">
@@ -98,23 +98,23 @@
 
     <!-- Step 1: Personal & Identity Verification -->
     <div id="step1" class="onboarding-step bg-white rounded-xl p-8 shadow-soft border border-slate-100">
-      <h3 class="text-2xl font-bold mb-2">Personal & Identity Verification</h3>
-      <p class="text-slate-600 mb-6">We need to verify your identity for insurance and payment purposes.</p>
+      <h3 class="text-xl md:text-2xl font-bold mb-2">Personal & Identity Verification</h3>
+      <p class="text-sm md:text-base text-slate-600 mb-4 md:mb-6">We need to verify your identity for insurance and payment purposes.</p>
 
       <form id="step1Form" class="space-y-6">
         <div class="grid md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-semibold mb-1">Full Legal Name *</label>
+            <label class="block text-xs md:text-sm font-semibold mb-1">Full Legal Name *</label>
             <input type="text" id="legalName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
           </div>
           <div>
-            <label class="block text-sm font-semibold mb-1">Date of Birth *</label>
+            <label class="block text-xs md:text-sm font-semibold mb-1">Date of Birth *</label>
             <input type="date" id="dob" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-2">Tax Identification</label>
+          <label class="block text-xs md:text-sm font-semibold mb-2">Tax Identification</label>
           <div class="flex gap-4 mb-2">
             <label class="flex items-center gap-2">
               <input type="radio" name="taxIdType" value="ssn" checked onchange="toggleTaxIdField()" />
@@ -127,19 +127,19 @@
           </div>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-semibold mb-1" id="taxIdLabel">Social Security Number (SSN) *</label>
+              <label class="block text-xs md:text-sm font-semibold mb-1" id="taxIdLabel">Social Security Number (SSN) *</label>
               <input type="text" id="ssn" required maxlength="11" placeholder="XXX-XX-XXXX" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
               <p class="text-xs text-slate-500 mt-1">Required for 1099 tax reporting</p>
             </div>
             <div>
-              <label class="block text-sm font-semibold mb-1">Driver's License / State ID Number *</label>
+              <label class="block text-xs md:text-sm font-semibold mb-1">Driver's License / State ID Number *</label>
               <input type="text" id="idNumber" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-2">Upload Government-Issued ID *</label>
+          <label class="block text-xs md:text-sm font-semibold mb-2">Upload Government-Issued ID *</label>
           <input type="file" id="govId" accept="image/*,.pdf" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
           <p class="text-xs text-slate-500 mt-1">Driver's license, passport, or state ID. Both sides if applicable.</p>
         </div>
@@ -430,8 +430,8 @@
 
     <!-- Step 6: Health, Safety & Risk Policy -->
     <div id="step6" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
-      <h3 class="text-2xl font-bold mb-2">Health, Safety & Risk Policy</h3>
-      <p class="text-slate-600 mb-6">Your safety and that of our customers is our top priority.</p>
+      <h3 class="text-xl md:text-2xl font-bold mb-2">Health, Safety & Risk Policy</h3>
+      <p class="text-sm md:text-base text-slate-600 mb-4 md:mb-6">Your safety and that of our customers is our top priority.</p>
 
       <form id="step6Form" class="space-y-6">
         <div class="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -459,7 +459,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-2">Emergency Contact Information *</label>
+          <label class="block text-xs md:text-sm font-semibold mb-2">Emergency Contact Information *</label>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-medium mb-1">Emergency Contact Name</label>
@@ -661,8 +661,8 @@
 
     <!-- Step 9: First Job Readiness -->
     <div id="step9" class="onboarding-step hidden bg-white rounded-xl p-8 shadow-soft border border-slate-100">
-      <h3 class="text-2xl font-bold mb-2">First Job Readiness</h3>
-      <p class="text-slate-600 mb-6">You're almost ready! Let's schedule your welcome call and set your availability.</p>
+      <h3 class="text-xl md:text-2xl font-bold mb-2">First Job Readiness</h3>
+      <p class="text-sm md:text-base text-slate-600 mb-4 md:mb-6">You're almost ready! Let's schedule your welcome call and set your availability.</p>
 
       <form id="step9Form" class="space-y-6">
         <div class="gradient-bg text-white rounded-xl p-6">
@@ -677,7 +677,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-3">Preferred Welcome Call Time *</label>
+          <label class="block text-xs md:text-sm font-semibold mb-3">Preferred Welcome Call Time *</label>
           <div class="grid md:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-medium mb-1">Date</label>
@@ -756,11 +756,11 @@
     <div class="max-w-7xl mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <h1 class="text-xl font-bold">SendAHandyman Dashboard</h1>
+          <h1 class="text-lg md:text-xl font-bold">SendAHandyman Dashboard</h1>
         </div>
-        <div class="flex items-center gap-4">
-          <span id="handymanName" class="text-sm font-semibold text-slate-700"></span>
-          <button id="logoutBtn" class="text-sm text-slate-600 hover:text-slate-900">Sign Out</button>
+        <div class="flex items-center gap-2 md:gap-4">
+          <span id="handymanName" class="text-xs md:text-sm font-semibold text-slate-700 truncate max-w-32 md:max-w-none"></span>
+          <button id="logoutBtn" class="text-xs md:text-sm text-slate-600 hover:text-slate-900 whitespace-nowrap">Sign Out</button>
         </div>
       </div>
     </div>
@@ -769,50 +769,50 @@
   <!-- Tabs -->
   <div class="bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4">
-      <nav class="flex gap-8 overflow-x-auto">
-        <button class="tab-btn py-4 font-semibold text-sm tab-active whitespace-nowrap" data-tab="overview">Overview</button>
-        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="tasks">Current Tasks</button>
-        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="history">Task History</button>
-        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="earnings">Earnings</button>
-        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="profile">Profile</button>
-        <button class="tab-btn py-4 font-semibold text-sm whitespace-nowrap" data-tab="expert">💡 Expert Advice</button>
+      <nav class="flex gap-4 md:gap-8 overflow-x-auto scrollbar-hide">
+        <button class="tab-btn py-3 md:py-4 font-semibold text-xs md:text-sm tab-active whitespace-nowrap px-2" data-tab="overview">Overview</button>
+        <button class="tab-btn py-3 md:py-4 font-semibold text-xs md:text-sm whitespace-nowrap px-2" data-tab="tasks">Tasks</button>
+        <button class="tab-btn py-3 md:py-4 font-semibold text-xs md:text-sm whitespace-nowrap px-2" data-tab="history">History</button>
+        <button class="tab-btn py-3 md:py-4 font-semibold text-xs md:text-sm whitespace-nowrap px-2" data-tab="earnings">Earnings</button>
+        <button class="tab-btn py-3 md:py-4 font-semibold text-xs md:text-sm whitespace-nowrap px-2" data-tab="profile">Profile</button>
+        <button class="tab-btn py-3 md:py-4 font-semibold text-xs md:text-sm whitespace-nowrap px-2" data-tab="expert">💡 Expert</button>
       </nav>
     </div>
   </div>
 
   <!-- Content -->
-  <div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-8">
 
     <!-- Overview Tab -->
     <div id="overviewTab" class="tab-content">
-      <div class="grid md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Active Tasks</div>
-          <div id="activeTasksCount" class="text-3xl font-bold text-indigo-600">0</div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Active Tasks</div>
+          <div id="activeTasksCount" class="text-2xl md:text-3xl font-bold text-indigo-600">0</div>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Completed This Month</div>
-          <div id="completedCount" class="text-3xl font-bold text-green-600">0</div>
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Completed This Month</div>
+          <div id="completedCount" class="text-2xl md:text-3xl font-bold text-green-600">0</div>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Earned This Month</div>
-          <div id="earnedMonth" class="text-3xl font-bold text-green-600">$0</div>
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Earned This Month</div>
+          <div id="earnedMonth" class="text-2xl md:text-3xl font-bold text-green-600">$0</div>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Payment Pending</div>
-          <div id="pendingAmount" class="text-3xl font-bold text-amber-600">$0</div>
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Payment Pending</div>
+          <div id="pendingAmount" class="text-2xl md:text-3xl font-bold text-amber-600">$0</div>
         </div>
       </div>
 
       <!-- Charts Row -->
       <div class="grid md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Monthly Performance</h3>
           <div style="height: 250px; max-height: 250px;">
             <canvas id="performanceChart"></canvas>
           </div>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Service Breakdown</h3>
           <div style="height: 250px; max-height: 250px;">
             <canvas id="serviceChart"></canvas>
@@ -820,7 +820,7 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+      <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
         <h3 class="text-lg font-bold mb-4">Upcoming Tasks</h3>
         <div id="upcomingTasksList" class="space-y-3">
           <p class="text-slate-500 text-sm">No upcoming tasks</p>
@@ -830,7 +830,7 @@
 
     <!-- Current Tasks Tab -->
     <div id="tasksTab" class="tab-content hidden">
-      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+      <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
         <h3 class="text-lg font-bold mb-4">Current Tasks</h3>
         <div id="currentTasksList" class="space-y-4">
           <p class="text-slate-500 text-sm">No current tasks</p>
@@ -840,7 +840,7 @@
 
     <!-- Task History Tab -->
     <div id="historyTab" class="tab-content hidden">
-      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+      <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
         <h3 class="text-lg font-bold mb-4">Completed Tasks</h3>
         <div id="historyTasksList" class="space-y-4">
           <p class="text-slate-500 text-sm">No completed tasks</p>
@@ -851,21 +851,21 @@
     <!-- Earnings Tab -->
     <div id="earningsTab" class="tab-content hidden">
       <div class="grid md:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Total Earned</div>
-          <div id="totalEarned" class="text-3xl font-bold text-green-600">$0</div>
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Total Earned</div>
+          <div id="totalEarned" class="text-2xl md:text-3xl font-bold text-green-600">$0</div>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Paid Out</div>
-          <div id="totalPaid" class="text-3xl font-bold text-indigo-600">$0</div>
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Paid Out</div>
+          <div id="totalPaid" class="text-2xl md:text-3xl font-bold text-indigo-600">$0</div>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
-          <div class="text-slate-600 text-sm font-semibold mb-1">Awaiting Payment</div>
-          <div id="awaitingPayment" class="text-3xl font-bold text-amber-600">$0</div>
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
+          <div class="text-slate-600 text-xs md:text-sm font-semibold mb-1">Awaiting Payment</div>
+          <div id="awaitingPayment" class="text-2xl md:text-3xl font-bold text-amber-600">$0</div>
         </div>
       </div>
 
-      <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+      <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
         <h3 class="text-lg font-bold mb-4">Payment History</h3>
         <div id="paymentHistoryList" class="space-y-3">
           <p class="text-slate-500 text-sm">No payment history</p>
@@ -877,7 +877,7 @@
     <div id="profileTab" class="tab-content hidden">
       <div class="grid gap-6">
         <!-- Personal Info -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Personal Information</h3>
           <form id="profileForm" class="space-y-4">
             <!-- Profile Picture Section -->
@@ -901,11 +901,11 @@
               <div class="flex-1 space-y-4">
                 <div class="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-semibold mb-1">Full Name</label>
+                    <label class="block text-xs md:text-sm font-semibold mb-1">Full Name</label>
                     <input type="text" id="profileName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
                   </div>
                   <div>
-                    <label class="block text-sm font-semibold mb-1">Phone</label>
+                    <label class="block text-xs md:text-sm font-semibold mb-1">Phone</label>
                     <input type="tel" id="profilePhone" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
                   </div>
                 </div>
@@ -913,9 +913,9 @@
             </div>
 
             <!-- Location & Service Area -->
-            <div class="grid md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
               <div>
-                <label class="block text-sm font-semibold mb-1">State</label>
+                <label class="block text-xs md:text-sm font-semibold mb-1">State</label>
                 <select id="profileState" class="w-full rounded-lg border border-slate-200 px-3 py-2">
                   <option value="">Select State</option>
                   <option value="FL">Florida</option>
@@ -923,40 +923,40 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-semibold mb-1">County</label>
+                <label class="block text-xs md:text-sm font-semibold mb-1">County</label>
                 <select id="profileCounty" class="w-full rounded-lg border border-slate-200 px-3 py-2">
                   <option value="">Select County</option>
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-semibold mb-1">City</label>
+                <label class="block text-xs md:text-sm font-semibold mb-1">City</label>
                 <input type="text" id="profileCity" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
               </div>
               <div>
-                <label class="block text-sm font-semibold mb-1">ZIP Code</label>
+                <label class="block text-xs md:text-sm font-semibold mb-1">ZIP Code</label>
                 <input type="text" id="profileZip" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
               </div>
             </div>
 
             <!-- Fixed Rate Display -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
               <div class="flex justify-between items-center">
                 <div>
                   <h4 class="font-semibold text-blue-900">Hourly Rate</h4>
                   <p class="text-sm text-blue-700">Fixed rate for all handymen</p>
                 </div>
                 <div class="text-right">
-                  <div class="text-2xl font-bold text-blue-900">$80/hr</div>
+                  <div class="text-xl md:text-2xl font-bold text-blue-900">$80/hr</div>
                   <p class="text-xs text-blue-600">You receive 80% ($64/hr)</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold mb-1">Professional Bio</label>
+              <label class="block text-xs md:text-sm font-semibold mb-1">Professional Bio</label>
               <textarea id="profileBio" rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
             </div>
-            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="w-full md:w-auto rounded-xl bg-indigo-600 text-white px-6 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
               Save Changes
             </button>
             <div id="profileSuccess" class="hidden text-sm text-green-600">Profile updated successfully!</div>
@@ -964,12 +964,12 @@
         </div>
 
         <!-- Skills & Service Areas -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Skills & Services</h3>
           <form id="skillsForm" class="space-y-4">
             <div>
-              <label class="block text-sm font-semibold mb-2">Select Your Skills</label>
-              <div class="grid md:grid-cols-3 gap-3">
+              <label class="block text-xs md:text-sm font-semibold mb-2">Select Your Skills</label>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3">
                 <label class="flex items-center gap-2">
                   <input type="checkbox" class="skill-checkbox" value="tv-mounting" />
                   <span class="text-sm">TV Mounting</span>
@@ -1018,30 +1018,20 @@
             </div>
 
             <div>
-              <label class="block text-sm font-semibold mb-2">Service Areas</label>
+              <label class="block text-xs md:text-sm font-semibold mb-2">Service Areas</label>
               <div class="space-y-2">
                 <select id="serviceState" class="w-full rounded-lg border border-slate-200 px-3 py-2">
                   <option value="">Select State</option>
                   <option value="FL">Florida</option>
+                  <option value="TX">Texas</option>
                 </select>
-                <div id="citySelection" class="hidden grid md:grid-cols-3 gap-3 mt-3">
-                  <label class="flex items-center gap-2">
-                    <input type="checkbox" class="city-checkbox" value="palm-beach" />
-                    <span class="text-sm">Palm Beach County</span>
-                  </label>
-                  <label class="flex items-center gap-2">
-                    <input type="checkbox" class="city-checkbox" value="broward" />
-                    <span class="text-sm">Broward County</span>
-                  </label>
-                  <label class="flex items-center gap-2">
-                    <input type="checkbox" class="city-checkbox" value="miami-dade" />
-                    <span class="text-sm">Miami-Dade County</span>
-                  </label>
+                <div id="citySelection" class="hidden grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-3 mt-3">
+                  <!-- Counties will be populated dynamically -->
                 </div>
               </div>
             </div>
 
-            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="w-full md:w-auto rounded-xl bg-indigo-600 text-white px-6 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
               Save Skills & Areas
             </button>
             <div id="skillsSuccess" class="hidden text-sm text-green-600">Skills updated successfully!</div>
@@ -1049,20 +1039,20 @@
         </div>
 
         <!-- Weekly Schedule -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Weekly Availability</h3>
-          <p class="text-sm text-slate-600 mb-4">Click cells to toggle your availability. Select the hours you're available to work.</p>
+          <p class="text-xs md:text-sm text-slate-600 mb-4">Click cells to toggle your availability. Select the hours you're available to work.</p>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm" id="scheduleTable">
+            <table class="w-full text-xs md:text-sm" id="scheduleTable">
               <thead>
               <tr class="border-b border-slate-200">
-                <th class="text-left py-2 px-3">Time</th>
-                <th class="text-center py-2 px-3">Mon</th>
-                <th class="text-center py-2 px-3">Tue</th>
-                <th class="text-center py-2 px-3">Wed</th>
-                <th class="text-center py-2 px-3">Thu</th>
-                <th class="text-center py-2 px-3">Fri</th>
-                <th class="text-center py-2 px-3">Sat</th>
+                <th class="text-left py-1 md:py-2 px-1 md:px-3">Time</th>
+                <th class="text-center py-1 md:py-2 px-1 md:px-3">Mon</th>
+                <th class="text-center py-1 md:py-2 px-1 md:px-3">Tue</th>
+                <th class="text-center py-1 md:py-2 px-1 md:px-3">Wed</th>
+                <th class="text-center py-1 md:py-2 px-1 md:px-3">Thu</th>
+                <th class="text-center py-1 md:py-2 px-1 md:px-3">Fri</th>
+                <th class="text-center py-1 md:py-2 px-1 md:px-3">Sat</th>
               </tr>
               </thead>
               <tbody id="scheduleBody">
@@ -1070,14 +1060,14 @@
               </tbody>
             </table>
           </div>
-          <button type="button" id="saveSchedule" class="mt-4 rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+          <button type="button" id="saveSchedule" class="mt-4 w-full md:w-auto rounded-xl bg-indigo-600 text-white px-6 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
             Save Schedule
           </button>
           <div id="scheduleSuccess" class="hidden text-sm text-green-600 mt-2">Schedule updated successfully!</div>
         </div>
 
         <!-- Insurance & Licenses -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Insurance & Licenses</h3>
           <form id="insuranceForm" class="space-y-4">
             <div>
@@ -1110,7 +1100,7 @@
               <button type="button" id="addEditLicense" class="mt-2 text-sm text-indigo-600 hover:text-indigo-700 font-semibold">+ Add License</button>
             </div>
 
-            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="w-full md:w-auto rounded-xl bg-indigo-600 text-white px-6 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
               Update Insurance & Licenses
             </button>
             <div id="insuranceSuccess" class="hidden text-sm text-green-600">Updated successfully!</div>
@@ -1118,18 +1108,18 @@
         </div>
 
         <!-- Change Password -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Change Password</h3>
           <form id="passwordForm" class="space-y-4">
             <div>
-              <label class="block text-sm font-semibold mb-1">New Password</label>
+              <label class="block text-xs md:text-sm font-semibold mb-1">New Password</label>
               <input type="password" id="newPassword" required minlength="8" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
             <div>
-              <label class="block text-sm font-semibold mb-1">Confirm Password</label>
+              <label class="block text-xs md:text-sm font-semibold mb-1">Confirm Password</label>
               <input type="password" id="confirmPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
             </div>
-            <button type="submit" class="rounded-xl bg-indigo-600 text-white px-6 py-2 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" class="w-full md:w-auto rounded-xl bg-indigo-600 text-white px-6 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
               Update Password
             </button>
             <div id="passwordError" class="hidden text-sm text-red-600"></div>
@@ -1141,34 +1131,34 @@
 
     <!-- Expert Advice Tab (NEW) -->
     <div id="expertTab" class="tab-content hidden">
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <!-- Canned Prompts -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-2">🚀 Quick Business Advice</h3>
-          <p class="text-sm text-slate-600 mb-4">Get instant AI-powered advice on common business challenges</p>
+          <p class="text-xs md:text-sm text-slate-600 mb-4">Get instant AI-powered advice on common business challenges</p>
 
           <div class="space-y-3">
-            <button onclick="askExpert('service-optimization')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+            <button onclick="askExpert('service-optimization')" class="w-full text-left border border-slate-200 rounded-lg p-3 md:p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <div class="font-semibold text-indigo-600">📊 Service Optimization</div>
               <div class="text-sm text-slate-600 mt-1">How can I improve my efficiency and service quality?</div>
             </button>
 
-            <button onclick="askExpert('more-bookings')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+            <button onclick="askExpert('more-bookings')" class="w-full text-left border border-slate-200 rounded-lg p-3 md:p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <div class="font-semibold text-indigo-600">📈 Get More Bookings</div>
               <div class="text-sm text-slate-600 mt-1">Strategies to increase my job volume and visibility</div>
             </button>
 
-            <button onclick="askExpert('client-retention')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+            <button onclick="askExpert('client-retention')" class="w-full text-left border border-slate-200 rounded-lg p-3 md:p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <div class="font-semibold text-indigo-600">🔄 Client Retention</div>
               <div class="text-sm text-slate-600 mt-1">How to turn one-time customers into repeat clients</div>
             </button>
 
-            <button onclick="askExpert('review-improvement')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+            <button onclick="askExpert('review-improvement')" class="w-full text-left border border-slate-200 rounded-lg p-3 md:p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <div class="font-semibold text-indigo-600">⭐ Improve Reviews</div>
               <div class="text-sm text-slate-600 mt-1">Tips for consistently earning 5-star reviews</div>
             </button>
 
-            <button onclick="askExpert('time-management')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
+            <button onclick="askExpert('time-management')" class="w-full text-left border border-slate-200 rounded-lg p-3 md:p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <div class="font-semibold text-indigo-600">⏰ Time Management</div>
               <div class="text-sm text-slate-600 mt-1">How to fit more jobs in my schedule efficiently</div>
             </button>
@@ -1176,13 +1166,13 @@
         </div>
 
         <!-- Custom Problem Solver -->
-        <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+        <div class="bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-2">💡 Custom Problem Solver</h3>
-          <p class="text-sm text-slate-600 mb-4">Ask anything about your handyman business or specific technical questions</p>
+          <p class="text-xs md:text-sm text-slate-600 mb-4">Ask anything about your handyman business or specific technical questions</p>
 
           <form id="expertForm" class="space-y-4">
             <div>
-              <label class="block text-sm font-semibold mb-2">Your Question</label>
+              <label class="block text-xs md:text-sm font-semibold mb-2">Your Question</label>
               <textarea id="customQuestion" rows="6" required class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="Examples:
 - How do I install a ceiling fan safely?
 - What's the best way to patch a large drywall hole?
@@ -1190,7 +1180,7 @@
 - Tips for dealing with difficult customers?"></textarea>
             </div>
 
-            <button type="submit" id="askExpertBtn" class="w-full rounded-xl bg-indigo-600 text-white px-6 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+            <button type="submit" id="askExpertBtn" class="w-full rounded-xl bg-indigo-600 text-white px-6 py-2 md:py-3 text-sm md:text-base font-semibold hover:bg-indigo-700 transition-colors">
               Get Expert Advice
             </button>
           </form>
@@ -1216,7 +1206,7 @@
       </div>
 
       <!-- Recent Questions -->
-      <div class="mt-6 bg-white rounded-xl p-6 shadow-soft border border-slate-100">
+      <div class="mt-6 bg-white rounded-xl p-4 md:p-6 shadow-soft border border-slate-100">
         <h3 class="text-lg font-bold mb-4">📝 Your Recent Questions</h3>
         <div id="recentQuestions" class="space-y-3">
           <p class="text-sm text-slate-500">No questions asked yet. Try asking something above!</p>
@@ -1308,7 +1298,9 @@
     }
 
     currentHandyman = handyman;
-    document.getElementById('handymanName').textContent = handyman.full_name || 'Handyman';
+    const displayName = handyman.full_name || 'Handyman';
+    const phone = handyman.phone ? ` • ${handyman.phone}` : '';
+    document.getElementById('handymanName').textContent = `${displayName}${phone}`;
 
     // Check if onboarding is complete
     if (!handyman.onboarding_completed) {
@@ -2218,12 +2210,20 @@
     }
 
     // Load profile picture
+    console.log('Loading profile picture, URL:', currentHandyman.profile_photo_url);
     if (currentHandyman.profile_photo_url) {
       const img = document.getElementById('currentProfilePic');
       const placeholder = document.getElementById('profilePicPlaceholder');
-      img.src = currentHandyman.profile_photo_url;
-      img.classList.remove('hidden');
-      placeholder.classList.add('hidden');
+      console.log('Profile pic elements:', { img, placeholder });
+
+      if (img && placeholder) {
+        img.src = currentHandyman.profile_photo_url;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        console.log('Profile picture loaded successfully');
+      } else {
+        console.error('Profile picture elements not found');
+      }
     }
 
     // Load skills
@@ -2234,12 +2234,20 @@
     }
 
     // Load service areas
-    if (currentHandyman.service_areas) {
-      document.getElementById('serviceState').value = 'FL';
-      document.getElementById('citySelection').classList.remove('hidden');
-      document.querySelectorAll('.city-checkbox').forEach(cb => {
-        cb.checked = currentHandyman.service_areas.includes(cb.value);
-      });
+    if (currentHandyman.service_state) {
+      document.getElementById('serviceState').value = currentHandyman.service_state;
+      // Trigger the change event to load counties
+      const event = new Event('change');
+      document.getElementById('serviceState').dispatchEvent(event);
+
+      // Set selected counties after a short delay to ensure they're loaded
+      setTimeout(() => {
+        if (currentHandyman.service_areas) {
+          document.querySelectorAll('.city-checkbox').forEach(cb => {
+            cb.checked = currentHandyman.service_areas.includes(cb.value);
+          });
+        }
+      }, 100);
     }
 
     // Load insurance
@@ -2323,6 +2331,42 @@
         console.log('Profile photo updated successfully');
         currentHandyman.profile_photo_url = profilePhotoUrl;
       }
+    }
+  });
+
+  // Handle service area state selection
+  document.getElementById('serviceState').addEventListener('change', function() {
+    const state = this.value;
+    const citySelection = document.getElementById('citySelection');
+
+    if (state && stateCounties[state]) {
+      // Show city selection
+      citySelection.classList.remove('hidden');
+
+      // Clear existing options
+      citySelection.innerHTML = '';
+
+      // Add counties as checkboxes
+      stateCounties[state].forEach(county => {
+        const label = document.createElement('label');
+        label.className = 'flex items-center gap-2';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'city-checkbox';
+        checkbox.value = county.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+        const span = document.createElement('span');
+        span.className = 'text-sm';
+        span.textContent = county + ' County';
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        citySelection.appendChild(label);
+      });
+    } else {
+      // Hide city selection
+      citySelection.classList.add('hidden');
     }
   });
 
