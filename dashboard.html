@@ -1399,7 +1399,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1460,9 +1459,7 @@
       return;
     }
 
-    console.log('Step 2 saved successfully, loading data...');
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
-    console.log('About to call nextStep()...');
+    console.log('Step 2 saved successfully, proceeding to next step...');
     nextStep();
   });
 
@@ -1495,7 +1492,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1521,7 +1517,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1548,7 +1543,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1576,7 +1570,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1615,7 +1608,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
@@ -1640,7 +1632,6 @@
       return;
     }
 
-    await loadHandymanData((await supabase.auth.getUser()).data.user.id);
     nextStep();
   });
 
