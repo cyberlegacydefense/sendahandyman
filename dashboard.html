@@ -180,11 +180,11 @@
         </div>
 
         <div class="border-t border-slate-200 pt-6">
-          <label class="block text-sm font-semibold mb-3">General Liability Insurance *</label>
+          <label class="block text-sm font-semibold mb-3">General Liability Insurance <span class="text-slate-500 font-normal">(Optional)</span></label>
           <div class="grid md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-medium mb-1">Insurance Status *</label>
-              <select id="insuranceStatus" required class="w-full rounded-lg border border-slate-200 px-3 py-2">
+              <label class="block text-xs font-medium mb-1">Insurance Status <span class="text-slate-500 font-normal">(Optional)</span></label>
+              <select id="insuranceStatus" class="w-full rounded-lg border border-slate-200 px-3 py-2">
                 <option value="">Select Status</option>
                 <option value="active">Active</option>
                 <option value="pending">Pending</option>
@@ -205,9 +205,9 @@
 
         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div class="flex items-start gap-3">
-            <input type="checkbox" id="complianceAck" required class="mt-1" />
+            <input type="checkbox" id="complianceAck" class="mt-1" />
             <label for="complianceAck" class="text-sm">
-              I acknowledge that I am responsible for obtaining and maintaining all required licenses, permits, and insurance for the services I provide. I understand that SendAHandyman may verify these credentials at any time.
+              I acknowledge that I am responsible for obtaining and maintaining all required licenses, permits, and insurance for the services I provide. I understand that SendAHandyman may verify these credentials at any time. <span class="text-slate-500 font-normal">(Optional)</span>
             </label>
           </div>
         </div>
@@ -1404,20 +1404,28 @@
 
     // Collect license data
     const licenses = [];
+    console.log('License containers found:', document.querySelectorAll('#licenseContainer > div').length);
     document.querySelectorAll('#licenseContainer > div').forEach(licenseDiv => {
       const type = licenseDiv.querySelector('.license-type')?.value;
       const number = licenseDiv.querySelector('.license-number')?.value;
       const expiry = licenseDiv.querySelector('.license-expiry')?.value;
+      console.log('License data:', { type, number, expiry });
       if (type || number) {
         licenses.push({ type, number, expiry });
       }
     });
 
+    // Check individual field values
+    const insuranceStatus = document.getElementById('insuranceStatus')?.value;
+    const insuranceProvider = document.getElementById('insuranceProvider')?.value;
+    console.log('Insurance status:', insuranceStatus);
+    console.log('Insurance provider:', insuranceProvider);
+
     // Collect form data
     const formData = {
       licenses: licenses.length > 0 ? licenses : null,
-      insurance_status: document.getElementById('insuranceStatus').value,
-      insurance_provider: document.getElementById('insuranceProvider').value || null,
+      insurance_status: insuranceStatus,
+      insurance_provider: insuranceProvider || null,
       updated_at: new Date().toISOString()
     };
 
