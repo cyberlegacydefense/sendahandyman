@@ -318,11 +318,18 @@
               <label class="block text-xs font-medium mb-1">Professional Bio *</label>
               <textarea id="profileBioSetup" required rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="Describe your experience, specialties, and what makes you a great handyman..."></textarea>
             </div>
-            <div class="grid md:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium mb-1">Hourly Rate *</label>
-                <input type="number" id="hourlyRate" required min="25" max="150" class="w-full rounded-lg border border-slate-200 px-3 py-2" placeholder="$65" />
-                <p class="text-xs text-slate-500 mt-1">Recommended: $55-$85/hr</p>
+            <div class="space-y-3">
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h4 class="font-semibold text-blue-900">Hourly Rate</h4>
+                    <p class="text-sm text-blue-700">Fixed rate for all handymen</p>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-blue-900">$80/hr</div>
+                    <p class="text-xs text-blue-600">You receive 80% ($64/hr)</p>
+                  </div>
+                </div>
               </div>
               <div>
                 <label class="block text-xs font-medium mb-1">Years of Experience *</label>
@@ -1501,7 +1508,7 @@
     const formData = {
       agreed_to_service_terms: document.getElementById('agreeServiceTerms').checked,
       bio: document.getElementById('profileBioSetup').value,
-      hourly_rate: parseFloat(document.getElementById('hourlyRate').value),
+      hourly_rate: 80, // Fixed rate for all handymen
       years_experience: parseInt(document.getElementById('yearsExp').value),
       updated_at: new Date().toISOString()
     };
@@ -1554,7 +1561,7 @@
       emergency_contact_phone: document.getElementById('emergencyPhone').value,
       emergency_contact_relation: document.getElementById('emergencyRelation').value,
       agreed_safety_policy: document.getElementById('agreeSafety').checked,
-      agreed_hazard_reporting: document.getElementById('agreeHazard').checked,
+      agreed_hazard_reporting: document.getElementById('agreeReportHazards').checked,
       agreed_refuse_unsafe: document.getElementById('agreeRefuseUnsafe').checked,
       updated_at: new Date().toISOString()
     };
