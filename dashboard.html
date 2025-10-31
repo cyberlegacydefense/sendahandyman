@@ -1424,14 +1424,17 @@
     // Collect form data
     const formData = {
       licenses: licenses.length > 0 ? licenses : null,
-      insurance_status: insuranceStatus,
+      insurance_status: insuranceStatus || null,
       insurance_provider: insuranceProvider || null,
       updated_at: new Date().toISOString()
     };
 
-    console.log('Step 2 form data:', formData);
+    console.log('Step 2 form data:', JSON.stringify(formData, null, 2));
 
     // TODO: Handle file uploads for license files and insurance proof
+
+    console.log('About to save to database...');
+    console.log('Current handyman ID:', currentHandyman?.id);
 
     const { error } = await supabase
       .from('handymen')
@@ -1444,7 +1447,9 @@
       return;
     }
 
+    console.log('Step 2 saved successfully, loading data...');
     await loadHandymanData((await supabase.auth.getUser()).data.user.id);
+    console.log('About to call nextStep()...');
     nextStep();
   });
 
