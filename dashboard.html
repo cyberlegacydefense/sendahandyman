@@ -2300,24 +2300,6 @@
     }
   }
 
-  // State and County Data
-  const stateCounties = {
-    'FL': [
-      'Alachua', 'Baker', 'Bay', 'Bradford', 'Brevard', 'Broward', 'Calhoun', 'Charlotte', 'Citrus', 'Clay',
-      'Collier', 'Columbia', 'DeSoto', 'Dixie', 'Duval', 'Escambia', 'Flagler', 'Franklin', 'Gadsden', 'Gilchrist',
-      'Glades', 'Gulf', 'Hamilton', 'Hardee', 'Hendry', 'Hernando', 'Highlands', 'Hillsborough', 'Holmes', 'Indian River',
-      'Jackson', 'Jefferson', 'Lafayette', 'Lake', 'Lee', 'Leon', 'Levy', 'Liberty', 'Madison', 'Manatee',
-      'Marion', 'Martin', 'Miami-Dade', 'Monroe', 'Nassau', 'Okaloosa', 'Okeechobee', 'Orange', 'Osceola', 'Palm Beach',
-      'Pasco', 'Pinellas', 'Polk', 'Putnam', 'Santa Rosa', 'Sarasota', 'Seminole', 'St. Johns', 'St. Lucie', 'Sumter',
-      'Suwannee', 'Taylor', 'Union', 'Volusia', 'Wakulla', 'Walton', 'Washington'
-    ],
-    'TX': [
-      // Austin Metro Area Counties
-      'Travis', 'Williamson', 'Hays', 'Caldwell', 'Bastrop',
-      // Additional Texas Counties
-      'Harris', 'Dallas', 'Tarrant', 'Bexar', 'Collin', 'Denton', 'Fort Bend', 'Montgomery', 'Galveston', 'Brazoria'
-    ]
-  };
 
   // Handle state selection
   document.getElementById('profileState').addEventListener('change', function() {
@@ -2370,7 +2352,12 @@
     );
 
     if (filePath) {
-      const profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${filePath}`;
+      // Get the public URL from Supabase
+      const { data: publicUrlData } = supabase.storage
+        .from('handyman-documents')
+        .getPublicUrl(filePath);
+
+      const profilePhotoUrl = publicUrlData.publicUrl;
       console.log('Profile photo uploaded, URL:', profilePhotoUrl);
 
       // Update database
@@ -2399,6 +2386,24 @@
       alert('Failed to upload profile photo. Please try again.');
     }
   });
+
+  // State counties mapping
+  const stateCounties = {
+    'FL': [
+      'Alachua', 'Baker', 'Bay', 'Bradford', 'Brevard', 'Broward', 'Calhoun', 'Charlotte', 'Citrus', 'Clay',
+      'Collier', 'Columbia', 'DeSoto', 'Dixie', 'Duval', 'Escambia', 'Flagler', 'Franklin', 'Gadsden', 'Gilchrist',
+      'Glades', 'Gulf', 'Hamilton', 'Hardee', 'Hendry', 'Hernando', 'Highlands', 'Hillsborough', 'Holmes', 'Indian River',
+      'Jackson', 'Jefferson', 'Lafayette', 'Lake', 'Lee', 'Leon', 'Levy', 'Liberty', 'Madison', 'Manatee',
+      'Marion', 'Martin', 'Miami-Dade', 'Monroe', 'Nassau', 'Okaloosa', 'Okeechobee', 'Orange', 'Osceola', 'Palm Beach',
+      'Pasco', 'Pinellas', 'Polk', 'Putnam', 'Saint Johns', 'Saint Lucie', 'Santa Rosa', 'Sarasota', 'Seminole', 'Sumter',
+      'Suwannee', 'Taylor', 'Union', 'Volusia', 'Wakulla', 'Walton', 'Washington'
+    ],
+    'TX': [
+      'Travis', 'Williamson', 'Hays', 'Caldwell', 'Bastrop', 'Harris', 'Dallas', 'Tarrant', 'Bexar', 'Collin',
+      'Denton', 'Fort Bend', 'Hidalgo', 'Montgomery', 'Galveston', 'Brazoria', 'Jefferson', 'Nueces', 'Bell',
+      'McLennan', 'Guadalupe', 'Comal', 'Wilson', 'Blanco'
+    ]
+  };
 
   // Handle service area state selection
   document.getElementById('serviceState').addEventListener('change', function() {
