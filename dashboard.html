@@ -8,6 +8,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="images/favicon.png">
 
+  <!-- Tailwind CSS via CDN - For development only. In production, install as PostCSS plugin -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -34,6 +35,7 @@
 <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl p-8 shadow-soft border border-slate-100 w-full max-w-md">
     <div class="text-center mb-6 md:mb-8">
+      <img src="images/helpinghands_logo.png" alt="SendAHandyman" class="h-16 md:h-20 w-auto mx-auto mb-4" />
       <h1 class="text-xl md:text-2xl font-bold mb-2">Handyman Portal</h1>
       <p class="text-sm md:text-base text-slate-600">Sign in to access your dashboard</p>
     </div>
@@ -756,6 +758,7 @@
     <div class="max-w-7xl mx-auto px-4 py-4">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
+          <img src="images/helpinghands_logo.png" alt="SendAHandyman" class="h-8 md:h-10 w-auto" />
           <h1 class="text-lg md:text-xl font-bold">SendAHandyman Dashboard</h1>
         </div>
         <div class="flex items-center gap-2 md:gap-4">
@@ -895,6 +898,9 @@
                   <input type="file" id="newProfilePhoto" accept="image/*" class="hidden" />
                   <button type="button" onclick="document.getElementById('newProfilePhoto').click()" class="text-sm text-indigo-600 hover:text-indigo-700 font-semibold">
                     Change Photo
+                  </button>
+                  <button type="button" onclick="testProfilePicture()" class="ml-2 text-xs text-blue-600 hover:text-blue-700 font-medium">
+                    Test Load
                   </button>
                 </div>
               </div>
@@ -2249,11 +2255,79 @@
     if (currentHandyman.profile_photo_url && currentHandyman.profile_photo_url.trim() !== '') {
       console.log('Setting profile picture URL:', currentHandyman.profile_photo_url);
 
+      // Try multiple approaches to load the image
+      let imageUrl = currentHandyman.profile_photo_url;
+
+      // If it's a Supabase storage URL, try to get proper access
+      if (imageUrl.includes('supabase.co/storage')) {
+        try {
+          // Extract the file path from the URL
+          const urlParts = imageUrl.split('/object/public/handyman-documents/');
+          if (urlParts.length === 2) {
+            const filePath = urlParts[1];
+            console.log('File path extracted:', filePath);
+
+            // Try to get a fresh public URL
+            const { data: publicUrlData } = supabase.storage
+              .from('handyman-documents')
+              .getPublicUrl(filePath);
+
+            if (publicUrlData && publicUrlData.publicUrl) {
+              imageUrl = publicUrlData.publicUrl;
+              console.log('Using fresh public URL:', imageUrl);
+            }
+
+            // Also try signed URL as backup
+            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+              .from('handyman-documents')
+              .createSignedUrl(filePath, 3600);
+
+            if (signedUrlData && !signedUrlError) {
+              console.log('Signed URL available as backup:', signedUrlData.signedUrl);
+
+              // Test if public URL works first, if not use signed URL
+              const testImg = new Image();
+              testImg.onload = function() {
+                console.log('Public URL works, using it');
+                img.src = imageUrl;
+              };
+              testImg.onerror = function() {
+                console.log('Public URL failed, using signed URL');
+                img.src = signedUrlData.signedUrl;
+              };
+              testImg.src = imageUrl;
+
+              // Don't set img.src here, let the test image handlers do it
+              return;
+            }
+          }
+        } catch (error) {
+          console.log('Error processing Supabase URL:', error);
+        }
+      }
+
       // Add error and load handlers
       img.onerror = function() {
-        console.error('Failed to load profile image:', currentHandyman.profile_photo_url);
-        img.classList.add('hidden');
-        placeholder.classList.remove('hidden');
+        console.error('Failed to load profile image:', imageUrl);
+        console.log('Trying to reload with cache busting...');
+
+        // Try cache busting
+        const cacheBustUrl = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+        console.log('Cache bust URL:', cacheBustUrl);
+
+        const retryImg = new Image();
+        retryImg.onload = function() {
+          console.log('Cache bust successful');
+          img.src = cacheBustUrl;
+          img.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+        };
+        retryImg.onerror = function() {
+          console.log('Cache bust also failed, showing placeholder');
+          img.classList.add('hidden');
+          placeholder.classList.remove('hidden');
+        };
+        retryImg.src = cacheBustUrl;
       };
 
       img.onload = function() {
@@ -2262,7 +2336,8 @@
         placeholder.classList.add('hidden');
       };
 
-      img.src = currentHandyman.profile_photo_url;
+      // Set the image source
+      img.src = imageUrl;
     } else {
       console.log('No profile photo URL found, showing placeholder');
       img.classList.add('hidden');
@@ -2407,10 +2482,12 @@
 
   // Handle service area state selection
   document.getElementById('serviceState').addEventListener('change', function() {
+    console.log('Service state changed to:', this.value);
     const state = this.value;
     const citySelection = document.getElementById('citySelection');
 
     if (state && stateCounties[state]) {
+      console.log('Loading counties for state:', state, 'Counties:', stateCounties[state]);
       // Show city selection
       citySelection.classList.remove('hidden');
 
@@ -2560,6 +2637,63 @@
       }
     });
   });
+
+  // Test profile picture loading
+  async function testProfilePicture() {
+    if (!currentHandyman || !currentHandyman.profile_photo_url) {
+      alert('No profile picture URL found');
+      return;
+    }
+
+    console.log('Testing profile picture URL:', currentHandyman.profile_photo_url);
+
+    // Test 1: Try to fetch the URL directly
+    try {
+      const response = await fetch(currentHandyman.profile_photo_url, { method: 'HEAD' });
+      console.log('Direct fetch response:', response.status, response.statusText);
+
+      if (response.ok) {
+        console.log('✅ Direct fetch successful');
+        loadProfile(); // Retry loading
+      } else {
+        console.log('❌ Direct fetch failed');
+
+        // Test 2: Try signed URL
+        const urlParts = currentHandyman.profile_photo_url.split('/object/public/handyman-documents/');
+        if (urlParts.length === 2) {
+          const filePath = urlParts[1];
+          const { data: signedUrlData, error } = await supabase.storage
+            .from('handyman-documents')
+            .createSignedUrl(filePath, 60);
+
+          if (signedUrlData && !error) {
+            console.log('✅ Signed URL created:', signedUrlData.signedUrl);
+
+            // Test the signed URL
+            const signedResponse = await fetch(signedUrlData.signedUrl, { method: 'HEAD' });
+            console.log('Signed URL fetch response:', signedResponse.status, signedResponse.statusText);
+
+            if (signedResponse.ok) {
+              // Update the database with signed URL and reload
+              await supabase
+                .from('handymen')
+                .update({ profile_photo_url: signedUrlData.signedUrl })
+                .eq('id', currentHandyman.id);
+
+              currentHandyman.profile_photo_url = signedUrlData.signedUrl;
+              loadProfile();
+              console.log('✅ Updated to use signed URL');
+            }
+          } else {
+            console.log('❌ Signed URL creation failed:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Test failed:', error);
+      alert('Test failed - check console for details');
+    }
+  }
 
   // Initialize app
   async function initializeApp() {
