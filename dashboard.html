@@ -1298,6 +1298,7 @@
     }
 
     currentHandyman = handyman;
+    console.log('Loaded handyman data:', handyman);
     const displayName = handyman.full_name || 'Handyman';
     const phone = handyman.phone ? ` • ${handyman.phone}` : '';
     document.getElementById('handymanName').textContent = `${displayName}${phone}`;
@@ -1308,6 +1309,27 @@
     } else {
       showDashboard();
     }
+  }
+
+  // Refresh handyman data from database
+  async function refreshHandymanData() {
+    if (!currentHandyman) return;
+
+    console.log('Refreshing handyman data from database');
+    const { data: handyman, error } = await supabase
+      .from('handymen')
+      .select('*')
+      .eq('id', currentHandyman.id)
+      .single();
+
+    if (error) {
+      console.error('Error refreshing handyman data:', error);
+      return;
+    }
+
+    console.log('Refreshed handyman data:', handyman);
+    currentHandyman = handyman;
+    return handyman;
   }
 
   // Show onboarding wizard
@@ -2194,7 +2216,12 @@
 
   // Load profile
   async function loadProfile() {
-    if (!currentHandyman) return;
+    if (!currentHandyman) {
+      console.log('No currentHandyman data available');
+      return;
+    }
+
+    console.log('Loading profile for handyman:', currentHandyman);
 
     document.getElementById('profileName').value = currentHandyman.full_name || '';
     document.getElementById('profilePhone').value = currentHandyman.phone || '';
@@ -2209,21 +2236,37 @@
       document.getElementById('profileState').dispatchEvent(event);
     }
 
-    // Load profile picture
-    console.log('Loading profile picture, URL:', currentHandyman.profile_photo_url);
-    if (currentHandyman.profile_photo_url) {
-      const img = document.getElementById('currentProfilePic');
-      const placeholder = document.getElementById('profilePicPlaceholder');
-      console.log('Profile pic elements:', { img, placeholder });
+    // Load profile picture with better error handling
+    console.log('Profile photo URL from database:', currentHandyman.profile_photo_url);
+    const img = document.getElementById('currentProfilePic');
+    const placeholder = document.getElementById('profilePicPlaceholder');
 
-      if (img && placeholder) {
-        img.src = currentHandyman.profile_photo_url;
+    if (!img || !placeholder) {
+      console.error('Profile picture elements not found:', { img, placeholder });
+      return;
+    }
+
+    if (currentHandyman.profile_photo_url && currentHandyman.profile_photo_url.trim() !== '') {
+      console.log('Setting profile picture URL:', currentHandyman.profile_photo_url);
+
+      // Add error and load handlers
+      img.onerror = function() {
+        console.error('Failed to load profile image:', currentHandyman.profile_photo_url);
+        img.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+      };
+
+      img.onload = function() {
+        console.log('Profile picture loaded successfully');
         img.classList.remove('hidden');
         placeholder.classList.add('hidden');
-        console.log('Profile picture loaded successfully');
-      } else {
-        console.error('Profile picture elements not found');
-      }
+      };
+
+      img.src = currentHandyman.profile_photo_url;
+    } else {
+      console.log('No profile photo URL found, showing placeholder');
+      img.classList.add('hidden');
+      placeholder.classList.remove('hidden');
     }
 
     // Load skills
@@ -2299,19 +2342,27 @@
     const file = e.target.files[0];
     if (!file) return;
 
-    // Show preview
+    console.log('Profile photo file selected:', file.name);
+
+    // Show preview immediately
     const reader = new FileReader();
     reader.onload = function(e) {
       const img = document.getElementById('currentProfilePic');
       const placeholder = document.getElementById('profilePicPlaceholder');
-      img.src = e.target.result;
-      img.classList.remove('hidden');
-      placeholder.classList.add('hidden');
+
+      if (img && placeholder) {
+        img.src = e.target.result;
+        img.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        console.log('Profile photo preview loaded');
+      }
     };
     reader.readAsDataURL(file);
 
     // Upload to storage
     const user = (await supabase.auth.getUser()).data.user;
+    console.log('Uploading profile photo for user:', user.id);
+
     const filePath = await uploadFile(
       file,
       'handyman-documents',
@@ -2320,6 +2371,7 @@
 
     if (filePath) {
       const profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${filePath}`;
+      console.log('Profile photo uploaded, URL:', profilePhotoUrl);
 
       // Update database
       const { error } = await supabase
@@ -2327,10 +2379,24 @@
         .update({ profile_photo_url: profilePhotoUrl })
         .eq('id', currentHandyman.id);
 
-      if (!error) {
-        console.log('Profile photo updated successfully');
+      if (error) {
+        console.error('Error updating profile photo in database:', error);
+        alert('Failed to save profile photo. Please try again.');
+      } else {
+        console.log('Profile photo updated successfully in database');
         currentHandyman.profile_photo_url = profilePhotoUrl;
+
+        // Show success message
+        const successMsg = document.createElement('div');
+        successMsg.className = 'text-sm text-green-600 mt-2';
+        successMsg.textContent = 'Profile photo updated successfully!';
+        document.querySelector('[onclick="document.getElementById(\'newProfilePhoto\').click()"]').parentNode.appendChild(successMsg);
+
+        setTimeout(() => successMsg.remove(), 3000);
       }
+    } else {
+      console.error('Failed to upload profile photo');
+      alert('Failed to upload profile photo. Please try again.');
     }
   });
 
@@ -2479,6 +2545,14 @@
 
       document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
       document.getElementById(tab + 'Tab').classList.remove('hidden');
+
+      // Refresh profile data when profile tab is clicked
+      if (tab === 'profile') {
+        console.log('Profile tab clicked, refreshing profile data');
+        refreshHandymanData().then(() => {
+          loadProfile();
+        });
+      }
     });
   });
 
