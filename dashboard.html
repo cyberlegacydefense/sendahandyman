@@ -1294,11 +1294,20 @@
 
   // Onboarding navigation
   function showStep(step) {
+    console.log('showStep() called with step:', step);
+
     // Hide all steps
     document.querySelectorAll('.onboarding-step').forEach(s => s.classList.add('hidden'));
 
     // Show current step
-    document.getElementById('step' + step).classList.remove('hidden');
+    const targetStep = document.getElementById('step' + step);
+    console.log('Target step element:', targetStep);
+    if (targetStep) {
+      targetStep.classList.remove('hidden');
+      console.log('Successfully showed step', step);
+    } else {
+      console.error('Step element not found:', 'step' + step);
+    }
 
     // Update progress
     document.getElementById('onboardingProgress').textContent = `Step ${step} of 9`;
@@ -1317,8 +1326,12 @@
   }
 
   function nextStep() {
+    console.log('nextStep() called, currentStep:', currentStep);
     if (currentStep < 9) {
+      console.log('Advancing to step:', currentStep + 1);
       showStep(currentStep + 1);
+    } else {
+      console.log('Already at final step, not advancing');
     }
   }
 
