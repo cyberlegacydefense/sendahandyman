@@ -1406,7 +1406,7 @@
   // Step form handlers
   // FILE STORAGE NOTES:
   // All uploaded files (govId, profilePhoto, licenses, insurance, W9, etc.) should be stored in Supabase Storage.
-  // Recommended structure: /handyman_documents/{handyman_documents}/{file_type}/{filename}
+  // Recommended structure: /handyman-documents/{handyman-documents}/{file_type}/{filename}
   // Example implementation:
   // const file = document.getElementById('govId').files[0];
   // const { data, error } = await supabase.storage
@@ -1434,22 +1434,22 @@
     if (govIdFile) {
       const govIdPath = await uploadFile(
         govIdFile,
-        'handyman_documents',
+        'handyman-documents',
         `${folderName}/gov-id/${Date.now()}-${govIdFile.name}`
       );
       if (govIdPath) {
-        govIdUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${govIdPath}`;
+        govIdUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${govIdPath}`;
       }
     }
 
     if (profilePhotoFile) {
       const profilePhotoPath = await uploadFile(
         profilePhotoFile,
-        'handyman_documents',
+        'handyman-documents',
         `${folderName}/profile/${Date.now()}-${profilePhotoFile.name}`
       );
       if (profilePhotoPath) {
-        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${profilePhotoPath}`;
+        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
       }
     }
 
@@ -1521,11 +1521,11 @@
     if (insuranceProofFile) {
       const insuranceProofPath = await uploadFile(
         insuranceProofFile,
-        'handyman_documents',
+        'handyman-documents',
         `${folderName}/insurance/${Date.now()}-${insuranceProofFile.name}`
       );
       if (insuranceProofPath) {
-        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${insuranceProofPath}`;
+        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${insuranceProofPath}`;
       }
     }
 
@@ -1536,11 +1536,11 @@
         const licenseFile = fileInput.files[0];
         const licenseFilePath = await uploadFile(
           licenseFile,
-          'handyman_documents',
+          'handyman-documents',
           `${folderName}/licenses/${Date.now()}-${index}-${licenseFile.name}`
         );
         if (licenseFilePath) {
-          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${licenseFilePath}`);
+          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${licenseFilePath}`);
         }
       }
     });
@@ -1707,11 +1707,11 @@
     if (w9File) {
       const w9Path = await uploadFile(
         w9File,
-        'handyman_documents',
+        'handyman-documents',
         `${folderName}/tax/${Date.now()}-${w9File.name}`
       );
       if (w9Path) {
-        w9Url = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${w9Path}`;
+        w9Url = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${w9Path}`;
       }
     }
 
@@ -2000,7 +2000,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_documents', currentHandyman.id);
+      .eq('handyman-documents', currentHandyman.id);
 
     const activeTasks = tasks?.filter(t => ['assigned', 'in_progress'].includes(t.status)).length || 0;
     const completedThisMonth = tasks?.filter(t =>
@@ -2044,7 +2044,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_documents', currentHandyman.id)
+      .eq('handyman-documents', currentHandyman.id)
       .in('status', ['assigned', 'in_progress'])
       .order('scheduled_date', { ascending: true });
 
@@ -2081,7 +2081,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_documents', currentHandyman.id)
+      .eq('handyman-documents', currentHandyman.id)
       .eq('status', 'completed')
       .order('completed_at', { ascending: false })
       .limit(20);
@@ -2110,7 +2110,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_documents', currentHandyman.id)
+      .eq('handyman-documents', currentHandyman.id)
       .eq('status', 'completed');
 
     const totalEarned = tasks?.reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
