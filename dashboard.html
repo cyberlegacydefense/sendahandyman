@@ -1419,10 +1419,11 @@
 
     const taxIdType = document.querySelector('input[name="taxIdType"]:checked').value;
 
-    // Get user info for folder naming
+    // Get user info for folder naming - use just user ID to match RLS policies
     const user = (await supabase.auth.getUser()).data.user;
-    const fullName = document.getElementById('legalName').value;
-    const folderName = generateHandymanFolderName(user.id, fullName);
+    const folderName = user.id;
+    console.log('Step 1 - User ID:', user.id);
+    console.log('Step 1 - Folder name:', folderName);
 
     // Upload files to Supabase Storage
     const govIdFile = document.getElementById('govId').files[0];
@@ -1510,9 +1511,9 @@
     console.log('Insurance status:', insuranceStatus);
     console.log('Insurance provider:', insuranceProvider);
 
-    // Get user info for folder naming
+    // Get user info for folder naming - use just user ID to match RLS policies
     const user = (await supabase.auth.getUser()).data.user;
-    const folderName = generateHandymanFolderName(user.id, currentHandyman.full_name || 'unknown');
+    const folderName = user.id;
 
     // Upload insurance proof if provided
     const insuranceProofFile = document.getElementById('insuranceProof').files[0];
@@ -1696,9 +1697,9 @@
       return;
     }
 
-    // Get user info for folder naming
+    // Get user info for folder naming - use just user ID to match RLS policies
     const user = (await supabase.auth.getUser()).data.user;
-    const folderName = generateHandymanFolderName(user.id, currentHandyman.full_name || 'unknown');
+    const folderName = user.id;
 
     // Upload W-9 file
     const w9File = document.getElementById('w9Upload').files[0];
