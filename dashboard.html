@@ -880,17 +880,54 @@
         <div class="bg-white rounded-xl p-6 shadow-soft border border-slate-100">
           <h3 class="text-lg font-bold mb-4">Personal Information</h3>
           <form id="profileForm" class="space-y-4">
-            <div class="grid md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-semibold mb-1">Full Name</label>
-                <input type="text" id="profileName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            <!-- Profile Picture Section -->
+            <div class="flex items-start gap-6">
+              <div class="flex-shrink-0">
+                <div class="w-24 h-24 rounded-full bg-slate-200 overflow-hidden">
+                  <img id="currentProfilePic" src="" alt="Profile" class="w-full h-full object-cover hidden" />
+                  <div id="profilePicPlaceholder" class="w-full h-full flex items-center justify-center text-slate-500">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <input type="file" id="newProfilePhoto" accept="image/*" class="hidden" />
+                  <button type="button" onclick="document.getElementById('newProfilePhoto').click()" class="text-sm text-indigo-600 hover:text-indigo-700 font-semibold">
+                    Change Photo
+                  </button>
+                </div>
               </div>
-              <div>
-                <label class="block text-sm font-semibold mb-1">Phone</label>
-                <input type="tel" id="profilePhone" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+              <div class="flex-1 space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Full Name</label>
+                    <input type="text" id="profileName" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Phone</label>
+                    <input type="tel" id="profilePhone" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="grid md:grid-cols-3 gap-4">
+
+            <!-- Location & Service Area -->
+            <div class="grid md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-semibold mb-1">State</label>
+                <select id="profileState" class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                  <option value="">Select State</option>
+                  <option value="FL">Florida</option>
+                  <option value="TX">Texas</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold mb-1">County</label>
+                <select id="profileCounty" class="w-full rounded-lg border border-slate-200 px-3 py-2">
+                  <option value="">Select County</option>
+                </select>
+              </div>
               <div>
                 <label class="block text-sm font-semibold mb-1">City</label>
                 <input type="text" id="profileCity" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
@@ -899,11 +936,22 @@
                 <label class="block text-sm font-semibold mb-1">ZIP Code</label>
                 <input type="text" id="profileZip" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
               </div>
-              <div>
-                <label class="block text-sm font-semibold mb-1">Hourly Rate</label>
-                <input type="number" id="profileRate" min="25" max="150" class="w-full rounded-lg border border-slate-200 px-3 py-2" />
+            </div>
+
+            <!-- Fixed Rate Display -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h4 class="font-semibold text-blue-900">Hourly Rate</h4>
+                  <p class="text-sm text-blue-700">Fixed rate for all handymen</p>
+                </div>
+                <div class="text-right">
+                  <div class="text-2xl font-bold text-blue-900">$80/hr</div>
+                  <p class="text-xs text-blue-600">You receive 80% ($64/hr)</p>
+                </div>
               </div>
             </div>
+
             <div>
               <label class="block text-sm font-semibold mb-1">Professional Bio</label>
               <textarea id="profileBio" rows="3" class="w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
@@ -1118,11 +1166,6 @@
             <button onclick="askExpert('review-improvement')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
               <div class="font-semibold text-indigo-600">⭐ Improve Reviews</div>
               <div class="text-sm text-slate-600 mt-1">Tips for consistently earning 5-star reviews</div>
-            </button>
-
-            <button onclick="askExpert('pricing-strategy')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
-              <div class="font-semibold text-indigo-600">💰 Pricing Strategy</div>
-              <div class="text-sm text-slate-600 mt-1">Should I raise my rates? How to price my services?</div>
             </button>
 
             <button onclick="askExpert('time-management')" class="w-full text-left border border-slate-200 rounded-lg p-4 hover:border-indigo-500 hover:bg-indigo-50 transition-all">
@@ -1769,14 +1812,31 @@
   document.getElementById('step9Form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // Collect Step 9 form data
+    const formData = {
+      welcome_call_scheduled: document.getElementById('welcomeCallDate').value,
+      welcome_call_time: document.getElementById('welcomeCallTime').value,
+      availability_start: document.getElementById('availableStart').value,
+      workflow_reviewed: document.getElementById('reviewedWorkflow').checked,
+      ready_to_start: document.getElementById('readyToStart').checked,
+      onboarding_completed: true,
+      onboarding_completed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('Step 9 form data being saved:', formData);
+
     // Mark onboarding as complete
     const { error } = await supabase
       .from('handymen')
-      .update({
-        onboarding_completed: true,
-        onboarding_completed_at: new Date().toISOString()
-      })
+      .update(formData)
       .eq('id', currentHandyman.id);
+
+    if (error) {
+      console.error('Error saving Step 9:', error);
+    } else {
+      console.log('Step 9 saved successfully');
+    }
 
     if (!error) {
       await loadHandymanData((await supabase.auth.getUser()).data.user.id);
@@ -1865,6 +1925,10 @@
 
   // Initialize charts
   function initializeCharts() {
+    // Destroy existing charts if they exist
+    Chart.getChart('performanceChart')?.destroy();
+    Chart.getChart('earningsChart')?.destroy();
+
     // Performance chart
     const perfCtx = document.getElementById('performanceChart').getContext('2d');
     new Chart(perfCtx, {
@@ -1913,7 +1977,6 @@
       'more-bookings': `Analyze my profile and suggest strategies to increase my booking volume. Consider my current skills, service areas, pricing, and availability. Provide actionable steps I can take this week.`,
       'client-retention': `How can I turn one-time customers into repeat clients? Provide specific strategies for follow-up, building relationships, and creating a memorable service experience.`,
       'review-improvement': `Give me a detailed guide on consistently earning 5-star reviews. Include communication tips, service delivery best practices, and how to handle difficult situations professionally.`,
-      'pricing-strategy': `Analyze my current hourly rate of $${currentHandyman.hourly_rate || 65} and help me understand if I should adjust my pricing. Consider market rates, my experience level, and value proposition.`,
       'time-management': `Help me optimize my schedule to fit more jobs without sacrificing quality. Include strategies for route planning, time estimation, and minimizing downtime between jobs.`
     };
 
@@ -2001,7 +2064,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman-documents', currentHandyman.id);
+      .eq('handyman_id', currentHandyman.id);
 
     const activeTasks = tasks?.filter(t => ['assigned', 'in_progress'].includes(t.status)).length || 0;
     const completedThisMonth = tasks?.filter(t =>
@@ -2045,7 +2108,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman-documents', currentHandyman.id)
+      .eq('handyman_id', currentHandyman.id)
       .in('status', ['assigned', 'in_progress'])
       .order('scheduled_date', { ascending: true });
 
@@ -2082,7 +2145,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman-documents', currentHandyman.id)
+      .eq('handyman_id', currentHandyman.id)
       .eq('status', 'completed')
       .order('completed_at', { ascending: false })
       .limit(20);
@@ -2111,7 +2174,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman-documents', currentHandyman.id)
+      .eq('handyman_id', currentHandyman.id)
       .eq('status', 'completed');
 
     const totalEarned = tasks?.reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
@@ -2146,7 +2209,22 @@
     document.getElementById('profileCity').value = currentHandyman.city || '';
     document.getElementById('profileZip').value = currentHandyman.zip || '';
     document.getElementById('profileBio').value = currentHandyman.bio || '';
-    document.getElementById('profileRate').value = currentHandyman.hourly_rate || '';
+    document.getElementById('profileState').value = currentHandyman.service_state || '';
+
+    // Trigger county loading if state is selected
+    if (currentHandyman.service_state) {
+      const event = new Event('change');
+      document.getElementById('profileState').dispatchEvent(event);
+    }
+
+    // Load profile picture
+    if (currentHandyman.profile_photo_url) {
+      const img = document.getElementById('currentProfilePic');
+      const placeholder = document.getElementById('profilePicPlaceholder');
+      img.src = currentHandyman.profile_photo_url;
+      img.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    }
 
     // Load skills
     if (currentHandyman.skills) {
@@ -2171,6 +2249,83 @@
     }
   }
 
+  // State and County Data
+  const stateCounties = {
+    'FL': [
+      'Alachua', 'Baker', 'Bay', 'Bradford', 'Brevard', 'Broward', 'Calhoun', 'Charlotte', 'Citrus', 'Clay',
+      'Collier', 'Columbia', 'DeSoto', 'Dixie', 'Duval', 'Escambia', 'Flagler', 'Franklin', 'Gadsden', 'Gilchrist',
+      'Glades', 'Gulf', 'Hamilton', 'Hardee', 'Hendry', 'Hernando', 'Highlands', 'Hillsborough', 'Holmes', 'Indian River',
+      'Jackson', 'Jefferson', 'Lafayette', 'Lake', 'Lee', 'Leon', 'Levy', 'Liberty', 'Madison', 'Manatee',
+      'Marion', 'Martin', 'Miami-Dade', 'Monroe', 'Nassau', 'Okaloosa', 'Okeechobee', 'Orange', 'Osceola', 'Palm Beach',
+      'Pasco', 'Pinellas', 'Polk', 'Putnam', 'Santa Rosa', 'Sarasota', 'Seminole', 'St. Johns', 'St. Lucie', 'Sumter',
+      'Suwannee', 'Taylor', 'Union', 'Volusia', 'Wakulla', 'Walton', 'Washington'
+    ],
+    'TX': [
+      // Austin Metro Area Counties
+      'Travis', 'Williamson', 'Hays', 'Caldwell', 'Bastrop',
+      // Additional Texas Counties
+      'Harris', 'Dallas', 'Tarrant', 'Bexar', 'Collin', 'Denton', 'Fort Bend', 'Montgomery', 'Galveston', 'Brazoria'
+    ]
+  };
+
+  // Handle state selection
+  document.getElementById('profileState').addEventListener('change', function() {
+    const state = this.value;
+    const countySelect = document.getElementById('profileCounty');
+
+    // Clear existing options
+    countySelect.innerHTML = '<option value="">Select County</option>';
+
+    if (state && stateCounties[state]) {
+      stateCounties[state].forEach(county => {
+        const option = document.createElement('option');
+        option.value = county;
+        option.textContent = county;
+        countySelect.appendChild(option);
+      });
+    }
+  });
+
+  // Handle profile picture upload
+  document.getElementById('newProfilePhoto').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById('currentProfilePic');
+      const placeholder = document.getElementById('profilePicPlaceholder');
+      img.src = e.target.result;
+      img.classList.remove('hidden');
+      placeholder.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+
+    // Upload to storage
+    const user = (await supabase.auth.getUser()).data.user;
+    const filePath = await uploadFile(
+      file,
+      'handyman-documents',
+      `${user.id}/profile/${Date.now()}-${file.name}`
+    );
+
+    if (filePath) {
+      const profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${filePath}`;
+
+      // Update database
+      const { error } = await supabase
+        .from('handymen')
+        .update({ profile_photo_url: profilePhotoUrl })
+        .eq('id', currentHandyman.id);
+
+      if (!error) {
+        console.log('Profile photo updated successfully');
+        currentHandyman.profile_photo_url = profilePhotoUrl;
+      }
+    }
+  });
+
   // Update profile
   document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -2183,7 +2338,7 @@
         city: document.getElementById('profileCity').value,
         zip: document.getElementById('profileZip').value,
         bio: document.getElementById('profileBio').value,
-        hourly_rate: document.getElementById('profileRate').value,
+        service_state: document.getElementById('profileState').value,
         updated_at: new Date().toISOString()
       })
       .eq('id', currentHandyman.id);
