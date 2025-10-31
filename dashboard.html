@@ -1299,6 +1299,44 @@
     initializeCharts();
   }
 
+  // Generate clean folder name for storage
+  function generateHandymanFolderName(userId, fullName) {
+    // Clean the full name: remove spaces, special chars, limit length
+    const cleanName = fullName
+      .replace(/[^a-zA-Z0-9]/g, '') // Remove special characters
+      .toLowerCase()
+      .substring(0, 20); // Limit to 20 characters
+
+    return `${userId}_${cleanName}`;
+  }
+
+  // File upload helper function
+  async function uploadFile(file, bucketName, filePath) {
+    if (!file) return null;
+
+    try {
+      console.log(`Uploading ${file.name} to ${bucketName}/${filePath}`);
+
+      const { data, error } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Upload error:', error);
+        return null;
+      }
+
+      console.log('Upload successful:', data);
+      return data.path;
+    } catch (error) {
+      console.error('Upload exception:', error);
+      return null;
+    }
+  }
+
   // Onboarding navigation
   function showStep(step) {
     console.log('showStep() called with step:', step);
@@ -1368,7 +1406,7 @@
   // Step form handlers
   // FILE STORAGE NOTES:
   // All uploaded files (govId, profilePhoto, licenses, insurance, W9, etc.) should be stored in Supabase Storage.
-  // Recommended structure: /handyman-uploads/{handyman_id}/{file_type}/{filename}
+  // Recommended structure: /handyman_documents/{handyman_documents}/{file_type}/{filename}
   // Example implementation:
   // const file = document.getElementById('govId').files[0];
   // const { data, error } = await supabase.storage
@@ -1381,6 +1419,40 @@
 
     const taxIdType = document.querySelector('input[name="taxIdType"]:checked').value;
 
+    // Get user info for folder naming
+    const user = (await supabase.auth.getUser()).data.user;
+    const fullName = document.getElementById('legalName').value;
+    const folderName = generateHandymanFolderName(user.id, fullName);
+
+    // Upload files to Supabase Storage
+    const govIdFile = document.getElementById('govId').files[0];
+    const profilePhotoFile = document.getElementById('profilePhoto').files[0];
+
+    let govIdUrl = null;
+    let profilePhotoUrl = null;
+
+    if (govIdFile) {
+      const govIdPath = await uploadFile(
+        govIdFile,
+        'handyman_documents',
+        `${folderName}/gov-id/${Date.now()}-${govIdFile.name}`
+      );
+      if (govIdPath) {
+        govIdUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${govIdPath}`;
+      }
+    }
+
+    if (profilePhotoFile) {
+      const profilePhotoPath = await uploadFile(
+        profilePhotoFile,
+        'handyman_documents',
+        `${folderName}/profile/${Date.now()}-${profilePhotoFile.name}`
+      );
+      if (profilePhotoPath) {
+        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${profilePhotoPath}`;
+      }
+    }
+
     // Collect form data
     const formData = {
       full_name: document.getElementById('legalName').value,
@@ -1388,12 +1460,10 @@
       tax_id_type: taxIdType,
       tax_id: document.getElementById('ssn').value,
       drivers_license: document.getElementById('idNumber').value,
+      gov_id_url: govIdUrl,
+      profile_photo_url: profilePhotoUrl,
       updated_at: new Date().toISOString()
     };
-
-    // TODO: Handle file uploads for govId and profilePhoto
-    // Files will need to be uploaded to Supabase Storage
-    // For now, just save the text data
 
     const { error } = await supabase
       .from('handymen')
@@ -1440,17 +1510,52 @@
     console.log('Insurance status:', insuranceStatus);
     console.log('Insurance provider:', insuranceProvider);
 
+    // Get user info for folder naming
+    const user = (await supabase.auth.getUser()).data.user;
+    const folderName = generateHandymanFolderName(user.id, currentHandyman.full_name || 'unknown');
+
+    // Upload insurance proof if provided
+    const insuranceProofFile = document.getElementById('insuranceProof').files[0];
+    let insuranceProofUrl = null;
+
+    if (insuranceProofFile) {
+      const insuranceProofPath = await uploadFile(
+        insuranceProofFile,
+        'handyman_documents',
+        `${folderName}/insurance/${Date.now()}-${insuranceProofFile.name}`
+      );
+      if (insuranceProofPath) {
+        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${insuranceProofPath}`;
+      }
+    }
+
+    // Upload license files if any
+    const licenseFiles = [];
+    document.querySelectorAll('#licenseContainer .license-file').forEach(async (fileInput, index) => {
+      if (fileInput.files[0]) {
+        const licenseFile = fileInput.files[0];
+        const licenseFilePath = await uploadFile(
+          licenseFile,
+          'handyman_documents',
+          `${folderName}/licenses/${Date.now()}-${index}-${licenseFile.name}`
+        );
+        if (licenseFilePath) {
+          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${licenseFilePath}`);
+        }
+      }
+    });
+
     // Collect form data
     const formData = {
       licenses: licenses.length > 0 ? licenses : null,
+      license_files: licenseFiles.length > 0 ? licenseFiles : null,
       insurance_status: insuranceStatus || null,
       insurance_provider: insuranceProvider || null,
+      insurance_proof_url: insuranceProofUrl,
       updated_at: new Date().toISOString()
     };
 
     console.log('Step 2 form data:', JSON.stringify(formData, null, 2));
-
-    // TODO: Handle file uploads for license files and insurance proof
 
     console.log('About to save to database...');
     console.log('Current handyman ID:', currentHandyman?.id);
@@ -1591,18 +1696,36 @@
       return;
     }
 
+    // Get user info for folder naming
+    const user = (await supabase.auth.getUser()).data.user;
+    const folderName = generateHandymanFolderName(user.id, currentHandyman.full_name || 'unknown');
+
+    // Upload W-9 file
+    const w9File = document.getElementById('w9Upload').files[0];
+    let w9Url = null;
+
+    if (w9File) {
+      const w9Path = await uploadFile(
+        w9File,
+        'handyman_documents',
+        `${folderName}/tax/${Date.now()}-${w9File.name}`
+      );
+      if (w9Path) {
+        w9Url = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman_documents/${w9Path}`;
+      }
+    }
+
     const formData = {
       bank_name: document.getElementById('bankName').value,
       routing_number: document.getElementById('routingNumber').value,
       account_number: accountNum,
       account_type: document.getElementById('accountType').value,
+      w9_form_url: w9Url,
       agreed_1099: document.getElementById('agree1099').checked,
       agreed_taxes: document.getElementById('agreeTaxes').checked,
       agreed_bank_info: document.getElementById('agreeBankInfo').checked,
       updated_at: new Date().toISOString()
     };
-
-    // TODO: Handle W-9 file upload
 
     const { error } = await supabase
       .from('handymen')
@@ -1622,9 +1745,9 @@
     e.preventDefault();
 
     const formData = {
-      agreed_review_policy: document.getElementById('agreeReview').checked,
-      agreed_quality_standards: document.getElementById('agreeQuality').checked,
-      agreed_reputation: document.getElementById('agreeReputation').checked,
+      agreed_review_policy: document.getElementById('understandReviews').checked,
+      agreed_quality_standards: document.getElementById('commitQuality').checked,
+      agreed_reputation: document.getElementById('respectCommunity').checked,
       updated_at: new Date().toISOString()
     };
 
@@ -1877,7 +2000,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_id', currentHandyman.id);
+      .eq('handyman_documents', currentHandyman.id);
 
     const activeTasks = tasks?.filter(t => ['assigned', 'in_progress'].includes(t.status)).length || 0;
     const completedThisMonth = tasks?.filter(t =>
@@ -1921,7 +2044,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_id', currentHandyman.id)
+      .eq('handyman_documents', currentHandyman.id)
       .in('status', ['assigned', 'in_progress'])
       .order('scheduled_date', { ascending: true });
 
@@ -1958,7 +2081,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_id', currentHandyman.id)
+      .eq('handyman_documents', currentHandyman.id)
       .eq('status', 'completed')
       .order('completed_at', { ascending: false })
       .limit(20);
@@ -1987,7 +2110,7 @@
     const { data: tasks } = await supabase
       .from('tasks')
       .select('*')
-      .eq('handyman_id', currentHandyman.id)
+      .eq('handyman_documents', currentHandyman.id)
       .eq('status', 'completed');
 
     const totalEarned = tasks?.reduce((sum, t) => sum + (parseFloat(t.total_amount) * 0.8), 0) || 0;
