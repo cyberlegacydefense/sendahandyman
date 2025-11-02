@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 export const handler = async (event, context) => {
   try {
@@ -18,6 +18,7 @@ export const handler = async (event, context) => {
     const taskData = JSON.parse(event.body || "{}");
 
     console.log('🔧 Creating task in database:', taskData.task_id);
+    console.log('🔑 Using Supabase key type:', supabaseKey === process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON');
 
     // Insert task into database
     const { data: task, error } = await supabase

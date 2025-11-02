@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>SendAHandyman — Same-Day / Next-Day Handyman Dispatch</title>
     <meta name="description" content="Book a vetted handyman today or tomorrow. Upload photos, get an instant AI estimate, and reserve with your card. Serving Palm Beach, Broward & Miami-Dade." />
+    <!-- SSL Certificate Status: DEVELOPMENT ONLY - Requires valid SSL certificate for full payment method support -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17598022946"></script>
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -2438,6 +2439,18 @@
         document.getElementById('paymentAmount').textContent = '$' + finalAmount.toFixed(0);
         document.getElementById('paymentTiming').textContent = selectedPricingOption.windowLabel;
         document.getElementById('paymentModal').classList.remove('hidden');
+
+        // Clean up existing payment element if it exists
+        if (paymentElement) {
+            console.log('🧹 Cleaning up existing payment element');
+            try {
+                paymentElement.unmount();
+            } catch (e) {
+                console.log('Note: Payment element unmount not needed or failed');
+            }
+            paymentElement = null;
+        }
+
         paymentElementReady = false;
         const paymentMessage = document.getElementById('paymentMessage');
         paymentMessage.classList.add('hidden');
@@ -2513,6 +2526,17 @@
                 layout: {
                     type: 'tabs',
                     defaultCollapsed: false
+                },
+                paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
+                fields: {
+                    billingDetails: {
+                        name: 'auto',
+                        email: 'auto',
+                        phone: 'auto',
+                        address: {
+                            postalCode: 'auto'
+                        }
+                    }
                 }
             });
             const mountTarget = document.getElementById('stripe-payment-element');
@@ -2535,12 +2559,18 @@
                     console.error('❌ Payment element load error:', error);
                     reject(new Error(error.error?.message || 'Failed to load payment form'));
                 });
+                let paymentElementComplete = false;
                 paymentElement.on('change', (event) => {
+                    console.log('🔄 Payment element change event:', event);
+                    paymentElementComplete = event.complete;
                     if (event.complete) {
                         console.log('✅ Payment details complete');
                     }
                     if (event.error) {
                         console.warn('⚠️ Payment validation error:', event.error.message);
+                    }
+                    if (event.value) {
+                        console.log('💳 Payment element value:', event.value);
                     }
                 });
                 setTimeout(() => {
@@ -2602,10 +2632,55 @@
         debugPricingFlow('PAYMENT_PROCESSING', null);
         try {
             console.log('🔄 Confirming payment for amount:', selectedPricingOption.pricing.total);
-            const { error: submitError } = await elements.submit();
-            if (submitError) {
-                throw new Error(submitError.message);
+
+            // First validate the payment element is complete
+            const paymentElement = elements.getElement('payment');
+            if (!paymentElement) {
+                throw new Error('Payment element not found. Please refresh and try again.');
             }
+
+            console.log('🔍 Validating payment details before submission...');
+
+            // Debug: Check elements state
+            console.log('🔍 Elements object:', elements);
+            console.log('🔍 Payment element object:', paymentElement);
+
+            // Try to get the current value of the payment element
+            try {
+                const elementValue = await paymentElement.getValue();
+                console.log('🔍 Payment element current value:', elementValue);
+            } catch (valueError) {
+                console.warn('⚠️ Could not get payment element value:', valueError);
+            }
+
+            // Check if payment details are complete
+            let paymentDetailsComplete = false;
+            try {
+                console.log('🔍 Calling elements.submit()...');
+                const { error: submitError } = await elements.submit();
+                if (submitError) {
+                    console.error('❌ Submit validation error:', submitError);
+                    if (submitError.message.includes('incomplete') || submitError.message.includes('required')) {
+                        throw new Error('Please complete all payment details before continuing.');
+                    }
+                    throw new Error(submitError.message);
+                }
+                paymentDetailsComplete = true;
+                console.log('✅ Payment details validated successfully');
+            } catch (submitErr) {
+                console.error('❌ Payment validation failed:', submitErr.message);
+                throw new Error('Please fill in all payment details before continuing.');
+            }
+
+            if (!paymentDetailsComplete) {
+                throw new Error('Please complete your payment information.');
+            }
+
+            console.log('🔍 About to call stripe.confirmPayment with params:', {
+                elementsExists: !!elements,
+                returnUrl: `${window.location.origin}${window.location.pathname}#success`
+            });
+
             const { error, paymentIntent } = await stripe.confirmPayment({
                 elements,
                 confirmParams: {
