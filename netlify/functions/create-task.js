@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export const handler = async (event, context) => {
   try {
@@ -24,16 +24,15 @@ export const handler = async (event, context) => {
     const taskData = JSON.parse(event.body || "{}");
 
     console.log('🔧 Creating task in database:', taskData.task_id);
-    console.log('🔑 Using Supabase key type:', supabaseKey === process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON');
+    console.log('🔑 Using Supabase SERVICE ROLE key (bypasses RLS)');
 
     // 🚨 DEBUG: Check if environment variables are actually set
     console.log('🔍 Environment Debug:', {
       hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      hasAnonKey: !!process.env.SUPABASE_ANON_KEY,
       hasUrl: !!process.env.SUPABASE_URL,
-      serviceRoleLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0,
-      keyUsedLength: supabaseKey?.length || 0,
-      keyStartsWith: supabaseKey?.substring(0, 10) + '...'
+      serviceRoleKeyLength: process.env.SUPABASE_SERVICE_ROLE_KEY?.length || 0,
+      urlLength: process.env.SUPABASE_URL?.length || 0,
+      keyStartsWith: supabaseKey?.substring(0, 20) + '...'
     });
 
     // Prepare task data for insertion
@@ -65,20 +64,25 @@ export const handler = async (event, context) => {
 
     console.log('🔍 Task data to insert:', JSON.stringify(taskInsertData, null, 2));
 
-    // 🚨 TEMPORARY WORKAROUND: Force use service role key if not already
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!serviceRoleKey) {
-      console.error('🚨 CRITICAL: SUPABASE_SERVICE_ROLE_KEY environment variable not set!');
-      throw new Error('Server configuration error: Missing service role key');
+    // 🔑 Using SERVICE ROLE key as configured in Netlify environment
+    if (!supabaseKey || !supabaseUrl) {
+      console.error('🚨 CRITICAL: Missing Netlify environment variables!');
+      console.error('🔍 Missing:', {
+        SUPABASE_URL: !supabaseUrl,
+        SUPABASE_SERVICE_ROLE_KEY: !supabaseKey
+      });
+      throw new Error('Server configuration error: Missing Netlify environment variables');
     }
 
-    // Create new supabase client with explicitly forced service role key
-    const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
-    console.log('🔐 Using explicit service role client for RLS bypass');
+    // Use the existing supabase client (with SERVICE ROLE key)
+    // Service role key automatically bypasses all RLS policies
+    console.log('🔐 Using SERVICE ROLE key - RLS policies bypassed automatically');
 
-    // Insert task into database using service role client
-    const { data: task, error } = await adminSupabase
+    // Insert task into database using SERVICE ROLE key
+    // Service role key bypasses all RLS policies - no authentication needed
+    console.log('🔄 Attempting task insert with SERVICE ROLE key...');
+
+    const { data: task, error } = await supabase
       .from('tasks')
       .insert([taskInsertData])
       .select()
@@ -87,20 +91,21 @@ export const handler = async (event, context) => {
     if (error) {
       console.error('❌ Database insert failed:', error);
       console.error('🔍 Full error details:', JSON.stringify(error, null, 2));
-      console.error('🔑 RLS Policy Debug:', {
+      console.error('🔑 Service Role Debug:', {
         errorCode: error.code,
         errorDetails: error.details,
         errorHint: error.hint,
         isRLSError: error.message?.includes('row-level security'),
-        keyType: supabaseKey === process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SERVICE_ROLE' : 'ANON'
+        keyType: 'SERVICE_ROLE',
+        note: 'Service role should bypass RLS - this may be a different error'
       });
       throw new Error(`Database insert failed: ${error.message}`);
     }
 
     console.log('✅ Task created successfully:', task.id);
 
-    // Also create payment record using service role client
-    const { data: payment, error: paymentError } = await adminSupabase
+    // Also create payment record using SERVICE ROLE key client
+    const { data: payment, error: paymentError } = await supabase
       .from('payments')
       .insert([
         {
