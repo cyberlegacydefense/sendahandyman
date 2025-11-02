@@ -2490,8 +2490,19 @@
             const result = await response.json();
             console.log('✅ Payment intent created successfully:', {
                 id: result.payment_intent_id,
-                hasClientSecret: !!result.client_secret
+                hasClientSecret: !!result.client_secret,
+                capture_method: result.capture_method,
+                status: result.status
             });
+
+            // 🚨 CRITICAL: Verify server returned manual capture method
+            if (result.capture_method !== 'manual') {
+                console.error('🚨 ERROR: Server did not return manual capture method!', result.capture_method);
+                alert('⚠️ ERROR: Payment system not configured for authorization holds. Contact support immediately.');
+            } else {
+                console.log('✅ CONFIRMED: Server returned manual capture method for authorization hold');
+            }
+
             if (!result.client_secret) {
                 throw new Error('No client secret received from server');
             }
@@ -2708,17 +2719,41 @@
                 status: paymentIntent?.status,
                 amount: paymentIntent?.amount,
                 capture_method: paymentIntent?.capture_method,
-                charges: paymentIntent?.charges?.data?.[0]?.captured
+                charges: paymentIntent?.charges?.data?.[0]?.captured,
+                latest_charge: paymentIntent?.latest_charge,
+                charges_data: paymentIntent?.charges?.data
             });
+
+            // 🚨 CRITICAL DEBUGGING: Log full payment intent details
+            console.log('🔍 FULL Payment Intent Object:', JSON.stringify(paymentIntent, null, 2));
 
             if (paymentIntent && (paymentIntent.status === 'requires_capture' || paymentIntent.status === 'succeeded')) {
                 console.log('✅ Payment authorization successful:', paymentIntent.id, 'Status:', paymentIntent.status);
 
                 if (paymentIntent.status === 'requires_capture') {
                     console.log('💳 ✅ CORRECT: Funds authorized and held on customer card (48hr hold)');
+
+                    // Extra validation: Check if charge is actually captured
+                    const charge = paymentIntent?.charges?.data?.[0];
+                    if (charge) {
+                        console.log('💳 🔍 CHARGE DETAILS:', {
+                            id: charge.id,
+                            captured: charge.captured,
+                            amount_captured: charge.amount_captured,
+                            status: charge.status
+                        });
+
+                        if (charge.captured === true) {
+                            console.log('💳 🚨 ERROR: Charge shows as captured despite requires_capture status!');
+                            alert('⚠️ WARNING: Payment may have been charged immediately instead of held. Please check your bank account and contact support if needed.');
+                        } else {
+                            console.log('💳 ✅ CONFIRMED: Charge is properly held, not captured');
+                        }
+                    }
                 } else if (paymentIntent.status === 'succeeded') {
                     console.log('💳 ❌ WARNING: Payment completed immediately - authorization hold may have failed!');
                     console.log('💳 Expected: requires_capture, Got: succeeded');
+                    alert('⚠️ WARNING: Payment was processed immediately instead of being held. This should not happen. Please contact support.');
                 }
 
                 paymentIntentId = paymentIntent.id;

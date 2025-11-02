@@ -42,13 +42,30 @@ export const handler = async (event, context) => {
     });
 
     console.log(`Payment intent created: ${paymentIntent.id} for $${amount}`);
+    console.log('🔍 Payment Intent Creation Debug:', {
+      id: paymentIntent.id,
+      status: paymentIntent.status,
+      capture_method: paymentIntent.capture_method,
+      amount: paymentIntent.amount,
+      currency: paymentIntent.currency,
+      automatic_payment_methods: paymentIntent.automatic_payment_methods
+    });
+
+    // 🚨 CRITICAL: Verify capture method is actually manual
+    if (paymentIntent.capture_method !== 'manual') {
+      console.error('🚨 ERROR: Payment intent capture method is not manual!', paymentIntent.capture_method);
+    } else {
+      console.log('✅ CONFIRMED: Payment intent created with manual capture method');
+    }
 
     return {
       statusCode: 200,
       headers: cors(),
       body: JSON.stringify({
         client_secret: paymentIntent.client_secret,
-        payment_intent_id: paymentIntent.id
+        payment_intent_id: paymentIntent.id,
+        capture_method: paymentIntent.capture_method,
+        status: paymentIntent.status
       })
     };
 
