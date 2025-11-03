@@ -62,6 +62,59 @@
         .pricing-badge.discount {
             background: #059669;
         }
+        .booking-step {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .booking-step.hidden {
+            opacity: 0;
+            transform: translateX(20px);
+            display: none;
+        }
+        .pricing-step {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .pricing-step.hidden {
+            opacity: 0;
+            transform: translateX(20px);
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .service-card {
+                margin-bottom: 1rem;
+            }
+            .service-details {
+                padding: 1rem;
+            }
+            .service-details .grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            #book .grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            .select-service-btn {
+                font-size: 1rem;
+                padding: 0.875rem 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+                line-height: 2.5rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+            .hero-section {
+                padding: 2rem 0;
+            }
+            .text-5xl {
+                font-size: 2.25rem;
+            }
+            .text-6xl {
+                font-size: 2.5rem;
+            }
+        }
         .chatbot-typing {
             display: inline-block;
         }
@@ -399,8 +452,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="tv_mount">
+                                Select TV Wall Mount Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -435,8 +490,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="ceiling_fan">
+                                Select Ceiling Fan Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -470,8 +527,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="light_fixture">
+                                Select Light Fixture Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -505,8 +564,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="faucet_showerhead">
+                                Select Faucet/Showerhead Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -540,8 +601,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="smart_doorbell">
+                                Select Smart Doorbell Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -575,8 +638,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="curtains_blinds">
+                                Select Curtains/Blinds Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -610,8 +675,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="floating_shelf">
+                                Select Floating Shelf Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -645,8 +712,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="appliance_hookup">
+                                Select Appliance Hookup Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -680,8 +749,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="furniture_assembly">
+                                Select Furniture Assembly Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -715,8 +786,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and answer specific questions in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="closet_organizer">
+                                Select Closet Organizer Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -756,8 +829,10 @@
                         <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                             <p class="text-sm text-amber-700"><strong>Perfect for:</strong> Touch-up painting, caulking, door adjustments, squeaky hinges, loose handles, weatherstripping, minor drywall repairs, picture hanging, shelf brackets, cabinet adjustments, and other miscellaneous tasks.</p>
                         </div>
-                        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-700">Click to select this service and specify your tasks in the booking form.</p>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="general_handyman">
+                                Select General Handyman Service
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -793,21 +868,27 @@
 
 <section id="book" class="py-12">
     <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-10 items-start">
-        <div class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100">
-            <h3 class="text-xl font-bold">Start your request</h3>
-            <p class="text-sm text-slate-600 mt-1">We'll analyze your photos and show pricing options before you pay.</p>
-            <div class="mt-4 grid md:grid-cols-2 gap-4">
-                <div><label class="text-sm font-semibold">Full name</label><input id="customerName" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-                <div><label class="text-sm font-semibold">Mobile phone</label><input id="customerPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-                <div><label class="text-sm font-semibold">Email</label><input type="email" id="customerEmail" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-                <div><label class="text-sm font-semibold">ZIP code</label><input id="customerZip" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-            </div>
-            <div class="mt-4"><label class="text-sm font-semibold">Address (optional)</label><input id="customerAddress" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" /></div>
-            <div class="mt-4 grid md:grid-cols-2 gap-4">
-                <div>
-                    <label class="text-sm font-semibold">Task</label>
-                    <select id="taskCategory" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
-                        <option value="">Select a task…</option>
+        <div class="bg-white rounded-2xl p-4 md:p-6 shadow-soft border border-slate-100">
+            <!-- Step 1: Task Selection -->
+            <div id="step-task-selection" class="booking-step">
+                <h3 class="text-xl md:text-2xl font-bold">Select Your Service</h3>
+                <p class="text-sm text-slate-600 mt-1">Choose a service from above or browse all options below.</p>
+                <div class="mt-6">
+                    <label class="text-sm font-semibold">Selected Service</label>
+                    <div id="selectedTaskDisplay" class="mt-2 p-4 bg-indigo-50 border border-indigo-200 rounded-lg hidden">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div id="selectedTaskName" class="font-semibold text-indigo-900"></div>
+                                <div id="selectedTaskPrice" class="text-sm text-indigo-700"></div>
+                            </div>
+                            <button id="changeTaskBtn" class="text-indigo-600 text-sm hover:text-indigo-800">Change</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <label class="text-sm font-semibold">Or select from all services</label>
+                    <select id="taskCategory" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-base">
+                        <option value="">Browse all services…</option>
                         <option value="tv_mount">TV mounting</option>
                         <option value="ceiling_fan">Ceiling fan install</option>
                         <option value="light_fixture">Light fixture / chandelier swap</option>
@@ -821,82 +902,168 @@
                         <option value="general_handyman">General handyman (3+ hours)</option>
                     </select>
                 </div>
-                <div>
+                <div class="mt-6">
+                    <button id="continueToTimingBtn" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Continue to Timing
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Timing Selection -->
+            <div id="step-timing" class="booking-step hidden">
+                <h3 class="text-xl md:text-2xl font-bold">Choose Your Timing</h3>
+                <p class="text-sm text-slate-600 mt-1">Select when you'd like the work done.</p>
+
+                <div class="mt-6">
                     <label class="text-sm font-semibold">Preferred timing</label>
-                    <select id="taskWindow" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+                    <select id="taskWindow" required class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base">
                         <option value="flexible">I'm flexible (best value)</option>
                     </select>
                 </div>
-            </div>
-            <div class="mt-4">
-                <label class="text-sm font-semibold">Or select a future week date (up to 2 weeks) - 10% discount!</label>
-                <input type="date" id="futureDate" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
-                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
-                    <div class="font-semibold mb-1">📅 Booking Calendar Rules:</div>
-                    <div class="grid grid-cols-1 gap-1">
-                        <div>✅ <strong>Mon-Fri:</strong> All time slots available with 10% discount</div>
-                        <div>⚠️ <strong>Saturday:</strong> Only 8AM-12PM available with 30% premium (no discount)</div>
-                        <div>🚫 <strong>Sunday:</strong> Not available (will be blocked if attempted)</div>
+
+                <div class="mt-4">
+                    <label class="text-sm font-semibold">Or select a future date (up to 2 weeks) - 10% discount!</label>
+                    <input type="date" id="futureDate" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base" />
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                        <div class="font-semibold mb-2">📅 Booking Rules:</div>
+                        <div class="space-y-1">
+                            <div>✅ <strong>Mon-Fri:</strong> All slots + 10% discount</div>
+                            <div>⚠️ <strong>Saturday:</strong> 8AM-12PM only + 30% premium</div>
+                            <div>🚫 <strong>Sunday:</strong> Not available</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="taskQuestions" class="mt-4 hidden">
-                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 class="font-semibold text-blue-800 mb-3">📋 Quick questions about your specific task</h4>
-                    <div id="questionsContainer" class="space-y-3"></div>
+
+                <div class="mt-6 flex gap-3">
+                    <button id="backToTaskBtn" class="flex-1 bg-slate-200 text-slate-700 py-3 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
+                        ← Back
+                    </button>
+                    <button id="continueToQuestionsBtn" class="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                        Continue
+                    </button>
                 </div>
             </div>
-            <div class="mt-4">
-                <label class="text-sm font-semibold">Describe the job</label>
-                <textarea id="taskDescription" rows="3" placeholder="Product link/model, wall/ceiling type, special notes…" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2"></textarea>
-            </div>
-            <div class="mt-4">
-                <label class="text-sm font-semibold">Upload photos (2–5)</label>
-                <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2" />
-                <div id="photoThumbs" class="mt-2 flex flex-wrap gap-2"></div>
-            </div>
-            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <p class="text-sm text-amber-800">
-                    <strong>⚠️ Important:</strong> The final price may include additional charges if site conditions differ from what's described above (e.g., non-standard materials, unexpected complications, etc.). Your technician will always get approval before performing any add-on work.
-                </p>
-            </div>
-            <div class="mt-6">
-                <button type="button" id="getEstimateBtn" class="relative w-full overflow-hidden rounded-xl bg-slate-900 text-white px-5 py-3 font-semibold transition-all disabled:opacity-75">
-                    <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
-                    <span id="estimateText" class="relative z-10">🔧 Get pricing options</span>
-                </button>
-                <div id="progressContainer" class="mt-3 hidden">
+
+            <!-- Step 3: Task Questions -->
+            <div id="step-questions" class="booking-step hidden">
+                <h3 class="text-xl md:text-2xl font-bold">Task Details</h3>
+                <p class="text-sm text-slate-600 mt-1">Help us understand your specific needs.</p>
+
+                <div id="taskQuestions" class="mt-6">
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 class="font-semibold text-blue-800 mb-3">📋 Quick questions about your task</h4>
+                        <div id="questionsContainer" class="space-y-4"></div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="text-sm font-semibold">Describe your job</label>
+                    <textarea id="taskDescription" rows="4" placeholder="Product link/model, wall/ceiling type, special requirements, access details..." class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base"></textarea>
+                </div>
+
+                <div class="mt-6">
+                    <label class="text-sm font-semibold">Upload photos (2–5 recommended)</label>
+                    <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base" />
+                    <div id="photoThumbs" class="mt-3 flex flex-wrap gap-2"></div>
+                    <p class="text-xs text-slate-500 mt-2">Photos help us provide accurate pricing and prepare your handyman</p>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button id="backToTimingBtn" class="flex-1 bg-slate-200 text-slate-700 py-3 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
+                        ← Back
+                    </button>
+                    <button id="getEstimateBtn" class="flex-1 relative overflow-hidden rounded-lg bg-slate-900 text-white px-4 py-3 font-semibold transition-all disabled:opacity-75">
+                        <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
+                        <span id="estimateText" class="relative z-10">🔧 Get Pricing</span>
+                    </button>
+                </div>
+
+                <div id="progressContainer" class="mt-4 hidden">
                     <div class="w-full bg-slate-200 rounded-full h-2">
                         <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <div id="progressMessage" class="text-sm text-slate-600 mt-1 text-center">Starting analysis...</div>
+                    <div id="progressMessage" class="text-sm text-slate-600 mt-2 text-center">Starting analysis...</div>
                 </div>
             </div>
         </div>
-        <aside id="estimatePanel" class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 hidden">
-            <h3 class="text-xl font-bold">Choose your timing & price</h3>
-            <p class="text-sm text-slate-600 mb-2">Select your preferred option. All prices include everything.</p>
-            <div id="flexibleNotice" class="hidden mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p class="text-sm text-green-700">
-                    💡 <strong>Great choice!</strong> You selected "I'm flexible" so we've automatically found the best value timing for you.
-                </p>
+        <aside id="estimatePanel" class="bg-white rounded-2xl p-4 md:p-6 shadow-soft border border-slate-100 hidden">
+            <!-- Step 4: Price Selection -->
+            <div id="step-pricing" class="pricing-step">
+                <h3 class="text-xl md:text-2xl font-bold">Choose Your Price</h3>
+                <p class="text-sm text-slate-600 mb-4">Select your preferred option. All prices include everything.</p>
+
+                <div id="flexibleNotice" class="hidden mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-sm text-green-700">
+                        💡 <strong>Great choice!</strong> You selected "I'm flexible" so we've found the best value timing.
+                    </p>
+                </div>
+                <div id="futureDateNotice" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-sm text-blue-700">
+                        📅 <strong>Future booking!</strong> Options for your selected date and nearby days.
+                    </p>
+                </div>
+
+                <div id="pricingOptions" class="space-y-3 mb-6"></div>
+
+                <div class="mt-4">
+                    <h4 class="font-semibold text-sm md:text-base">What we'll do</h4>
+                    <ul id="estimateScope" class="list-disc pl-5 text-sm text-slate-700 space-y-1 mt-2"></ul>
+                </div>
+                <div class="mt-4">
+                    <h4 class="font-semibold text-sm md:text-base">Things to note</h4>
+                    <ul id="estimateRisks" class="list-disc pl-5 text-sm text-slate-700 space-y-1 mt-2"></ul>
+                </div>
+
+                <div class="mt-6">
+                    <button id="continueToInfoBtn" class="w-full rounded-lg bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50" disabled>
+                        Continue to Details
+                    </button>
+                </div>
             </div>
-            <div id="futureDateNotice" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p class="text-sm text-blue-700">
-                    📅 <strong>Future booking!</strong> You selected a specific date. We've shown you options for the day before, your selected day, and the day after for flexibility.
-                </p>
-            </div>
-            <div id="pricingOptions" class="space-y-4 mb-6"></div>
-            <div class="mt-4">
-                <h4 class="font-semibold">What we'll do</h4>
-                <ul id="estimateScope" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
-            </div>
-            <div class="mt-4">
-                <h4 class="font-semibold">Things to note</h4>
-                <ul id="estimateRisks" class="list-disc pl-5 text-sm text-slate-700 space-y-1"></ul>
-            </div>
-            <div class="mt-6">
-                <button id="reserveBtn" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold shadow-soft disabled:opacity-50" disabled>💳 Reserve with card</button>
+
+            <!-- Step 5: Personal Information -->
+            <div id="step-personal-info" class="pricing-step hidden">
+                <h3 class="text-xl md:text-2xl font-bold">Your Information</h3>
+                <p class="text-sm text-slate-600 mb-6">We need a few details to complete your booking.</p>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm font-semibold">Full name *</label>
+                            <input id="customerName" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" />
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold">Mobile phone *</label>
+                            <input id="customerPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" placeholder="(555) 123-4567" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm font-semibold">Email *</label>
+                            <input type="email" id="customerEmail" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" />
+                        </div>
+                        <div>
+                            <label class="text-sm font-semibold">ZIP code *</label>
+                            <input id="customerZip" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" placeholder="33467" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold">Service address</label>
+                        <input id="customerAddress" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" placeholder="123 Main St, City, FL 33467" />
+                        <p class="text-xs text-slate-500 mt-1">Where should the handyman go? (Optional if same as billing)</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button id="backToPricingBtn" class="flex-1 bg-slate-200 text-slate-700 py-3 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
+                        ← Back
+                    </button>
+                    <button id="reserveBtn" class="flex-1 rounded-lg bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50" disabled>
+                        💳 Secure Payment
+                    </button>
+                </div>
             </div>
             <p class="mt-3 text-xs text-slate-500">If site conditions differ, your tech will confirm any changes before work begins.</p>
         </aside>
@@ -2420,7 +2587,11 @@
             type: option.type,
             pricing: { ...option.pricing }
         };
-        document.getElementById('reserveBtn').disabled = false;
+        // Enable continue to info button instead of reserve button
+        const continueToInfoBtn = document.getElementById('continueToInfoBtn');
+        if (continueToInfoBtn) {
+            continueToInfoBtn.disabled = false;
+        }
         debugPricingFlow('OPTION_SELECTED', option);
         console.log('✅ Selected pricing option:', selectedPricingOption);
     }
@@ -3116,6 +3287,138 @@
         console.log('✅ Chatbot initialized');
     }
 
+    // Service selection and step navigation functions
+    function selectService(taskKey) {
+        console.log('🎯 Selecting service:', taskKey);
+
+        // Update the dropdown
+        const taskSelect = document.getElementById('taskCategory');
+        if (taskSelect) {
+            taskSelect.value = taskKey;
+        }
+
+        // Show selected service in the display
+        const selectedTaskDisplay = document.getElementById('selectedTaskDisplay');
+        const selectedTaskName = document.getElementById('selectedTaskName');
+        const selectedTaskPrice = document.getElementById('selectedTaskPrice');
+
+        if (selectedTaskDisplay && selectedTaskName && selectedTaskPrice) {
+            const serviceData = getServiceData(taskKey);
+            selectedTaskName.textContent = serviceData.name;
+            selectedTaskPrice.textContent = serviceData.price;
+            selectedTaskDisplay.classList.remove('hidden');
+        }
+
+        // Enable continue button
+        updateContinueButton();
+
+        // Scroll to booking section on mobile
+        if (window.innerWidth < 768) {
+            setTimeout(() => {
+                document.getElementById('book').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 100);
+        }
+
+        // Close all service details
+        document.querySelectorAll('.service-details').forEach(details => {
+            details.classList.add('hidden');
+        });
+        document.querySelectorAll('.expand-icon').forEach(icon => {
+            icon.style.transform = 'rotate(0deg)';
+        });
+    }
+
+    function getServiceData(taskKey) {
+        const serviceMap = {
+            'tv_mount': { name: '📺 TV Wall Mount (32–65")', price: '~2.0 hr base • Starting at $160' },
+            'ceiling_fan': { name: '💡 Ceiling Fan Install/Replace', price: '~2.5 hr base • Starting at $200' },
+            'light_fixture': { name: '✨ Light Fixture / Chandelier Swap', price: '~1.5 hr base • Starting at $120' },
+            'faucet_showerhead': { name: '🚰 Faucet / Showerhead Replace', price: '~1.5 hr base • Starting at $120' },
+            'smart_doorbell': { name: '🔔 Smart Doorbell Install', price: '~1.25 hr base • Starting at $100' },
+            'curtains_blinds': { name: '🪟 Curtain Rods / Blinds', price: '~1.5 hr base • Starting at $120' },
+            'floating_shelf': { name: '📚 Floating Shelf Install', price: '~1.5 hr base • Starting at $120' },
+            'appliance_hookup': { name: '⚡ Appliance Hookup (W/D/DW)', price: '~2.0 hr base • Starting at $160' },
+            'furniture_assembly': { name: '🪑 Furniture Assembly (S–M)', price: '~2.0 hr base • Starting at $160' },
+            'closet_organizer': { name: '👕 Closet Organizer Install', price: '~2.5 hr base • Starting at $200' },
+            'general_handyman': { name: '🔧 General Handyman (3+ hours)', price: '~3 hr minimum • Starting at $240' }
+        };
+        return serviceMap[taskKey] || { name: 'Unknown Service', price: 'Price varies' };
+    }
+
+    function showStep(stepId) {
+        console.log('📋 Showing step:', stepId);
+
+        // Hide all booking steps
+        document.querySelectorAll('.booking-step').forEach(step => {
+            step.classList.add('hidden');
+        });
+
+        // Show the requested step
+        const targetStep = document.getElementById(stepId);
+        if (targetStep) {
+            targetStep.classList.remove('hidden');
+
+            // If moving to questions step, show questions for selected task
+            if (stepId === 'step-questions') {
+                const taskSelect = document.getElementById('taskCategory');
+                if (taskSelect && taskSelect.value) {
+                    showTaskQuestions(taskSelect.value);
+                }
+            }
+        }
+
+        // Scroll to top of booking section on mobile
+        if (window.innerWidth < 768) {
+            document.getElementById('book').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
+
+    function showPricingStep(stepId) {
+        console.log('💰 Showing pricing step:', stepId);
+
+        // Hide all pricing steps
+        document.querySelectorAll('.pricing-step').forEach(step => {
+            step.classList.add('hidden');
+        });
+
+        // Show the requested step
+        const targetStep = document.getElementById(stepId);
+        if (targetStep) {
+            targetStep.classList.remove('hidden');
+        }
+    }
+
+    function updateContinueButton() {
+        const taskSelect = document.getElementById('taskCategory');
+        const continueBtn = document.getElementById('continueToTimingBtn');
+        const selectedDisplay = document.getElementById('selectedTaskDisplay');
+
+        if (continueBtn && taskSelect) {
+            const hasSelection = taskSelect.value || !selectedDisplay.classList.contains('hidden');
+            continueBtn.disabled = !hasSelection;
+        }
+    }
+
+    function validatePersonalInfo() {
+        const name = document.getElementById('customerName').value.trim();
+        const phone = document.getElementById('customerPhone').value.trim();
+        const email = document.getElementById('customerEmail').value.trim();
+        const zip = document.getElementById('customerZip').value.trim();
+        const reserveBtn = document.getElementById('reserveBtn');
+
+        const isValid = name && phone && email && zip;
+
+        if (reserveBtn) {
+            reserveBtn.disabled = !isValid;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 DOM Content Loaded - Initializing app...');
         console.log('📊 App Version:', APP_VERSION);
@@ -3279,6 +3582,61 @@
         } else {
             console.error('❌ Task category dropdown not found');
         }
+
+        // Add event listeners for new service selection buttons
+        document.querySelectorAll('.select-service-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const taskKey = btn.getAttribute('data-task');
+                console.log('🎯 Service selected via button:', taskKey);
+                selectService(taskKey);
+            });
+        });
+
+        // Add event listeners for step navigation
+        const continueToTimingBtn = document.getElementById('continueToTimingBtn');
+        const backToTaskBtn = document.getElementById('backToTaskBtn');
+        const continueToQuestionsBtn = document.getElementById('continueToQuestionsBtn');
+        const backToTimingBtn = document.getElementById('backToTimingBtn');
+        const continueToInfoBtn = document.getElementById('continueToInfoBtn');
+        const backToPricingBtn = document.getElementById('backToPricingBtn');
+
+        if (continueToTimingBtn) {
+            continueToTimingBtn.addEventListener('click', () => showStep('step-timing'));
+        }
+        if (backToTaskBtn) {
+            backToTaskBtn.addEventListener('click', () => showStep('step-task-selection'));
+        }
+        if (continueToQuestionsBtn) {
+            continueToQuestionsBtn.addEventListener('click', () => showStep('step-questions'));
+        }
+        if (backToTimingBtn) {
+            backToTimingBtn.addEventListener('click', () => showStep('step-timing'));
+        }
+        if (continueToInfoBtn) {
+            continueToInfoBtn.addEventListener('click', () => showPricingStep('step-personal-info'));
+        }
+        if (backToPricingBtn) {
+            backToPricingBtn.addEventListener('click', () => showPricingStep('step-pricing'));
+        }
+
+        // Make continue buttons responsive to selections
+        const taskCategorySelect = document.getElementById('taskCategory');
+        if (taskCategorySelect) {
+            taskCategorySelect.addEventListener('change', () => {
+                updateContinueButton();
+            });
+        }
+
+        // Add validation for personal information form
+        const personalInfoInputs = ['customerName', 'customerPhone', 'customerEmail', 'customerZip'];
+        personalInfoInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.addEventListener('input', validatePersonalInfo);
+            }
+        });
         console.log('✅ Service selection system initialized');
         const photoInput = document.getElementById('taskPhotos');
         if (photoInput) {

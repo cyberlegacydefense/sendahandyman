@@ -135,9 +135,8 @@ export const handler = async (event, context) => {
       console.error('❌ Failed to update task payment status:', taskUpdateError);
     }
 
-    // TODO: Send notification to customer about completed work
-    // TODO: Send SMS confirmation to customer
-    // TODO: Update handyman earnings
+    // Send completion notifications to customer
+    await sendCustomerCompletionNotifications(task, capturedPayment.id, completion_photos, completion_notes);
 
     return {
       statusCode: 200,
@@ -163,6 +162,84 @@ export const handler = async (event, context) => {
     };
   }
 };
+
+// Send completion notifications to customer
+async function sendCustomerCompletionNotifications(task, paymentIntentId, completionPhotos, completionNotes) {
+  try {
+    console.log(`📧 Sending completion notifications for task ${task.id}`);
+
+    // Send SMS notification
+    try {
+      const smsResponse = await fetch('/.netlify/functions/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'job_complete',
+          data: {
+            customer_phone: task.customer_phone,
+            task_id: task.task_id,
+            final_amount: task.total_amount,
+            service_name: task.task_category,
+            customer_name: task.customer_name
+          }
+        })
+      });
+
+      if (smsResponse.ok) {
+        console.log('✅ SMS completion notification sent successfully');
+      } else {
+        console.error('❌ SMS notification failed:', await smsResponse.text());
+      }
+    } catch (smsError) {
+      console.error('❌ SMS notification error:', smsError);
+    }
+
+    // Send email notification
+    try {
+      const emailResponse = await fetch('/.netlify/functions/send-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'task_completion',
+          customer: {
+            name: task.customer_name,
+            email: task.customer_email,
+            phone: task.customer_phone,
+            address: task.customer_address
+          },
+          task: {
+            id: task.task_id,
+            category: task.task_category,
+            description: task.task_description,
+            completed_at: new Date().toISOString(),
+            completion_notes: completionNotes || 'Task completed successfully'
+          },
+          handyman: {
+            name: task.assigned_handyman_name,
+            phone: task.assigned_handyman_phone
+          },
+          payment: {
+            amount: task.total_amount,
+            payment_intent_id: paymentIntentId,
+            status: 'completed'
+          },
+          completion_photos: completionPhotos || []
+        })
+      });
+
+      if (emailResponse.ok) {
+        console.log('✅ Email completion notification sent successfully');
+      } else {
+        console.error('❌ Email notification failed:', await emailResponse.text());
+      }
+    } catch (emailError) {
+      console.error('❌ Email notification error:', emailError);
+    }
+
+  } catch (error) {
+    console.error('❌ Error sending completion notifications:', error);
+  }
+}
 
 function cors() {
   return {
