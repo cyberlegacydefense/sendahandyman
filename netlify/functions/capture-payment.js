@@ -124,7 +124,8 @@ export const handler = async (event, context) => {
     const { error: taskUpdateError } = await supabase
       .from('tasks')
       .update({
-        payment_status: 'paid',
+        status: 'completed',
+        payment_status: 'captured',
         payment_captured_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
