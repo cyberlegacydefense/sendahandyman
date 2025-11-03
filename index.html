@@ -3312,15 +3312,6 @@
         // Enable continue button
         updateContinueButton();
 
-        // Scroll to booking section on mobile
-        if (window.innerWidth < 768) {
-            setTimeout(() => {
-                document.getElementById('book').scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }, 100);
-        }
 
         // Close all service details
         document.querySelectorAll('.service-details').forEach(details => {
@@ -3370,13 +3361,6 @@
             }
         }
 
-        // Scroll to top of booking section on mobile
-        if (window.innerWidth < 768) {
-            document.getElementById('book').scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
     }
 
     function showPricingStep(stepId) {
@@ -3550,12 +3534,6 @@
                                 console.log('✅ Task dropdown set to:', taskKey);
                             }
                             showTaskQuestions(taskKey);
-                            setTimeout(() => {
-                                const bookSection = document.getElementById('book');
-                                if (bookSection) {
-                                    bookSection.scrollIntoView({ behavior: 'smooth' });
-                                }
-                            }, 300);
                         } else {
                             details.classList.add('hidden');
                             icon.style.transform = 'rotate(0deg)';
