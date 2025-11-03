@@ -2533,7 +2533,8 @@
         document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
         document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
 
-        // Show the pricing step instead of the old estimate panel
+        // Show the estimate panel and then show the pricing step
+        document.getElementById('estimatePanel').classList.remove('hidden');
         showPricingStep('step-pricing');
         document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
