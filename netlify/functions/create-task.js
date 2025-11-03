@@ -58,7 +58,7 @@ export const handler = async (event, context) => {
       reminder_2hr_sent_at: null,
       reminder_30min_sent: false,
       reminder_30min_sent_at: null,
-      payment_captured_at: null,
+      payment_captured_at: null, // Will be set when payment is captured
       notes: `Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
     };
 
