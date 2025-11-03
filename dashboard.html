@@ -1940,51 +1940,156 @@
     }
   });
 
-  // Initialize charts
-  function initializeCharts() {
+  // Initialize charts with real data
+  async function initializeCharts() {
+    if (!currentHandyman) return;
+
     // Destroy existing charts if they exist
     Chart.getChart('performanceChart')?.destroy();
-    Chart.getChart('earningsChart')?.destroy();
+    Chart.getChart('serviceChart')?.destroy();
 
-    // Performance chart
-    const perfCtx = document.getElementById('performanceChart').getContext('2d');
-    new Chart(perfCtx, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Jobs Completed',
-          data: [12, 19, 15, 25, 22, 30],
-          borderColor: '#4f46e5',
-          backgroundColor: 'rgba(79, 70, 229, 0.1)',
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false }
+    try {
+      // Get all completed tasks for this handyman
+      const { data: completedTasks, error } = await supabase
+        .from('tasks')
+        .select('completed_at, task_category')
+        .eq('handyman_id', currentHandyman.id)
+        .eq('status', 'completed')
+        .not('completed_at', 'is', null);
+
+      if (error) {
+        console.error('Error fetching chart data:', error);
+        return;
+      }
+
+      // Process data for monthly performance chart
+      const monthlyData = processMonthlyPerformance(completedTasks || []);
+
+      // Process data for service breakdown chart
+      const serviceData = processServiceBreakdown(completedTasks || []);
+
+      // Create performance chart
+      const perfCtx = document.getElementById('performanceChart').getContext('2d');
+      new Chart(perfCtx, {
+        type: 'line',
+        data: {
+          labels: monthlyData.labels,
+          datasets: [{
+            label: 'Jobs Completed',
+            data: monthlyData.data,
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
         }
-      }
+      });
+
+      // Create service breakdown chart
+      const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+      new Chart(serviceCtx, {
+        type: 'doughnut',
+        data: {
+          labels: serviceData.labels,
+          datasets: [{
+            data: serviceData.data,
+            backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#6b7280', '#8b5cf6', '#f97316']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 15
+              }
+            }
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error('Error initializing charts:', error);
+    }
+  }
+
+  // Process monthly performance data
+  function processMonthlyPerformance(tasks) {
+    const now = new Date();
+    const months = [];
+    const counts = [];
+
+    // Get last 6 months
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+      months.push(monthName);
+
+      // Count tasks completed in this month
+      const monthTasks = tasks.filter(task => {
+        const completedDate = new Date(task.completed_at);
+        return completedDate.getMonth() === date.getMonth() &&
+               completedDate.getFullYear() === date.getFullYear();
+      });
+      counts.push(monthTasks.length);
+    }
+
+    return { labels: months, data: counts };
+  }
+
+  // Process service breakdown data
+  function processServiceBreakdown(tasks) {
+    const serviceCounts = {};
+
+    // Count each service category
+    tasks.forEach(task => {
+      const category = task.task_category || 'Other';
+      serviceCounts[category] = (serviceCounts[category] || 0) + 1;
     });
 
-    // Service breakdown chart
-    const serviceCtx = document.getElementById('serviceChart').getContext('2d');
-    new Chart(serviceCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['TV Mounting', 'Furniture', 'Drywall', 'Painting', 'Other'],
-        datasets: [{
-          data: [30, 25, 20, 15, 10],
-          backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#6b7280']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
+    // Convert to arrays and sort by count (descending)
+    const sorted = Object.entries(serviceCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 7); // Top 7 categories
+
+    // Format category names
+    const formatCategoryName = (category) => {
+      return category.replace(/_/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    };
+
+    const labels = sorted.map(([category]) => formatCategoryName(category));
+    const data = sorted.map(([,count]) => count);
+
+    // If no data, show placeholder
+    if (labels.length === 0) {
+      return {
+        labels: ['No Services Yet'],
+        data: [1]
+      };
+    }
+
+    return { labels, data };
   }
 
   // Claude API Expert Advice
