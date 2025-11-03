@@ -2051,9 +2051,9 @@
         try {
             const data = saveFormData();
             console.log('📋 Form data collected:', data);
-            if (!data.name || !data.phone || !data.email || !data.category) {
+            if (!data.category) {
                 console.error('❌ Missing required fields');
-                alert('Please fill out all required fields (Name, Phone, Email, and Task)');
+                alert('Please select a task category first');
                 return;
             }
             if (data.futureDate) {
@@ -2082,10 +2082,10 @@
                 rush: data.rush,
                 addons: addons,
                 futureDate: data.futureDate,
-                name: data.name,
-                phone: data.phone,
-                email: data.email,
-                address: data.address
+                name: data.name || 'Customer', // Placeholder until personal info is provided
+                phone: data.phone || '',
+                email: data.email || '',
+                address: data.address || ''
             };
             console.log('📤 Calling AI scope function with payload:', aiPayload);
             const response = await fetch('/.netlify/functions/scope', {
@@ -2532,7 +2532,9 @@
 
         document.getElementById('estimateScope').innerHTML = (estimate.step_scope || []).map(s => `<li>${s}</li>`).join('');
         document.getElementById('estimateRisks').innerHTML = (estimate.risk_flags || []).map(r => `<li>${r}</li>`).join('');
-        document.getElementById('estimatePanel').classList.remove('hidden');
+
+        // Show the pricing step instead of the old estimate panel
+        showPricingStep('step-pricing');
         document.getElementById('estimatePanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
