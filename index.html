@@ -3312,7 +3312,6 @@
         // Enable continue button
         updateContinueButton();
 
-
         // Close all service details
         document.querySelectorAll('.service-details').forEach(details => {
             details.classList.add('hidden');
@@ -3320,6 +3319,14 @@
         document.querySelectorAll('.expand-icon').forEach(icon => {
             icon.style.transform = 'rotate(0deg)';
         });
+
+        // Navigate to booking section where additional information is requested
+        setTimeout(() => {
+            document.getElementById('book').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 300);
     }
 
     function getServiceData(taskKey) {
