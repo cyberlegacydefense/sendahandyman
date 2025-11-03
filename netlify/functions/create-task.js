@@ -35,31 +35,31 @@ export const handler = async (event, context) => {
       keyStartsWith: supabaseKey?.substring(0, 20) + '...'
     });
 
-    // Prepare task data for insertion
+    // Prepare task data for insertion - using exact schema columns
     const taskInsertData = {
       task_id: taskData.task_id,
+      handyman_id: null, // Will be assigned later
       customer_name: taskData.name,
       customer_phone: taskData.phone,
       customer_email: taskData.email,
       customer_address: taskData.address || taskData.property_address,
       task_category: taskData.category,
       task_description: taskData.description || '',
-      scheduled_date: new Date().toISOString().split('T')[0], // Today's date for now
+      scheduled_date: new Date().toISOString().split('T')[0],
+      scheduled_datetime: null,
       time_window: taskData.window,
       estimated_hours: taskData.estimated_hours,
       status: 'pending',
+      payment_status: 'authorized', // Payment hold placed
       total_amount: taskData.total_amount,
-      notes: `Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`,
-      // New fields for automated reminders (will be populated when handyman is assigned)
-      scheduled_datetime: null, // Will be set when appointment is scheduled
-      assigned_handyman_phone: null, // Will be set when handyman is assigned
-      assigned_handyman_name: null, // Will be set when handyman is assigned
+      assigned_handyman_name: null,
+      assigned_handyman_phone: null,
       reminder_2hr_sent: false,
       reminder_2hr_sent_at: null,
       reminder_30min_sent: false,
       reminder_30min_sent_at: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      payment_captured_at: null,
+      notes: `Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
     };
 
     console.log('🔍 Task data to insert:', JSON.stringify(taskInsertData, null, 2));
@@ -82,7 +82,8 @@ export const handler = async (event, context) => {
     // Service role key bypasses all RLS policies - no authentication needed
     console.log('🔄 Attempting task insert with SERVICE ROLE key...');
 
-    const { data: task, error } = await supabase
+    // Insert all fields at once since they match the schema
+    let { data: task, error } = await supabase
       .from('tasks')
       .insert([taskInsertData])
       .select()
