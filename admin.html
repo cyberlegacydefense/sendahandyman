@@ -2057,42 +2057,47 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   }
 
   try {
-    console.log('🔐 Creating handyman via improved Netlify function...');
+    console.log('🔐 Creating handyman via Supabase Edge Function...');
 
-    // Generate a secure password
-    const tempPassword = generateSecurePassword();
+    // Get current user session for authentication
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-    // Call the improved Netlify function
-    const response = await fetch('/.netlify/functions/admin-create-handyman', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email,
-        password: tempPassword,
-        full_name: fullName,
-        phone: phone,
-        city: city,
-        skills: skills
-      })
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.details || result.error || 'Failed to create handyman');
+    if (sessionError || !session) {
+      throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
     }
 
-    console.log('✅ Handyman created successfully:', result);
+    console.log('User session verified, calling Edge Function...');
+
+    // Call the Supabase Edge Function
+    const { data, error } = await supabase.functions.invoke('create-handyman', {
+      body: {
+        name: fullName,
+        email: email,
+        phone: phone || null
+      },
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    if (error) {
+      console.error('Edge Function error:', error);
+      throw new Error(`Function call failed: ${error.message}`);
+    }
+
+    if (!data.success) {
+      throw new Error(data.error || 'Unknown error occurred');
+    }
+
+    console.log('✅ Handyman created successfully:', data.handyman);
 
     // Show PostMyStyle-style success modal with generated credentials
     showHandymanCreatedModal(
-      fullName,
-      email,
-      tempPassword,
-      result.auth_user_id,
-      result.handyman_id
+      data.handyman.name,
+      data.credentials.email,
+      data.credentials.password,
+      data.handyman.auth_user_id,
+      data.handyman.id
     );
 
     closeAddHandymanModal();
