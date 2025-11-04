@@ -926,13 +926,14 @@ async function loadDashboardData() {
 // Load metrics
 async function loadMetrics() {
   try {
-    // Count all handymen (assuming no status filter needed)
+    // Count active handymen based on onboarding and skills
     const { data: handymen, error: handymenError } = await supabase
       .from('handymen')
-      .select('id');
+      .select('id, onboarding_completed, skills');
 
     if (!handymenError) {
-      document.getElementById('activeHandymenCount').textContent = handymen?.length || 0;
+      const activeHandymen = handymen?.filter(h => h.onboarding_completed && h.skills) || [];
+      document.getElementById('activeHandymenCount').textContent = activeHandymen.length;
     }
 
     // Count active tasks
@@ -1012,6 +1013,17 @@ async function loadHandymenData() {
     if (error) throw error;
 
     handymenData = handymen || [];
+    console.log('📊 Loaded handymen:', handymenData.length, 'records');
+
+    // Log status breakdown
+    const activeCount = handymenData.filter(h => h.onboarding_completed && h.skills).length;
+    const incompleteCount = handymenData.filter(h => !h.onboarding_completed || !h.skills).length;
+    console.log(`📊 Status breakdown: ${activeCount} active, ${incompleteCount} incomplete`);
+
+    handymenData.forEach(h => {
+      console.log(`👤 ${h.full_name}: onboarding=${h.onboarding_completed}, skills=${!!h.skills}`);
+    });
+
     renderHandymenTable();
 
   } catch (error) {
@@ -1042,12 +1054,11 @@ function renderHandymenTable() {
         <div class="text-xs text-slate-500">${handyman.city || 'N/A'}</div>
       </td>
       <td class="py-3 px-4">
-        <span class="status-badge status-${handyman.status || 'pending'}">
-          ${(handyman.status || 'pending').toUpperCase()}
-        </span>
+        ${getHandymanStatusBadge(handyman)}
       </td>
       <td class="py-3 px-4">
-        <div class="text-sm">${handyman.skills || 'General'}</div>
+        <div class="text-sm">${handyman.skills || 'No skills set'}</div>
+        <div class="text-xs text-slate-500">${handyman.specialties || ''}</div>
       </td>
       <td class="py-3 px-4">
         <div class="text-sm">${handyman.created_at ? new Date(handyman.created_at).toLocaleDateString() : 'N/A'}</div>
@@ -1133,24 +1144,79 @@ function renderQuotesTable() {
 }
 
 // Load analytics data
-function loadAnalyticsData() {
+async function loadAnalyticsData() {
   console.log('📈 Loading analytics data...');
 
-  // Initialize charts
-  initializeCharts();
+  try {
+    // Get real revenue data from completed tasks
+    const { data: completedTasks, error } = await supabase
+      .from('tasks')
+      .select('final_amount, completed_at, created_at')
+      .eq('status', 'completed')
+      .not('final_amount', 'is', null)
+      .order('completed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error loading analytics data:', error);
+      // Fallback to fake data if real data fails
+      initializeCharts();
+      return;
+    }
+
+    // Process real data for charts
+    initializeChartsWithRealData(completedTasks || []);
+
+  } catch (error) {
+    console.error('Error in loadAnalyticsData:', error);
+    // Fallback to fake data
+    initializeCharts();
+  }
 }
 
-// Initialize charts
-function initializeCharts() {
+// Initialize charts with real data
+function initializeChartsWithRealData(completedTasks) {
+  // Process revenue data by week
+  const weeks = [];
+  const revenueData = [];
+
+  if (completedTasks.length > 0) {
+    // Group by week and calculate revenue
+    const weeklyRevenue = {};
+    const now = new Date();
+
+    for (let i = 3; i >= 0; i--) {
+      const weekStart = new Date(now);
+      weekStart.setDate(now.getDate() - (i + 1) * 7);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 7);
+
+      const weekLabel = `Week ${4 - i}`;
+      weeks.push(weekLabel);
+
+      const weekRevenue = completedTasks
+        .filter(task => {
+          const completedDate = new Date(task.completed_at);
+          return completedDate >= weekStart && completedDate < weekEnd;
+        })
+        .reduce((sum, task) => sum + (parseFloat(task.final_amount) || 0), 0);
+
+      revenueData.push(weekRevenue);
+    }
+  } else {
+    // No data available - show empty chart
+    weeks.push('Week 1', 'Week 2', 'Week 3', 'Week 4');
+    revenueData.push(0, 0, 0, 0);
+  }
+
   // Revenue chart
   const revenueCtx = document.getElementById('revenueChart').getContext('2d');
   new Chart(revenueCtx, {
     type: 'line',
     data: {
-      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      labels: weeks,
       datasets: [{
-        label: 'Revenue',
-        data: [1200, 1900, 1500, 2100],
+        label: 'Revenue ($)',
+        data: revenueData,
         borderColor: '#10b981',
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
         tension: 0.4
@@ -1241,6 +1307,68 @@ document.getElementById('createQuoteForm').addEventListener('submit', async (e) 
     alert('Failed to create quote: ' + error.message);
   }
 });
+
+// Initialize charts with fake data (fallback)
+function initializeCharts() {
+  // Revenue chart with fake data
+  const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+  new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+      labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+      datasets: [{
+        label: 'Revenue ($)',
+        data: [0, 0, 0, 0], // Show zeros instead of fake data
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return '$' + value;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// Get handyman status badge based on registration completion
+function getHandymanStatusBadge(handyman) {
+  let status, statusClass, statusText;
+
+  if (handyman.onboarding_completed && handyman.skills) {
+    status = 'active';
+    statusClass = 'bg-green-100 text-green-800';
+    statusText = 'ACTIVE';
+  } else if (handyman.onboarding_completed && !handyman.skills) {
+    status = 'incomplete';
+    statusClass = 'bg-orange-100 text-orange-800';
+    statusText = 'NEEDS SKILLS';
+  } else if (!handyman.onboarding_completed && handyman.skills) {
+    status = 'incomplete';
+    statusClass = 'bg-orange-100 text-orange-800';
+    statusText = 'NEEDS ONBOARDING';
+  } else {
+    status = 'pending';
+    statusClass = 'bg-red-100 text-red-800';
+    statusText = 'INCOMPLETE';
+  }
+
+  return `<span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusText}</span>`;
+}
 
 // Helper functions
 function copyQuoteLink(quoteId) {
@@ -1342,15 +1470,15 @@ function renderTasksTable() {
 
 // Update task summary cards
 function updateTaskSummary() {
-  const totalTasks = tasksData.length;
   const unassignedTasks = tasksData.filter(task => !task.handyman_id).length;
+  const assignedTasks = tasksData.filter(task => task.handyman_id && task.status === 'assigned').length;
+  const inProgressTasks = tasksData.filter(task => task.status === 'in_progress').length;
   const completedTasks = tasksData.filter(task => task.status === 'completed').length;
-  const pendingTasks = tasksData.filter(task => task.status === 'pending' || task.status === 'in_progress').length;
 
-  document.getElementById('totalTasksCount').textContent = totalTasks;
   document.getElementById('unassignedTasksCount').textContent = unassignedTasks;
+  document.getElementById('assignedTasksCount').textContent = assignedTasks;
+  document.getElementById('inProgressTasksCount').textContent = inProgressTasks;
   document.getElementById('completedTasksCount').textContent = completedTasks;
-  document.getElementById('pendingTasksCount').textContent = pendingTasks;
 }
 
 // Handle task selection for bulk operations
@@ -1611,6 +1739,25 @@ function closeTaskDetailsModal() {
 document.getElementById('assignTaskForm').addEventListener('submit', (e) => {
   e.preventDefault();
   handleTaskAssignment();
+});
+
+// Event listeners for handyman management
+document.getElementById('quickAddHandyman').addEventListener('click', () => {
+  alert('Add Handyman functionality - This would open a form to add new handymen to the system');
+});
+
+// Event listeners for bulk task assignment
+document.getElementById('assignBulkTasks').addEventListener('click', () => {
+  quickAssignSelected();
+});
+
+// Event listener for select all tasks checkbox
+document.getElementById('selectAllTasks').addEventListener('change', (e) => {
+  const checkboxes = document.querySelectorAll('.task-checkbox');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = e.target.checked;
+    handleTaskSelection(checkbox);
+  });
 });
 
 console.log('🔐 Admin dashboard loaded');
