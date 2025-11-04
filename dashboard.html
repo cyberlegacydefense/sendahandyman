@@ -1313,7 +1313,15 @@
     document.getElementById('handymanName').textContent = `${displayName}${phone}`;
 
     // Check if user is admin by querying admin_users table
+    console.log('🔍 About to check admin access with handyman email:', handyman.email);
     await checkAdminAccess(handyman.email);
+
+    // Also check using current auth user email as backup
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && user.email && user.email !== handyman.email) {
+      console.log('🔍 Also checking admin access with auth user email:', user.email);
+      await checkAdminAccess(user.email);
+    }
 
     // Check if onboarding is complete
     if (!handyman.onboarding_completed) {
@@ -3256,7 +3264,10 @@
 
   // Check admin access using admin_users table
   async function checkAdminAccess(email) {
-    if (!email) return;
+    if (!email) {
+      console.log('❌ No email provided to checkAdminAccess');
+      return;
+    }
 
     try {
       console.log('🔐 Checking admin access for:', email);
