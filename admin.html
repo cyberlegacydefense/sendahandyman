@@ -2001,6 +2001,18 @@ function closeAddHandymanModal() {
   document.getElementById('addHandymanForm').reset();
 }
 
+// Generate a secure temporary password (same as PostMyStyle approach)
+function generateSecurePassword() {
+  const adjectives = ['Quick', 'Smart', 'Brave', 'Swift', 'Bright', 'Strong', 'Fast', 'Bold'];
+  const nouns = ['Tiger', 'Eagle', 'Wolf', 'Lion', 'Bear', 'Hawk', 'Fox', 'Shark'];
+  const numbers = Math.floor(100 + Math.random() * 900); // 3-digit number
+
+  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+
+  return `${adjective}${noun}${numbers}`;
+}
+
 // Add Handyman form handler
 document.getElementById('addHandymanForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -2019,47 +2031,42 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   }
 
   try {
-    console.log('🔐 Creating handyman via Supabase Edge Function...');
+    console.log('🔐 Creating handyman via improved Netlify function...');
 
-    // Get current user session for authentication
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    // Generate a secure password
+    const tempPassword = generateSecurePassword();
 
-    if (sessionError || !session) {
-      throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
-    }
-
-    console.log('User session verified, calling Edge Function...');
-
-    // Call the Supabase Edge Function (PostMyStyle approach)
-    const { data, error } = await supabase.functions.invoke('create-handyman', {
-      body: {
-        name: fullName,
-        email: email,
-        phone: phone || null
-      },
+    // Call the improved Netlify function
+    const response = await fetch('/.netlify/functions/admin-create-handyman', {
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        email: email,
+        password: tempPassword,
+        full_name: fullName,
+        phone: phone,
+        city: city,
+        skills: skills
+      })
     });
 
-    if (error) {
-      console.error('Edge Function error:', error);
-      throw new Error(`Function call failed: ${error.message}`);
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.details || result.error || 'Failed to create handyman');
     }
 
-    if (!data.success) {
-      throw new Error(data.error || 'Unknown error occurred');
-    }
-
-    console.log('✅ Handyman created successfully:', data.handyman);
+    console.log('✅ Handyman created successfully:', result);
 
     // Show PostMyStyle-style success modal with generated credentials
     showHandymanCreatedModal(
-      data.handyman.name,
-      data.credentials.email,
-      data.credentials.password,
-      data.handyman.auth_user_id,
-      data.handyman.id
+      fullName,
+      email,
+      tempPassword,
+      result.auth_user_id,
+      result.handyman_id
     );
 
     closeAddHandymanModal();
