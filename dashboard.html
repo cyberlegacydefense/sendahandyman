@@ -763,6 +763,7 @@
         </div>
         <div class="flex items-center gap-2 md:gap-4">
           <span id="handymanName" class="text-xs md:text-sm font-semibold text-slate-700 truncate max-w-32 md:max-w-none"></span>
+          <button id="adminBtn" class="hidden text-xs md:text-sm bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition-colors whitespace-nowrap">Admin</button>
           <button id="logoutBtn" class="text-xs md:text-sm text-slate-600 hover:text-slate-900 whitespace-nowrap">Sign Out</button>
         </div>
       </div>
@@ -1276,6 +1277,11 @@
     location.reload();
   });
 
+  // Admin button functionality
+  document.getElementById('adminBtn').addEventListener('click', () => {
+    window.open('/admin.html', '_blank');
+  });
+
   // Check authentication
   async function checkAuth() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -1305,6 +1311,9 @@
     const displayName = handyman.full_name || 'Handyman';
     const phone = handyman.phone ? ` • ${handyman.phone}` : '';
     document.getElementById('handymanName').textContent = `${displayName}${phone}`;
+
+    // Check if user is admin by querying admin_users table
+    await checkAdminAccess(handyman.email);
 
     // Check if onboarding is complete
     if (!handyman.onboarding_completed) {
@@ -3242,6 +3251,63 @@
       console.error('❌ Error processing additional materials:', error);
       alert(`Failed to process additional materials: ${error.message}`);
       throw error; // Re-throw to handle in parent function
+    }
+  }
+
+  // Check admin access using admin_users table
+  async function checkAdminAccess(email) {
+    if (!email) return;
+
+    try {
+      console.log('🔐 Checking admin access for:', email);
+
+      // Get current auth user to use their UUID
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        // First try to find by auth UUID
+        const { data: adminUser, error } = await supabase
+          .from('admin_users')
+          .select('id, email, full_name, role, is_active')
+          .eq('id', user.id)
+          .eq('is_active', true)
+          .single();
+
+        if (!error && adminUser) {
+          console.log('✅ Admin access granted:', adminUser.role);
+          document.getElementById('adminBtn').classList.remove('hidden');
+
+          // Update last login time
+          await supabase
+            .from('admin_users')
+            .update({ last_login_at: new Date().toISOString() })
+            .eq('id', adminUser.id);
+          return;
+        }
+      }
+
+      // Fallback: check by email for existing records
+      const { data: adminUser, error } = await supabase
+        .from('admin_users')
+        .select('id, email, full_name, role, is_active')
+        .eq('email', email.toLowerCase())
+        .eq('is_active', true)
+        .single();
+
+      if (!error && adminUser) {
+        console.log('✅ Admin access granted (by email):', adminUser.role);
+        document.getElementById('adminBtn').classList.remove('hidden');
+
+        // Update last login time
+        await supabase
+          .from('admin_users')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', adminUser.id);
+      } else {
+        console.log('ℹ️ No admin access for this user');
+      }
+    } catch (error) {
+      console.error('❌ Error checking admin access:', error);
     }
   }
 
