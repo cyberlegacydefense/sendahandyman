@@ -20,6 +20,9 @@
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.stripe.com/v3/"></script>
+    <!-- Leaflet.js for interactive maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -28,6 +31,10 @@
     <style>
         body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji"}
         .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+        .coverage-tab { color: #64748b; background: transparent; }
+        .coverage-tab.active { background: #4f46e5; color: white; }
+        .coverage-tab:hover { background: #e2e8f0; }
+        .coverage-tab.active:hover { background: #4338ca; }
         @keyframes shimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -1198,7 +1205,59 @@
 <section id="coverage" class="py-12 bg-white border-t border-b border-slate-100">
     <div class="max-w-6xl mx-auto px-4">
         <h2 class="text-2xl md:text-3xl font-bold">Coverage areas</h2>
-        <p class="mt-2 text-slate-600">Palm Beach • Boca Raton • Delray Beach • Boynton Beach • Fort Lauderdale • Hollywood • Aventura • Miami • Coral Gables • Kendall</p>
+        <p class="mt-2 text-slate-600 mb-8">We provide professional handyman services in two major metropolitan areas</p>
+
+        <!-- Coverage Area Tabs -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Tab Navigation -->
+            <div class="lg:w-1/3">
+                <div class="flex lg:flex-col bg-slate-50 rounded-lg p-1">
+                    <button id="florida-tab" class="coverage-tab active flex-1 lg:flex-none py-3 px-4 rounded-lg font-semibold text-left transition-colors">
+                        🌴 South Florida
+                    </button>
+                    <button id="austin-tab" class="coverage-tab flex-1 lg:flex-none py-3 px-4 rounded-lg font-semibold text-left transition-colors">
+                        🤠 Austin & Central Texas
+                    </button>
+                </div>
+
+                <!-- Area Details -->
+                <div id="florida-details" class="coverage-details mt-6">
+                    <h3 class="text-lg font-bold text-slate-900 mb-3">South Florida Metropolitan</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div>• Palm Beach County: West Palm Beach, Boca Raton, Delray Beach, Boynton Beach</div>
+                        <div>• Broward County: Fort Lauderdale, Hollywood, Plantation, Aventura</div>
+                        <div>• Miami-Dade County: Miami, Coral Gables, Kendall, Aventura</div>
+                    </div>
+                    <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                        <p class="text-sm text-green-700">✅ <strong>Fully operational</strong> - Same-day and next-day service available</p>
+                    </div>
+                </div>
+
+                <div id="austin-details" class="coverage-details mt-6 hidden">
+                    <h3 class="text-lg font-bold text-slate-900 mb-3">Austin & Central Texas</h3>
+                    <div class="space-y-2 text-sm text-slate-600">
+                        <div>• Austin Metro: Austin, Round Rock, Cedar Park, Pflugerville</div>
+                        <div>• Travis County: Austin, Lakeway, Bee Cave, West Lake Hills</div>
+                        <div>• Williamson County: Round Rock, Georgetown, Leander</div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-sm text-blue-700">🚀 <strong>Now serving Austin!</strong> - Book your handyman service today</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="lg:w-2/3">
+                <div id="coverage-map" class="h-80 bg-slate-100 rounded-lg border border-slate-200 relative overflow-hidden">
+                    <div class="absolute inset-0 flex items-center justify-center text-slate-500">
+                        <div class="text-center">
+                            <div class="text-2xl mb-2">🗺️</div>
+                            <p class="text-sm">Interactive map loading...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -3768,7 +3827,156 @@
         document.getElementById('version').textContent = APP_VERSION;
         console.log('🎯 All event listeners initialized successfully');
         initializeChatbot();
+        initializeCoverageMap();
     });
+
+    // Coverage Map Functionality
+    let coverageMap = null;
+    let currentCoverageArea = 'florida';
+
+    function initializeCoverageMap() {
+        console.log('🗺️ Initializing coverage area map...');
+
+        // Initialize the map
+        coverageMap = L.map('coverage-map', {
+            zoomControl: true,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            dragging: true,
+            touchZoom: true
+        });
+
+        // Add map tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(coverageMap);
+
+        // Set up tab functionality
+        setupCoverageTabs();
+
+        // Show Florida by default
+        showCoverageArea('florida');
+
+        console.log('✅ Coverage map initialized successfully');
+    }
+
+    function setupCoverageTabs() {
+        const floridaTab = document.getElementById('florida-tab');
+        const austinTab = document.getElementById('austin-tab');
+
+        if (floridaTab) {
+            floridaTab.addEventListener('click', () => {
+                switchCoverageTab('florida');
+            });
+        }
+
+        if (austinTab) {
+            austinTab.addEventListener('click', () => {
+                switchCoverageTab('austin');
+            });
+        }
+    }
+
+    function switchCoverageTab(area) {
+        // Update tab appearance
+        document.querySelectorAll('.coverage-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(`${area}-tab`).classList.add('active');
+
+        // Update details display
+        document.querySelectorAll('.coverage-details').forEach(details => {
+            details.classList.add('hidden');
+        });
+        document.getElementById(`${area}-details`).classList.remove('hidden');
+
+        // Update map
+        showCoverageArea(area);
+        currentCoverageArea = area;
+    }
+
+    function showCoverageArea(area) {
+        if (!coverageMap) return;
+
+        // Clear existing layers
+        coverageMap.eachLayer((layer) => {
+            if (layer instanceof L.Polygon || layer instanceof L.Circle || layer instanceof L.Marker) {
+                coverageMap.removeLayer(layer);
+            }
+        });
+
+        if (area === 'florida') {
+            // South Florida coverage area
+            const floridaBounds = [
+                [25.7617, -80.1918], // Miami
+                [26.3683, -80.1289], // Boca Raton
+                [26.7153, -80.0534], // West Palm Beach
+                [26.1224, -80.1373], // Fort Lauderdale
+            ];
+
+            // Create coverage polygon
+            const floridaPolygon = L.polygon([
+                [25.6, -80.6], // SW corner
+                [27.0, -80.6], // NW corner
+                [27.0, -79.8], // NE corner
+                [25.6, -79.8]  // SE corner
+            ], {
+                color: '#10b981',
+                fillColor: '#10b981',
+                fillOpacity: 0.2,
+                weight: 2
+            }).addTo(coverageMap);
+
+            // Add city markers
+            const cities = [
+                { name: 'Miami', coords: [25.7617, -80.1918] },
+                { name: 'Fort Lauderdale', coords: [26.1224, -80.1373] },
+                { name: 'Boca Raton', coords: [26.3683, -80.1289] },
+                { name: 'West Palm Beach', coords: [26.7153, -80.0534] }
+            ];
+
+            cities.forEach(city => {
+                L.marker(city.coords)
+                    .bindPopup(`<strong>${city.name}</strong><br>✅ Service Available`)
+                    .addTo(coverageMap);
+            });
+
+            // Set map view to South Florida
+            coverageMap.setView([26.2, -80.2], 8);
+
+        } else if (area === 'austin') {
+            // Austin coverage area
+            const austinPolygon = L.polygon([
+                [30.0, -98.0], // SW corner
+                [30.8, -98.0], // NW corner
+                [30.8, -97.3], // NE corner
+                [30.0, -97.3]  // SE corner
+            ], {
+                color: '#3b82f6',
+                fillColor: '#3b82f6',
+                fillOpacity: 0.2,
+                weight: 2
+            }).addTo(coverageMap);
+
+            // Add Austin area city markers
+            const austinCities = [
+                { name: 'Austin', coords: [30.2672, -97.7431] },
+                { name: 'Round Rock', coords: [30.5082, -97.6789] },
+                { name: 'Cedar Park', coords: [30.5052, -97.8203] },
+                { name: 'Georgetown', coords: [30.6327, -97.6779] }
+            ];
+
+            austinCities.forEach(city => {
+                L.marker(city.coords)
+                    .bindPopup(`<strong>${city.name}</strong><br>🚀 Now Available!`)
+                    .addTo(coverageMap);
+            });
+
+            // Set map view to Austin area
+            coverageMap.setView([30.4, -97.7], 9);
+        }
+    }
+
     console.log('📜 JavaScript finished loading');
 </script>
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PW9HC7HL"
