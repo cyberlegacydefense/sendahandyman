@@ -2284,6 +2284,64 @@
                         placeholder="Any additional notes about the completed work..."></textarea>
             </div>
 
+            <!-- Additional Materials Section -->
+            <div class="border-t border-slate-200 pt-4 mt-4">
+              <label class="flex items-center gap-2 mb-4 cursor-pointer">
+                <input type="checkbox"
+                       id="additional-materials-${task.id}"
+                       class="rounded border-slate-300"
+                       onchange="toggleMaterialsForm('${task.id}')">
+                <span class="text-sm font-semibold">Additional materials were needed for this job</span>
+              </label>
+
+              <div id="materials-form-${task.id}" class="hidden space-y-3 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Materials Cost ($) *</label>
+                    <input type="number"
+                           id="materials-cost-${task.id}"
+                           step="0.01"
+                           placeholder="0.00"
+                           class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2">
+                    <p class="text-xs text-slate-500 mt-1">Enter total cost of materials purchased</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Upload Receipts</label>
+                    <input type="file"
+                           id="materials-receipts-${task.id}"
+                           multiple
+                           accept="image/*"
+                           class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2">
+                    <p class="text-xs text-slate-500 mt-1">Upload photos of receipts</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Materials Description *</label>
+                  <textarea id="materials-notes-${task.id}"
+                            rows="2"
+                            class="w-full text-sm border border-slate-200 rounded-lg px-3 py-2"
+                            placeholder="What materials were purchased and why were they needed..."></textarea>
+                </div>
+
+                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200">
+                  <div class="flex items-start gap-2">
+                    <span class="text-amber-600">💰</span>
+                    <div>
+                      <p class="text-sm font-semibold text-amber-800">Total Customer Charge</p>
+                      <p class="text-sm text-amber-700">
+                        $80 travel fee + materials cost = $<span id="total-additional-${task.id}">80.00</span>
+                      </p>
+                      <p class="text-xs text-amber-600 mt-1">
+                        This will be automatically charged to the customer's saved payment method
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="flex gap-3">
               <button onclick="markTaskComplete('${task.id}')"
                       class="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors">
@@ -3050,6 +3108,12 @@
       const result = await response.json();
       console.log('💰 Payment captured successfully:', result);
 
+      // Check if additional materials are needed
+      const additionalMaterialsCheckbox = document.getElementById(`additional-materials-${taskId}`);
+      if (additionalMaterialsCheckbox && additionalMaterialsCheckbox.checked) {
+        await processAdditionalMaterials(taskId);
+      }
+
       // Show success message
       alert('✅ Task completed successfully! Payment has been processed and customer has been charged.');
 
@@ -3065,6 +3129,119 @@
       // Restore button state
       button.disabled = false;
       button.textContent = originalText;
+    }
+  }
+
+  // Toggle materials form visibility
+  function toggleMaterialsForm(taskId) {
+    const checkbox = document.getElementById(`additional-materials-${taskId}`);
+    const form = document.getElementById(`materials-form-${taskId}`);
+    const costInput = document.getElementById(`materials-cost-${taskId}`);
+
+    if (checkbox.checked) {
+      form.classList.remove('hidden');
+      costInput.addEventListener('input', () => updateMaterialsTotal(taskId));
+    } else {
+      form.classList.add('hidden');
+      costInput.value = '';
+      updateMaterialsTotal(taskId);
+    }
+  }
+
+  // Update total additional cost display
+  function updateMaterialsTotal(taskId) {
+    const costInput = document.getElementById(`materials-cost-${taskId}`);
+    const totalSpan = document.getElementById(`total-additional-${taskId}`);
+    const materialsCost = parseFloat(costInput.value) || 0;
+    const travelFee = 80;
+    const total = materialsCost + travelFee;
+    totalSpan.textContent = total.toFixed(2);
+  }
+
+  // Upload materials receipts
+  async function uploadMaterialsReceipts(taskId, files) {
+    const user = (await supabase.auth.getUser()).data.user;
+    const receiptUrls = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const timestamp = Date.now();
+      const fileName = `receipt-${timestamp}-${i + 1}-${file.name}`;
+
+      const filePath = await uploadFile(
+        file,
+        'handyman-documents',
+        `${user.id}/receipts/${taskId}/${fileName}`
+      );
+
+      if (filePath) {
+        const { data: signedUrlData } = await supabase.storage
+          .from('handyman-documents')
+          .createSignedUrl(filePath, 31536000); // 1 year expiry
+
+        if (signedUrlData) {
+          receiptUrls.push(signedUrlData.signedUrl);
+        }
+      }
+    }
+
+    return receiptUrls;
+  }
+
+  // Process additional materials charge
+  async function processAdditionalMaterials(taskId) {
+    try {
+      console.log('💰 Processing additional materials for task:', taskId);
+
+      // Get materials form data
+      const materialsCost = parseFloat(document.getElementById(`materials-cost-${taskId}`).value) || 0;
+      const materialsNotes = document.getElementById(`materials-notes-${taskId}`).value;
+      const receiptsInput = document.getElementById(`materials-receipts-${taskId}`);
+
+      // Validate required fields
+      if (materialsCost <= 0) {
+        throw new Error('Please enter a valid materials cost');
+      }
+      if (!materialsNotes.trim()) {
+        throw new Error('Please provide a description of the materials purchased');
+      }
+
+      // Upload receipt photos if any
+      let receiptUrls = [];
+      if (receiptsInput.files && receiptsInput.files.length > 0) {
+        console.log('📸 Uploading receipt photos...');
+        receiptUrls = await uploadMaterialsReceipts(taskId, receiptsInput.files);
+      }
+
+      // Charge additional materials
+      const additionalChargeResponse = await fetch('/.netlify/functions/charge-additional-materials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task_id: taskId,
+          material_costs: materialsCost,
+          travel_fee: 80,
+          material_receipts: receiptUrls,
+          handyman_notes: materialsNotes,
+          customer_approved: true // Handyman confirms customer approved the purchase
+        })
+      });
+
+      if (!additionalChargeResponse.ok) {
+        const errorData = await additionalChargeResponse.json();
+        throw new Error(errorData.error || 'Additional materials charge failed');
+      }
+
+      const additionalResult = await additionalChargeResponse.json();
+      console.log('💰 Additional materials charged successfully:', additionalResult);
+
+      const totalAdditional = materialsCost + 80;
+      alert(`✅ Additional materials charged successfully!\n\nMaterials: $${materialsCost}\nTravel fee: $80\nTotal additional charge: $${totalAdditional}\n\nCustomer has been notified and charged.`);
+
+    } catch (error) {
+      console.error('❌ Error processing additional materials:', error);
+      alert(`Failed to process additional materials: ${error.message}`);
+      throw error; // Re-throw to handle in parent function
     }
   }
 

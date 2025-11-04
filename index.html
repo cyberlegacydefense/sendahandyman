@@ -350,13 +350,13 @@
             </a>
             <nav class="desktop-nav flex items-center gap-6 text-sm">
                 <a href="#how" class="hover:text-indigo-600">How it works</a>
-                <a href="#book" class="hover:text-indigo-600">Book now</a>
+                <a href="#services" class="hover:text-indigo-600">Book now</a>
                 <a href="concierge.html" class="hover:text-indigo-600">Concierge</a>
                 <a href="#coverage" class="hover:text-indigo-600">Coverage</a>
                 <a href="#faq" class="hover:text-indigo-600">FAQ</a>
                 <a href="join-team.html" class="hover:text-green-600 font-semibold">💼 Join Our Team</a>
             </nav>
-            <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
+            <a href="#services" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Start your request</a>
         </div>
         <div class="md:hidden">
             <div class="flex items-center justify-between">
@@ -371,12 +371,12 @@
                 </button>
             </div>
             <div class="mobile-header-row-2 flex justify-center">
-                <a href="#book" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Book same-day</a>
+                <a href="#services" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-white text-sm font-semibold shadow-soft">Start your request</a>
             </div>
         </div>
         <div class="mobile-menu" id="mobile-menu">
             <a href="#how">How it works</a>
-            <a href="#book">Book now</a>
+            <a href="#services">Book now</a>
             <a href="concierge.html">Concierge</a>
             <a href="#coverage">Coverage</a>
             <a href="#faq">FAQ</a>
@@ -397,7 +397,6 @@
                 <li>✅ Same-day / next-day time windows</li>
             </ul>
             <div class="mt-6 flex gap-3">
-                <a href="#book" class="rounded-xl bg-indigo-600 px-5 py-3 text-white font-semibold shadow-soft">Start your request</a>
                 <a href="#how" class="rounded-xl bg-white px-5 py-3 font-semibold border border-slate-200">How it works</a>
             </div>
         </div>
@@ -1024,7 +1023,24 @@
             <!-- Step 5: Personal Information -->
             <div id="step-personal-info" class="pricing-step hidden">
                 <h3 class="text-xl md:text-2xl font-bold">Your Information</h3>
-                <p class="text-sm text-slate-600 mb-6">We need a few details to complete your booking.</p>
+                <p class="text-sm text-slate-600 mb-4">We need a few details to complete your booking.</p>
+
+                <!-- Additional Costs Notice -->
+                <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <div class="flex items-start gap-3">
+                        <div class="text-amber-600 text-lg">⚠️</div>
+                        <div>
+                            <h4 class="font-semibold text-amber-800 mb-1">Additional Costs May Apply</h4>
+                            <p class="text-sm text-amber-700">
+                                If your handyman needs to purchase additional materials after arriving at your location,
+                                you will be charged <strong>$80 travel fee + cost of materials</strong> via the same payment method used for booking.
+                            </p>
+                            <p class="text-xs text-amber-600 mt-2">
+                                Your handyman will get your approval before purchasing any additional materials.
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3607,6 +3623,25 @@
         }
         if (backToPricingBtn) {
             backToPricingBtn.addEventListener('click', () => showPricingStep('step-pricing'));
+        }
+
+        // Change task button - go back to service selection
+        const changeTaskBtn = document.getElementById('changeTaskBtn');
+        if (changeTaskBtn) {
+            changeTaskBtn.addEventListener('click', () => {
+                // Clear selected service
+                document.getElementById('selectedTaskDisplay').classList.add('hidden');
+                document.getElementById('taskCategory').value = '';
+
+                // Scroll back to services section
+                document.getElementById('services').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                // Update continue button state
+                updateContinueButton();
+            });
         }
 
         // Make continue buttons responsive to selections
