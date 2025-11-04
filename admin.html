@@ -1050,22 +1050,48 @@ async function loadRecentActivity() {
   try {
     const activities = [];
 
-    // Get recent completed tasks
-    const { data: recentTasks, error: tasksError } = await supabase
-      .from('tasks')
-      .select(`
-        id,
-        service_type,
-        status,
-        total_amount,
-        updated_at,
-        handymen:handyman_id (full_name)
-      `)
-      .eq('status', 'completed')
-      .order('updated_at', { ascending: false })
-      .limit(3);
+    // Get recent completed tasks (with error handling)
+    let recentTasks = [];
+    try {
+      const { data: tasks, error: tasksError } = await supabase
+        .from('tasks')
+        .select(`
+          id,
+          service_type,
+          status,
+          total_amount,
+          updated_at,
+          handymen:handyman_id (full_name)
+        `)
+        .eq('status', 'completed')
+        .order('updated_at', { ascending: false })
+        .limit(3);
 
-    if (!tasksError && recentTasks) {
+      if (!tasksError && tasks) {
+        recentTasks = tasks;
+      } else {
+        console.warn('Tasks query failed, trying fallback:', tasksError);
+        // Fallback: get tasks without handyman info
+        const { data: simpleTasks, error: simpleError } = await supabase
+          .from('tasks')
+          .select('id, service_type, status, total_amount, updated_at')
+          .eq('status', 'completed')
+          .order('updated_at', { ascending: false })
+          .limit(3);
+
+        if (!simpleError && simpleTasks) {
+          recentTasks = simpleTasks.map(task => ({
+            ...task,
+            handymen: { full_name: 'Unknown' }
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Error in tasks query:', err);
+      recentTasks = [];
+    }
+
+    if (recentTasks && recentTasks.length > 0) {
       recentTasks.forEach(task => {
         const handymanName = task.handymen?.full_name || 'Unknown';
         activities.push({
