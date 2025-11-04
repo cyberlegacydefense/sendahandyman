@@ -926,11 +926,10 @@ async function loadDashboardData() {
 // Load metrics
 async function loadMetrics() {
   try {
-    // Count active handymen
+    // Count all handymen (assuming no status filter needed)
     const { data: handymen, error: handymenError } = await supabase
       .from('handymen')
-      .select('id, status')
-      .eq('status', 'active');
+      .select('id');
 
     if (!handymenError) {
       document.getElementById('activeHandymenCount').textContent = handymen?.length || 0;
@@ -1278,7 +1277,7 @@ async function loadTasksData() {
         *,
         handymen:handyman_id (
           id,
-          name,
+          full_name,
           email,
           phone
         )
@@ -1321,7 +1320,7 @@ function renderTasksTable() {
       <td class="px-4 py-3">${task.service_type}</td>
       <td class="px-4 py-3">
         ${task.handymen ?
-          `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${task.handymen.name}</span>` :
+          `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${task.handymen.full_name}</span>` :
           `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Unassigned</span>`
         }
       </td>
@@ -1408,16 +1407,15 @@ async function openAssignModal(taskId = null) {
     // Load available handymen
     const { data: handymen, error } = await supabase
       .from('handymen')
-      .select('id, name, email, status, specialties')
-      .eq('status', 'active')
-      .order('name');
+      .select('id, full_name, email, specialties')
+      .order('full_name');
 
     if (error) throw error;
 
     const handymenSelect = document.getElementById('assignHandyman');
     handymenSelect.innerHTML = '<option value="">Select a handyman...</option>' +
       handymen.map(handyman =>
-        `<option value="${handyman.id}">${handyman.name} - ${handyman.specialties || 'General'}</option>`
+        `<option value="${handyman.id}">${handyman.full_name} - ${handyman.specialties || 'General'}</option>`
       ).join('');
 
     // Set modal title and behavior based on single vs bulk assignment
@@ -1555,7 +1553,7 @@ async function viewTaskDetails(taskId) {
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Assigned To</label>
-            <p class="text-sm text-slate-900">${task.handymen ? task.handymen.name : 'Unassigned'}</p>
+            <p class="text-sm text-slate-900">${task.handymen ? task.handymen.full_name : 'Unassigned'}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Created</label>
