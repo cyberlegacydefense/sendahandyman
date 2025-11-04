@@ -1349,38 +1349,51 @@ function renderQuotesTable() {
   `).join('');
 }
 
+// Global chart instances for cleanup
+let revenueChart = null;
+let conversionChart = null;
+
 // Load analytics data
 async function loadAnalyticsData() {
   console.log('📈 Loading analytics data...');
 
   try {
+    // Destroy existing charts before creating new ones
+    if (revenueChart) {
+      revenueChart.destroy();
+      revenueChart = null;
+    }
+    if (conversionChart) {
+      conversionChart.destroy();
+      conversionChart = null;
+    }
     // Get real revenue data from completed tasks
     const { data: completedTasks, error } = await supabase
       .from('tasks')
-      .select('final_amount, completed_at, created_at')
+      .select('total_amount, completed_at, created_at')
       .eq('status', 'completed')
-      .not('final_amount', 'is', null)
+      .not('total_amount', 'is', null)
       .order('completed_at', { ascending: false });
 
     if (error) {
       console.error('Error loading analytics data:', error);
-      // Fallback to fake data if real data fails
-      initializeCharts();
+      // Create charts with empty data if real data fails
+      createChartsWithData([]);
       return;
     }
 
     // Process real data for charts
-    initializeChartsWithRealData(completedTasks || []);
+    createChartsWithData(completedTasks || []);
 
   } catch (error) {
     console.error('Error in loadAnalyticsData:', error);
-    // Fallback to fake data
-    initializeCharts();
+    // Create charts with empty data
+    createChartsWithData([]);
   }
 }
 
-// Initialize charts with real data
-function initializeChartsWithRealData(completedTasks) {
+// Create charts with provided data
+function createChartsWithData(completedTasks) {
   // Process revenue data by week
   const weeks = [];
   const revenueData = [];
@@ -1404,7 +1417,7 @@ function initializeChartsWithRealData(completedTasks) {
           const completedDate = new Date(task.completed_at);
           return completedDate >= weekStart && completedDate < weekEnd;
         })
-        .reduce((sum, task) => sum + (parseFloat(task.final_amount) || 0), 0);
+        .reduce((sum, task) => sum + (parseFloat(task.total_amount) || 0), 0);
 
       revenueData.push(weekRevenue);
     }
@@ -1416,7 +1429,7 @@ function initializeChartsWithRealData(completedTasks) {
 
   // Revenue chart
   const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-  new Chart(revenueCtx, {
+  revenueChart = new Chart(revenueCtx, {
     type: 'line',
     data: {
       labels: weeks,
@@ -1440,7 +1453,7 @@ function initializeChartsWithRealData(completedTasks) {
 
   // Conversion chart
   const conversionCtx = document.getElementById('conversionChart').getContext('2d');
-  new Chart(conversionCtx, {
+  conversionChart = new Chart(conversionCtx, {
     type: 'doughnut',
     data: {
       labels: ['Converted', 'Pending', 'Expired'],
@@ -1514,11 +1527,17 @@ document.getElementById('createQuoteForm').addEventListener('submit', async (e) 
   }
 });
 
-// Initialize charts with fake data (fallback)
+// Initialize charts with fallback data (only used if analytics data fails)
 function initializeCharts() {
-  // Revenue chart with fake data
+  // Only initialize if charts don't already exist
+  if (revenueChart || conversionChart) {
+    console.log('Charts already initialized, skipping...');
+    return;
+  }
+
+  // Revenue chart with fallback data
   const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-  new Chart(revenueCtx, {
+  revenueChart = new Chart(revenueCtx, {
     type: 'line',
     data: {
       labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],

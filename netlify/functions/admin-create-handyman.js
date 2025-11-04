@@ -37,6 +37,24 @@ export const handler = async (event, context) => {
 
     console.log(`🔐 Admin creating handyman: ${email}`);
 
+    // Check if email already exists in handymen table
+    const { data: existingHandyman, error: checkError } = await supabase
+      .from('handymen')
+      .select('id, email')
+      .eq('email', email.toLowerCase())
+      .single();
+
+    if (existingHandyman) {
+      return {
+        statusCode: 409,
+        headers: cors(),
+        body: JSON.stringify({
+          error: "Email already exists",
+          details: `A handyman with email "${email}" already exists in the system`
+        })
+      };
+    }
+
     // Step 1: Create Supabase Auth user using service role
     const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
       email: email,
