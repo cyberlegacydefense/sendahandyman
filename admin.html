@@ -114,7 +114,7 @@
         <div class="bg-white rounded-lg p-6 shadow-soft">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-slate-600">Active Handymen</p>
+              <p class="text-sm text-slate-600">Completed Onboarding</p>
               <p id="activeHandymenCount" class="text-2xl font-bold text-green-600">-</p>
             </div>
             <div class="bg-green-100 p-3 rounded-lg">
@@ -932,13 +932,8 @@ async function loadMetrics() {
       .select('id, onboarding_completed, skills');
 
     if (!handymenError) {
-      const activeHandymen = handymen?.filter(h => {
-        const hasSkills = h.skills &&
-          ((Array.isArray(h.skills) && h.skills.length > 0) ||
-           (typeof h.skills === 'string' && h.skills.trim().length > 0));
-        return h.onboarding_completed && hasSkills;
-      }) || [];
-      document.getElementById('activeHandymenCount').textContent = activeHandymen.length;
+      const completedHandymen = handymen?.filter(h => h.onboarding_completed) || [];
+      document.getElementById('activeHandymenCount').textContent = completedHandymen.length;
     }
 
     // Count active tasks
@@ -1010,31 +1005,39 @@ async function loadHandymenData() {
   console.log('👥 Loading handymen data...');
 
   try {
+    console.log('🔍 Running handymen query...');
+
+    // First, try to get a count to see if RLS is blocking
+    const { count, error: countError } = await supabase
+      .from('handymen')
+      .select('*', { count: 'exact', head: true });
+
+    console.log('📊 Total handymen count (with RLS):', count);
+    if (countError) console.error('Count error:', countError);
+
     const { data: handymen, error } = await supabase
       .from('handymen')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Handymen query error:', error);
+      throw error;
+    }
 
     handymenData = handymen || [];
     console.log('📊 Loaded handymen:', handymenData.length, 'records');
 
     // Log status breakdown
-    const activeCount = handymenData.filter(h => {
-      const hasSkills = h.skills &&
-        ((Array.isArray(h.skills) && h.skills.length > 0) ||
-         (typeof h.skills === 'string' && h.skills.trim().length > 0));
-      return h.onboarding_completed && hasSkills;
-    }).length;
-    const incompleteCount = handymenData.length - activeCount;
-    console.log(`📊 Status breakdown: ${activeCount} active, ${incompleteCount} incomplete`);
+    const completedCount = handymenData.filter(h => h.onboarding_completed).length;
+    const pendingCount = handymenData.filter(h => !h.onboarding_completed).length;
+    console.log(`📊 Onboarding status: ${completedCount} completed, ${pendingCount} pending`);
 
     handymenData.forEach(h => {
       const hasSkills = h.skills &&
         ((Array.isArray(h.skills) && h.skills.length > 0) ||
          (typeof h.skills === 'string' && h.skills.trim().length > 0));
-      console.log(`👤 ${h.full_name}: onboarding=${h.onboarding_completed}, skills=${hasSkills} (${Array.isArray(h.skills) ? h.skills.length + ' items' : typeof h.skills})`);
+      console.log(`👤 ${h.full_name}: onboarding=${h.onboarding_completed ? 'COMPLETED' : 'PENDING'}, skills=${hasSkills ? 'SET' : 'NEEDS SKILLS'} (${Array.isArray(h.skills) ? h.skills.length + ' items' : typeof h.skills})`);
     });
 
     renderHandymenTable();
@@ -1358,31 +1361,16 @@ function initializeCharts() {
   });
 }
 
-// Get handyman status badge based on registration completion
+// Get handyman status badge based on ONBOARDING completion only
 function getHandymanStatusBadge(handyman) {
-  let status, statusClass, statusText;
+  let statusClass, statusText;
 
-  // Check if skills exist (array with items, or non-empty string)
-  const hasSkills = handyman.skills &&
-    ((Array.isArray(handyman.skills) && handyman.skills.length > 0) ||
-     (typeof handyman.skills === 'string' && handyman.skills.trim().length > 0));
-
-  if (handyman.onboarding_completed && hasSkills) {
-    status = 'active';
+  if (handyman.onboarding_completed) {
     statusClass = 'bg-green-100 text-green-800';
-    statusText = 'ACTIVE';
-  } else if (handyman.onboarding_completed && !hasSkills) {
-    status = 'incomplete';
-    statusClass = 'bg-orange-100 text-orange-800';
-    statusText = 'NEEDS SKILLS';
-  } else if (!handyman.onboarding_completed && hasSkills) {
-    status = 'incomplete';
-    statusClass = 'bg-orange-100 text-orange-800';
-    statusText = 'NEEDS ONBOARDING';
+    statusText = 'COMPLETED';
   } else {
-    status = 'pending';
     statusClass = 'bg-red-100 text-red-800';
-    statusText = 'INCOMPLETE';
+    statusText = 'PENDING';
   }
 
   return `<span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${statusText}</span>`;
@@ -1390,18 +1378,19 @@ function getHandymanStatusBadge(handyman) {
 
 // Format skills for display
 function formatSkills(skills) {
-  if (!skills) return 'No skills set';
+  if (!skills) return '<span class="text-red-600 font-medium">NEEDS SKILLS</span>';
 
   if (Array.isArray(skills)) {
-    if (skills.length === 0) return 'No skills set';
+    if (skills.length === 0) return '<span class="text-red-600 font-medium">NEEDS SKILLS</span>';
     return skills.join(', ').replace(/-/g, ' ');
   }
 
   if (typeof skills === 'string') {
-    return skills.trim() || 'No skills set';
+    const trimmed = skills.trim();
+    return trimmed || '<span class="text-red-600 font-medium">NEEDS SKILLS</span>';
   }
 
-  return 'No skills set';
+  return '<span class="text-red-600 font-medium">NEEDS SKILLS</span>';
 }
 
 // Helper functions
