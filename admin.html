@@ -1028,13 +1028,13 @@ async function loadMetrics() {
 
     const { data: completedTasks, error: revenueError } = await supabase
       .from('tasks')
-      .select('cost')
+      .select('total_amount')
       .eq('status', 'completed')
       .gte('updated_at', todayStart.toISOString())
       .lt('updated_at', todayEnd.toISOString());
 
     if (!revenueError && completedTasks) {
-      const todayRevenue = completedTasks.reduce((sum, task) => sum + (task.cost || 0), 0);
+      const todayRevenue = completedTasks.reduce((sum, task) => sum + (task.total_amount || 0), 0);
       document.getElementById('todayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
     } else {
       document.getElementById('todayRevenue').textContent = '$0.00';
@@ -1059,7 +1059,7 @@ async function loadRecentActivity() {
         id,
         service_type,
         status,
-        cost,
+        total_amount,
         updated_at,
         handymen:handyman_id (full_name)
       `)
@@ -1072,7 +1072,7 @@ async function loadRecentActivity() {
         const handymanName = task.handymen?.full_name || 'Unknown';
         activities.push({
           type: 'task_completed',
-          message: `${task.service_type} completed by ${handymanName} - $${task.cost || 0}`,
+          message: `${task.service_type} completed by ${handymanName} - $${task.total_amount || 0}`,
           time: formatTimeAgo(task.updated_at),
           timestamp: task.updated_at
         });

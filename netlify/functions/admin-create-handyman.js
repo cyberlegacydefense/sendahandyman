@@ -42,9 +42,11 @@ export const handler = async (event, context) => {
       .from('handymen')
       .select('id, email')
       .eq('email', email.toLowerCase())
-      .single();
+      .maybeSingle(); // Use maybeSingle() to handle no results gracefully
 
+    // If we found an existing handyman with this email
     if (existingHandyman) {
+      console.log(`❌ Email already exists: ${email}`);
       return {
         statusCode: 409,
         headers: cors(),
@@ -53,6 +55,11 @@ export const handler = async (event, context) => {
           details: `A handyman with email "${email}" already exists in the system`
         })
       };
+    }
+
+    // Log the check error for debugging (but continue if it's just "no results")
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.log('Email check error (non-fatal):', checkError);
     }
 
     // Step 1: Create Supabase Auth user using service role
