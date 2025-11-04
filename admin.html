@@ -669,12 +669,18 @@
 
         <div>
           <label class="block text-sm font-semibold mb-1">Email</label>
-          <input type="email" id="handymanEmail" required class="w-full border border-slate-200 rounded-lg px-3 py-2">
+          <input type="email" id="handymanEmail" required class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="user@example.com">
+          <div class="text-xs text-slate-500 mt-1">Must be a valid email format (e.g., name@domain.com)</div>
         </div>
 
         <div>
           <label class="block text-sm font-semibold mb-1">Password</label>
-          <input type="password" id="handymanPassword" required minlength="6" class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="Minimum 6 characters">
+          <div class="relative">
+            <input type="password" id="handymanPassword" required minlength="6" class="w-full border border-slate-200 rounded-lg px-3 py-2 pr-10" placeholder="Minimum 6 characters">
+            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 hover:text-slate-600" onclick="togglePasswordVisibility()">
+              <span id="passwordToggleIcon">👁️</span>
+            </button>
+          </div>
         </div>
 
         <div>
@@ -1847,17 +1853,49 @@ document.getElementById('selectAllTasks').addEventListener('change', (e) => {
 function closeAddHandymanModal() {
   document.getElementById('addHandymanModal').classList.add('hidden');
   document.getElementById('addHandymanForm').reset();
+  // Reset password visibility
+  const passwordInput = document.getElementById('handymanPassword');
+  const toggleIcon = document.getElementById('passwordToggleIcon');
+  passwordInput.type = 'password';
+  toggleIcon.textContent = '👁️';
+}
+
+// Toggle password visibility
+function togglePasswordVisibility() {
+  const passwordInput = document.getElementById('handymanPassword');
+  const toggleIcon = document.getElementById('passwordToggleIcon');
+
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleIcon.textContent = '🙈';
+  } else {
+    passwordInput.type = 'password';
+    toggleIcon.textContent = '👁️';
+  }
 }
 
 // Add Handyman form handler
 document.getElementById('addHandymanForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById('handymanEmail').value;
+  const email = document.getElementById('handymanEmail').value.trim();
   const password = document.getElementById('handymanPassword').value;
-  const fullName = document.getElementById('handymanFullName').value;
-  const phone = document.getElementById('handymanPhone').value;
-  const city = document.getElementById('handymanCity').value;
+  const fullName = document.getElementById('handymanFullName').value.trim();
+  const phone = document.getElementById('handymanPhone').value.trim();
+  const city = document.getElementById('handymanCity').value.trim();
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Please enter a valid email address (e.g., name@domain.com)');
+    return;
+  }
+
+  // Check if email has proper domain
+  if (email.includes('@test.') && !email.includes('@test.com')) {
+    alert('Email domain appears incomplete. Please use a full domain like @test.com or @gmail.com');
+    return;
+  }
 
   try {
     // Step 1: Create Supabase Auth user
@@ -1873,7 +1911,19 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       }
     });
 
-    if (authError) throw new Error(`Auth creation failed: ${authError.message}`);
+    if (authError) {
+      console.error('Auth error details:', authError);
+
+      // Provide helpful error messages
+      if (authError.message.includes('invalid')) {
+        throw new Error(`Email validation failed: "${email}" is not accepted by Supabase.\n\nTry using:\n• A real email domain (@gmail.com, @outlook.com, etc.)\n• Or @example.com for testing\n\nOriginal error: ${authError.message}`);
+      } else if (authError.message.includes('already registered')) {
+        throw new Error(`Email "${email}" is already registered. Please use a different email address.`);
+      } else {
+        throw new Error(`Auth creation failed: ${authError.message}`);
+      }
+    }
+
     if (!authUser.user) throw new Error('No auth user returned');
 
     console.log('✅ Auth user created:', authUser.user.id);
