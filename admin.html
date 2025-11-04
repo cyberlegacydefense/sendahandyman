@@ -2069,22 +2069,26 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
     console.log('User session verified, calling Edge Function...');
 
-    // Call the Supabase Edge Function
-    const { data, error } = await supabase.functions.invoke('create-handyman', {
-      body: {
+    // Call the Edge Function directly with fetch (avoid automatic content-type)
+    const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'apikey': supabase.supabaseKey,
+      },
+      body: JSON.stringify({
         name: fullName,
         email: email,
         phone: phone || null
-      },
-      headers: {
-        Authorization: `Bearer ${session.access_token}`,
-      },
+      })
     });
 
-    if (error) {
-      console.error('Edge Function error:', error);
-      throw new Error(`Function call failed: ${error.message}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Edge Function call failed');
     }
+
+    const data = await response.json();
 
     if (!data.success) {
       throw new Error(data.error || 'Unknown error occurred');
