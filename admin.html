@@ -673,6 +673,11 @@
         </div>
 
         <div>
+          <label class="block text-sm font-semibold mb-1">Password</label>
+          <input type="password" id="handymanPassword" required minlength="6" class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="Minimum 6 characters">
+        </div>
+
+        <div>
           <label class="block text-sm font-semibold mb-1">Phone</label>
           <input type="tel" id="handymanPhone" class="w-full border border-slate-200 rounded-lg px-3 py-2">
         </div>
@@ -1819,6 +1824,11 @@ document.getElementById('quickAddHandyman').addEventListener('click', () => {
   document.getElementById('addHandymanModal').classList.remove('hidden');
 });
 
+// Add event listener for the "Add New Handyman" button in Handyman Management tab
+document.getElementById('addNewHandyman').addEventListener('click', () => {
+  document.getElementById('addHandymanModal').classList.remove('hidden');
+});
+
 // Event listeners for bulk task assignment
 document.getElementById('assignBulkTasks').addEventListener('click', () => {
   quickAssignSelected();
@@ -1843,38 +1853,67 @@ function closeAddHandymanModal() {
 document.getElementById('addHandymanForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const formData = {
-    full_name: document.getElementById('handymanFullName').value,
-    email: document.getElementById('handymanEmail').value,
-    phone: document.getElementById('handymanPhone').value,
-    city: document.getElementById('handymanCity').value,
-    hourly_rate: 64.00, // Default rate
-    onboarding_completed: false,
-    is_active: true
-  };
-
-  // Process skills
-  const skillsInput = document.getElementById('handymanSkills').value;
-  if (skillsInput.trim()) {
-    formData.skills = skillsInput.split(',').map(skill => skill.trim().toLowerCase().replace(/\s+/g, '-'));
-  }
+  const email = document.getElementById('handymanEmail').value;
+  const password = document.getElementById('handymanPassword').value;
+  const fullName = document.getElementById('handymanFullName').value;
+  const phone = document.getElementById('handymanPhone').value;
+  const city = document.getElementById('handymanCity').value;
 
   try {
-    const { data, error } = await supabase
+    // Step 1: Create Supabase Auth user
+    console.log('Creating Supabase Auth user...');
+    const { data: authUser, error: authError } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          full_name: fullName,
+          user_type: 'handyman'
+        }
+      }
+    });
+
+    if (authError) throw new Error(`Auth creation failed: ${authError.message}`);
+    if (!authUser.user) throw new Error('No auth user returned');
+
+    console.log('✅ Auth user created:', authUser.user.id);
+
+    // Step 2: Create handyman record with the auth user ID
+    const handymanData = {
+      user_id: authUser.user.id, // Link to auth user
+      full_name: fullName,
+      email: email,
+      phone: phone,
+      city: city,
+      hourly_rate: 64.00,
+      onboarding_completed: false,
+      is_active: true
+    };
+
+    // Process skills
+    const skillsInput = document.getElementById('handymanSkills').value;
+    if (skillsInput.trim()) {
+      handymanData.skills = skillsInput.split(',').map(skill => skill.trim().toLowerCase().replace(/\s+/g, '-'));
+    }
+
+    const { data: handyman, error: handymanError } = await supabase
       .from('handymen')
-      .insert(formData)
+      .insert(handymanData)
       .select()
       .single();
 
-    if (error) throw error;
+    if (handymanError) throw new Error(`Handyman creation failed: ${handymanError.message}`);
 
-    alert('Handyman added successfully!');
+    console.log('✅ Handyman record created:', handyman.id);
+
+    alert(`Handyman added successfully!\n\nAuth User ID: ${authUser.user.id}\nHandyman ID: ${handyman.id}\n\nThey can now log in with:\nEmail: ${email}\nPassword: (the password you set)`);
+
     closeAddHandymanModal();
     loadHandymenData(); // Refresh the table
 
   } catch (error) {
-    console.error('Error adding handyman:', error);
-    alert('Failed to add handyman: ' + error.message);
+    console.error('❌ Error adding handyman:', error);
+    alert(`Failed to add handyman: ${error.message}`);
   }
 });
 
