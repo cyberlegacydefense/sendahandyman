@@ -652,8 +652,8 @@
 
 <script>
 // Initialize Supabase
-const supabaseUrl = 'https://znyluowpkrhgqwhrvqjj.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpueWx1b3dwa3JoZ3F3aHJ2cWpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzI1NjQxNTksImV4cCI6MjA0ODE0MDE1OX0.nLkJ_qW5TvzD3Qp-S-rT7_nCJQjKAzUgNY5jzIRBAGI';
+const supabaseUrl = 'https://ynbhskdiplwabsksamxa.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 let currentAdminUser = null;
@@ -781,34 +781,28 @@ async function checkExistingAuth() {
 
       if (!error && adminUser) {
         console.log('✅ Admin access confirmed:', adminUser.role);
-
-        // Set current admin user
-        currentAdminUser = {
-          id: adminUser.id,
-          email: adminUser.email,
-          name: adminUser.full_name,
-          role: adminUser.role
-        };
-
-        // Update last login time
-        await supabase
-          .from('admin_users')
-          .update({ last_login_at: new Date().toISOString() })
-          .eq('id', adminUser.id);
-
-        // Show dashboard directly
-        document.getElementById('adminLoginPage').classList.add('hidden');
-        document.getElementById('adminDashboard').classList.remove('hidden');
-        document.getElementById('adminUserName').textContent = `${currentAdminUser.name} (${currentAdminUser.role})`;
-
-        // Load dashboard data
-        loadDashboardData();
-        return;
-      } else {
-        console.log('❌ User authenticated but no admin access');
-        showAccessDeniedMessage();
+        await setupAdminUser(adminUser);
         return;
       }
+
+      // Fallback: check by email for existing records
+      console.log('🔄 Trying email-based lookup as fallback...');
+      const { data: adminUserByEmail, error: emailError } = await supabase
+        .from('admin_users')
+        .select('id, email, full_name, role, is_active')
+        .eq('email', user.email.toLowerCase())
+        .eq('is_active', true)
+        .single();
+
+      if (!emailError && adminUserByEmail) {
+        console.log('✅ Admin access confirmed by email:', adminUserByEmail.role);
+        await setupAdminUser(adminUserByEmail);
+        return;
+      }
+
+      console.log('❌ User authenticated but no admin access');
+      showAccessDeniedMessage();
+      return;
     }
 
     console.log('ℹ️ No existing authentication found');
@@ -819,6 +813,31 @@ async function checkExistingAuth() {
     console.error('❌ Error checking existing auth:', error);
     document.getElementById('adminLoginPage').classList.remove('hidden');
   }
+}
+
+// Helper function to setup admin user and show dashboard
+async function setupAdminUser(adminUser) {
+  // Set current admin user
+  currentAdminUser = {
+    id: adminUser.id,
+    email: adminUser.email,
+    name: adminUser.full_name,
+    role: adminUser.role
+  };
+
+  // Update last login time
+  await supabase
+    .from('admin_users')
+    .update({ last_login_at: new Date().toISOString() })
+    .eq('id', adminUser.id);
+
+  // Show dashboard directly
+  document.getElementById('adminLoginPage').classList.add('hidden');
+  document.getElementById('adminDashboard').classList.remove('hidden');
+  document.getElementById('adminUserName').textContent = `${currentAdminUser.name} (${currentAdminUser.role})`;
+
+  // Load dashboard data
+  loadDashboardData();
 }
 
 // Show access denied message instead of login form
