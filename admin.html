@@ -1007,9 +1007,38 @@ async function loadMetrics() {
       document.getElementById('activeTasksCount').textContent = tasks?.length || 0;
     }
 
-    // Mock data for now - replace with actual queries
-    document.getElementById('pendingQuotesCount').textContent = '12';
-    document.getElementById('todayRevenue').textContent = '$2,450';
+    // Count pending quotes from quotes table
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quotes')
+      .select('id, status')
+      .eq('status', 'pending');
+
+    if (!quotesError) {
+      document.getElementById('pendingQuotesCount').textContent = quotes?.length || 0;
+    } else {
+      console.warn('Quotes table may not exist:', quotesError);
+      document.getElementById('pendingQuotesCount').textContent = '0';
+    }
+
+    // Calculate today's revenue from completed tasks
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const todayEnd = new Date(todayStart);
+    todayEnd.setDate(todayEnd.getDate() + 1);
+
+    const { data: completedTasks, error: revenueError } = await supabase
+      .from('tasks')
+      .select('cost')
+      .eq('status', 'completed')
+      .gte('updated_at', todayStart.toISOString())
+      .lt('updated_at', todayEnd.toISOString());
+
+    if (!revenueError && completedTasks) {
+      const todayRevenue = completedTasks.reduce((sum, task) => sum + (task.cost || 0), 0);
+      document.getElementById('todayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
+    } else {
+      document.getElementById('todayRevenue').textContent = '$0.00';
+    }
 
   } catch (error) {
     console.error('Error loading metrics:', error);
@@ -1020,27 +1049,127 @@ async function loadMetrics() {
 async function loadRecentActivity() {
   const activityContainer = document.getElementById('recentActivity');
 
-  // Mock recent activity - replace with actual data
-  const activities = [
-    { type: 'task_completed', message: 'Task #1234 completed by John Smith', time: '10 minutes ago' },
-    { type: 'quote_created', message: 'New quote created for TV Mount - $180', time: '25 minutes ago' },
-    { type: 'handyman_joined', message: 'Mike Johnson joined as handyman', time: '1 hour ago' },
-    { type: 'payment_processed', message: 'Payment processed for task #1233 - $220', time: '2 hours ago' }
-  ];
+  try {
+    const activities = [];
 
-  activityContainer.innerHTML = activities.map(activity => `
-    <div class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg">
-      <div class="text-lg">
-        ${activity.type === 'task_completed' ? '✅' :
-          activity.type === 'quote_created' ? '💰' :
-          activity.type === 'handyman_joined' ? '👷' : '💳'}
+    // Get recent completed tasks
+    const { data: recentTasks, error: tasksError } = await supabase
+      .from('tasks')
+      .select(`
+        id,
+        service_type,
+        status,
+        cost,
+        updated_at,
+        handymen:handyman_id (full_name)
+      `)
+      .eq('status', 'completed')
+      .order('updated_at', { ascending: false })
+      .limit(3);
+
+    if (!tasksError && recentTasks) {
+      recentTasks.forEach(task => {
+        const handymanName = task.handymen?.full_name || 'Unknown';
+        activities.push({
+          type: 'task_completed',
+          message: `${task.service_type} completed by ${handymanName} - $${task.cost || 0}`,
+          time: formatTimeAgo(task.updated_at),
+          timestamp: task.updated_at
+        });
+      });
+    }
+
+    // Get recent quotes
+    const { data: recentQuotes, error: quotesError } = await supabase
+      .from('quotes')
+      .select('quote_id, service_type, custom_amount, created_at')
+      .order('created_at', { ascending: false })
+      .limit(2);
+
+    if (!quotesError && recentQuotes) {
+      recentQuotes.forEach(quote => {
+        activities.push({
+          type: 'quote_created',
+          message: `New quote created for ${quote.service_type} - $${quote.custom_amount}`,
+          time: formatTimeAgo(quote.created_at),
+          timestamp: quote.created_at
+        });
+      });
+    }
+
+    // Get recent handymen who joined
+    const { data: recentHandymen, error: handymenError } = await supabase
+      .from('handymen')
+      .select('full_name, created_at')
+      .order('created_at', { ascending: false })
+      .limit(2);
+
+    if (!handymenError && recentHandymen) {
+      recentHandymen.forEach(handyman => {
+        activities.push({
+          type: 'handyman_joined',
+          message: `${handyman.full_name} joined as handyman`,
+          time: formatTimeAgo(handyman.created_at),
+          timestamp: handyman.created_at
+        });
+      });
+    }
+
+    // Sort all activities by time (newest first) and limit to 5
+    activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    const displayActivities = activities.slice(0, 5);
+
+    // If no real activities, show a placeholder
+    if (displayActivities.length === 0) {
+      activityContainer.innerHTML = `
+        <div class="flex items-center justify-center p-8 text-gray-500">
+          <div class="text-center">
+            <p class="text-sm">No recent activity</p>
+            <p class="text-xs mt-1">Activity will appear here as tasks are completed</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    activityContainer.innerHTML = displayActivities.map(activity => `
+      <div class="flex items-center gap-3 p-3 border border-slate-200 rounded-lg">
+        <div class="text-lg">
+          ${activity.type === 'task_completed' ? '✅' :
+            activity.type === 'quote_created' ? '💰' :
+            activity.type === 'handyman_joined' ? '👷' : '💳'}
+        </div>
+        <div class="flex-1">
+          <p class="text-sm font-medium">${activity.message}</p>
+          <p class="text-xs text-slate-500">${activity.time}</p>
+        </div>
       </div>
-      <div class="flex-1">
-        <p class="text-sm font-medium">${activity.message}</p>
-        <p class="text-xs text-slate-500">${activity.time}</p>
+    `).join('');
+
+  } catch (error) {
+    console.error('Error loading recent activity:', error);
+    activityContainer.innerHTML = `
+      <div class="flex items-center justify-center p-8 text-red-500">
+        <p class="text-sm">Error loading activity data</p>
       </div>
-    </div>
-  `).join('');
+    `;
+  }
+}
+
+// Helper function to format time ago
+function formatTimeAgo(timestamp) {
+  const now = new Date();
+  const time = new Date(timestamp);
+  const diffMs = now - time;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  return time.toLocaleDateString();
 }
 
 // Load section-specific data
@@ -1883,6 +2012,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   const fullName = document.getElementById('handymanFullName').value.trim();
   const phone = document.getElementById('handymanPhone').value.trim();
   const city = document.getElementById('handymanCity').value.trim();
+  const skills = document.getElementById('handymanSkills').value.trim();
 
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1891,80 +2021,211 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
     return;
   }
 
-  // Check if email has proper domain
-  if (email.includes('@test.') && !email.includes('@test.com')) {
-    alert('Email domain appears incomplete. Please use a full domain like @test.com or @gmail.com');
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters long');
     return;
   }
 
   try {
-    // Step 1: Create Supabase Auth user
-    console.log('Creating Supabase Auth user...');
-    const { data: authUser, error: authError } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          full_name: fullName,
-          user_type: 'handyman'
-        }
-      }
+    console.log('🔐 Creating handyman via admin function...');
+
+    // Call the admin function to create user + handyman
+    const response = await fetch('/.netlify/functions/admin-create-handyman', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        full_name: fullName,
+        phone: phone,
+        city: city,
+        skills: skills
+      })
     });
 
-    if (authError) {
-      console.error('Auth error details:', authError);
+    const result = await response.json();
 
-      // Provide helpful error messages
-      if (authError.message.includes('invalid')) {
-        throw new Error(`Email validation failed: "${email}" is not accepted by Supabase.\n\nTry using:\n• A real email domain (@gmail.com, @outlook.com, etc.)\n• Or @example.com for testing\n\nOriginal error: ${authError.message}`);
-      } else if (authError.message.includes('already registered')) {
-        throw new Error(`Email "${email}" is already registered. Please use a different email address.`);
-      } else {
-        throw new Error(`Auth creation failed: ${authError.message}`);
-      }
+    if (!response.ok) {
+      throw new Error(result.details || result.error || 'Failed to create handyman');
     }
 
-    if (!authUser.user) throw new Error('No auth user returned');
+    console.log('✅ Handyman created successfully:', result);
 
-    console.log('✅ Auth user created:', authUser.user.id);
-
-    // Step 2: Create handyman record with the auth user ID
-    const handymanData = {
-      user_id: authUser.user.id, // Link to auth user
-      full_name: fullName,
-      email: email,
-      phone: phone,
-      city: city,
-      hourly_rate: 64.00,
-      onboarding_completed: false,
-      is_active: true
-    };
-
-    // Process skills
-    const skillsInput = document.getElementById('handymanSkills').value;
-    if (skillsInput.trim()) {
-      handymanData.skills = skillsInput.split(',').map(skill => skill.trim().toLowerCase().replace(/\s+/g, '-'));
-    }
-
-    const { data: handyman, error: handymanError } = await supabase
-      .from('handymen')
-      .insert(handymanData)
-      .select()
-      .single();
-
-    if (handymanError) throw new Error(`Handyman creation failed: ${handymanError.message}`);
-
-    console.log('✅ Handyman record created:', handyman.id);
-
-    alert(`Handyman added successfully!\n\nAuth User ID: ${authUser.user.id}\nHandyman ID: ${handyman.id}\n\nThey can now log in with:\nEmail: ${email}\nPassword: (the password you set)`);
+    // Show PostMyStyle-style success modal
+    showHandymanCreatedModal(fullName, email, password, result.auth_user_id, result.handyman_id);
 
     closeAddHandymanModal();
     loadHandymenData(); // Refresh the table
 
   } catch (error) {
-    console.error('❌ Error adding handyman:', error);
-    alert(`Failed to add handyman: ${error.message}`);
+    console.error('❌ Error creating handyman:', error);
+    alert(`Failed to create handyman: ${error.message}`);
   }
+});
+
+// PostMyStyle-style success modal for handyman creation
+function showHandymanCreatedModal(fullName, email, password, authUserId, handymanId) {
+  // Create modal HTML dynamically
+  const modalHtml = `
+    <div id="handymanCreatedModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+        <div class="text-center">
+          <!-- Success Icon -->
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+
+          <!-- Title -->
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Handyman Created Successfully!</h3>
+          <p class="text-sm text-gray-500 mb-6">${fullName} has been added to the system</p>
+
+          <!-- Credentials Section -->
+          <div class="bg-gray-50 rounded-lg p-4 mb-4">
+            <h4 class="text-sm font-medium text-gray-900 mb-3">Account Credentials</h4>
+
+            <!-- Email Row -->
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Email:</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-mono bg-white px-2 py-1 rounded border">${email}</span>
+                <button onclick="copyToClipboard('${email}')" class="text-blue-600 hover:text-blue-800">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Password Row -->
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm text-gray-600">Password:</span>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-mono bg-white px-2 py-1 rounded border">${password}</span>
+                <button onclick="copyToClipboard('${password}')" class="text-blue-600 hover:text-blue-800">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- IDs for reference -->
+            <div class="mt-3 pt-3 border-t border-gray-200">
+              <div class="text-xs text-gray-500">
+                <div>Auth ID: ${authUserId}</div>
+                <div>Handyman ID: ${handymanId}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps -->
+          <div class="bg-blue-50 rounded-lg p-4 mb-4">
+            <h4 class="text-sm font-medium text-blue-900 mb-2">Next Steps</h4>
+            <ul class="text-sm text-blue-800 space-y-1 text-left">
+              <li>• Share credentials with ${fullName}</li>
+              <li>• Direct them to <span class="font-mono">sendahandyman.com/dashboard</span></li>
+              <li>• They need to complete onboarding process</li>
+              <li>• Skills and profile setup required</li>
+            </ul>
+          </div>
+
+          <!-- Copy All Button -->
+          <button onclick="copyAllCredentials('${email}', '${password}')"
+                  class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 mb-3">
+            📋 Copy All Credentials
+          </button>
+
+          <!-- Close Button -->
+          <button onclick="closeHandymanCreatedModal()"
+                  class="w-full bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition duration-200">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Remove existing modal if present
+  const existingModal = document.getElementById('handymanCreatedModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  // Add modal to DOM
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// Copy functions for the success modal
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    // Show brief success feedback
+    const event = new CustomEvent('showToast', {
+      detail: { message: 'Copied to clipboard!', type: 'success' }
+    });
+    window.dispatchEvent(event);
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+    // Fallback - show alert
+    alert('Copied: ' + text);
+  });
+}
+
+function copyAllCredentials(email, password) {
+  const credentials = `Handyman Account Credentials:
+Email: ${email}
+Password: ${password}
+Dashboard: sendahandyman.com/dashboard
+
+Please complete your onboarding process after logging in.`;
+
+  navigator.clipboard.writeText(credentials).then(() => {
+    const event = new CustomEvent('showToast', {
+      detail: { message: 'All credentials copied to clipboard!', type: 'success' }
+    });
+    window.dispatchEvent(event);
+  }).catch(err => {
+    console.error('Failed to copy: ', err);
+    alert('Credentials copied!');
+  });
+}
+
+function closeHandymanCreatedModal() {
+  const modal = document.getElementById('handymanCreatedModal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+// Simple toast notification system for copy feedback
+window.addEventListener('showToast', (e) => {
+  const { message, type } = e.detail;
+
+  // Remove existing toast
+  const existingToast = document.getElementById('copyToast');
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Create toast
+  const toast = document.createElement('div');
+  toast.id = 'copyToast';
+  toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white text-sm font-medium ${
+    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  } transform transition-all duration-300`;
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+
+  // Auto remove after 2 seconds
+  setTimeout(() => {
+    if (toast) {
+      toast.remove();
+    }
+  }, 2000);
 });
 
 console.log('🔐 Admin dashboard loaded');
