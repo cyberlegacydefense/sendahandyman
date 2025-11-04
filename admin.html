@@ -1071,10 +1071,10 @@ async function loadRecentActivity() {
         recentTasks = tasks;
       } else {
         console.warn('Tasks query failed, trying fallback:', tasksError);
-        // Fallback: get tasks without handyman info
+        // Fallback: get tasks with minimal columns (no service_type)
         const { data: simpleTasks, error: simpleError } = await supabase
           .from('tasks')
-          .select('id, service_type, status, total_amount, updated_at')
+          .select('id, status, total_amount, updated_at')
           .eq('status', 'completed')
           .order('updated_at', { ascending: false })
           .limit(3);
@@ -1082,6 +1082,7 @@ async function loadRecentActivity() {
         if (!simpleError && simpleTasks) {
           recentTasks = simpleTasks.map(task => ({
             ...task,
+            service_type: 'Task', // Default service type
             handymen: { full_name: 'Unknown' }
           }));
         }
