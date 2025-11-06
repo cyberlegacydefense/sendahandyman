@@ -2069,12 +2069,13 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
     console.log('User session verified, calling Edge Function...');
 
-    // Call the Edge Function directly with fetch (avoid automatic content-type)
+    // Call the Edge Function directly with fetch
     const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
         'apikey': supabase.supabaseKey,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         name: fullName,
@@ -2084,8 +2085,16 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Edge Function call failed');
+      const errorText = await response.text();
+      console.error('❌ Edge Function error response:', errorText);
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        console.error('❌ Failed to parse error response as JSON:', e);
+        throw new Error(`Edge Function call failed (${response.status}): ${errorText}`);
+      }
+      throw new Error(errorData.error || errorData.details || 'Edge Function call failed');
     }
 
     const data = await response.json();
