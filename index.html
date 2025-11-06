@@ -800,6 +800,84 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Premium Move-Out Removal Service -->
+            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="premium_moveout">
+                <div class="service-header p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg">🏠 Premium Move-Out Removal (Includes Patching & Cleanup)</h3>
+                            <p class="text-sm text-slate-600">~3.0 hr base • Starting at $300</p>
+                        </div>
+                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                    </div>
+                </div>
+                <div class="service-details hidden border-t border-slate-100">
+                    <div class="p-4 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-semibold text-slate-800 mb-2">✅ What's Included:</h4>
+                                <ul class="text-sm text-slate-600 space-y-1">
+                                    <li>• Wall hole patching & repair</li>
+                                    <li>• Paint touch-ups & spot painting</li>
+                                    <li>• Fixture removal & restoration</li>
+                                    <li>• Deep cleaning & sanitization</li>
+                                    <li>• Deposit recovery optimization</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-800 mb-2">⏱️ Time Estimate:</h4>
+                                <ul class="text-sm text-slate-600 space-y-1">
+                                    <li>• Studio/1BR: 3-4 hours</li>
+                                    <li>• 2BR: 4-5 hours</li>
+                                    <li>• 3BR+: 5-7 hours</li>
+                                    <li>• Additional rooms: +1-2 hrs each</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-slate-800">🔧 Add-On Services:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+                                    <span>Full room repainting (per room)</span>
+                                    <span class="font-semibold text-green-600">+$75</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+                                    <span>Carpet cleaning and deodorizing</span>
+                                    <span class="font-semibold text-green-600">+$50</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+                                    <span>Kitchen appliance deep clean</span>
+                                    <span class="font-semibold text-green-600">+$40</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+                                    <span>Bathroom tile & grout restoration</span>
+                                    <span class="font-semibold text-green-600">+$35</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+                                    <span>Hardwood floor refinishing (per room)</span>
+                                    <span class="font-semibold text-green-600">+$60</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-slate-50 rounded">
+                                    <span>Window cleaning (interior/exterior)</span>
+                                    <span class="font-semibold text-green-600">+$25</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <p class="text-sm text-green-700"><strong>Perfect for:</strong> Landlords preparing units for new tenants, renters maximizing security deposit returns, property managers handling turnovers, and anyone needing comprehensive move-out restoration.</p>
+                        </div>
+                        <div class="mt-6">
+                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="premium_moveout">
+                                Select Premium Move-Out Service
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="general_handyman">
                 <div class="service-header p-4">
                     <div class="flex items-center justify-between">
@@ -1702,6 +1780,53 @@
                         { value: 'drywall', label: 'Standard drywall', addon: 0 },
                         { value: 'masonry', label: 'Concrete/masonry', addon: 40 },
                         { value: 'unsure', label: 'Not sure', addon: 0 }
+                    ]
+                }
+            ]
+        },
+        premium_moveout: {
+            hours: 3.0,
+            label: "Premium Move-Out Removal (Includes Patching & Cleanup)",
+            questions: [
+                {
+                    id: 'property_size',
+                    label: 'What size is the property?',
+                    options: [
+                        { value: 'studio', label: 'Studio/1 Bedroom', addon: 0 },
+                        { value: '2br', label: '2 Bedroom', addon: 80 },
+                        { value: '3br', label: '3 Bedroom', addon: 160 },
+                        { value: '4br', label: '4+ Bedroom', addon: 240 }
+                    ]
+                },
+                {
+                    id: 'damage_level',
+                    label: 'How much damage needs repair?',
+                    options: [
+                        { value: 'light', label: 'Light (few nail holes, minor touch-ups)', addon: 0 },
+                        { value: 'moderate', label: 'Moderate (multiple holes, some paint)', addon: 50 },
+                        { value: 'heavy', label: 'Heavy (major repairs, extensive work)', addon: 120 }
+                    ]
+                },
+                {
+                    id: 'additional_services',
+                    label: 'Any additional services needed?',
+                    options: [
+                        { value: 'carpet_clean', label: 'Carpet cleaning and deodorizing', addon: 50 },
+                        { value: 'full_paint', label: 'Full room repainting', addon: 75 },
+                        { value: 'kitchen_deep', label: 'Kitchen appliance deep clean', addon: 40 },
+                        { value: 'bathroom_restore', label: 'Bathroom tile & grout restoration', addon: 35 },
+                        { value: 'floor_refinish', label: 'Hardwood floor refinishing', addon: 60 },
+                        { value: 'window_clean', label: 'Window cleaning (interior/exterior)', addon: 25 },
+                        { value: 'none', label: 'None needed', addon: 0 }
+                    ]
+                },
+                {
+                    id: 'timeline',
+                    label: 'When do you need this completed?',
+                    options: [
+                        { value: 'flexible', label: 'Flexible timing', addon: 0 },
+                        { value: 'soon', label: 'Within 1-2 weeks', addon: 0 },
+                        { value: 'urgent', label: 'ASAP (rush job)', addon: 50 }
                     ]
                 }
             ]
@@ -3419,6 +3544,7 @@
             'appliance_hookup': { name: '⚡ Appliance Hookup (W/D/DW)', price: '~2.0 hr base • Starting at $160' },
             'furniture_assembly': { name: '🪑 Furniture Assembly (S–M)', price: '~2.0 hr base • Starting at $160' },
             'closet_organizer': { name: '👕 Closet Organizer Install', price: '~2.5 hr base • Starting at $200' },
+            'premium_moveout': { name: '🏠 Premium Move-Out Removal (Includes Patching & Cleanup)', price: '~3.0 hr base • Starting at $300' },
             'general_handyman': { name: '🔧 General Handyman (3+ hours)', price: '~3 hr minimum • Starting at $240' }
         };
         return serviceMap[taskKey] || { name: 'Unknown Service', price: 'Price varies' };
