@@ -280,12 +280,13 @@
                 <th class="text-left py-3 px-4 font-semibold text-sm">Amount</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Status</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Created</th>
+                <th class="text-left py-3 px-4 font-semibold text-sm">Quote Link</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Actions</th>
               </tr>
             </thead>
             <tbody id="quotesTableBody">
               <tr>
-                <td colspan="7" class="text-center py-8 text-slate-500">Loading quotes...</td>
+                <td colspan="8" class="text-center py-8 text-slate-500">Loading quotes...</td>
               </tr>
             </tbody>
           </table>
@@ -512,6 +513,39 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Quote Success Modal -->
+<div id="quoteSuccessModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg max-w-lg w-full">
+    <div class="p-6">
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+          <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-green-600 mb-2">Quote Created Successfully!</h3>
+        <p class="text-slate-600 mb-4">Your quote has been created and is ready to send to the customer.</p>
+      </div>
+
+      <div class="bg-slate-50 rounded-lg p-4 mb-6">
+        <label class="block text-sm font-semibold mb-2">Quote Link:</label>
+        <div class="flex gap-2">
+          <input type="text" id="quoteSuccessLink" readonly class="flex-1 bg-white border border-slate-200 rounded px-3 py-2 text-sm font-mono text-slate-600">
+          <button id="copyQuoteSuccessLink" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-semibold">
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button id="closeQuoteSuccessModal" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-semibold">
+          Got it!
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1341,7 +1375,7 @@ function renderQuotesTable() {
   const tbody = document.getElementById('quotesTableBody');
 
   if (quotesData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-500">No quotes found</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-500">No quotes found</td></tr>';
     return;
   }
 
@@ -1365,8 +1399,15 @@ function renderQuotesTable() {
         <div class="text-sm">${new Date(quote.created_at).toLocaleDateString()}</div>
       </td>
       <td class="py-3 px-4">
+        <div class="flex items-center gap-2">
+          <input type="text" value="${window.location.origin}/quote.html?token=${quote.quote_token}" readonly class="flex-1 text-xs font-mono bg-slate-50 border border-slate-200 rounded px-2 py-1 max-w-48">
+          <button onclick="copyQuoteLink('${quote.quote_token}')" class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 border border-blue-200 rounded hover:bg-blue-50" title="Copy link">
+            📋
+          </button>
+        </div>
+      </td>
+      <td class="py-3 px-4">
         <div class="flex gap-2">
-          <button onclick="copyQuoteLink('${quote.id}')" class="text-blue-600 hover:text-blue-800 text-sm">Copy Link</button>
           <button onclick="resendQuote('${quote.id}')" class="text-green-600 hover:text-green-800 text-sm">Resend</button>
         </div>
       </td>
@@ -1510,6 +1551,15 @@ document.getElementById('cancelQuoteCreation').addEventListener('click', () => {
   document.getElementById('createQuoteModal').classList.add('hidden');
 });
 
+// Quote success modal event listeners
+document.getElementById('closeQuoteSuccessModal').addEventListener('click', () => {
+  document.getElementById('quoteSuccessModal').classList.add('hidden');
+});
+
+document.getElementById('copyQuoteSuccessLink').addEventListener('click', () => {
+  copyQuoteSuccessLink();
+});
+
 // Create quote form
 document.getElementById('createQuoteForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -1534,9 +1584,12 @@ document.getElementById('createQuoteForm').addEventListener('submit', async (e) 
 
     if (response.ok) {
       const result = await response.json();
-      alert(`Quote created successfully!\nQuote Link: ${window.location.origin}/quote/${result.quote_token}`);
+      const quoteLink = `${window.location.origin}/quote.html?token=${result.quote_token}`;
 
-      // Reset form and close modal
+      // Show success modal with copy functionality
+      showQuoteSuccessModal(quoteLink, result);
+
+      // Reset form and close create modal
       document.getElementById('createQuoteForm').reset();
       document.getElementById('createQuoteModal').classList.add('hidden');
 
@@ -1628,10 +1681,65 @@ function formatSkills(skills) {
 }
 
 // Helper functions
-function copyQuoteLink(quoteId) {
-  const link = `${window.location.origin}/quote/${quoteId}`;
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-semibold ${
+    type === 'success' ? 'bg-green-600' :
+    type === 'error' ? 'bg-red-600' :
+    'bg-blue-600'
+  } transform translate-x-full opacity-0 transition-all duration-300`;
+  notification.textContent = message;
+
+  document.body.appendChild(notification);
+
+  // Show notification
+  setTimeout(() => {
+    notification.classList.remove('translate-x-full', 'opacity-0');
+  }, 100);
+
+  // Hide notification after 3 seconds
+  setTimeout(() => {
+    notification.classList.add('translate-x-full', 'opacity-0');
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
+
+function showQuoteSuccessModal(quoteLink, quoteData) {
+  const modal = document.getElementById('quoteSuccessModal');
+  const linkInput = document.getElementById('quoteSuccessLink');
+
+  linkInput.value = quoteLink;
+  modal.classList.remove('hidden');
+}
+
+function copyQuoteSuccessLink() {
+  const linkInput = document.getElementById('quoteSuccessLink');
+  linkInput.select();
+  navigator.clipboard.writeText(linkInput.value).then(() => {
+    showNotification('Quote link copied to clipboard!', 'success');
+  }).catch(() => {
+    // Fallback for older browsers
+    document.execCommand('copy');
+    showNotification('Quote link copied to clipboard!', 'success');
+  });
+}
+
+function copyQuoteLink(quoteToken) {
+  const link = `${window.location.origin}/quote.html?token=${quoteToken}`;
   navigator.clipboard.writeText(link).then(() => {
-    alert('Quote link copied to clipboard!');
+    showNotification('Quote link copied to clipboard!', 'success');
+  }).catch(() => {
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea');
+    textArea.value = link;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    showNotification('Quote link copied to clipboard!', 'success');
   });
 }
 
