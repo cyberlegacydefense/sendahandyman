@@ -61,6 +61,7 @@
                         <h1 class="text-3xl font-bold text-slate-800">SendAHandyman</h1>
                     </div>
                     <p class="text-slate-600">Your personalized service quote</p>
+                    <p class="text-lg font-bold text-slate-800 mt-1">Uber Fast</p>
                 </div>
             </div>
         </div>
@@ -228,7 +229,7 @@
 
             // Initialize Stripe
             try {
-                stripe = Stripe('pk_test_51QA6EFP2pywCaNW7fJPjFV5iT7zN7LxZWjfXR4y6bTKRzYJCAfQMnPV1S8eXLSkGJe3DeSNhVRJ0mJAVUwIcdKVi00nVZNqMZp'); // Replace with your publishable key
+                stripe = Stripe('pk_live_51Rz41zHQ4TkcNcqv0IXVWGjAjLo8EoSkGO2fbeINw6U23GsLSiaOsHYVSEPwlJbR2EZ515tqPDJcRPvDBYSdv2Wy00N7DPqhI3'); // Replace with your publishable key
                 const elements = stripe.elements();
                 cardElement = elements.create('card');
                 cardElement.mount('#card-element');
