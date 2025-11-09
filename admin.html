@@ -476,17 +476,27 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-semibold mb-1">Service Type *</label>
-            <select id="quoteServiceType" required class="w-full border border-slate-200 rounded-lg px-3 py-2">
+            <select id="quoteServiceType" required class="w-full border border-slate-200 rounded-lg px-3 py-2" onchange="updateServicePricing()">
               <option value="">Select Service</option>
-              <option value="tv_mount">TV Wall Mount</option>
-              <option value="ceiling_fan">Ceiling Fan Install</option>
-              <option value="furniture_assembly">Furniture Assembly</option>
-              <option value="custom">Custom Service</option>
+              <option value="tv_mount" data-price="160">📺 TV Wall Mount (32–65") - Starting at $160</option>
+              <option value="ceiling_fan" data-price="160">💡 Ceiling Fan Install/Replace - Starting at $160</option>
+              <option value="light_fixture" data-price="120">✨ Light Fixture / Chandelier Swap - Starting at $120</option>
+              <option value="faucet_showerhead" data-price="120">🚰 Faucet / Showerhead Replace - Starting at $120</option>
+              <option value="smart_doorbell" data-price="100">🔔 Smart Doorbell Install - Starting at $100</option>
+              <option value="curtains_blinds" data-price="120">🪟 Curtain Rods / Blinds - Starting at $120</option>
+              <option value="floating_shelf" data-price="120">📚 Floating Shelf Install - Starting at $120</option>
+              <option value="appliance_hookup" data-price="160">⚡ Appliance Hookup (W/D/DW) - Starting at $160</option>
+              <option value="furniture_assembly" data-price="160">🪑 Furniture Assembly (S–M) - Starting at $160</option>
+              <option value="closet_organizer" data-price="200">👕 Closet Organizer Install - Starting at $200</option>
+              <option value="premium_moveout" data-price="300">🏠 Premium Move-Out Removal - Starting at $300</option>
+              <option value="general_handyman" data-price="240">🔧 General Handyman (3+ hours) - Starting at $240</option>
+              <option value="custom" data-price="">💼 Custom Service - Set Custom Price</option>
             </select>
           </div>
           <div>
             <label class="block text-sm font-semibold mb-1">Quote Amount ($) *</label>
-            <input type="number" id="quoteAmount" step="0.01" required class="w-full border border-slate-200 rounded-lg px-3 py-2">
+            <input type="number" id="quoteAmount" step="0.01" required class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="Amount will auto-populate">
+            <p class="text-xs text-slate-500 mt-1">Base price auto-fills when service is selected. Adjust as needed.</p>
           </div>
         </div>
 
@@ -1680,6 +1690,18 @@ function formatSkills(skills) {
 }
 
 // Helper functions
+function updateServicePricing() {
+  const serviceSelect = document.getElementById('quoteServiceType');
+  const amountInput = document.getElementById('quoteAmount');
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+
+  if (selectedOption && selectedOption.dataset.price) {
+    amountInput.value = selectedOption.dataset.price;
+  } else {
+    amountInput.value = '';
+  }
+}
+
 function showNotification(message, type = 'info') {
   // Create notification element
   const notification = document.createElement('div');
