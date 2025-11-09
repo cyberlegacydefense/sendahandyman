@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Quote - Helping Hands</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Loading State -->
+    <div id="loadingState" class="flex items-center justify-center min-h-screen">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                <svg class="w-8 h-8 text-blue-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            </div>
+            <p class="text-slate-600">Loading your quote...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="hidden min-h-screen flex items-center justify-center">
+        <div class="max-w-md mx-auto text-center p-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">Quote Not Found</h1>
+            <p id="errorMessage" class="text-slate-600 mb-4">This quote may have expired or the link is invalid.</p>
+            <a href="/" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Return to Homepage
+            </a>
+        </div>
+    </div>
+
+    <!-- Quote Content -->
+    <div id="quoteContent" class="hidden">
+        <div class="max-w-2xl mx-auto p-6">
+            <!-- Header -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 mb-6">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-bold text-slate-800 mb-2">🔧 Helping Hands</h1>
+                    <p class="text-slate-600">Your personalized service quote</p>
+                </div>
+
+                <!-- Quote Details -->
+                <div class="bg-slate-50 rounded-lg p-4 mb-6">
+                    <h2 class="text-lg font-semibold text-slate-800 mb-3">Quote Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-semibold text-slate-700">Quote ID:</span>
+                            <span id="quoteId" class="text-slate-600 font-mono">-</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-slate-700">Service:</span>
+                            <span id="serviceType" class="text-slate-600">-</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-slate-700">Customer:</span>
+                            <span id="customerName" class="text-slate-600">-</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold text-slate-700">Expires:</span>
+                            <span id="expiryDate" class="text-slate-600">-</span>
+                        </div>
+                    </div>
+
+                    <div id="descriptionSection" class="mt-4 hidden">
+                        <span class="font-semibold text-slate-700">Description:</span>
+                        <p id="serviceDescription" class="text-slate-600 mt-1">-</p>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full mb-3">
+                        <span class="text-2xl">💰</span>
+                    </div>
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">$<span id="quoteAmount">0</span></h3>
+                    <p class="text-slate-600">Total amount for your service</p>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                <h2 class="text-xl font-semibold text-slate-800 mb-4">Complete Your Booking</h2>
+
+                <form id="paymentForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Full Name *</label>
+                            <input type="text" id="customerNameInput" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Phone Number *</label>
+                            <input type="tel" id="customerPhoneInput" required class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+                        <input type="email" id="customerEmailInput" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Service Address *</label>
+                        <textarea id="customerAddressInput" required rows="3" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter the full address where service will be performed"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Preferred Timing</label>
+                        <select id="timingPreference" class="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="flexible">I'm flexible with timing</option>
+                            <option value="morning">Morning preferred (8AM-12PM)</option>
+                            <option value="afternoon">Afternoon preferred (12PM-5PM)</option>
+                            <option value="evening">Evening preferred (5PM-8PM)</option>
+                            <option value="urgent">ASAP - willing to pay rush fee</option>
+                        </select>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="border-t border-slate-200 pt-4">
+                        <label class="block text-sm font-semibold text-slate-700 mb-3">Payment Information</label>
+                        <div id="card-element" class="p-3 border border-slate-300 rounded-lg bg-white">
+                            <!-- Stripe Elements will create form elements here -->
+                        </div>
+                        <div id="card-errors" class="text-red-600 text-sm mt-2 hidden"></div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="submit" id="submitButton" class="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold text-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                            <span id="buttonText">Pay $<span id="buttonAmount">0</span> & Book Service</span>
+                            <span id="buttonSpinner" class="hidden">
+                                <svg class="inline w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Processing...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Trust Indicators -->
+            <div class="text-center mt-6 text-sm text-slate-500">
+                <p>🔒 Secure payment powered by Stripe</p>
+                <p class="mt-1">Your handyman will contact you within 24 hours to schedule your service.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let stripe = null;
+        let cardElement = null;
+        let quoteData = null;
+        let quoteToken = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Extract token from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            quoteToken = urlParams.get('token');
+
+            if (!quoteToken) {
+                showError('No quote token provided in URL');
+                return;
+            }
+
+            // Initialize Stripe
+            try {
+                stripe = Stripe('pk_test_51QA6EFP2pywCaNW7fJPjFV5iT7zN7LxZWjfXR4y6bTKRzYJCAfQMnPV1S8eXLSkGJe3DeSNhVRJ0mJAVUwIcdKVi00nVZNqMZp'); // Replace with your publishable key
+                const elements = stripe.elements();
+                cardElement = elements.create('card');
+                cardElement.mount('#card-element');
+
+                // Handle card input errors
+                cardElement.on('change', ({error}) => {
+                    const errorElement = document.getElementById('card-errors');
+                    if (error) {
+                        errorElement.textContent = error.message;
+                        errorElement.classList.remove('hidden');
+                    } else {
+                        errorElement.classList.add('hidden');
+                    }
+                });
+            } catch (error) {
+                console.error('Stripe initialization failed:', error);
+                showError('Payment system initialization failed');
+                return;
+            }
+
+            // Load quote data
+            await loadQuote();
+        });
+
+        async function loadQuote() {
+            try {
+                const response = await fetch(`/.netlify/functions/get-quote/${quoteToken}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (data.expired) {
+                        showError('This quote has expired. Please contact us for a new quote.');
+                    } else if (data.already_paid) {
+                        showError('This quote has already been used.');
+                    } else {
+                        showError(data.error || 'Quote not found');
+                    }
+                    return;
+                }
+
+                quoteData = data.quote;
+                displayQuote();
+
+            } catch (error) {
+                console.error('Failed to load quote:', error);
+                showError('Failed to load quote. Please check your internet connection.');
+            }
+        }
+
+        function displayQuote() {
+            // Populate quote details
+            document.getElementById('quoteId').textContent = quoteData.quote_id;
+            document.getElementById('serviceType').textContent = quoteData.service_type;
+            document.getElementById('customerName').textContent = quoteData.customer_name;
+            document.getElementById('quoteAmount').textContent = quoteData.amount;
+            document.getElementById('buttonAmount').textContent = quoteData.amount;
+
+            // Format expiry date
+            const expiryDate = new Date(quoteData.expires_at);
+            document.getElementById('expiryDate').textContent = expiryDate.toLocaleDateString() + ' (' + quoteData.days_until_expiry + ' days remaining)';
+
+            // Show description if provided
+            if (quoteData.description) {
+                document.getElementById('serviceDescription').textContent = quoteData.description;
+                document.getElementById('descriptionSection').classList.remove('hidden');
+            }
+
+            // Pre-fill customer information
+            document.getElementById('customerNameInput').value = quoteData.customer_name || '';
+            document.getElementById('customerPhoneInput').value = quoteData.customer_phone || '';
+            document.getElementById('customerEmailInput').value = quoteData.customer_email || '';
+
+            // Show content and hide loading
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('quoteContent').classList.remove('hidden');
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+        // Handle form submission
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitButton = document.getElementById('submitButton');
+            const buttonText = document.getElementById('buttonText');
+            const buttonSpinner = document.getElementById('buttonSpinner');
+
+            // Disable button and show spinner
+            submitButton.disabled = true;
+            buttonText.classList.add('hidden');
+            buttonSpinner.classList.remove('hidden');
+
+            try {
+                // Create payment method
+                const {paymentMethod, error} = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: cardElement,
+                    billing_details: {
+                        name: document.getElementById('customerNameInput').value,
+                        email: document.getElementById('customerEmailInput').value,
+                        phone: document.getElementById('customerPhoneInput').value,
+                    },
+                });
+
+                if (error) {
+                    throw new Error(error.message);
+                }
+
+                // Process payment
+                const response = await fetch('/.netlify/functions/process-quote-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        quote_token: quoteToken,
+                        customer_name: document.getElementById('customerNameInput').value,
+                        customer_phone: document.getElementById('customerPhoneInput').value,
+                        customer_email: document.getElementById('customerEmailInput').value,
+                        customer_address: document.getElementById('customerAddressInput').value,
+                        timing_preference: document.getElementById('timingPreference').value,
+                        payment_method_id: paymentMethod.id
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Payment failed');
+                }
+
+                // Success! Redirect to success page or show success message
+                window.location.href = '/success.html?booking_id=' + result.task_id;
+
+            } catch (error) {
+                console.error('Payment error:', error);
+                alert('Payment failed: ' + error.message);
+
+                // Re-enable button
+                submitButton.disabled = false;
+                buttonText.classList.remove('hidden');
+                buttonSpinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

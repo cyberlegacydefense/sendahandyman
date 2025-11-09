@@ -1341,33 +1341,32 @@ function renderHandymenTable() {
 }
 
 // Load quotes data
-function loadQuotesData() {
+async function loadQuotesData() {
   console.log('💰 Loading quotes data...');
 
-  // Mock quotes data - implement actual database queries
-  quotesData = [
-    {
-      id: 'quote-001',
-      customer_name: 'John Doe',
-      customer_phone: '(555) 123-4567',
-      service_type: 'TV Mount',
-      amount: 180,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      expires_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
-    },
-    {
-      id: 'quote-002',
-      customer_name: 'Jane Smith',
-      customer_phone: '(555) 987-6543',
-      service_type: 'Ceiling Fan',
-      amount: 220,
-      status: 'paid',
-      created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-    }
-  ];
+  try {
+    // Load actual quotes from database
+    const { data: quotes, error: quotesError } = await supabase
+      .from('quotes')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  renderQuotesTable();
+    if (quotesError) {
+      console.error('❌ Error loading quotes:', quotesError);
+      // Fallback to empty array instead of mock data
+      quotesData = [];
+    } else {
+      console.log(`📊 Loaded ${quotes.length} quotes from database`);
+      quotesData = quotes || [];
+    }
+
+    renderQuotesTable();
+
+  } catch (error) {
+    console.error('❌ Failed to load quotes:', error);
+    quotesData = [];
+    renderQuotesTable();
+  }
 }
 
 // Render quotes table
@@ -1382,14 +1381,14 @@ function renderQuotesTable() {
   tbody.innerHTML = quotesData.map(quote => `
     <tr class="border-b border-slate-200 hover:bg-slate-50">
       <td class="py-3 px-4">
-        <div class="font-mono text-sm">${quote.id}</div>
+        <div class="font-mono text-sm">${quote.quote_id || quote.id}</div>
       </td>
       <td class="py-3 px-4">
         <div class="font-semibold">${quote.customer_name}</div>
         <div class="text-sm text-slate-500">${quote.customer_phone}</div>
       </td>
       <td class="py-3 px-4">${quote.service_type}</td>
-      <td class="py-3 px-4 font-semibold">$${quote.amount}</td>
+      <td class="py-3 px-4 font-semibold">$${quote.custom_amount || quote.amount}</td>
       <td class="py-3 px-4">
         <span class="status-badge status-${quote.status}">
           ${quote.status.toUpperCase()}
