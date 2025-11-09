@@ -26,12 +26,26 @@ serve(async (req) => {
     )
 
     // Verify the user is authenticated (session-based security)
-    const authHeader = req.headers.get('Authorization')!
+    const authHeader = req.headers.get('Authorization')
+
+    if (!authHeader) {
+      console.error('❌ No Authorization header provided');
+      return new Response(
+        JSON.stringify({ error: 'Authorization header required' }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
     const token = authHeader.replace('Bearer ', '')
+    console.log(`🔑 Token received (length: ${token.length})`);
 
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
 
     if (userError || !user) {
+      console.error('❌ Authentication failed:', userError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized - please log in again' }),
         {
@@ -40,6 +54,8 @@ serve(async (req) => {
         }
       )
     }
+
+    console.log(`✅ User authenticated: ${user.id} (${user.email})`);
 
     // Verify user has admin access
     const { data: adminUser, error: adminError } = await supabaseAdmin
@@ -50,6 +66,8 @@ serve(async (req) => {
       .single()
 
     if (adminError || !adminUser) {
+      console.error('❌ Admin access denied:', adminError);
+      console.log(`🔍 User ID: ${user.id}, Admin lookup failed`);
       return new Response(
         JSON.stringify({ error: 'Access denied - admin privileges required' }),
         {
@@ -59,8 +77,26 @@ serve(async (req) => {
       )
     }
 
+    console.log(`✅ Admin verified: ${adminUser.role}`);
+
     // Parse request body
-    const { name, email, phone } = await req.json()
+    let name, email, phone;
+    try {
+      const requestBody = await req.json();
+      name = requestBody.name;
+      email = requestBody.email;
+      phone = requestBody.phone;
+      console.log(`📦 Parsed request body:`, { name, email, phone });
+    } catch (parseError) {
+      console.error('❌ Failed to parse request body:', parseError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     // Validate required fields
     if (!name || !email) {
