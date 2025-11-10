@@ -633,6 +633,75 @@
   </div>
 </div>
 
+<!-- Edit Handyman Modal -->
+<div id="editHandymanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold">Edit Handyman</h3>
+        <button id="closeEditHandymanModal" class="text-slate-500 hover:text-slate-700">✕</button>
+      </div>
+      <form id="editHandymanForm" class="space-y-4">
+        <input type="hidden" id="editHandymanId">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="editFullName" class="block text-sm font-medium mb-1">Full Name</label>
+            <input type="text" id="editFullName" class="w-full border rounded-lg px-3 py-2" required>
+          </div>
+          <div>
+            <label for="editEmail" class="block text-sm font-medium mb-1">Email</label>
+            <input type="email" id="editEmail" class="w-full border rounded-lg px-3 py-2" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="editPhone" class="block text-sm font-medium mb-1">Phone</label>
+            <input type="tel" id="editPhone" class="w-full border rounded-lg px-3 py-2">
+          </div>
+          <div>
+            <label for="editHourlyRate" class="block text-sm font-medium mb-1">Hourly Rate ($)</label>
+            <input type="number" id="editHourlyRate" class="w-full border rounded-lg px-3 py-2" step="0.01" min="0">
+          </div>
+        </div>
+
+        <div>
+          <label for="editSkills" class="block text-sm font-medium mb-1">Skills (comma-separated)</label>
+          <input type="text" id="editSkills" class="w-full border rounded-lg px-3 py-2"
+                 placeholder="e.g. Plumbing, Electrical, Painting">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="editOnboardingStatus" class="block text-sm font-medium mb-1">Onboarding Status</label>
+            <select id="editOnboardingStatus" class="w-full border rounded-lg px-3 py-2">
+              <option value="false">Pending</option>
+              <option value="true">Completed</option>
+            </select>
+          </div>
+          <div>
+            <label for="editActiveStatus" class="block text-sm font-medium mb-1">Active Status</label>
+            <select id="editActiveStatus" class="w-full border rounded-lg px-3 py-2">
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            Save Changes
+          </button>
+          <button type="button" id="cancelEditHandyman" class="bg-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-400 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Bulk Assignment Modal -->
 <div id="bulkAssignModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-lg max-w-3xl w-full max-h-96 overflow-y-auto">
@@ -1370,7 +1439,7 @@ function renderHandymenTable() {
         <div class="flex gap-2">
           <button onclick="editHandyman('${handyman.id}')" class="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
           <button onclick="toggleHandymanStatus('${handyman.id}')" class="text-orange-600 hover:text-orange-800 text-sm">
-            ${handyman.status === 'active' ? 'Suspend' : 'Activate'}
+            ${handyman.is_active ? 'Suspend' : 'Activate'}
           </button>
         </div>
       </td>
@@ -1796,12 +1865,152 @@ function resendQuote(quoteId) {
   alert('Resend functionality would be implemented here');
 }
 
-function editHandyman(handymanId) {
-  alert('Edit handyman functionality would be implemented here');
+async function editHandyman(handymanId) {
+  try {
+    // Load handyman data
+    const { data: handyman, error } = await supabase
+      .from('handymen')
+      .select('*')
+      .eq('id', handymanId)
+      .single();
+
+    if (error) throw error;
+    if (!handyman) {
+      alert('Handyman not found');
+      return;
+    }
+
+    // Populate form with current data
+    document.getElementById('editHandymanId').value = handyman.id;
+    document.getElementById('editFullName').value = handyman.full_name || '';
+    document.getElementById('editEmail').value = handyman.email || '';
+    document.getElementById('editPhone').value = handyman.phone || '';
+    document.getElementById('editHourlyRate').value = handyman.hourly_rate || '';
+
+    // Handle skills (could be array or string)
+    let skillsValue = '';
+    if (handyman.skills) {
+      if (Array.isArray(handyman.skills)) {
+        skillsValue = handyman.skills.join(', ');
+      } else if (typeof handyman.skills === 'string') {
+        skillsValue = handyman.skills;
+      }
+    }
+    document.getElementById('editSkills').value = skillsValue;
+
+    document.getElementById('editOnboardingStatus').value = handyman.onboarding_completed ? 'true' : 'false';
+    document.getElementById('editActiveStatus').value = handyman.is_active ? 'true' : 'false';
+
+    // Show modal
+    document.getElementById('editHandymanModal').classList.remove('hidden');
+
+  } catch (error) {
+    console.error('Error loading handyman:', error);
+    alert('Error loading handyman data: ' + error.message);
+  }
 }
 
-function toggleHandymanStatus(handymanId) {
-  alert('Toggle handyman status functionality would be implemented here');
+async function saveHandymanEdits() {
+  try {
+    const handymanId = document.getElementById('editHandymanId').value;
+    const fullName = document.getElementById('editFullName').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const hourlyRate = parseFloat(document.getElementById('editHourlyRate').value) || null;
+    const skillsInput = document.getElementById('editSkills').value.trim();
+    const onboardingCompleted = document.getElementById('editOnboardingStatus').value === 'true';
+    const isActive = document.getElementById('editActiveStatus').value === 'true';
+
+    // Validate required fields
+    if (!fullName || !email) {
+      alert('Full name and email are required');
+      return;
+    }
+
+    // Process skills
+    let skills = null;
+    if (skillsInput) {
+      skills = skillsInput.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    }
+
+    // Update handyman in database
+    const { error } = await supabase
+      .from('handymen')
+      .update({
+        full_name: fullName,
+        email: email.toLowerCase(),
+        phone: phone || null,
+        hourly_rate: hourlyRate,
+        skills: skills,
+        onboarding_completed: onboardingCompleted,
+        is_active: isActive
+      })
+      .eq('id', handymanId);
+
+    if (error) throw error;
+
+    // Close modal and refresh data
+    closeEditHandymanModal();
+    loadHandymenData();
+    showNotification('Handyman updated successfully!', 'success');
+
+  } catch (error) {
+    console.error('Error updating handyman:', error);
+    alert('Error updating handyman: ' + error.message);
+  }
+}
+
+function closeEditHandymanModal() {
+  document.getElementById('editHandymanModal').classList.add('hidden');
+  document.getElementById('editHandymanForm').reset();
+}
+
+async function toggleHandymanStatus(handymanId) {
+  try {
+    // Get current handyman data
+    const { data: handyman, error: fetchError } = await supabase
+      .from('handymen')
+      .select('full_name, is_active')
+      .eq('id', handymanId)
+      .single();
+
+    if (fetchError) throw fetchError;
+    if (!handyman) {
+      alert('Handyman not found');
+      return;
+    }
+
+    const currentStatus = handyman.is_active;
+    const newStatus = !currentStatus;
+    const action = newStatus ? 'activate' : 'suspend';
+    const actionPast = newStatus ? 'activated' : 'suspended';
+
+    // Confirm the action
+    const confirmMessage = `Are you sure you want to ${action} ${handyman.full_name}?\n\n` +
+      (newStatus
+        ? 'They will be able to receive new task assignments.'
+        : 'They will stop receiving new task assignments (existing tasks will remain assigned).');
+
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    // Update the status
+    const { error: updateError } = await supabase
+      .from('handymen')
+      .update({ is_active: newStatus })
+      .eq('id', handymanId);
+
+    if (updateError) throw updateError;
+
+    // Refresh the handyman list and show success message
+    loadHandymenData();
+    showNotification(`${handyman.full_name} has been ${actionPast}!`, 'success');
+
+  } catch (error) {
+    console.error('Error toggling handyman status:', error);
+    alert('Error updating handyman status: ' + error.message);
+  }
 }
 
 // Task Management Functions
@@ -2493,6 +2702,20 @@ window.addEventListener('showToast', (e) => {
       toast.remove();
     }
   }, 2000);
+});
+
+// Event listeners for edit handyman modal
+document.getElementById('editHandymanForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  saveHandymanEdits();
+});
+
+document.getElementById('closeEditHandymanModal').addEventListener('click', () => {
+  closeEditHandymanModal();
+});
+
+document.getElementById('cancelEditHandyman').addEventListener('click', () => {
+  closeEditHandymanModal();
 });
 
 console.log('🔐 Admin dashboard loaded');
