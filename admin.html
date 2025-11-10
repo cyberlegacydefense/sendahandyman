@@ -1116,7 +1116,7 @@ async function loadRecentActivity() {
     try {
       const { data: tasks, error: tasksError } = await supabase
         .from('tasks')
-        .select('id, service_type, status, total_amount, updated_at, handyman_id')
+        .select('id, task_category, status, total_amount, updated_at, handyman_id')
         .eq('status', 'completed')
         .order('updated_at', { ascending: false })
         .limit(3);
@@ -1155,7 +1155,7 @@ async function loadRecentActivity() {
         if (!simpleError && simpleTasks) {
           recentTasks = simpleTasks.map(task => ({
             ...task,
-            service_type: 'Task', // Default service type
+            task_category: 'Task', // Default task category
             handyman_name: 'Unknown'
           }));
         }
@@ -1170,7 +1170,7 @@ async function loadRecentActivity() {
         const handymanName = task.handyman_name || 'Unknown';
         activities.push({
           type: 'task_completed',
-          message: `${task.service_type} completed by ${handymanName} - $${task.total_amount || 0}`,
+          message: `${task.task_category || 'Task'} completed by ${handymanName} - $${task.total_amount || 0}`,
           time: formatTimeAgo(task.updated_at),
           timestamp: task.updated_at
         });
@@ -1871,7 +1871,7 @@ function renderTasksTable() {
       </td>
       <td class="px-4 py-3 font-medium">#${task.id.slice(0, 8)}</td>
       <td class="px-4 py-3">${task.customer_name}</td>
-      <td class="px-4 py-3">${task.service_type}</td>
+      <td class="px-4 py-3">${task.task_category || 'N/A'}</td>
       <td class="px-4 py-3">
         ${task.handyman_name ?
           `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${task.handyman_name}</span>` :
@@ -1985,10 +1985,26 @@ async function openAssignModal(taskId = null) {
       title.textContent = 'Assign Task';
       modal.dataset.taskId = taskId;
       modal.dataset.mode = 'single';
+
+      // Populate task details in the assignment form
+      const task = tasksData.find(t => t.id === taskId);
+      if (task) {
+        document.getElementById('assignTaskId').value = taskId;
+        document.getElementById('displayTaskId').textContent = `#${taskId.slice(0, 8)}`;
+        document.getElementById('displayCustomer').textContent = task.customer_name || 'N/A';
+        document.getElementById('displayService').textContent = task.task_category || 'N/A';
+        document.getElementById('displayAmount').textContent = `$${task.total_amount || 0}`;
+      }
     } else {
       // Bulk assignment
       title.textContent = `Assign ${selectedTasks.length} Tasks`;
       modal.dataset.mode = 'bulk';
+
+      // Clear task details for bulk assignment
+      document.getElementById('displayTaskId').textContent = `${selectedTasks.length} tasks selected`;
+      document.getElementById('displayCustomer').textContent = 'Multiple customers';
+      document.getElementById('displayService').textContent = 'Multiple services';
+      document.getElementById('displayAmount').textContent = 'Various amounts';
     }
 
     modal.classList.remove('hidden');
@@ -2113,7 +2129,7 @@ async function viewTaskDetails(taskId) {
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Service Type</label>
-            <p class="text-sm text-slate-900">${task.service_type || 'N/A'}</p>
+            <p class="text-sm text-slate-900">${task.task_category || 'N/A'}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Assigned To</label>
@@ -2175,6 +2191,15 @@ function closeTaskDetailsModal() {
 document.getElementById('assignTaskForm').addEventListener('submit', (e) => {
   e.preventDefault();
   handleTaskAssignment();
+});
+
+// Event listeners for assignment modal close buttons
+document.getElementById('closeAssignModal').addEventListener('click', () => {
+  closeAssignModal();
+});
+
+document.getElementById('cancelAssignment').addEventListener('click', () => {
+  closeAssignModal();
 });
 
 // Event listeners for handyman management
