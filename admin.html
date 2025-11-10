@@ -370,15 +370,14 @@
                 <th class="text-left py-3 px-4 font-semibold text-sm">Customer</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Service</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Amount</th>
-                <th class="text-left py-3 px-4 font-semibold text-sm">Status</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Assigned To</th>
-                <th class="text-left py-3 px-4 font-semibold text-sm">Created</th>
+                <th class="text-left py-3 px-4 font-semibold text-sm">Status</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Actions</th>
               </tr>
             </thead>
             <tbody id="tasksTableBody">
               <tr>
-                <td colspan="9" class="text-center py-8 text-slate-500">Loading tasks...</td>
+                <td colspan="8" class="text-center py-8 text-slate-500">Loading tasks...</td>
               </tr>
             </tbody>
           </table>
@@ -1847,7 +1846,7 @@ async function loadTasksData() {
   } catch (error) {
     console.error('Error loading tasks:', error);
     document.getElementById('tasksTableBody').innerHTML = `
-      <tr><td colspan="7" class="text-center py-8 text-red-500">Error loading tasks data</td></tr>
+      <tr><td colspan="8" class="text-center py-8 text-red-500">Error loading tasks data</td></tr>
     `;
   }
 }
@@ -1858,7 +1857,7 @@ function renderTasksTable() {
 
   if (!tasksData.length) {
     tbody.innerHTML = `
-      <tr><td colspan="7" class="text-center py-8 text-slate-500">No tasks found</td></tr>
+      <tr><td colspan="8" class="text-center py-8 text-slate-500">No tasks found</td></tr>
     `;
     return;
   }
@@ -1872,6 +1871,7 @@ function renderTasksTable() {
       <td class="px-4 py-3 font-medium">#${task.id.slice(0, 8)}</td>
       <td class="px-4 py-3">${task.customer_name}</td>
       <td class="px-4 py-3">${task.task_category || 'N/A'}</td>
+      <td class="px-4 py-3 font-semibold">$${task.total_amount || task.estimated_cost || 'N/A'}</td>
       <td class="px-4 py-3">
         ${task.handyman_name ?
           `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${task.handyman_name}</span>` :
@@ -1922,10 +1922,10 @@ function handleTaskSelection(checkbox) {
   const selectedCount = document.getElementById('selectedCount');
 
   if (selectedTasks.length > 0) {
-    bulkActions.style.display = 'block';
-    selectedCount.textContent = selectedTasks.length;
+    if (bulkActions) bulkActions.style.display = 'block';
+    if (selectedCount) selectedCount.textContent = selectedTasks.length;
   } else {
-    bulkActions.style.display = 'none';
+    if (bulkActions) bulkActions.style.display = 'none';
   }
 }
 
@@ -2062,7 +2062,10 @@ async function handleTaskAssignment() {
 
     // Clear selections
     selectedTasks = [];
-    document.getElementById('bulkActions').style.display = 'none';
+    const bulkActionsEl = document.getElementById('bulkActions');
+    if (bulkActionsEl) {
+      bulkActionsEl.style.display = 'none';
+    }
 
     // Reload tasks
     loadTasksData();
