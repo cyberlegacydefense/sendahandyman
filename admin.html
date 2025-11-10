@@ -2036,16 +2036,18 @@ async function handleTaskAssignment() {
       taskIds = selectedTasks;
     }
 
+    // Log assignment notes (admin_notes column doesn't exist in current schema)
+    if (notes) {
+      console.log(`Assignment notes for task(s): ${notes}`);
+    }
+
     // Update tasks with assignment
     for (const taskId of taskIds) {
       const { error } = await supabase
         .from('tasks')
         .update({
           handyman_id: handymanId,
-          status: 'assigned',
-          admin_notes: notes,
-          assigned_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          status: 'assigned'
         })
         .eq('id', taskId);
 
