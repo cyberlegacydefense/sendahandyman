@@ -753,6 +753,23 @@
   </div>
 </div>
 
+<!-- Task Details Modal -->
+<div id="taskDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg max-w-4xl w-full max-h-96 overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold">Task Details</h3>
+        <button onclick="closeTaskDetailsModal()" class="text-slate-500 hover:text-slate-700">✕</button>
+      </div>
+
+      <div id="taskDetailContent" class="space-y-4">
+        <!-- Task details will be populated here -->
+        <div class="text-center py-8 text-slate-500">Loading task details...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // Initialize Supabase
 const supabaseUrl = 'https://ynbhskdiplwabsksamxa.supabase.co';
@@ -1921,16 +1938,20 @@ async function openAssignModal(taskId = null) {
     // Load available handymen
     const { data: handymen, error } = await supabase
       .from('handymen')
-      .select('id, full_name, email, specialties')
+      .select('id, full_name, email, skills')
+      .eq('is_active', true)
       .order('full_name');
 
     if (error) throw error;
 
-    const handymenSelect = document.getElementById('assignHandyman');
+    const handymenSelect = document.getElementById('assignHandymanSelect');
     handymenSelect.innerHTML = '<option value="">Select a handyman...</option>' +
-      handymen.map(handyman =>
-        `<option value="${handyman.id}">${handyman.full_name} - ${handyman.specialties || 'General'}</option>`
-      ).join('');
+      handymen.map(handyman => {
+        const skillsText = handyman.skills && Array.isArray(handyman.skills) && handyman.skills.length > 0
+          ? handyman.skills.slice(0, 2).join(', ') + (handyman.skills.length > 2 ? '...' : '')
+          : 'General';
+        return `<option value="${handyman.id}">${handyman.full_name} - ${skillsText}</option>`;
+      }).join('');
 
     // Set modal title and behavior based on single vs bulk assignment
     const modal = document.getElementById('assignTaskModal');
@@ -2030,19 +2051,25 @@ async function viewTaskDetails(taskId) {
   try {
     const { data: task, error } = await supabase
       .from('tasks')
-      .select(`
-        *,
-        handymen:handyman_id (
-          id,
-          full_name,
-          email,
-          phone
-        )
-      `)
+      .select('*')
       .eq('id', taskId)
       .single();
 
     if (error) throw error;
+
+    // Get handyman details separately if assigned
+    let handyman = null;
+    if (task.handyman_id) {
+      const { data: handymanData, error: handymanError } = await supabase
+        .from('handymen')
+        .select('id, full_name, email, phone')
+        .eq('id', task.handyman_id)
+        .single();
+
+      if (!handymanError) {
+        handyman = handymanData;
+      }
+    }
 
     // Populate task details modal
     const modal = document.getElementById('taskDetailsModal');
@@ -2059,15 +2086,15 @@ async function viewTaskDetails(taskId) {
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Customer</label>
-            <p class="text-sm text-slate-900">${task.customer_name}</p>
+            <p class="text-sm text-slate-900">${task.customer_name || 'N/A'}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Service Type</label>
-            <p class="text-sm text-slate-900">${task.service_type}</p>
+            <p class="text-sm text-slate-900">${task.service_type || 'N/A'}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Assigned To</label>
-            <p class="text-sm text-slate-900">${task.handymen ? task.handymen.full_name : 'Unassigned'}</p>
+            <p class="text-sm text-slate-900">${handyman ? handyman.full_name : 'Unassigned'}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Created</label>
