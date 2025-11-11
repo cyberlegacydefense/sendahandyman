@@ -2011,6 +2011,15 @@ async function saveHandymanEdits() {
       email: session.session?.user?.email
     });
 
+    // Check admin user role and permissions
+    const { data: adminUser, error: adminError } = await supabase
+      .from('admin_users')
+      .select('*')
+      .eq('id', session.session?.user?.id)
+      .single();
+
+    console.log('👑 Admin user data:', { adminUser, adminError });
+
     // First, let's verify the record exists and we can read it
     const { data: existingRecord, error: readError } = await supabase
       .from('handymen')
@@ -2027,7 +2036,9 @@ async function saveHandymanEdits() {
       throw new Error('Handyman record not found or not accessible for updates');
     }
 
-    // Update handyman in database with detailed logging
+    // Try direct update approach with enhanced debugging
+    console.log('🔄 Attempting handyman update...');
+
     const { data: updateResult, error } = await supabase
       .from('handymen')
       .update({
@@ -2077,7 +2088,43 @@ async function saveHandymanEdits() {
         console.log('✅ Update actually succeeded (RLS policy prevents returning updated record)');
       } else {
         console.error('❌ Update failed - record was not modified');
-        throw new Error('Update failed: Record was not modified. This may be due to database permissions.');
+
+        // Since direct updates don't work due to RLS, let's create an Edge Function to handle this
+        console.log('🔄 Attempting update via Edge Function...');
+
+        const response = await fetch('/.netlify/functions/admin-update-handyman', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          },
+          body: JSON.stringify({
+            handyman_id: handymanId,
+            updates: {
+              full_name: fullName,
+              email: email.toLowerCase(),
+              phone: phone || null,
+              hourly_rate: hourlyRate,
+              skills: skills,
+              onboarding_completed: onboardingCompleted,
+              is_active: isActive
+            }
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(`Edge Function failed: ${errorData.error || response.statusText}`);
+        }
+
+        const edgeResult = await response.json();
+        console.log('✅ Edge Function update successful:', edgeResult);
+
+        if (!edgeResult.success) {
+          throw new Error(edgeResult.error || 'Edge Function update failed');
+        }
+
+        return edgeResult;
       }
     }
 
