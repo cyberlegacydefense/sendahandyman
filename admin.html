@@ -2011,6 +2011,22 @@ async function saveHandymanEdits() {
       email: session.session?.user?.email
     });
 
+    // First, let's verify the record exists and we can read it
+    const { data: existingRecord, error: readError } = await supabase
+      .from('handymen')
+      .select('*')
+      .eq('id', handymanId);
+
+    console.log('🔍 Record check before update:', {
+      found: existingRecord?.length > 0,
+      record: existingRecord?.[0],
+      readError
+    });
+
+    if (!existingRecord || existingRecord.length === 0) {
+      throw new Error('Handyman record not found or not accessible for updates');
+    }
+
     // Update handyman in database with detailed logging
     const { data: updateResult, error } = await supabase
       .from('handymen')
@@ -2038,6 +2054,32 @@ async function saveHandymanEdits() {
     }
 
     console.log('✅ Update result:', updateResult);
+
+    // Check if update actually affected any rows
+    if (!updateResult || updateResult.length === 0) {
+      console.warn('⚠️  Update returned empty result - this suggests RLS policy issues');
+
+      // Let's try to verify what happened by reading the record again
+      const { data: afterUpdate, error: afterError } = await supabase
+        .from('handymen')
+        .select('*')
+        .eq('id', handymanId);
+
+      console.log('🔍 Record after attempted update:', {
+        found: afterUpdate?.length > 0,
+        record: afterUpdate?.[0],
+        afterError
+      });
+
+      // Check if the update actually worked despite empty return
+      const actualRecord = afterUpdate?.[0];
+      if (actualRecord && actualRecord.full_name === fullName) {
+        console.log('✅ Update actually succeeded (RLS policy prevents returning updated record)');
+      } else {
+        console.error('❌ Update failed - record was not modified');
+        throw new Error('Update failed: Record was not modified. This may be due to database permissions.');
+      }
+    }
 
     console.log('✅ Handyman updated successfully');
 
