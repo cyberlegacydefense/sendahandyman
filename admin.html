@@ -2084,8 +2084,31 @@ async function saveHandymanEdits() {
 
       // Check if the update actually worked despite empty return
       const actualRecord = afterUpdate?.[0];
-      if (actualRecord && actualRecord.full_name === fullName) {
+
+      console.log('🔍 Comparing update values:', {
+        expectedName: fullName,
+        actualName: actualRecord?.full_name,
+        nameMatch: actualRecord?.full_name === fullName,
+        expectedPhone: phone || null,
+        actualPhone: actualRecord?.phone,
+        phoneMatch: actualRecord?.phone === (phone || null),
+        expectedEmail: email.toLowerCase(),
+        actualEmail: actualRecord?.email,
+        emailMatch: actualRecord?.email === email.toLowerCase()
+      });
+
+      // Check if any of the key fields were updated
+      const nameUpdated = actualRecord && actualRecord.full_name === fullName;
+      const phoneUpdated = actualRecord && actualRecord.phone === (phone || null);
+      const emailUpdated = actualRecord && actualRecord.email === email.toLowerCase();
+
+      if (nameUpdated || phoneUpdated || emailUpdated) {
         console.log('✅ Update actually succeeded (RLS policy prevents returning updated record)');
+        console.log('✅ Fields updated:', {
+          name: nameUpdated,
+          phone: phoneUpdated,
+          email: emailUpdated
+        });
       } else {
         console.error('❌ Update failed - record was not modified');
 
