@@ -2924,11 +2924,18 @@ function initializeEventListeners() {
 
   // Add event delegation for edit handyman buttons
   document.addEventListener('click', function(e) {
+    console.log('👆 Click detected on element:', e.target.tagName, e.target.className);
+
     if (e.target && e.target.classList.contains('edit-handyman-btn')) {
       const handymanId = e.target.getAttribute('data-handyman-id');
       console.log(`🎯 Edit button clicked for handyman: ${handymanId}`);
       if (handymanId) {
-        editHandyman(handymanId);
+        try {
+          console.log('🔄 Calling editHandyman function...');
+          editHandyman(handymanId);
+        } catch (error) {
+          console.error('❌ Error calling editHandyman:', error);
+        }
       } else {
         console.error('❌ No handyman ID found on edit button');
       }
@@ -2941,6 +2948,19 @@ function initializeEventListeners() {
     console.log('✅ editHandyman function is available');
   } else {
     console.error('❌ editHandyman function is not available');
+  }
+
+  // Ensure function is globally accessible
+  if (typeof window.editHandyman !== 'function') {
+    window.editHandyman = editHandyman;
+    console.log('📌 editHandyman attached to window object');
+  }
+
+  // Test window function
+  if (typeof window.editHandyman === 'function') {
+    console.log('✅ window.editHandyman is available');
+  } else {
+    console.error('❌ window.editHandyman is not available');
   }
 }
 
