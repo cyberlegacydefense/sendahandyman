@@ -1450,7 +1450,7 @@ function renderHandymenTable() {
       </td>
       <td class="py-3 px-4">
         <div class="flex gap-2">
-          <button onclick="editHandyman('${handyman.id}')" class="text-blue-600 hover:text-blue-800 text-sm">Edit</button>
+          <button class="edit-handyman-btn text-blue-600 hover:text-blue-800 text-sm" data-handyman-id="${handyman.id}">Edit</button>
           <button onclick="toggleHandymanStatus('${handyman.id}')" class="text-orange-600 hover:text-orange-800 text-sm">
             ${handyman.is_active ? 'Suspend' : 'Activate'}
           </button>
@@ -1880,7 +1880,8 @@ function resendQuote(quoteId) {
 
 async function editHandyman(handymanId) {
   try {
-    console.log(`🔧 Opening edit modal for handyman: ${handymanId}`);
+    console.log(`🔧 EDIT HANDYMAN FUNCTION CALLED for handyman: ${handymanId}`);
+    console.log('🔧 Function triggered successfully');
 
     // Load handyman data
     const { data: handyman, error } = await supabase
@@ -2920,6 +2921,27 @@ function initializeEventListeners() {
   }
 
   console.log('✅ All event listeners initialized');
+
+  // Add event delegation for edit handyman buttons
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.classList.contains('edit-handyman-btn')) {
+      const handymanId = e.target.getAttribute('data-handyman-id');
+      console.log(`🎯 Edit button clicked for handyman: ${handymanId}`);
+      if (handymanId) {
+        editHandyman(handymanId);
+      } else {
+        console.error('❌ No handyman ID found on edit button');
+      }
+    }
+  });
+  console.log('✅ Event delegation for edit buttons added');
+
+  // Test if editHandyman function is available
+  if (typeof editHandyman === 'function') {
+    console.log('✅ editHandyman function is available');
+  } else {
+    console.error('❌ editHandyman function is not available');
+  }
 }
 
 // Initialize when DOM is fully loaded
