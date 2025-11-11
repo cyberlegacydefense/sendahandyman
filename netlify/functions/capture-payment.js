@@ -53,6 +53,59 @@ export const handler = async (event, context) => {
       .eq('status', 'pending')
       .single();
 
+    console.log(`💾 Payment record lookup:`, {
+      payment,
+      paymentError,
+      taskId: task.id
+    });
+
+    // If we have a payment record with payment_intent_id, use it directly
+    if (payment && payment.payment_intent_id) {
+      console.log(`🎯 Found payment intent ID in database: ${payment.payment_intent_id}`);
+
+      try {
+        const existingPaymentIntent = await stripe.paymentIntents.retrieve(payment.payment_intent_id);
+
+        if (existingPaymentIntent && existingPaymentIntent.status === 'requires_capture') {
+          console.log(`✅ Using stored payment intent: ${payment.payment_intent_id}`);
+
+          // Capture the payment using stored ID
+          const capturedPayment = await stripe.paymentIntents.capture(payment.payment_intent_id, {
+            metadata: {
+              task_completed_at: new Date().toISOString(),
+              completion_photos_count: completion_photos?.length || 0,
+              completion_notes: completion_notes || 'No notes provided'
+            }
+          });
+
+          console.log(`✅ Payment captured using stored ID: ${capturedPayment.id} - $${task.total_amount}`);
+
+          // Update payment record
+          await updatePaymentRecord(supabase, payment, capturedPayment, completion_photos, completion_notes);
+
+          // Update task status
+          await updateTaskStatus(supabase, task_id);
+
+          // Send notifications
+          await sendCustomerCompletionNotifications(task, capturedPayment.id, completion_photos, completion_notes);
+
+          return {
+            statusCode: 200,
+            headers: cors(),
+            body: JSON.stringify({
+              success: true,
+              payment_intent_id: capturedPayment.id,
+              amount_captured: task.total_amount,
+              message: "Payment captured successfully using stored payment intent ID",
+              task_id: task_id
+            })
+          };
+        }
+      } catch (retrieveError) {
+        console.error(`❌ Failed to retrieve stored payment intent ${payment.payment_intent_id}:`, retrieveError);
+      }
+    }
+
     if (paymentError || !payment) {
       console.error('❌ Payment record not found:', paymentError);
       return {
@@ -70,12 +123,35 @@ export const handler = async (event, context) => {
 
     // Find the payment intent for this task by matching amount and customer info
     const targetAmount = Math.round(task.total_amount * 100); // Convert to cents
-    const paymentIntent = paymentIntents.data.find(pi =>
-      pi.amount === targetAmount &&
-      pi.status === 'requires_capture' &&
-      (pi.metadata.customer_name === task.customer_name ||
-       pi.metadata.customer_email === task.customer_email)
-    );
+
+    console.log(`🔍 Searching for payment intent:`, {
+      targetAmount,
+      taskCustomerName: task.customer_name,
+      taskCustomerEmail: task.customer_email,
+      availablePaymentIntents: paymentIntents.data.map(pi => ({
+        id: pi.id,
+        amount: pi.amount,
+        status: pi.status,
+        metadata: pi.metadata
+      }))
+    });
+
+    const paymentIntent = paymentIntents.data.find(pi => {
+      const amountMatches = pi.amount === targetAmount;
+      const statusMatches = pi.status === 'requires_capture';
+      const nameMatches = pi.metadata.customer_name === task.customer_name;
+      const emailMatches = pi.metadata.customer_email === task.customer_email;
+
+      console.log(`🔍 Checking payment intent ${pi.id}:`, {
+        amountMatches,
+        statusMatches,
+        nameMatches,
+        emailMatches,
+        metadata: pi.metadata
+      });
+
+      return amountMatches && statusMatches && (nameMatches || emailMatches);
+    });
 
     if (!paymentIntent) {
       console.error('❌ No capturable payment intent found for task');
@@ -102,38 +178,9 @@ export const handler = async (event, context) => {
 
     console.log(`✅ Payment captured: ${capturedPayment.id} - $${task.total_amount}`);
 
-    // Update payment record in database
-    const { error: paymentUpdateError } = await supabase
-      .from('payments')
-      .update({
-        status: 'completed',
-        payment_intent_id: capturedPayment.id,
-        captured_at: new Date().toISOString(),
-        completion_photos: completion_photos,
-        completion_notes: completion_notes,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', payment.id);
-
-    if (paymentUpdateError) {
-      console.error('❌ Failed to update payment record:', paymentUpdateError);
-      // Don't fail the whole request since payment was captured successfully
-    }
-
-    // Update task with payment confirmation
-    const { error: taskUpdateError } = await supabase
-      .from('tasks')
-      .update({
-        status: 'completed',
-        payment_status: 'captured',
-        payment_captured_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', task_id);
-
-    if (taskUpdateError) {
-      console.error('❌ Failed to update task payment status:', taskUpdateError);
-    }
+    // Update payment record and task status
+    await updatePaymentRecord(supabase, payment, capturedPayment, completion_photos, completion_notes);
+    await updateTaskStatus(supabase, task_id);
 
     // Send completion notifications to customer
     await sendCustomerCompletionNotifications(task, capturedPayment.id, completion_photos, completion_notes);
@@ -238,6 +285,47 @@ async function sendCustomerCompletionNotifications(task, paymentIntentId, comple
 
   } catch (error) {
     console.error('❌ Error sending completion notifications:', error);
+  }
+}
+
+// Helper function to update payment record
+async function updatePaymentRecord(supabase, payment, capturedPayment, completionPhotos, completionNotes) {
+  const { error: paymentUpdateError } = await supabase
+    .from('payments')
+    .update({
+      status: 'completed',
+      payment_intent_id: capturedPayment.id,
+      captured_at: new Date().toISOString(),
+      completion_photos: completionPhotos,
+      completion_notes: completionNotes,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', payment.id);
+
+  if (paymentUpdateError) {
+    console.error('❌ Failed to update payment record:', paymentUpdateError);
+    // Don't fail the whole request since payment was captured successfully
+  } else {
+    console.log('✅ Payment record updated successfully');
+  }
+}
+
+// Helper function to update task status
+async function updateTaskStatus(supabase, taskId) {
+  const { error: taskUpdateError } = await supabase
+    .from('tasks')
+    .update({
+      status: 'completed',
+      payment_status: 'captured',
+      payment_captured_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', taskId);
+
+  if (taskUpdateError) {
+    console.error('❌ Failed to update task payment status:', taskUpdateError);
+  } else {
+    console.log('✅ Task status updated successfully');
   }
 }
 

@@ -702,6 +702,19 @@
   </div>
 </div>
 
+<!-- Photo Modal -->
+<div id="photoModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+  <div class="max-w-4xl w-full h-full flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="photoModalTitle" class="text-xl font-bold text-white">Photo</h3>
+      <button onclick="closePhotoModal()" class="text-white hover:text-gray-300 text-2xl">&times;</button>
+    </div>
+    <div class="flex-1 flex items-center justify-center">
+      <img id="photoModalImage" src="" alt="Task Photo" class="max-w-full max-h-full object-contain rounded-lg">
+    </div>
+  </div>
+</div>
+
 <!-- Bulk Assignment Modal -->
 <div id="bulkAssignModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-lg max-w-3xl w-full max-h-96 overflow-y-auto">
@@ -1921,9 +1934,25 @@ async function saveHandymanEdits() {
     const onboardingCompleted = document.getElementById('editOnboardingStatus').value === 'true';
     const isActive = document.getElementById('editActiveStatus').value === 'true';
 
+    console.log('💾 Saving handyman edits:', {
+      handymanId,
+      fullName,
+      email,
+      phone,
+      hourlyRate,
+      skillsInput,
+      onboardingCompleted,
+      isActive
+    });
+
     // Validate required fields
     if (!fullName || !email) {
       alert('Full name and email are required');
+      return;
+    }
+
+    if (!handymanId) {
+      alert('Handyman ID is missing');
       return;
     }
 
@@ -1932,6 +1961,8 @@ async function saveHandymanEdits() {
     if (skillsInput) {
       skills = skillsInput.split(',').map(s => s.trim()).filter(s => s.length > 0);
     }
+
+    console.log('🔄 Updating handyman in database...');
 
     // Update handyman in database
     const { error } = await supabase
@@ -1949,13 +1980,15 @@ async function saveHandymanEdits() {
 
     if (error) throw error;
 
+    console.log('✅ Handyman updated successfully');
+
     // Close modal and refresh data
     closeEditHandymanModal();
     loadHandymenData();
     showNotification('Handyman updated successfully!', 'success');
 
   } catch (error) {
-    console.error('Error updating handyman:', error);
+    console.error('❌ Error updating handyman:', error);
     alert('Error updating handyman: ' + error.message);
   }
 }
@@ -2324,6 +2357,67 @@ async function viewTaskDetails(taskId) {
       }
     }
 
+    // Get completion details if task is completed
+    let completionDetails = '';
+    if (task.status === 'completed' && task.handyman_id) {
+      const { data: taskUpdates } = await supabase
+        .from('task_updates')
+        .select('*')
+        .eq('task_id', taskId)
+        .order('created_at', { ascending: false });
+
+      const { data: taskPhotos } = await supabase
+        .from('task_photos')
+        .select('*')
+        .eq('task_id', taskId)
+        .order('created_at', { ascending: false });
+
+      if (taskUpdates && taskUpdates.length > 0) {
+        const latestUpdate = taskUpdates[0];
+        completionDetails += `
+        <div class="border-t pt-4">
+          <h4 class="text-lg font-semibold mb-3 text-green-700">Job Completion Details</h4>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Completion Date</label>
+              <p class="text-sm text-slate-900">${new Date(latestUpdate.created_at).toLocaleString()}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Handyman Notes</label>
+              <p class="text-sm text-slate-900">${latestUpdate.notes || 'No notes provided'}</p>
+            </div>
+            ${latestUpdate.time_spent ? `
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Time Spent</label>
+              <p class="text-sm text-slate-900">${latestUpdate.time_spent} hours</p>
+            </div>
+            ` : ''}
+          </div>
+        </div>`;
+      }
+
+      if (taskPhotos && taskPhotos.length > 0) {
+        completionDetails += `
+        <div class="border-t pt-4">
+          <h4 class="text-lg font-semibold mb-3 text-green-700">Completion Photos</h4>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            ${taskPhotos.map(photo => `
+              <div class="relative">
+                <img src="${photo.photo_url}" alt="Completion Photo"
+                     class="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                     onclick="openPhotoModal('${photo.photo_url}', '${photo.description || 'Completion Photo'}')">
+                ${photo.description ? `
+                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg">
+                  ${photo.description}
+                </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      }
+    }
+
     // Populate task details modal
     const modal = document.getElementById('taskDetailsModal');
     document.getElementById('taskDetailContent').innerHTML = `
@@ -2331,7 +2425,7 @@ async function viewTaskDetails(taskId) {
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-slate-700">Task ID</label>
-            <p class="text-sm text-slate-900">#${task.id}</p>
+            <p class="text-sm text-slate-900">#${task.id.slice(0, 8)}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700">Status</label>
@@ -2346,6 +2440,10 @@ async function viewTaskDetails(taskId) {
             <p class="text-sm text-slate-900">${task.task_category || 'N/A'}</p>
           </div>
           <div>
+            <label class="block text-sm font-medium text-slate-700">Amount</label>
+            <p class="text-sm text-slate-900 font-semibold">$${task.total_amount || task.estimated_cost || 'N/A'}</p>
+          </div>
+          <div>
             <label class="block text-sm font-medium text-slate-700">Assigned To</label>
             <p class="text-sm text-slate-900">${handyman ? handyman.full_name : 'Unassigned'}</p>
           </div>
@@ -2353,6 +2451,12 @@ async function viewTaskDetails(taskId) {
             <label class="block text-sm font-medium text-slate-700">Created</label>
             <p class="text-sm text-slate-900">${new Date(task.created_at).toLocaleDateString()}</p>
           </div>
+          ${task.scheduled_date ? `
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Scheduled Date</label>
+            <p class="text-sm text-slate-900">${new Date(task.scheduled_date).toLocaleDateString()}</p>
+          </div>
+          ` : ''}
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700">Description</label>
@@ -2362,12 +2466,19 @@ async function viewTaskDetails(taskId) {
           <label class="block text-sm font-medium text-slate-700">Customer Address</label>
           <p class="text-sm text-slate-900">${task.customer_address || 'No address provided'}</p>
         </div>
+        ${task.customer_phone ? `
+        <div>
+          <label class="block text-sm font-medium text-slate-700">Customer Phone</label>
+          <p class="text-sm text-slate-900">${task.customer_phone}</p>
+        </div>
+        ` : ''}
         ${task.admin_notes ? `
         <div>
           <label class="block text-sm font-medium text-slate-700">Admin Notes</label>
           <p class="text-sm text-slate-900">${task.admin_notes}</p>
         </div>
         ` : ''}
+        ${completionDetails}
       </div>
     `;
 
@@ -2399,6 +2510,20 @@ function closeAssignModal() {
 
 function closeTaskDetailsModal() {
   document.getElementById('taskDetailsModal').classList.add('hidden');
+}
+
+function openPhotoModal(photoUrl, description) {
+  const modal = document.getElementById('photoModal');
+  const image = document.getElementById('photoModalImage');
+  const title = document.getElementById('photoModalTitle');
+
+  image.src = photoUrl;
+  title.textContent = description || 'Task Photo';
+  modal.classList.remove('hidden');
+}
+
+function closePhotoModal() {
+  document.getElementById('photoModal').classList.add('hidden');
 }
 
 // Event listeners for task assignment form
