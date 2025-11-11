@@ -1880,6 +1880,8 @@ function resendQuote(quoteId) {
 
 async function editHandyman(handymanId) {
   try {
+    console.log(`🔧 Opening edit modal for handyman: ${handymanId}`);
+
     // Load handyman data
     const { data: handyman, error } = await supabase
       .from('handymen')
@@ -1893,12 +1895,39 @@ async function editHandyman(handymanId) {
       return;
     }
 
+    console.log('📋 Handyman data loaded:', handyman);
+
+    // Check if form elements exist
+    const formElements = {
+      editHandymanId: document.getElementById('editHandymanId'),
+      editFullName: document.getElementById('editFullName'),
+      editEmail: document.getElementById('editEmail'),
+      editPhone: document.getElementById('editPhone'),
+      editHourlyRate: document.getElementById('editHourlyRate'),
+      editSkills: document.getElementById('editSkills'),
+      editOnboardingStatus: document.getElementById('editOnboardingStatus'),
+      editActiveStatus: document.getElementById('editActiveStatus')
+    };
+
+    // Check which elements are missing
+    const missingElements = Object.entries(formElements)
+      .filter(([name, element]) => !element)
+      .map(([name]) => name);
+
+    if (missingElements.length > 0) {
+      console.error('❌ Missing form elements:', missingElements);
+      alert(`Error: Missing form elements: ${missingElements.join(', ')}`);
+      return;
+    }
+
+    console.log('✅ All form elements found');
+
     // Populate form with current data
-    document.getElementById('editHandymanId').value = handyman.id;
-    document.getElementById('editFullName').value = handyman.full_name || '';
-    document.getElementById('editEmail').value = handyman.email || '';
-    document.getElementById('editPhone').value = handyman.phone || '';
-    document.getElementById('editHourlyRate').value = handyman.hourly_rate || '';
+    formElements.editHandymanId.value = handyman.id;
+    formElements.editFullName.value = handyman.full_name || '';
+    formElements.editEmail.value = handyman.email || '';
+    formElements.editPhone.value = handyman.phone || '';
+    formElements.editHourlyRate.value = handyman.hourly_rate || '';
 
     // Handle skills (could be array or string)
     let skillsValue = '';
@@ -1909,16 +1938,26 @@ async function editHandyman(handymanId) {
         skillsValue = handyman.skills;
       }
     }
-    document.getElementById('editSkills').value = skillsValue;
+    formElements.editSkills.value = skillsValue;
 
-    document.getElementById('editOnboardingStatus').value = handyman.onboarding_completed ? 'true' : 'false';
-    document.getElementById('editActiveStatus').value = handyman.is_active ? 'true' : 'false';
+    formElements.editOnboardingStatus.value = handyman.onboarding_completed ? 'true' : 'false';
+    formElements.editActiveStatus.value = handyman.is_active ? 'true' : 'false';
+
+    console.log('✅ Form populated with data');
 
     // Show modal
-    document.getElementById('editHandymanModal').classList.remove('hidden');
+    const modal = document.getElementById('editHandymanModal');
+    if (!modal) {
+      console.error('❌ Edit modal not found!');
+      alert('Error: Edit modal not found in DOM');
+      return;
+    }
+
+    modal.classList.remove('hidden');
+    console.log('✅ Edit modal opened');
 
   } catch (error) {
-    console.error('Error loading handyman:', error);
+    console.error('❌ Error loading handyman:', error);
     alert('Error loading handyman data: ' + error.message);
   }
 }
@@ -1964,8 +2003,15 @@ async function saveHandymanEdits() {
 
     console.log('🔄 Updating handyman in database...');
 
-    // Update handyman in database
-    const { error } = await supabase
+    // Check current user session first
+    const { data: session } = await supabase.auth.getSession();
+    console.log('🔐 Current session:', {
+      user: session.session?.user?.id,
+      email: session.session?.user?.email
+    });
+
+    // Update handyman in database with detailed logging
+    const { data: updateResult, error } = await supabase
       .from('handymen')
       .update({
         full_name: fullName,
@@ -1976,9 +2022,21 @@ async function saveHandymanEdits() {
         onboarding_completed: onboardingCompleted,
         is_active: isActive
       })
-      .eq('id', handymanId);
+      .eq('id', handymanId)
+      .select(); // Return the updated record
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Database update error:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      });
+      throw error;
+    }
+
+    console.log('✅ Update result:', updateResult);
 
     console.log('✅ Handyman updated successfully');
 
@@ -2360,57 +2418,53 @@ async function viewTaskDetails(taskId) {
     // Get completion details if task is completed
     let completionDetails = '';
     if (task.status === 'completed' && task.handyman_id) {
-      const { data: taskUpdates } = await supabase
-        .from('task_updates')
-        .select('*')
-        .eq('task_id', taskId)
-        .order('created_at', { ascending: false });
-
-      const { data: taskPhotos } = await supabase
-        .from('task_photos')
-        .select('*')
-        .eq('task_id', taskId)
-        .order('created_at', { ascending: false });
-
-      if (taskUpdates && taskUpdates.length > 0) {
-        const latestUpdate = taskUpdates[0];
-        completionDetails += `
+      completionDetails = `
         <div class="border-t pt-4">
           <h4 class="text-lg font-semibold mb-3 text-green-700">Job Completion Details</h4>
-          <div class="space-y-3">
+          <div class="space-y-3">`;
+
+      if (task.completed_at) {
+        completionDetails += `
             <div>
               <label class="block text-sm font-medium text-slate-700">Completion Date</label>
-              <p class="text-sm text-slate-900">${new Date(latestUpdate.created_at).toLocaleString()}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Handyman Notes</label>
-              <p class="text-sm text-slate-900">${latestUpdate.notes || 'No notes provided'}</p>
-            </div>
-            ${latestUpdate.time_spent ? `
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Time Spent</label>
-              <p class="text-sm text-slate-900">${latestUpdate.time_spent} hours</p>
-            </div>
-            ` : ''}
-          </div>
-        </div>`;
+              <p class="text-sm text-slate-900">${new Date(task.completed_at).toLocaleString()}</p>
+            </div>`;
       }
 
-      if (taskPhotos && taskPhotos.length > 0) {
+      if (task.completion_notes) {
+        completionDetails += `
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Handyman Completion Notes</label>
+              <p class="text-sm text-slate-900 bg-green-50 p-3 rounded-lg">${task.completion_notes}</p>
+            </div>`;
+      }
+
+      if (task.time_spent) {
+        completionDetails += `
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Time Spent</label>
+              <p class="text-sm text-slate-900">${task.time_spent} hours</p>
+            </div>`;
+      }
+
+      completionDetails += `
+          </div>
+        </div>`;
+
+      // Handle completion photos
+      if (task.completion_photo_urls && task.completion_photo_urls.length > 0) {
         completionDetails += `
         <div class="border-t pt-4">
           <h4 class="text-lg font-semibold mb-3 text-green-700">Completion Photos</h4>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            ${taskPhotos.map(photo => `
+            ${task.completion_photo_urls.map((photoUrl, index) => `
               <div class="relative">
-                <img src="${photo.photo_url}" alt="Completion Photo"
-                     class="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
-                     onclick="openPhotoModal('${photo.photo_url}', '${photo.description || 'Completion Photo'}')">
-                ${photo.description ? `
-                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg">
-                  ${photo.description}
+                <img src="${photoUrl}" alt="Completion Photo ${index + 1}"
+                     class="w-full h-32 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity border border-green-200"
+                     onclick="openPhotoModal('${photoUrl}', 'Completion Photo ${index + 1}')">
+                <div class="absolute top-1 right-1 bg-green-600 text-white text-xs px-1 rounded">
+                  ${index + 1}
                 </div>
-                ` : ''}
               </div>
             `).join('')}
           </div>
@@ -2828,19 +2882,52 @@ window.addEventListener('showToast', (e) => {
   }, 2000);
 });
 
-// Event listeners for edit handyman modal
-document.getElementById('editHandymanForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  saveHandymanEdits();
-});
+// Initialize event listeners when DOM is ready
+function initializeEventListeners() {
+  console.log('🔧 Initializing event listeners...');
 
-document.getElementById('closeEditHandymanModal').addEventListener('click', () => {
-  closeEditHandymanModal();
-});
+  // Edit handyman modal event listeners
+  const editForm = document.getElementById('editHandymanForm');
+  const closeEditModal = document.getElementById('closeEditHandymanModal');
+  const cancelEditButton = document.getElementById('cancelEditHandyman');
 
-document.getElementById('cancelEditHandyman').addEventListener('click', () => {
-  closeEditHandymanModal();
-});
+  if (editForm) {
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveHandymanEdits();
+    });
+    console.log('✅ Edit form submit listener attached');
+  } else {
+    console.error('❌ Edit form not found');
+  }
+
+  if (closeEditModal) {
+    closeEditModal.addEventListener('click', () => {
+      closeEditHandymanModal();
+    });
+    console.log('✅ Close edit modal listener attached');
+  } else {
+    console.error('❌ Close edit modal button not found');
+  }
+
+  if (cancelEditButton) {
+    cancelEditButton.addEventListener('click', () => {
+      closeEditHandymanModal();
+    });
+    console.log('✅ Cancel edit button listener attached');
+  } else {
+    console.error('❌ Cancel edit button not found');
+  }
+
+  console.log('✅ All event listeners initialized');
+}
+
+// Initialize when DOM is fully loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeEventListeners);
+} else {
+  initializeEventListeners();
+}
 
 console.log('🔐 Admin dashboard loaded');
 </script>
