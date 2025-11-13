@@ -121,6 +121,7 @@ export const handler = async (event, context) => {
       amount: Math.round(quote.custom_amount * 100), // Convert to cents
       currency: 'usd',
       payment_method: payment_method_id,
+      capture_method: 'manual', // 🔐 AUTHORIZATION HOLD - same as main website
       confirmation_method: 'manual',
       confirm: true,
       return_url: `${event.headers.origin || 'https://sendahandyman.com'}/quote-payment-success?token=${quote_token}`,
@@ -171,8 +172,11 @@ export const handler = async (event, context) => {
           }
         })
       };
-    } else if (paymentIntent.status !== 'succeeded') {
-      throw new Error('Payment failed');
+    } else if (paymentIntent.status === 'requires_capture') {
+      // This is correct - authorization successful, awaiting capture
+      console.log(`✅ Payment authorized (hold placed): ${paymentIntent.id} - $${quote.custom_amount}`);
+    } else if (paymentIntent.status !== 'succeeded' && paymentIntent.status !== 'requires_capture') {
+      throw new Error('Payment authorization failed');
     }
 
     console.log(`✅ Payment successful: ${paymentIntent.id} - $${quote.custom_amount}`);
@@ -210,12 +214,13 @@ export const handler = async (event, context) => {
       task_description: quote.description || quote.service_type,
       time_window: timing_preference || 'flexible',
       status: 'pending',
-      payment_status: 'completed',
+      payment_status: 'authorized',
       total_amount: quote.custom_amount,
       source: 'admin_quote',
       quote_id: quote.quote_id,
       scheduled_date: new Date().toISOString().split('T')[0],
-      notes: `Created from admin quote ${quote.quote_id}`
+      notes: `Created from admin quote ${quote.quote_id}`,
+      created_at: new Date().toISOString()
     };
 
     console.log('📝 Task data:', {
@@ -228,21 +233,44 @@ export const handler = async (event, context) => {
       source: taskData.source
     });
 
-    const { data: task, error: taskError } = await supabase
+    // Try with service role key for elevated permissions
+    const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
+    let { data: task, error: taskError } = await supabaseAdmin
       .from('tasks')
       .insert(taskData)
       .select()
       .single();
 
+    console.log('🔍 Task insertion attempt:', {
+      usingServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      taskData: JSON.stringify(taskData, null, 2)
+    });
+
     if (taskError) {
-      console.error('❌ Failed to create task:', taskError);
+      console.error('❌ Failed to create task with service role:', taskError);
       console.error('Task error details:', {
         message: taskError.message,
         code: taskError.code,
         details: taskError.details,
         hint: taskError.hint
       });
-      // Don't throw error here, continue with other operations
+
+      // Try with regular client as fallback
+      console.log('🔄 Trying task creation with regular client...');
+      const { data: taskFallback, error: taskFallbackError } = await supabase
+        .from('tasks')
+        .insert(taskData)
+        .select()
+        .single();
+
+      if (taskFallbackError) {
+        console.error('❌ Fallback task creation also failed:', taskFallbackError);
+        // Don't throw error here, continue with other operations
+      } else {
+        console.log('✅ Fallback task creation successful:', taskFallback);
+        task = taskFallback; // Use fallback task
+        taskError = null; // Clear error since fallback worked
+      }
     } else {
       console.log('✅ Task created successfully:', {
         id: task?.id,
@@ -251,6 +279,28 @@ export const handler = async (event, context) => {
         status: task?.status,
         payment_status: task?.payment_status
       });
+
+      // Verify task was actually inserted by querying it back
+      try {
+        const { data: verifyTask, error: verifyError } = await supabaseAdmin
+          .from('tasks')
+          .select('*')
+          .eq('task_id', task?.task_id)
+          .single();
+
+        if (verifyError) {
+          console.error('❌ Could not verify task insertion:', verifyError);
+        } else {
+          console.log('✅ Task verification successful:', {
+            database_id: verifyTask.id,
+            task_id: verifyTask.task_id,
+            created_at: verifyTask.created_at,
+            source: verifyTask.source
+          });
+        }
+      } catch (verifyError) {
+        console.error('❌ Task verification failed:', verifyError);
+      }
 
       // Force admin task refresh if possible
       try {
@@ -271,7 +321,7 @@ export const handler = async (event, context) => {
         task_id: task?.id,
         amount: quote.custom_amount,
         payment_intent_id: paymentIntent.id,
-        status: 'completed',
+        status: 'pending', // Authorization hold, not captured yet
         payment_type: 'quote_payment',
         quote_id: quote.quote_id,
         created_at: new Date().toISOString()
