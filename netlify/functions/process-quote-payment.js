@@ -206,20 +206,30 @@ export const handler = async (event, context) => {
 
     const taskData = {
       task_id: taskId,
+      handyman_id: null, // Will be assigned later
       customer_name: customer_name,
       customer_phone: customer_phone,
       customer_email: customer_email,
       customer_address: customer_address,
       task_category: quote.service_type,
       task_description: quote.description || quote.service_type,
+      scheduled_date: new Date().toISOString().split('T')[0],
+      scheduled_datetime: null,
       time_window: timing_preference || 'flexible',
+      estimated_hours: quote.estimated_hours || null,
       status: 'pending',
       payment_status: 'authorized',
       total_amount: quote.custom_amount,
+      assigned_handyman_name: null,
+      assigned_handyman_phone: null,
+      reminder_2hr_sent: false,
+      reminder_2hr_sent_at: null,
+      reminder_30min_sent: false,
+      reminder_30min_sent_at: null,
+      payment_captured_at: null,
       source: 'admin_quote',
       quote_id: quote.quote_id,
-      scheduled_date: new Date().toISOString().split('T')[0],
-      notes: `Created from admin quote ${quote.quote_id}`,
+      notes: `Created from admin quote ${quote.quote_id}. Timing: ${timing_preference || 'flexible'}`,
       created_at: new Date().toISOString()
     };
 
@@ -343,7 +353,7 @@ export const handler = async (event, context) => {
         task_id: taskId,
         amount: quote.custom_amount,
         service: quote.service_type,
-        message: "Payment successful! Your handyman service has been booked."
+        message: "Payment authorized! Funds are held on your card and your handyman service has been booked."
       })
     };
 
