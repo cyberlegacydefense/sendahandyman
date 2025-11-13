@@ -236,9 +236,32 @@ export const handler = async (event, context) => {
 
     if (taskError) {
       console.error('❌ Failed to create task:', taskError);
+      console.error('Task error details:', {
+        message: taskError.message,
+        code: taskError.code,
+        details: taskError.details,
+        hint: taskError.hint
+      });
       // Don't throw error here, continue with other operations
     } else {
-      console.log('✅ Task created:', { id: task?.id, task_id: task?.task_id });
+      console.log('✅ Task created successfully:', {
+        id: task?.id,
+        task_id: task?.task_id,
+        customer_name: task?.customer_name,
+        status: task?.status,
+        payment_status: task?.payment_status
+      });
+
+      // Force admin task refresh if possible
+      try {
+        await fetch(`${process.env.SITE_URL || 'https://sendahandyman.com'}/.netlify/functions/refresh-admin-cache`, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'refresh_tasks' })
+        });
+        console.log('📡 Admin cache refresh requested');
+      } catch (refreshError) {
+        console.log('⚠️  Admin refresh not available:', refreshError.message);
+      }
     }
 
     // Create payment record
