@@ -43,7 +43,10 @@
 
             <!-- Action Buttons -->
             <div class="space-y-3">
-                <a href="/" class="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center">
+                <button onclick="closeWindow()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                    Close Window
+                </button>
+                <a href="/" class="block w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors text-center">
                     Return to Homepage
                 </a>
             </div>
@@ -63,6 +66,28 @@
             `;
         } else {
             document.getElementById('bookingDetails').style.display = 'none';
+        }
+
+        // Close window function
+        function closeWindow() {
+            if (window.opener || window.parent !== window) {
+                // This is a popup or iframe, close it
+                window.close();
+            } else {
+                // Regular window, go back in history or to homepage
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = '/';
+                }
+            }
+        }
+
+        // Auto-close if opened as popup after 15 seconds
+        if (window.opener) {
+            setTimeout(() => {
+                window.close();
+            }, 15000);
         }
     </script>
 </body>

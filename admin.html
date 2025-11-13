@@ -3020,6 +3020,46 @@ function initializeEventListeners() {
   } else {
     console.error('❌ window.editHandyman is not available');
   }
+
+  // Add refresh button event listeners
+  const refreshHandymen = document.getElementById('refreshHandymen');
+  const refreshQuotes = document.getElementById('refreshQuotes');
+  const refreshTasks = document.getElementById('refreshTasks');
+
+  if (refreshHandymen) {
+    refreshHandymen.addEventListener('click', () => {
+      console.log('🔄 Refreshing handymen data...');
+      loadHandymenData();
+    });
+    console.log('✅ Refresh handymen button listener attached');
+  }
+
+  if (refreshQuotes) {
+    refreshQuotes.addEventListener('click', () => {
+      console.log('🔄 Refreshing quotes data...');
+      loadQuotesData();
+    });
+    console.log('✅ Refresh quotes button listener attached');
+  }
+
+  if (refreshTasks) {
+    refreshTasks.addEventListener('click', () => {
+      console.log('🔄 Refreshing tasks data...');
+      loadTasksData();
+    });
+    console.log('✅ Refresh tasks button listener attached');
+  }
+
+  // Auto-refresh task manager every 30 seconds when on tasks tab
+  setInterval(() => {
+    const activeTab = document.querySelector('.admin-nav-btn.active');
+    if (activeTab && activeTab.textContent.includes('Task Manager')) {
+      console.log('🔄 Auto-refreshing tasks data...');
+      loadTasksData();
+    }
+  }, 30000); // 30 seconds
+
+  console.log('✅ Auto-refresh for tasks enabled (30s interval)');
 }
 
 // Initialize when DOM is fully loaded
