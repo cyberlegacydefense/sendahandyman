@@ -210,7 +210,7 @@ export const handler = async (event, context) => {
       task_description: quote.description || quote.service_type,
       time_window: timing_preference || 'flexible',
       status: 'pending',
-      payment_status: 'authorized',
+      payment_status: 'completed',
       total_amount: quote.custom_amount,
       source: 'admin_quote',
       quote_id: quote.quote_id,
@@ -222,7 +222,10 @@ export const handler = async (event, context) => {
       task_id: taskData.task_id,
       customer_name: taskData.customer_name,
       task_category: taskData.task_category,
-      total_amount: taskData.total_amount
+      total_amount: taskData.total_amount,
+      payment_status: taskData.payment_status,
+      status: taskData.status,
+      source: taskData.source
     });
 
     const { data: task, error: taskError } = await supabase
