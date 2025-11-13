@@ -2036,119 +2036,65 @@ async function saveHandymanEdits() {
       throw new Error('Handyman record not found or not accessible for updates');
     }
 
-    // Try direct update approach with enhanced debugging
-    console.log('🔄 Attempting handyman update...');
+    // Since RLS policies are inconsistently blocking updates, use Edge Function for all admin updates
+    console.log('🚀 Using Edge Function for reliable admin updates...');
 
-    const { data: updateResult, error } = await supabase
-      .from('handymen')
-      .update({
-        full_name: fullName,
-        email: email.toLowerCase(),
-        phone: phone || null,
-        hourly_rate: hourlyRate,
-        skills: skills,
-        onboarding_completed: onboardingCompleted,
-        is_active: isActive
+    const updateData = {
+      full_name: fullName,
+      email: email.toLowerCase(),
+      phone: phone || null,
+      hourly_rate: hourlyRate,
+      skills: skills,
+      onboarding_completed: onboardingCompleted,
+      is_active: isActive
+    };
+
+    console.log('🔍 Update payload:', updateData);
+
+    const response = await fetch('/.netlify/functions/admin-update-handyman', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+      },
+      body: JSON.stringify({
+        handyman_id: handymanId,
+        updates: updateData
       })
-      .eq('id', handymanId)
-      .select(); // Return the updated record
+    });
 
-    if (error) {
-      console.error('❌ Database update error:', error);
-      console.error('Error details:', {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint
-      });
-      throw error;
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Edge Function error:', errorData);
+      throw new Error(`Update failed: ${errorData.error || response.statusText}`);
     }
 
-    console.log('✅ Update result:', updateResult);
+    const edgeResult = await response.json();
+    console.log('✅ Edge Function update successful:', edgeResult);
 
-    // Check if update actually affected any rows
-    if (!updateResult || updateResult.length === 0) {
-      console.warn('⚠️  Update returned empty result - this suggests RLS policy issues');
+    if (!edgeResult.success) {
+      throw new Error(edgeResult.error || 'Update failed');
+    }
 
-      // Let's try to verify what happened by reading the record again
-      const { data: afterUpdate, error: afterError } = await supabase
-        .from('handymen')
-        .select('*')
-        .eq('id', handymanId);
+    // Verify the update worked by reading the record again
+    const { data: verifyRecord, error: verifyError } = await supabase
+      .from('handymen')
+      .select('*')
+      .eq('id', handymanId)
+      .single();
 
-      console.log('🔍 Record after attempted update:', {
-        found: afterUpdate?.length > 0,
-        record: afterUpdate?.[0],
-        afterError
-      });
-
-      // Check if the update actually worked despite empty return
-      const actualRecord = afterUpdate?.[0];
-
-      console.log('🔍 Comparing update values:', {
+    if (!verifyError && verifyRecord) {
+      console.log('🔍 Verification - Record after update:', {
         expectedName: fullName,
-        actualName: actualRecord?.full_name,
-        nameMatch: actualRecord?.full_name === fullName,
+        actualName: verifyRecord.full_name,
+        nameUpdated: verifyRecord.full_name === fullName,
         expectedPhone: phone || null,
-        actualPhone: actualRecord?.phone,
-        phoneMatch: actualRecord?.phone === (phone || null),
+        actualPhone: verifyRecord.phone,
+        phoneUpdated: verifyRecord.phone === (phone || null),
         expectedEmail: email.toLowerCase(),
-        actualEmail: actualRecord?.email,
-        emailMatch: actualRecord?.email === email.toLowerCase()
+        actualEmail: verifyRecord.email,
+        emailUpdated: verifyRecord.email === email.toLowerCase()
       });
-
-      // Check if any of the key fields were updated
-      const nameUpdated = actualRecord && actualRecord.full_name === fullName;
-      const phoneUpdated = actualRecord && actualRecord.phone === (phone || null);
-      const emailUpdated = actualRecord && actualRecord.email === email.toLowerCase();
-
-      if (nameUpdated || phoneUpdated || emailUpdated) {
-        console.log('✅ Update actually succeeded (RLS policy prevents returning updated record)');
-        console.log('✅ Fields updated:', {
-          name: nameUpdated,
-          phone: phoneUpdated,
-          email: emailUpdated
-        });
-      } else {
-        console.error('❌ Update failed - record was not modified');
-
-        // Since direct updates don't work due to RLS, let's create an Edge Function to handle this
-        console.log('🔄 Attempting update via Edge Function...');
-
-        const response = await fetch('/.netlify/functions/admin-update-handyman', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-          },
-          body: JSON.stringify({
-            handyman_id: handymanId,
-            updates: {
-              full_name: fullName,
-              email: email.toLowerCase(),
-              phone: phone || null,
-              hourly_rate: hourlyRate,
-              skills: skills,
-              onboarding_completed: onboardingCompleted,
-              is_active: isActive
-            }
-          })
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(`Edge Function failed: ${errorData.error || response.statusText}`);
-        }
-
-        const edgeResult = await response.json();
-        console.log('✅ Edge Function update successful:', edgeResult);
-
-        if (!edgeResult.success) {
-          throw new Error(edgeResult.error || 'Edge Function update failed');
-        }
-
-        return edgeResult;
-      }
     }
 
     console.log('✅ Handyman updated successfully');
