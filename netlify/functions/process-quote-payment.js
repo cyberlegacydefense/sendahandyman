@@ -123,6 +123,7 @@ export const handler = async (event, context) => {
       payment_method: payment_method_id,
       confirmation_method: 'manual',
       confirm: true,
+      return_url: `${event.headers.origin || 'https://sendahandyman.com'}/quote-payment-success?token=${quote_token}`,
       description: `Quote Payment: ${quote.service_type} for ${customer_name}`,
       metadata: {
         quote_id: quote.quote_id,
