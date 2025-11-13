@@ -8,6 +8,14 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
 export const handler = async (event, context) => {
+  console.log('🚀 Quote payment function started');
+  console.log('📝 Environment check:', {
+    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+    hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY || !!process.env.SUPABASE_ANON_KEY,
+    method: event.httpMethod
+  });
+
   try {
     if (event.httpMethod === "OPTIONS") {
       return { statusCode: 200, headers: cors() };
@@ -17,6 +25,24 @@ export const handler = async (event, context) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let requestData;
+    try {
+      requestData = JSON.parse(event.body || "{}");
+      console.log('📦 Request data received:', {
+        hasQuoteToken: !!requestData.quote_token,
+        hasPaymentMethodId: !!requestData.payment_method_id,
+        hasCustomerData: !!(requestData.customer_name && requestData.customer_email)
+      });
+    } catch (parseError) {
+      console.error('❌ JSON parsing error:', parseError);
+      return {
+        statusCode: 400,
+        headers: cors(),
+        body: JSON.stringify({ error: "Invalid request data" })
+      };
+    }
+
     const {
       quote_token,
       customer_name,
@@ -25,9 +51,10 @@ export const handler = async (event, context) => {
       customer_address,
       timing_preference,
       payment_method_id
-    } = JSON.parse(event.body || "{}");
+    } = requestData;
 
     if (!quote_token || !payment_method_id) {
+      console.error('❌ Missing required fields:', { quote_token: !!quote_token, payment_method_id: !!payment_method_id });
       return {
         statusCode: 400,
         headers: cors(),
@@ -38,19 +65,37 @@ export const handler = async (event, context) => {
     console.log(`💰 Processing quote payment for token: ${quote_token.substring(0, 8)}...`);
 
     // Get quote details
+    console.log('🔍 Looking up quote...');
     const { data: quote, error: quoteError } = await supabase
       .from('quotes')
       .select('*')
       .eq('quote_token', quote_token)
       .single();
 
-    if (quoteError || !quote) {
+    if (quoteError) {
+      console.error('❌ Quote lookup error:', quoteError);
+      return {
+        statusCode: 404,
+        headers: cors(),
+        body: JSON.stringify({ error: "Quote not found", details: quoteError.message })
+      };
+    }
+
+    if (!quote) {
+      console.error('❌ Quote not found for token:', quote_token.substring(0, 8));
       return {
         statusCode: 404,
         headers: cors(),
         body: JSON.stringify({ error: "Quote not found" })
       };
     }
+
+    console.log('✅ Quote found:', {
+      id: quote.quote_id,
+      status: quote.status,
+      amount: quote.custom_amount,
+      service: quote.service_type
+    });
 
     // Verify quote is still valid
     if (quote.status !== 'pending') {
@@ -70,7 +115,9 @@ export const handler = async (event, context) => {
     }
 
     // Create payment intent with Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
+    console.log('💳 Creating Stripe payment intent...');
+
+    const paymentIntentData = {
       amount: Math.round(quote.custom_amount * 100), // Convert to cents
       currency: 'usd',
       payment_method: payment_method_id,
@@ -84,7 +131,32 @@ export const handler = async (event, context) => {
         service_type: quote.service_type,
         source: 'admin_quote'
       }
+    };
+
+    console.log('💳 Payment intent data:', {
+      amount: paymentIntentData.amount,
+      currency: paymentIntentData.currency,
+      hasPaymentMethod: !!payment_method_id
     });
+
+    let paymentIntent;
+    try {
+      paymentIntent = await stripe.paymentIntents.create(paymentIntentData);
+      console.log('✅ Payment intent created:', {
+        id: paymentIntent.id,
+        status: paymentIntent.status
+      });
+    } catch (stripeError) {
+      console.error('❌ Stripe payment intent error:', stripeError);
+      return {
+        statusCode: 400,
+        headers: cors(),
+        body: JSON.stringify({
+          error: 'Payment processing failed',
+          details: stripeError.message
+        })
+      };
+    }
 
     if (paymentIntent.status === 'requires_action') {
       return {
@@ -124,32 +196,45 @@ export const handler = async (event, context) => {
     }
 
     // Create task record for the paid quote
+    console.log('📝 Creating task record...');
     const taskId = `TASK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const taskData = {
+      task_id: taskId,
+      customer_name: customer_name,
+      customer_phone: customer_phone,
+      customer_email: customer_email,
+      customer_address: customer_address,
+      task_category: quote.service_type,
+      task_description: quote.description || quote.service_type,
+      time_window: timing_preference || 'flexible',
+      status: 'pending',
+      payment_status: 'authorized',
+      total_amount: quote.custom_amount,
+      source: 'admin_quote',
+      quote_id: quote.quote_id,
+      scheduled_date: new Date().toISOString().split('T')[0],
+      notes: `Created from admin quote ${quote.quote_id}`
+    };
+
+    console.log('📝 Task data:', {
+      task_id: taskData.task_id,
+      customer_name: taskData.customer_name,
+      task_category: taskData.task_category,
+      total_amount: taskData.total_amount
+    });
 
     const { data: task, error: taskError } = await supabase
       .from('tasks')
-      .insert({
-        task_id: taskId,
-        customer_name: customer_name,
-        customer_phone: customer_phone,
-        customer_email: customer_email,
-        customer_address: customer_address,
-        task_category: quote.service_type,
-        task_description: quote.description || quote.service_type,
-        time_window: timing_preference || 'flexible',
-        status: 'pending',
-        payment_status: 'authorized',
-        total_amount: quote.custom_amount,
-        source: 'admin_quote',
-        quote_id: quote.quote_id,
-        scheduled_date: new Date().toISOString().split('T')[0],
-        notes: `Created from admin quote ${quote.quote_id}`
-      })
+      .insert(taskData)
       .select()
       .single();
 
     if (taskError) {
       console.error('❌ Failed to create task:', taskError);
+      // Don't throw error here, continue with other operations
+    } else {
+      console.log('✅ Task created:', { id: task?.id, task_id: task?.task_id });
     }
 
     // Create payment record
