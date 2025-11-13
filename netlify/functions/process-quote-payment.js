@@ -7,6 +7,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
+// Critical debugging: Log which keys are being used
+console.log('🔑 Supabase Configuration Debug:', {
+  url: supabaseUrl,
+  hasServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+  hasAnonKey: !!process.env.SUPABASE_ANON_KEY,
+  usingKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'service_role' : 'anon',
+  keyPrefix: supabaseKey?.substring(0, 20) + '...'
+});
+
 export const handler = async (event, context) => {
   console.log('🚀 Quote payment function started');
   console.log('📝 Environment check:', {
@@ -200,135 +209,73 @@ export const handler = async (event, context) => {
       console.error('❌ Failed to update quote status:', quoteUpdateError);
     }
 
-    // Create task record for the paid quote
-    console.log('📝 Creating task record...');
+    // Create task record using the same proven method as main website
+    console.log('📝 Creating task record using proven create-task function...');
     const taskId = `TASK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    const taskData = {
+    // Prepare task data in the same format as main website
+    const taskCreationData = {
       task_id: taskId,
-      handyman_id: null, // Will be assigned later
-      customer_name: customer_name,
-      customer_phone: customer_phone,
-      customer_email: customer_email,
-      customer_address: customer_address,
-      task_category: quote.service_type,
-      task_description: quote.description || quote.service_type,
-      scheduled_date: new Date().toISOString().split('T')[0],
-      scheduled_datetime: null,
-      time_window: timing_preference || 'flexible',
+      name: customer_name,
+      phone: customer_phone,
+      email: customer_email,
+      address: customer_address,
+      category: quote.service_type,
+      description: quote.description || quote.service_type,
+      window: timing_preference || 'flexible',
       estimated_hours: quote.estimated_hours || null,
-      status: 'pending',
-      payment_status: 'authorized',
       total_amount: quote.custom_amount,
-      assigned_handyman_name: null,
-      assigned_handyman_phone: null,
-      reminder_2hr_sent: false,
-      reminder_2hr_sent_at: null,
-      reminder_30min_sent: false,
-      reminder_30min_sent_at: null,
-      payment_captured_at: null,
-      source: 'admin_quote',
-      quote_id: quote.quote_id,
-      notes: `Created from admin quote ${quote.quote_id}. Timing: ${timing_preference || 'flexible'}`,
-      created_at: new Date().toISOString()
+      access_details: 'Created from admin quote',
+      pets_and_special: 'N/A',
+      additional_details: `Admin quote ${quote.quote_id}. Timing: ${timing_preference || 'flexible'}`
     };
 
-    console.log('📝 Task data:', {
-      task_id: taskData.task_id,
-      customer_name: taskData.customer_name,
-      task_category: taskData.task_category,
-      total_amount: taskData.total_amount,
-      payment_status: taskData.payment_status,
-      status: taskData.status,
-      source: taskData.source
+    console.log('📝 Task creation data:', {
+      task_id: taskCreationData.task_id,
+      customer_name: taskCreationData.name,
+      task_category: taskCreationData.category,
+      total_amount: taskCreationData.total_amount,
+      window: taskCreationData.window
     });
 
-    // Try with service role key for elevated permissions
-    const supabaseAdmin = createClient(supabaseUrl, process.env.SUPABASE_SERVICE_ROLE_KEY);
-    let { data: task, error: taskError } = await supabaseAdmin
-      .from('tasks')
-      .insert(taskData)
-      .select()
-      .single();
-
-    console.log('🔍 Task insertion attempt:', {
-      usingServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      taskData: JSON.stringify(taskData, null, 2)
-    });
-
-    if (taskError) {
-      console.error('❌ Failed to create task with service role:', taskError);
-      console.error('Task error details:', {
-        message: taskError.message,
-        code: taskError.code,
-        details: taskError.details,
-        hint: taskError.hint
+    // 🗄️ Use the same proven create-task function as main website
+    let task;
+    try {
+      console.log('🔄 Calling proven create-task function...');
+      const taskResponse = await fetch(`${event.headers.origin || 'https://sendahandyman.com'}/.netlify/functions/create-task`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(taskCreationData)
       });
 
-      // Try with regular client as fallback
-      console.log('🔄 Trying task creation with regular client...');
-      const { data: taskFallback, error: taskFallbackError } = await supabase
-        .from('tasks')
-        .insert(taskData)
-        .select()
-        .single();
-
-      if (taskFallbackError) {
-        console.error('❌ Fallback task creation also failed:', taskFallbackError);
-        // Don't throw error here, continue with other operations
-      } else {
-        console.log('✅ Fallback task creation successful:', taskFallback);
-        task = taskFallback; // Use fallback task
-        taskError = null; // Clear error since fallback worked
+      if (!taskResponse.ok) {
+        const errorData = await taskResponse.json();
+        throw new Error(`Task creation failed: ${errorData.detail || errorData.error || 'Unknown error'}`);
       }
-    } else {
-      console.log('✅ Task created successfully:', {
-        id: task?.id,
-        task_id: task?.task_id,
-        customer_name: task?.customer_name,
-        status: task?.status,
-        payment_status: task?.payment_status
+
+      const taskResult = await taskResponse.json();
+      console.log('✅ Task created successfully using proven function:', {
+        task_id: taskResult.task_id,
+        task_number: taskResult.task_number,
+        success: taskResult.success
       });
 
-      // Verify task was actually inserted by querying it back
-      try {
-        const { data: verifyTask, error: verifyError } = await supabaseAdmin
-          .from('tasks')
-          .select('*')
-          .eq('task_id', task?.task_id)
-          .single();
+      // For compatibility with payment record creation, create a task object
+      task = {
+        id: taskResult.task_id,
+        task_id: taskResult.task_number
+      };
 
-        if (verifyError) {
-          console.error('❌ Could not verify task insertion:', verifyError);
-        } else {
-          console.log('✅ Task verification successful:', {
-            database_id: verifyTask.id,
-            task_id: verifyTask.task_id,
-            created_at: verifyTask.created_at,
-            source: verifyTask.source
-          });
-        }
-      } catch (verifyError) {
-        console.error('❌ Task verification failed:', verifyError);
-      }
-
-      // Force admin task refresh if possible
-      try {
-        await fetch(`${process.env.SITE_URL || 'https://sendahandyman.com'}/.netlify/functions/refresh-admin-cache`, {
-          method: 'POST',
-          body: JSON.stringify({ action: 'refresh_tasks' })
-        });
-        console.log('📡 Admin cache refresh requested');
-      } catch (refreshError) {
-        console.log('⚠️  Admin refresh not available:', refreshError.message);
-      }
+    } catch (taskError) {
+      console.error('❌ CRITICAL: Task creation failed using proven function:', taskError);
+      throw new Error(`Task creation completely failed: ${taskError.message}`);
     }
 
     // Create payment record
     const { error: paymentError } = await supabase
       .from('payments')
       .insert({
-        task_id: task?.id,
+        task_id: task.id, // Use confirmed task ID
         amount: quote.custom_amount,
         payment_intent_id: paymentIntent.id,
         status: 'pending', // Authorization hold, not captured yet
@@ -350,7 +297,7 @@ export const handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         payment_intent_id: paymentIntent.id,
-        task_id: taskId,
+        task_id: task.task_id,
         amount: quote.custom_amount,
         service: quote.service_type,
         message: "Payment authorized! Funds are held on your card and your handyman service has been booked."
