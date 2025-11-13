@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Successful - Send a Handyman</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-4">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <!-- Success Icon -->
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+
+            <!-- Success Message -->
+            <h1 class="text-2xl font-bold text-gray-900 mb-2">Booking Successful!</h1>
+            <p class="text-gray-600 mb-6">
+                Thank you! Your handyman service has been booked successfully.
+            </p>
+
+            <!-- Booking Details -->
+            <div id="bookingDetails" class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+                <h3 class="font-semibold text-gray-900 mb-2">Booking Details:</h3>
+                <div id="bookingInfo" class="text-sm text-gray-600">
+                    <p>Loading your booking details...</p>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="text-left mb-6">
+                <h3 class="font-semibold text-gray-900 mb-2">What's Next:</h3>
+                <ul class="text-sm text-gray-600 space-y-1">
+                    <li>✓ You'll receive a confirmation email shortly</li>
+                    <li>✓ We'll assign a qualified handyman to your job</li>
+                    <li>✓ You'll be contacted within 24 hours to schedule</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3">
+                <a href="/" class="block w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center">
+                    Return to Homepage
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get booking ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('booking_id');
+
+        if (bookingId) {
+            document.getElementById('bookingInfo').innerHTML = `
+                <p><strong>Booking ID:</strong> ${bookingId}</p>
+                <p><strong>Status:</strong> Payment Confirmed</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            `;
+        } else {
+            document.getElementById('bookingDetails').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
