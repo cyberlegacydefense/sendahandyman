@@ -410,14 +410,16 @@
                 return;
             }
 
-            console.log('🔄 Initializing Payment Element for quote payments...');
+            console.log('🔄 Initializing modern payment form...');
 
+            // For quotes, we'll use the traditional Card Element but with modern styling
+            // This avoids the complexity of Payment Intents while still improving mobile experience
             if (paymentElement) {
                 console.log('🧹 Cleaning up existing payment element');
                 try {
                     paymentElement.unmount();
                 } catch (e) {
-                    console.log('Note: Payment element unmount not needed or failed');
+                    console.log('Note: Payment element unmount not needed');
                 }
                 paymentElement = null;
                 elements = null;
@@ -429,35 +431,47 @@
             errorElement.textContent = '';
 
             try {
-                // Initialize Payment Element WITHOUT Payment Intent (backend will handle)
-                // This gives us the mobile-optimized UI without the Payment Intent complexity
-                console.log('🔄 Setting up Payment Element for quote payment...');
+                console.log('🔄 Setting up enhanced Card Element with mobile optimization...');
 
-                // Initialize Elements without client secret (for setup intent style)
+                // Use Elements with modern styling (but Card element for simplicity)
                 elements = stripe.elements({
-                    mode: 'setup', // Setup mode for collecting payment method
-                    currency: 'usd',
-                    appearance: {
-                        theme: 'stripe',
-                        variables: {
-                            colorPrimary: '#4f46e5',
-                        }
-                    }
+                    fonts: [{
+                        cssSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
+                    }]
                 });
 
-                paymentElement = elements.create('payment', {
-                    layout: {
-                        type: 'tabs',
-                        defaultCollapsed: false
-                    },
-                    paymentMethodOrder: ['card', 'apple_pay', 'google_pay'],
-                    fields: {
-                        billingDetails: {
-                            name: 'auto',
-                            email: 'auto',
-                            phone: 'auto'
+                // Create Card Element with mobile-optimized styling
+                paymentElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px', // Prevents iOS zoom
+                            lineHeight: '1.5',
+                            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            fontWeight: '400',
+                            color: '#32325d',
+                            backgroundColor: '#ffffff',
+                            iconColor: '#4f46e5',
+                            '::placeholder': {
+                                color: '#a0aec0',
+                                fontSize: '16px' // Consistent font size
+                            },
+                            // Mobile-specific optimizations
+                            '@media (max-width: 768px)': {
+                                fontSize: '16px', // Critical for iOS
+                                lineHeight: '1.6'
+                            }
+                        },
+                        focus: {
+                            color: '#1a202c',
+                            iconColor: '#4f46e5'
+                        },
+                        invalid: {
+                            color: '#e53e3e',
+                            iconColor: '#e53e3e'
                         }
-                    }
+                    },
+                    hidePostalCode: false, // Show postal code for better verification
+                    iconStyle: 'solid'
                 });
 
                 const mountTarget = document.getElementById('stripe-payment-element');
@@ -465,19 +479,31 @@
                     throw new Error('Payment element container not found');
                 }
 
+                // Add mobile-optimized container styling
                 mountTarget.innerHTML = '';
+                mountTarget.style.cssText = `
+                    padding: 16px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    background: white;
+                    min-height: 50px;
+                    box-sizing: border-box;
+                `;
+
+                // Mobile-specific styling
+                if (window.innerWidth <= 768) {
+                    mountTarget.style.cssText += `
+                        padding: 20px 16px;
+                        min-height: 60px;
+                        font-size: 16px;
+                    `;
+                }
 
                 paymentElement.mount('#stripe-payment-element');
 
                 paymentElement.on('ready', () => {
-                    console.log('✅ Payment element mounted and ready');
+                    console.log('✅ Enhanced Card Element mounted and ready');
                     paymentElementReady = true;
-                });
-
-                paymentElement.on('loaderror', (error) => {
-                    console.error('❌ Payment element load error:', error);
-                    errorElement.textContent = 'Failed to load payment form. Please refresh and try again.';
-                    errorElement.classList.remove('hidden');
                 });
 
                 paymentElement.on('change', (event) => {
@@ -490,7 +516,7 @@
                     }
                 });
 
-                console.log('✅ Payment Element initialized in setup mode');
+                console.log('✅ Enhanced Card Element initialized with mobile optimization');
 
             } catch (error) {
                 console.error('❌ Payment element setup error:', error);
@@ -586,7 +612,7 @@
             buttonSpinner.classList.remove('hidden');
 
             try {
-                // Check if Payment Element is ready
+                // Check if enhanced Card Element is ready
                 if (!stripe || !elements || !paymentElement || !paymentElementReady) {
                     throw new Error('Payment form not ready. Please select a pricing option and wait for the payment form to load.');
                 }
@@ -597,30 +623,33 @@
                     throw new Error('Payment form not properly loaded. Please refresh the page and try again.');
                 }
 
-                console.log('🔄 Confirming payment with Payment Element...');
+                console.log('🔄 Creating payment method with enhanced Card Element...');
 
-                // Create payment method using Payment Element (modern UI, compatible backend)
-                console.log('🔄 Creating payment method with Payment Element...');
-
-                const { error, setupIntent } = await stripe.confirmSetup({
-                    elements,
-                    confirmParams: {
-                        return_url: `${window.location.origin}/quote-payment-success.html?token=${quoteToken}`,
+                // Create payment method using enhanced Card Element (mobile-optimized, backend compatible)
+                const { error, paymentMethod } = await stripe.createPaymentMethod({
+                    type: 'card',
+                    card: paymentElement, // Using the enhanced Card Element
+                    billing_details: {
+                        name: document.getElementById('customerNameInput').value,
+                        email: document.getElementById('customerEmailInput').value,
+                        phone: document.getElementById('customerPhoneInput').value,
+                        address: {
+                            line1: document.getElementById('customerAddressInput').value
+                        }
                     },
-                    redirect: 'if_required'
                 });
 
                 if (error) {
                     throw new Error(error.message);
                 }
 
-                console.log('✅ Payment method created:', setupIntent.payment_method);
+                console.log('✅ Payment method created:', paymentMethod.id);
 
                 // Calculate final amount for backend
                 const finalAmount = calculateTotalPrice();
 
                 // Use the payment method ID for backend
-                const paymentMethodId = setupIntent.payment_method;
+                const paymentMethodId = paymentMethod.id;
 
                 // Send additional data to backend
                 const response = await fetch('/.netlify/functions/process-quote-payment', {
