@@ -21,6 +21,50 @@
             background-color: #eff6ff !important;
         }
         .hidden { display: none; }
+
+        /* Mobile optimization for Stripe Card Element */
+        @media (max-width: 768px) {
+            #stripe-payment-element {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 0 !important;
+            }
+
+            #stripe-payment-element iframe {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 300px !important; /* Ensure minimum width for CC numbers */
+            }
+
+            /* Ensure Stripe field containers are wide enough */
+            .StripeElement {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Force proper width for input containers */
+            #stripe-payment-element .InputContainer,
+            #stripe-payment-element .Input {
+                width: 100% !important;
+                max-width: none !important;
+                min-width: 280px !important; /* Minimum for full CC number display */
+            }
+        }
+
+        /* Additional mobile improvements */
+        @media (max-width: 480px) {
+            #stripe-payment-element {
+                margin: 0 -8px; /* Extend slightly beyond container for more space */
+                padding: 20px 16px;
+                border-left: none;
+                border-right: none;
+                border-radius: 0;
+            }
+
+            #stripe-payment-element iframe {
+                min-width: 280px !important; /* Ensure CC number fits */
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -451,19 +495,23 @@
                             color: '#32325d',
                             backgroundColor: '#ffffff',
                             iconColor: '#4f46e5',
+                            padding: '12px',
                             '::placeholder': {
                                 color: '#a0aec0',
                                 fontSize: '16px' // Consistent font size
                             },
-                            // Mobile-specific optimizations
+                            // Mobile-specific optimizations for CC number display
                             '@media (max-width: 768px)': {
                                 fontSize: '16px', // Critical for iOS
-                                lineHeight: '1.6'
+                                lineHeight: '1.6',
+                                padding: '14px 12px', // Better spacing
+                                letterSpacing: '0.5px' // Slight spacing for readability
                             }
                         },
                         focus: {
                             color: '#1a202c',
-                            iconColor: '#4f46e5'
+                            iconColor: '#4f46e5',
+                            outline: 'none'
                         },
                         invalid: {
                             color: '#e53e3e',
@@ -471,7 +519,13 @@
                         }
                     },
                     hidePostalCode: false, // Show postal code for better verification
-                    iconStyle: 'solid'
+                    iconStyle: 'solid',
+                    // Additional mobile options
+                    classes: {
+                        focus: 'StripeElement--focus',
+                        empty: 'StripeElement--empty',
+                        invalid: 'StripeElement--invalid',
+                    }
                 });
 
                 const mountTarget = document.getElementById('stripe-payment-element');
@@ -488,14 +542,19 @@
                     background: white;
                     min-height: 50px;
                     box-sizing: border-box;
+                    width: 100%;
+                    max-width: 100%;
                 `;
 
-                // Mobile-specific styling
+                // Mobile-specific styling for proper CC number display
                 if (window.innerWidth <= 768) {
                     mountTarget.style.cssText += `
                         padding: 20px 16px;
-                        min-height: 60px;
+                        min-height: 70px;
                         font-size: 16px;
+                        width: 100% !important;
+                        max-width: none !important;
+                        overflow: visible !important;
                     `;
                 }
 
@@ -504,6 +563,31 @@
                 paymentElement.on('ready', () => {
                     console.log('✅ Enhanced Card Element mounted and ready');
                     paymentElementReady = true;
+
+                    // Additional mobile optimization after mount
+                    if (window.innerWidth <= 768) {
+                        console.log('📱 Applying mobile optimizations for CC display');
+
+                        // Ensure iframe has proper width
+                        setTimeout(() => {
+                            const iframe = document.querySelector('#stripe-payment-element iframe');
+                            if (iframe) {
+                                iframe.style.width = '100%';
+                                iframe.style.minWidth = '300px';
+                                iframe.style.maxWidth = 'none';
+
+                                // Force parent container width
+                                const container = document.getElementById('stripe-payment-element');
+                                if (container) {
+                                    container.style.width = '100%';
+                                    container.style.minWidth = '300px';
+                                    container.style.overflow = 'visible';
+                                }
+
+                                console.log('📱 Mobile width optimization applied');
+                            }
+                        }, 100); // Small delay to ensure iframe is fully loaded
+                    }
                 });
 
                 paymentElement.on('change', (event) => {
