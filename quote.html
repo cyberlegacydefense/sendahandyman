@@ -22,47 +22,56 @@
         }
         .hidden { display: none; }
 
-        /* Mobile optimization for Stripe Card Element */
+        /* Mobile optimization for separate Stripe elements */
         @media (max-width: 768px) {
-            #stripe-payment-element {
+            /* Card number gets full width */
+            #card-number-element {
                 width: 100% !important;
-                max-width: none !important;
-                min-width: 0 !important;
+                min-width: 280px !important;
             }
 
-            #stripe-payment-element iframe {
+            #card-number-element iframe {
                 width: 100% !important;
-                max-width: none !important;
-                min-width: 300px !important; /* Ensure minimum width for CC numbers */
+                min-width: 280px !important; /* Ensure full CC number displays */
             }
 
-            /* Ensure Stripe field containers are wide enough */
-            .StripeElement {
-                width: 100% !important;
-                box-sizing: border-box !important;
+            /* Other elements stack on mobile */
+            .grid.grid-cols-1.md\\:grid-cols-3 {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
             }
 
-            /* Force proper width for input containers */
-            #stripe-payment-element .InputContainer,
-            #stripe-payment-element .Input {
+            /* Ensure all Stripe elements are properly sized */
+            #card-expiry-element,
+            #card-cvc-element,
+            #postal-code-element {
                 width: 100% !important;
-                max-width: none !important;
-                min-width: 280px !important; /* Minimum for full CC number display */
+            }
+
+            #card-expiry-element iframe,
+            #card-cvc-element iframe,
+            #postal-code-element iframe {
+                width: 100% !important;
+                min-width: 120px !important; /* Enough for expiry/CVC */
             }
         }
 
-        /* Additional mobile improvements */
+        /* Very small screens - stack everything */
         @media (max-width: 480px) {
-            #stripe-payment-element {
-                margin: 0 -8px; /* Extend slightly beyond container for more space */
-                padding: 20px 16px;
+            .grid.grid-cols-1.md\\:grid-cols-3 {
+                display: block !important;
+            }
+
+            .grid.grid-cols-1.md\\:grid-cols-3 > div {
+                margin-bottom: 1rem !important;
+            }
+
+            /* More space for card number on small screens */
+            #card-number-element {
+                margin: 0 -8px;
                 border-left: none;
                 border-right: none;
                 border-radius: 0;
-            }
-
-            #stripe-payment-element iframe {
-                min-width: 280px !important; /* Ensure CC number fits */
             }
         }
     </style>
@@ -201,9 +210,37 @@
                     <!-- Payment Method -->
                     <div class="border-t border-slate-200 pt-6">
                         <label class="block text-sm font-semibold text-slate-700 mb-3">Payment Information</label>
-                        <div id="stripe-payment-element" class="mb-4">
-                            <!-- Stripe Payment Element will create form elements here -->
+
+                        <!-- Card Number - Full Width -->
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-slate-600 mb-2">Card Number</label>
+                            <div id="card-number-element" class="p-4 border border-slate-300 rounded-lg bg-white">
+                                <!-- Card Number Element -->
+                            </div>
                         </div>
+
+                        <!-- Card Details Row -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-2">Expiry</label>
+                                <div id="card-expiry-element" class="p-4 border border-slate-300 rounded-lg bg-white">
+                                    <!-- Card Expiry Element -->
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-2">CVC</label>
+                                <div id="card-cvc-element" class="p-4 border border-slate-300 rounded-lg bg-white">
+                                    <!-- Card CVC Element -->
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-600 mb-2">ZIP Code</label>
+                                <div id="postal-code-element" class="p-4 border border-slate-300 rounded-lg bg-white">
+                                    <!-- Postal Code Element -->
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="payment-errors" class="text-red-600 text-sm mt-2 hidden"></div>
                     </div>
 
@@ -484,121 +521,117 @@
                     }]
                 });
 
-                // Create Card Element with mobile-optimized styling
-                paymentElement = elements.create('card', {
-                    style: {
-                        base: {
-                            fontSize: '16px', // Prevents iOS zoom
-                            lineHeight: '1.5',
-                            fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                            fontWeight: '400',
-                            color: '#32325d',
-                            backgroundColor: '#ffffff',
-                            iconColor: '#4f46e5',
-                            padding: '12px',
-                            '::placeholder': {
-                                color: '#a0aec0',
-                                fontSize: '16px' // Consistent font size
-                            },
-                            // Mobile-specific optimizations for CC number display
-                            '@media (max-width: 768px)': {
-                                fontSize: '16px', // Critical for iOS
-                                lineHeight: '1.6',
-                                padding: '14px 12px', // Better spacing
-                                letterSpacing: '0.5px' // Slight spacing for readability
-                            }
+                // Create individual card elements for better mobile layout
+                const cardStyle = {
+                    base: {
+                        fontSize: '16px', // Prevents iOS zoom
+                        lineHeight: '1.5',
+                        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        fontWeight: '400',
+                        color: '#32325d',
+                        backgroundColor: '#ffffff',
+                        iconColor: '#4f46e5',
+                        padding: '14px',
+                        '::placeholder': {
+                            color: '#a0aec0',
+                            fontSize: '16px'
                         },
-                        focus: {
-                            color: '#1a202c',
-                            iconColor: '#4f46e5',
-                            outline: 'none'
-                        },
-                        invalid: {
-                            color: '#e53e3e',
-                            iconColor: '#e53e3e'
+                        // Mobile-specific optimizations
+                        '@media (max-width: 768px)': {
+                            fontSize: '16px', // Critical for iOS
+                            lineHeight: '1.6',
+                            padding: '16px 14px',
+                            letterSpacing: '0.5px'
                         }
                     },
-                    hidePostalCode: false, // Show postal code for better verification
-                    iconStyle: 'solid',
-                    // Additional mobile options
-                    classes: {
-                        focus: 'StripeElement--focus',
-                        empty: 'StripeElement--empty',
-                        invalid: 'StripeElement--invalid',
+                    focus: {
+                        color: '#1a202c',
+                        iconColor: '#4f46e5',
+                        outline: 'none'
+                    },
+                    invalid: {
+                        color: '#e53e3e',
+                        iconColor: '#e53e3e'
                     }
+                };
+
+                // Create separate elements for better mobile control
+                const cardNumber = elements.create('cardNumber', {
+                    style: cardStyle,
+                    placeholder: '1234 1234 1234 1234'
                 });
 
-                const mountTarget = document.getElementById('stripe-payment-element');
-                if (!mountTarget) {
-                    throw new Error('Payment element container not found');
-                }
-
-                // Add mobile-optimized container styling
-                mountTarget.innerHTML = '';
-                mountTarget.style.cssText = `
-                    padding: 16px;
-                    border: 1px solid #d1d5db;
-                    border-radius: 8px;
-                    background: white;
-                    min-height: 50px;
-                    box-sizing: border-box;
-                    width: 100%;
-                    max-width: 100%;
-                `;
-
-                // Mobile-specific styling for proper CC number display
-                if (window.innerWidth <= 768) {
-                    mountTarget.style.cssText += `
-                        padding: 20px 16px;
-                        min-height: 70px;
-                        font-size: 16px;
-                        width: 100% !important;
-                        max-width: none !important;
-                        overflow: visible !important;
-                    `;
-                }
-
-                paymentElement.mount('#stripe-payment-element');
-
-                paymentElement.on('ready', () => {
-                    console.log('✅ Enhanced Card Element mounted and ready');
-                    paymentElementReady = true;
-
-                    // Additional mobile optimization after mount
-                    if (window.innerWidth <= 768) {
-                        console.log('📱 Applying mobile optimizations for CC display');
-
-                        // Ensure iframe has proper width
-                        setTimeout(() => {
-                            const iframe = document.querySelector('#stripe-payment-element iframe');
-                            if (iframe) {
-                                iframe.style.width = '100%';
-                                iframe.style.minWidth = '300px';
-                                iframe.style.maxWidth = 'none';
-
-                                // Force parent container width
-                                const container = document.getElementById('stripe-payment-element');
-                                if (container) {
-                                    container.style.width = '100%';
-                                    container.style.minWidth = '300px';
-                                    container.style.overflow = 'visible';
-                                }
-
-                                console.log('📱 Mobile width optimization applied');
-                            }
-                        }, 100); // Small delay to ensure iframe is fully loaded
-                    }
+                const cardExpiry = elements.create('cardExpiry', {
+                    style: cardStyle,
+                    placeholder: 'MM / YY'
                 });
 
-                paymentElement.on('change', (event) => {
-                    console.log('🔄 Payment element change event');
+                const cardCvc = elements.create('cardCvc', {
+                    style: cardStyle,
+                    placeholder: 'CVC'
+                });
+
+                const postalCode = elements.create('postalCode', {
+                    style: cardStyle,
+                    placeholder: 'ZIP Code'
+                });
+
+                // Store references for later use
+                paymentElement = {
+                    cardNumber,
+                    cardExpiry,
+                    cardCvc,
+                    postalCode
+                };
+
+                // Mount each element to its container
+                const cardNumberElement = document.getElementById('card-number-element');
+                const cardExpiryElement = document.getElementById('card-expiry-element');
+                const cardCvcElement = document.getElementById('card-cvc-element');
+                const postalCodeElement = document.getElementById('postal-code-element');
+
+                if (!cardNumberElement || !cardExpiryElement || !cardCvcElement || !postalCodeElement) {
+                    throw new Error('Payment element containers not found');
+                }
+
+                // Mount individual elements
+                cardNumber.mount('#card-number-element');
+                cardExpiry.mount('#card-expiry-element');
+                cardCvc.mount('#card-cvc-element');
+                postalCode.mount('#postal-code-element');
+
+                // Set up event handlers for all elements
+                let elementsReady = 0;
+                const totalElements = 4;
+
+                function checkAllReady() {
+                    elementsReady++;
+                    if (elementsReady === totalElements) {
+                        console.log('✅ All card elements mounted and ready');
+                        paymentElementReady = true;
+                    }
+                }
+
+                // Ready event handlers
+                cardNumber.on('ready', checkAllReady);
+                cardExpiry.on('ready', checkAllReady);
+                cardCvc.on('ready', checkAllReady);
+                postalCode.on('ready', checkAllReady);
+
+                // Change event handlers for error display
+                function handleElementChange(event) {
                     if (event.error) {
                         errorElement.textContent = event.error.message;
                         errorElement.classList.remove('hidden');
                     } else {
                         errorElement.classList.add('hidden');
                     }
-                });
+                }
+
+                cardNumber.on('change', handleElementChange);
+                cardExpiry.on('change', handleElementChange);
+                cardCvc.on('change', handleElementChange);
+                postalCode.on('change', handleElementChange);
 
                 console.log('✅ Enhanced Card Element initialized with mobile optimization');
 
@@ -701,18 +734,18 @@
                     throw new Error('Payment form not ready. Please select a pricing option and wait for the payment form to load.');
                 }
 
-                // Validate payment element is in DOM
-                const elementInDom = document.querySelector('#stripe-payment-element iframe');
-                if (!elementInDom) {
+                // Validate payment elements are in DOM
+                const cardNumberInDom = document.querySelector('#card-number-element iframe');
+                if (!cardNumberInDom) {
                     throw new Error('Payment form not properly loaded. Please refresh the page and try again.');
                 }
 
-                console.log('🔄 Creating payment method with enhanced Card Element...');
+                console.log('🔄 Creating payment method with separate card elements...');
 
-                // Create payment method using enhanced Card Element (mobile-optimized, backend compatible)
+                // Create payment method using card number element (mobile-optimized, backend compatible)
                 const { error, paymentMethod } = await stripe.createPaymentMethod({
                     type: 'card',
-                    card: paymentElement, // Using the enhanced Card Element
+                    card: paymentElement.cardNumber, // Using the card number element
                     billing_details: {
                         name: document.getElementById('customerNameInput').value,
                         email: document.getElementById('customerEmailInput').value,
