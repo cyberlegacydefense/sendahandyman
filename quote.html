@@ -404,11 +404,13 @@
             return serviceMap[serviceTypeName] || 'general';
         }
 
-        async function initializePaymentElement() {
+        function initializePaymentElement() {
             if (!selectedPricingOption) {
                 console.log('⏳ No pricing option selected yet');
                 return;
             }
+
+            console.log('🔄 Initializing Payment Element for quote payments...');
 
             if (paymentElement) {
                 console.log('🧹 Cleaning up existing payment element');
@@ -418,6 +420,7 @@
                     console.log('Note: Payment element unmount not needed or failed');
                 }
                 paymentElement = null;
+                elements = null;
             }
 
             paymentElementReady = false;
@@ -426,39 +429,14 @@
             errorElement.textContent = '';
 
             try {
-                console.log('🔄 Setting up payment intent for amount:', selectedPricingOption.basePrice);
+                // Initialize Payment Element WITHOUT Payment Intent (backend will handle)
+                // This gives us the mobile-optimized UI without the Payment Intent complexity
+                console.log('🔄 Setting up Payment Element for quote payment...');
 
-                // Create Payment Intent (similar to main website)
-                const response = await fetch('/.netlify/functions/create-payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        amount: calculateTotalPrice(),
-                        currency: 'usd',
-                        capture_method: 'manual' // Authorization hold like main website
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Failed to create payment intent');
-                }
-
-                const result = await response.json();
-                console.log('✅ Payment intent created:', result.payment_intent_id);
-
-                // Clean up existing elements
-                if (elements) {
-                    try {
-                        elements = null;
-                    } catch (e) {
-                        console.log('Element cleanup:', e.message);
-                    }
-                }
-
-                // Initialize Payment Element (copy from main website)
+                // Initialize Elements without client secret (for setup intent style)
                 elements = stripe.elements({
-                    clientSecret: result.client_secret,
+                    mode: 'setup', // Setup mode for collecting payment method
+                    currency: 'usd',
                     appearance: {
                         theme: 'stripe',
                         variables: {
@@ -489,53 +467,34 @@
 
                 mountTarget.innerHTML = '';
 
-                // Mount and wait for ready
-                await new Promise((resolve, reject) => {
-                    let readyFired = false;
+                paymentElement.mount('#stripe-payment-element');
 
-                    paymentElement.mount('#stripe-payment-element');
-
-                    paymentElement.on('ready', () => {
-                        console.log('✅ Payment element mounted and ready');
-                        paymentElementReady = true;
-                        readyFired = true;
-                        resolve();
-                    });
-
-                    paymentElement.on('loaderror', (error) => {
-                        console.error('❌ Payment element load error:', error);
-                        reject(new Error(error.error?.message || 'Failed to load payment form'));
-                    });
-
-                    paymentElement.on('change', (event) => {
-                        console.log('🔄 Payment element change event');
-                        if (event.error) {
-                            errorElement.textContent = event.error.message;
-                            errorElement.classList.remove('hidden');
-                        } else {
-                            errorElement.classList.add('hidden');
-                        }
-                    });
-
-                    // Timeout fallback
-                    setTimeout(() => {
-                        if (!readyFired) {
-                            console.warn('⚠️ Payment element ready event timeout');
-                            const elementInDom = document.querySelector('#stripe-payment-element iframe');
-                            if (elementInDom) {
-                                console.log('✅ Payment element iframe found in DOM, assuming ready');
-                                paymentElementReady = true;
-                                resolve();
-                            } else {
-                                reject(new Error('Payment element failed to mount'));
-                            }
-                        }
-                    }, 8000);
+                paymentElement.on('ready', () => {
+                    console.log('✅ Payment element mounted and ready');
+                    paymentElementReady = true;
                 });
+
+                paymentElement.on('loaderror', (error) => {
+                    console.error('❌ Payment element load error:', error);
+                    errorElement.textContent = 'Failed to load payment form. Please refresh and try again.';
+                    errorElement.classList.remove('hidden');
+                });
+
+                paymentElement.on('change', (event) => {
+                    console.log('🔄 Payment element change event');
+                    if (event.error) {
+                        errorElement.textContent = event.error.message;
+                        errorElement.classList.remove('hidden');
+                    } else {
+                        errorElement.classList.add('hidden');
+                    }
+                });
+
+                console.log('✅ Payment Element initialized in setup mode');
 
             } catch (error) {
                 console.error('❌ Payment element setup error:', error);
-                errorElement.textContent = 'Unable to load payment form. Please try again.';
+                errorElement.textContent = 'Unable to load payment form. Please refresh the page.';
                 errorElement.classList.remove('hidden');
             }
         }
@@ -640,33 +599,28 @@
 
                 console.log('🔄 Confirming payment with Payment Element...');
 
-                // Use confirmPayment (modern approach like main website)
-                const { error, paymentIntent } = await stripe.confirmPayment({
+                // Create payment method using Payment Element (modern UI, compatible backend)
+                console.log('🔄 Creating payment method with Payment Element...');
+
+                const { error, setupIntent } = await stripe.confirmSetup({
                     elements,
                     confirmParams: {
                         return_url: `${window.location.origin}/quote-payment-success.html?token=${quoteToken}`,
-                        payment_method_data: {
-                            billing_details: {
-                                name: document.getElementById('customerNameInput').value,
-                                email: document.getElementById('customerEmailInput').value,
-                                phone: document.getElementById('customerPhoneInput').value,
-                            }
-                        }
                     },
-                    redirect: 'if_required' // Handle without redirect when possible
+                    redirect: 'if_required'
                 });
 
                 if (error) {
                     throw new Error(error.message);
                 }
 
-                console.log('✅ Payment confirmed:', paymentIntent.id);
+                console.log('✅ Payment method created:', setupIntent.payment_method);
 
                 // Calculate final amount for backend
                 const finalAmount = calculateTotalPrice();
 
-                // Extract payment method ID from the Payment Intent for backend compatibility
-                const paymentMethodId = paymentIntent.payment_method || paymentIntent.payment_method?.id;
+                // Use the payment method ID for backend
+                const paymentMethodId = setupIntent.payment_method;
 
                 // Send additional data to backend
                 const response = await fetch('/.netlify/functions/process-quote-payment', {
@@ -683,8 +637,7 @@
                         timing_preference: selectedPricingOption.id,
                         selected_addons: selectedAddons,
                         final_amount: finalAmount,
-                        payment_method_id: paymentMethodId, // Send payment method ID for backend compatibility
-                        payment_intent_id: paymentIntent.id // Also send Payment Intent ID for reference
+                        payment_method_id: paymentMethodId // Modern Payment Element, backend compatible
                     })
                 });
 
