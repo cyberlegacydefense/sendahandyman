@@ -24,15 +24,42 @@
 
         /* Mobile optimization for separate Stripe elements */
         @media (max-width: 768px) {
-            /* Card number gets full width */
+            /* Card input field container adjustments for portrait mobile */
             #card-number-element {
-                width: 100% !important;
-                min-width: 280px !important;
+                padding-right: 80px !important; /* Space for brand icons */
             }
 
-            #card-number-element iframe {
-                width: 100% !important;
-                min-width: 280px !important; /* Ensure full CC number displays */
+            /* Reduce card brand icon size and ensure proper positioning */
+            .absolute.right-4 {
+                right: 8px !important;
+                max-width: 70px !important;
+                overflow: hidden;
+            }
+
+            /* Smaller card brand icons for mobile portrait */
+            #card-brand-icon div,
+            #accepted-cards div {
+                width: 20px !important;
+                height: 12px !important;
+                font-size: 8px !important;
+                line-height: 1 !important;
+            }
+
+            #accepted-cards {
+                gap: 2px !important;
+            }
+
+            /* Security section mobile layout */
+            .bg-gradient-to-r.from-blue-50 .flex.items-center.justify-between {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.75rem !important;
+            }
+
+            .bg-gradient-to-r.from-blue-50 .flex.items-center.space-x-3 {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+                margin: 0 !important;
             }
 
             /* Other elements stack on mobile */
@@ -41,23 +68,51 @@
                 gap: 1rem !important;
             }
 
-            /* Ensure all Stripe elements are properly sized */
-            #card-expiry-element,
-            #card-cvc-element,
-            #postal-code-element {
-                width: 100% !important;
+            /* Ensure proper container width */
+            .max-w-4xl {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
             }
 
-            #card-expiry-element iframe,
-            #card-cvc-element iframe,
-            #postal-code-element iframe {
-                width: 100% !important;
-                min-width: 120px !important; /* Enough for expiry/CVC */
+            /* Payment form container adjustments */
+            .bg-gradient-to-br.from-slate-50 {
+                margin-left: -0.5rem !important;
+                margin-right: -0.5rem !important;
+                padding: 1rem !important;
+            }
+        }
+
+        /* Portrait mobile specific optimizations */
+        @media (max-width: 430px) {
+            /* Even smaller card brand icons for small portrait screens */
+            #card-brand-icon div,
+            #accepted-cards div {
+                width: 18px !important;
+                height: 10px !important;
+                font-size: 7px !important;
+            }
+
+            /* More padding for card input to avoid overlap */
+            #card-number-element {
+                padding-right: 65px !important;
+            }
+
+            .absolute.right-4 {
+                right: 6px !important;
+                max-width: 60px !important;
+            }
+
+            /* Stack security section items vertically */
+            .bg-gradient-to-r.from-blue-50 .flex.items-center.space-x-3 {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                space-x-0 !important;
+                gap: 0.25rem !important;
             }
         }
 
         /* Very small screens - stack everything */
-        @media (max-width: 480px) {
+        @media (max-width: 375px) {
             .grid.grid-cols-1.md\\:grid-cols-3 {
                 display: block !important;
             }
@@ -66,12 +121,12 @@
                 margin-bottom: 1rem !important;
             }
 
-            /* More space for card number on small screens */
-            #card-number-element {
-                margin: 0 -8px;
-                border-left: none;
-                border-right: none;
-                border-radius: 0;
+            /* Minimal brand icons for very small screens */
+            #card-brand-icon div,
+            #accepted-cards div {
+                width: 16px !important;
+                height: 9px !important;
+                font-size: 6px !important;
             }
         }
     </style>
@@ -728,14 +783,15 @@
                     const acceptedCards = document.getElementById('accepted-cards');
 
                     if (event.brand && event.brand !== 'unknown') {
+                        // Responsive card brand icons - CSS media queries handle sizing
                         const brandIcons = {
-                            'visa': '<div class="w-12 h-7 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold tracking-wide">VISA</div>',
-                            'mastercard': '<div class="w-12 h-7 bg-gradient-to-r from-red-600 to-red-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">MC</div>',
-                            'amex': '<div class="w-12 h-7 bg-gradient-to-r from-blue-800 to-blue-900 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">AMEX</div>',
-                            'discover': '<div class="w-12 h-7 bg-gradient-to-r from-orange-600 to-orange-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">DISC</div>',
-                            'diners': '<div class="w-12 h-7 bg-gradient-to-r from-gray-700 to-gray-800 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">DINERS</div>',
-                            'jcb': '<div class="w-12 h-7 bg-gradient-to-r from-green-600 to-green-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">JCB</div>',
-                            'unionpay': '<div class="w-12 h-7 bg-gradient-to-r from-purple-600 to-purple-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">UP</div>'
+                            'visa': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold tracking-wide">VISA</div>',
+                            'mastercard': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-red-600 to-red-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">MC</div>',
+                            'amex': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-blue-800 to-blue-900 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">AMEX</div>',
+                            'discover': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-orange-600 to-orange-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">DISC</div>',
+                            'diners': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-gray-700 to-gray-800 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">DINERS</div>',
+                            'jcb': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-green-600 to-green-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">JCB</div>',
+                            'unionpay': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-purple-600 to-purple-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">UP</div>'
                         };
 
                         cardBrandIcon.innerHTML = brandIcons[event.brand] || '';
