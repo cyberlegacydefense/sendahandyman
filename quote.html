@@ -24,31 +24,6 @@
 
         /* Mobile optimization for separate Stripe elements */
         @media (max-width: 768px) {
-            /* Card input field container adjustments for portrait mobile */
-            #card-number-element {
-                padding-right: 80px !important; /* Space for brand icons */
-            }
-
-            /* Reduce card brand icon size and ensure proper positioning */
-            .absolute.right-4 {
-                right: 8px !important;
-                max-width: 70px !important;
-                overflow: hidden;
-            }
-
-            /* Smaller card brand icons for mobile portrait */
-            #card-brand-icon div,
-            #accepted-cards div {
-                width: 20px !important;
-                height: 12px !important;
-                font-size: 8px !important;
-                line-height: 1 !important;
-            }
-
-            #accepted-cards {
-                gap: 2px !important;
-            }
-
             /* Security section mobile layout */
             .bg-gradient-to-r.from-blue-50 .flex.items-center.justify-between {
                 flex-direction: column !important;
@@ -80,34 +55,42 @@
                 margin-right: -0.5rem !important;
                 padding: 1rem !important;
             }
+
+            /* Card brand icons below input - mobile responsive */
+            .flex.justify-between.items-center {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 0.75rem !important;
+            }
+
+            /* Stack "We accept" cards vertically on very small screens */
+            #accepted-cards .flex.items-center.space-x-1 {
+                flex-wrap: wrap !important;
+                gap: 0.25rem !important;
+            }
         }
 
         /* Portrait mobile specific optimizations */
         @media (max-width: 430px) {
-            /* Even smaller card brand icons for small portrait screens */
-            #card-brand-icon div,
-            #accepted-cards div {
-                width: 18px !important;
-                height: 10px !important;
-                font-size: 7px !important;
-            }
-
-            /* More padding for card input to avoid overlap */
-            #card-number-element {
-                padding-right: 65px !important;
-            }
-
-            .absolute.right-4 {
-                right: 6px !important;
-                max-width: 60px !important;
-            }
-
             /* Stack security section items vertically */
             .bg-gradient-to-r.from-blue-50 .flex.items-center.space-x-3 {
                 flex-direction: column !important;
                 align-items: flex-start !important;
                 space-x-0 !important;
                 gap: 0.25rem !important;
+            }
+
+            /* Smaller card brand icons for mobile */
+            #card-brand-icon div {
+                width: 32px !important;
+                height: 20px !important;
+                font-size: 10px !important;
+            }
+
+            #accepted-cards div {
+                width: 28px !important;
+                height: 18px !important;
+                font-size: 9px !important;
             }
         }
 
@@ -121,12 +104,17 @@
                 margin-bottom: 1rem !important;
             }
 
-            /* Minimal brand icons for very small screens */
-            #card-brand-icon div,
+            /* Even smaller brand icons for very small screens */
+            #card-brand-icon div {
+                width: 30px !important;
+                height: 18px !important;
+                font-size: 9px !important;
+            }
+
             #accepted-cards div {
-                width: 16px !important;
-                height: 9px !important;
-                font-size: 6px !important;
+                width: 26px !important;
+                height: 16px !important;
+                font-size: 8px !important;
             }
         }
     </style>
@@ -289,20 +277,34 @@
                                         Card Number
                                     </div>
                                 </label>
-                                <div class="relative group">
-                                    <div id="card-number-element" class="p-4 border-2 border-slate-200 rounded-lg bg-white shadow-sm focus-within:border-blue-500 focus-within:shadow-md transition-all duration-300 group-hover:border-slate-300">
+                                <div class="group">
+                                    <div id="card-number-element" class="p-4 border-2 border-slate-200 rounded-lg bg-white shadow-sm focus-within:border-blue-500 focus-within:shadow-md transition-all duration-300 group-hover:border-slate-300 mb-3">
                                         <!-- Card Number Element -->
                                     </div>
-                                    <!-- Enhanced Card Brand Icons -->
-                                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 flex space-x-2">
-                                        <div id="card-brand-icon" class="hidden">
-                                            <!-- Card brand icon will be inserted here -->
+                                    <!-- Card Brand Icons Below Input -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Active Card Brand Icon -->
+                                            <div id="card-brand-icon" class="hidden">
+                                                <!-- Detected card brand will appear here -->
+                                            </div>
+                                            <!-- Accepted Cards Display -->
+                                            <div id="accepted-cards" class="flex items-center space-x-2">
+                                                <span class="text-xs text-slate-500 font-medium">We accept:</span>
+                                                <div class="flex items-center space-x-1">
+                                                    <div class="w-10 h-6 bg-blue-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold">VISA</div>
+                                                    <div class="w-10 h-6 bg-red-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold">MC</div>
+                                                    <div class="w-10 h-6 bg-green-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold">AMEX</div>
+                                                    <div class="w-10 h-6 bg-orange-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold text-xs">DISC</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <!-- Professional Accepted Cards Display -->
-                                        <div id="accepted-cards" class="flex items-center space-x-1 opacity-40">
-                                            <div class="w-8 h-5 bg-blue-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold">VISA</div>
-                                            <div class="w-8 h-5 bg-red-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold">MC</div>
-                                            <div class="w-8 h-5 bg-green-600 rounded shadow-sm text-white text-xs flex items-center justify-center font-bold">AMEX</div>
+                                        <!-- Security Indicator -->
+                                        <div class="flex items-center text-xs text-slate-500">
+                                            <svg class="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                            </svg>
+                                            Secure
                                         </div>
                                     </div>
                                 </div>
@@ -783,15 +785,15 @@
                     const acceptedCards = document.getElementById('accepted-cards');
 
                     if (event.brand && event.brand !== 'unknown') {
-                        // Responsive card brand icons - CSS media queries handle sizing
+                        // Card brand icons displayed below input with proper sizing
                         const brandIcons = {
-                            'visa': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold tracking-wide">VISA</div>',
-                            'mastercard': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-red-600 to-red-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">MC</div>',
-                            'amex': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-blue-800 to-blue-900 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">AMEX</div>',
-                            'discover': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-orange-600 to-orange-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">DISC</div>',
-                            'diners': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-gray-700 to-gray-800 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">DINERS</div>',
-                            'jcb': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-green-600 to-green-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">JCB</div>',
-                            'unionpay': '<div class="w-12 h-7 md:w-12 md:h-7 bg-gradient-to-r from-purple-600 to-purple-700 rounded-md shadow-sm text-white text-xs flex items-center justify-center font-bold">UP</div>'
+                            'visa': '<div class="w-16 h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold tracking-wide">VISA</div>',
+                            'mastercard': '<div class="w-16 h-8 bg-gradient-to-r from-red-600 to-red-700 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold">MC</div>',
+                            'amex': '<div class="w-16 h-8 bg-gradient-to-r from-blue-800 to-blue-900 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold">AMEX</div>',
+                            'discover': '<div class="w-16 h-8 bg-gradient-to-r from-orange-600 to-orange-700 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold">DISC</div>',
+                            'diners': '<div class="w-16 h-8 bg-gradient-to-r from-gray-700 to-gray-800 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold text-xs">DINERS</div>',
+                            'jcb': '<div class="w-16 h-8 bg-gradient-to-r from-green-600 to-green-700 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold">JCB</div>',
+                            'unionpay': '<div class="w-16 h-8 bg-gradient-to-r from-purple-600 to-purple-700 rounded-md shadow-sm text-white text-sm flex items-center justify-center font-bold text-xs">UP</div>'
                         };
 
                         cardBrandIcon.innerHTML = brandIcons[event.brand] || '';
