@@ -63,10 +63,19 @@
                 gap: 0.75rem !important;
             }
 
-            /* Stack "We accept" cards vertically on very small screens */
+            /* Keep "We accept" cards horizontal in a row */
+            #accepted-cards {
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                align-items: center !important;
+                gap: 0.5rem !important;
+            }
+
             #accepted-cards .flex.items-center.space-x-1 {
+                flex-direction: row !important;
                 flex-wrap: wrap !important;
                 gap: 0.25rem !important;
+                justify-content: flex-start !important;
             }
         }
 
