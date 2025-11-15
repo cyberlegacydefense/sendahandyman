@@ -1395,6 +1395,7 @@ async function loadHandymenData() {
     }
 
     handymenData = handymen || [];
+    window.currentHandymenData = handymenData; // Make available for duplicate checking
     console.log('📊 Loaded handymen:', handymenData.length, 'records');
 
     // Log status breakdown
@@ -2696,20 +2697,68 @@ function generateSecurePassword() {
   return `${adjective}${noun}${numbers}`;
 }
 
+// Real-time email validation
+document.getElementById('handymanEmail')?.addEventListener('input', (e) => {
+  const email = e.target.value.trim().toLowerCase();
+  const existingHandymen = window.currentHandymenData || [];
+  const duplicateEmail = existingHandymen.find(h => h.email?.toLowerCase() === email);
+
+  // Clear any existing validation messages
+  let validationMessage = e.target.parentElement.querySelector('.validation-message');
+  if (validationMessage) {
+    validationMessage.remove();
+  }
+
+  if (email && duplicateEmail) {
+    // Show inline warning
+    validationMessage = document.createElement('div');
+    validationMessage.className = 'validation-message text-red-500 text-sm mt-1';
+    validationMessage.textContent = `⚠️ This email is already used by ${duplicateEmail.full_name}`;
+    e.target.parentElement.appendChild(validationMessage);
+    e.target.style.borderColor = '#ef4444';
+  } else {
+    e.target.style.borderColor = '';
+  }
+});
+
 // Add Handyman form handler
 document.getElementById('addHandymanForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById('handymanEmail').value.trim();
+  const email = document.getElementById('handymanEmail').value.trim().toLowerCase();
   const fullName = document.getElementById('handymanFullName').value.trim();
   const phone = document.getElementById('handymanPhone').value.trim();
   const city = document.getElementById('handymanCity').value.trim();
   const skills = document.getElementById('handymanSkills').value.trim();
 
+  // Validate required fields
+  if (!fullName) {
+    alert('Please enter the handyman\'s full name');
+    document.getElementById('handymanFullName').focus();
+    return;
+  }
+
+  if (!email) {
+    alert('Please enter an email address');
+    document.getElementById('handymanEmail').focus();
+    return;
+  }
+
   // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     alert('Please enter a valid email address (e.g., name@domain.com)');
+    document.getElementById('handymanEmail').focus();
+    return;
+  }
+
+  // Check if email already exists in current handymen list
+  const existingHandymen = window.currentHandymenData || [];
+  const duplicateEmail = existingHandymen.find(h => h.email?.toLowerCase() === email);
+  if (duplicateEmail) {
+    alert(`This email is already used by ${duplicateEmail.full_name || 'an existing handyman'}.\n\nPlease use a different email address.`);
+    document.getElementById('handymanEmail').focus();
+    document.getElementById('handymanEmail').select();
     return;
   }
 
@@ -2769,12 +2818,34 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       data.handyman.id
     );
 
+    // Clear the form
+    document.getElementById('addHandymanForm').reset();
+
     closeAddHandymanModal();
     loadHandymenData(); // Refresh the table
 
   } catch (error) {
     console.error('❌ Error creating handyman:', error);
-    alert(`Failed to create handyman: ${error.message}`);
+
+    let errorMessage = error.message;
+
+    // Provide more specific error messages
+    if (errorMessage.includes('duplicate key value violates unique constraint "handymen_email_key"')) {
+      errorMessage = `This email address is already in use by another handyman.\n\nPlease use a different email address.`;
+      document.getElementById('handymanEmail').focus();
+      document.getElementById('handymanEmail').select();
+    } else if (errorMessage.includes('Email already exists')) {
+      errorMessage = `This email address is already registered in the system.\n\nPlease use a different email address.`;
+      document.getElementById('handymanEmail').focus();
+      document.getElementById('handymanEmail').select();
+    } else if (errorMessage.includes('Invalid email format')) {
+      errorMessage = 'Please enter a valid email address (e.g., name@domain.com)';
+      document.getElementById('handymanEmail').focus();
+    } else if (errorMessage.includes('Name and email required')) {
+      errorMessage = 'Please fill in both the name and email fields';
+    }
+
+    alert(`Failed to create handyman:\n\n${errorMessage}`);
   }
 });
 
