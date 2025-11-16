@@ -2862,6 +2862,11 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         json: async () => data
       };
 
+    } catch (fetchError) {
+      console.error('🔄 Edge Function error:', fetchError);
+      throw new Error(`Failed to create handyman: ${fetchError.message}`);
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('❌ Edge Function error response:', errorText);
