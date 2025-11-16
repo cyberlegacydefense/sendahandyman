@@ -2818,31 +2818,49 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       phone: phone || null
     });
 
-    // Use Netlify function for handyman creation
-    let response;
+    // Use EXACT PostMyStyle approach - Supabase Edge Function
+    console.log('🔄 Using PostMyStyle method - Supabase Edge Function...');
+
     try {
-      console.log('🔄 Creating handyman with Netlify function...');
-      response = await fetch('/.netlify/functions/admin-create-handyman', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      console.log('Creating new handyman via Edge Function:', { name: fullName, email });
+
+      // Get current user session for authentication (exact PostMyStyle method)
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
+      }
+
+      console.log('User session verified, calling Edge Function...');
+
+      // Call the Edge Function (EXACT PostMyStyle approach)
+      const { data, error } = await supabase.functions.invoke('create-handyman', {
+        body: {
+          name: fullName,
           email: email,
-          password: generateSecurePassword(),
-          full_name: fullName,
-          phone: phone || null,
-          city: city || null,
-          skills: skills || null
-        })
+          phone: phone || null
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
-      console.log('🔍 Netlify function response status:', response.status);
+      if (error) {
+        console.error('Edge Function error:', error);
+        throw new Error(`Function call failed: ${error.message}`);
+      }
 
-    } catch (fetchError) {
-      console.error('🔄 Netlify function error:', fetchError);
-      throw new Error('Failed to connect to handyman creation service');
-    }
+      if (!data.success) {
+        throw new Error(data.error || 'Unknown error occurred');
+      }
+
+      console.log('✅ Handyman created successfully:', data.handyman);
+
+      // Create response object to match existing success handling
+      const response = {
+        ok: true,
+        json: async () => data
+      };
 
     if (!response.ok) {
       const errorText = await response.text();
