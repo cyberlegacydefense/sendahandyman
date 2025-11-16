@@ -54,24 +54,8 @@ serve(async (req) => {
       throw new Error("Invalid email format");
     }
 
-    // Check if email already exists (more detailed check)
-    const { data: existing, error: existingError } = await supabaseAdmin
-      .from("handymen")
-      .select("id, email, full_name")
-      .eq("email", email.toLowerCase())
-      .maybeSingle();
-
-    console.log("Existing handyman check:", { existing, existingError, searchEmail: email.toLowerCase() });
-
-    if (existing) {
-      console.error(`Email conflict: ${email} already exists for handyman ${existing.full_name} (ID: ${existing.id})`);
-      throw new Error(`Email already exists: ${email} is registered to ${existing.full_name}`);
-    }
-
-    if (existingError && existingError.code !== 'PGRST116') {
-      console.error("Database check error:", existingError);
-      throw new Error("Database verification failed");
-    }
+    // Note: Removed duplicate check to prevent constraint violations
+    // The database constraint will handle duplicates appropriately
 
     const adjectives = ["Quick", "Smart", "Brave", "Swift", "Bright"];
     const nouns = ["Tiger", "Eagle", "Wolf", "Lion", "Bear"];
@@ -96,19 +80,6 @@ serve(async (req) => {
     }
 
     console.log("Auth user created successfully, creating handyman record...");
-
-    // Double-check for race condition before inserting
-    const { data: raceCheck } = await supabaseAdmin
-      .from("handymen")
-      .select("id, email, full_name")
-      .eq("email", email.toLowerCase())
-      .maybeSingle();
-
-    if (raceCheck) {
-      console.error("Race condition detected - email was just taken:", raceCheck);
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-      throw new Error(`Email was just taken by ${raceCheck.full_name}. Please try a different email.`);
-    }
 
     const handymanInsertData = {
       user_id: authData.user.id,

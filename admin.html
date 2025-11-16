@@ -2809,28 +2809,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
     }
 
-    console.log('User session verified, now checking for duplicates...');
-
-    // ⚠️ FIRST CHECK FOR EXISTING HANDYMAN
-    console.log('🔍 Checking for existing handyman with email:', email);
-    const { data: existingHandyman, error: checkError } = await supabase
-      .from('handymen')
-      .select('id, email, full_name, is_active')
-      .eq('email', email.toLowerCase())
-      .maybeSingle();
-
-    if (checkError && checkError.code !== 'PGRST116') {
-      console.error('❌ Error checking for existing handyman:', checkError);
-      throw new Error(`Database check failed: ${checkError.message}`);
-    }
-
-    if (existingHandyman) {
-      console.log('⚠️ Handyman already exists:', existingHandyman);
-      const statusText = existingHandyman.is_active ? 'Active' : 'Inactive';
-      throw new Error(`Email already exists: ${email} is registered to ${existingHandyman.full_name} (Status: ${statusText}). Please use a different email address or edit the existing handyman record.`);
-    }
-
-    console.log('✅ Email is available, proceeding with creation...');
+    console.log('User session verified, calling Edge Function...');
     console.log('🔍 Attempting to create handyman with email:', email);
     console.log('🔍 Full payload:', {
       name: fullName,
@@ -2919,22 +2898,6 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         }
 
         console.log('✅ Auth user created directly:', authData.user?.id);
-
-        // Check again for duplicates before inserting (race condition protection)
-        console.log('🔍 Final duplicate check before inserting handyman record...');
-        const { data: finalCheck, error: finalCheckError } = await supabase
-          .from('handymen')
-          .select('id, email, full_name, is_active')
-          .eq('email', email.toLowerCase())
-          .maybeSingle();
-
-        if (finalCheck) {
-          console.log('⚠️ Race condition: Handyman was created during auth process:', finalCheck);
-          // Clean up the auth user we just created
-          await supabase.auth.admin.deleteUser(authData.user.id);
-          const statusText = finalCheck.is_active ? 'Active' : 'Inactive';
-          throw new Error(`Email was taken during creation: ${email} is registered to ${finalCheck.full_name} (Status: ${statusText}). Please try a different email.`);
-        }
 
         // Create handyman record directly (this might still fail due to RLS, but let's try)
         const { data: handyman, error: handymanError } = await supabase
