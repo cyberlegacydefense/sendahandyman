@@ -2809,8 +2809,28 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
     }
 
-    console.log('User session verified, calling Edge Function...');
+    console.log('User session verified, now checking for duplicates...');
 
+    // ⚠️ FIRST CHECK FOR EXISTING HANDYMAN
+    console.log('🔍 Checking for existing handyman with email:', email);
+    const { data: existingHandyman, error: checkError } = await supabase
+      .from('handymen')
+      .select('id, email, full_name, is_active')
+      .eq('email', email.toLowerCase())
+      .maybeSingle();
+
+    if (checkError && checkError.code !== 'PGRST116') {
+      console.error('❌ Error checking for existing handyman:', checkError);
+      throw new Error(`Database check failed: ${checkError.message}`);
+    }
+
+    if (existingHandyman) {
+      console.log('⚠️ Handyman already exists:', existingHandyman);
+      const statusText = existingHandyman.is_active ? 'Active' : 'Inactive';
+      throw new Error(`Email already exists: ${email} is registered to ${existingHandyman.full_name} (Status: ${statusText}). Please use a different email address or edit the existing handyman record.`);
+    }
+
+    console.log('✅ Email is available, proceeding with creation...');
     console.log('🔍 Attempting to create handyman with email:', email);
     console.log('🔍 Full payload:', {
       name: fullName,
@@ -2899,6 +2919,22 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         }
 
         console.log('✅ Auth user created directly:', authData.user?.id);
+
+        // Check again for duplicates before inserting (race condition protection)
+        console.log('🔍 Final duplicate check before inserting handyman record...');
+        const { data: finalCheck, error: finalCheckError } = await supabase
+          .from('handymen')
+          .select('id, email, full_name, is_active')
+          .eq('email', email.toLowerCase())
+          .maybeSingle();
+
+        if (finalCheck) {
+          console.log('⚠️ Race condition: Handyman was created during auth process:', finalCheck);
+          // Clean up the auth user we just created
+          await supabase.auth.admin.deleteUser(authData.user.id);
+          const statusText = finalCheck.is_active ? 'Active' : 'Inactive';
+          throw new Error(`Email was taken during creation: ${email} is registered to ${finalCheck.full_name} (Status: ${statusText}). Please try a different email.`);
+        }
 
         // Create handyman record directly (this might still fail due to RLS, but let's try)
         const { data: handyman, error: handymanError } = await supabase
@@ -3026,10 +3062,13 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       errorMessage = `This email address is already in use by another handyman.\n\nPlease use a different email address.`;
       document.getElementById('handymanEmail').focus();
       document.getElementById('handymanEmail').select();
-    } else if (errorMessage.includes('Email already exists')) {
-      errorMessage = `This email address is already registered in the system.\n\nPlease use a different email address.`;
+    } else if (errorMessage.includes('Email already exists') || errorMessage.includes('is registered to')) {
+      errorMessage = `This email address is already registered in the system.\n\nPlease use a different email address or check the existing handyman in the list below.`;
       document.getElementById('handymanEmail').focus();
       document.getElementById('handymanEmail').select();
+
+      // Highlight existing handyman with this email if visible
+      highlightExistingHandyman(email);
     } else if (errorMessage.includes('Invalid email format')) {
       errorMessage = 'Please enter a valid email address (e.g., name@domain.com)';
       document.getElementById('handymanEmail').focus();
@@ -3040,6 +3079,30 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
     alert(`Failed to create handyman:\n\n${errorMessage}`);
   }
 });
+
+// Function to highlight existing handyman with duplicate email
+function highlightExistingHandyman(email) {
+  // Find all handyman rows and check for matching email
+  const handymanRows = document.querySelectorAll('#handymanTableBody tr');
+
+  handymanRows.forEach(row => {
+    const emailCell = row.querySelector('td:nth-child(3)'); // Email is usually 3rd column
+    if (emailCell && emailCell.textContent.toLowerCase().trim() === email.toLowerCase()) {
+      // Add highlighting
+      row.style.backgroundColor = '#fef2f2'; // Light red background
+      row.style.border = '2px solid #fca5a5'; // Red border
+
+      // Scroll to the row if it's not visible
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Remove highlighting after 5 seconds
+      setTimeout(() => {
+        row.style.backgroundColor = '';
+        row.style.border = '';
+      }, 5000);
+    }
+  });
+}
 
 // PostMyStyle-style success modal for handyman creation
 function showHandymanCreatedModal(fullName, email, password, authUserId, handymanId) {
