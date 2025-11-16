@@ -2818,10 +2818,10 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       phone: phone || null
     });
 
-    // Try Netlify function FIRST to bypass Edge Function issues
+    // Use Netlify function for handyman creation
     let response;
     try {
-      console.log('🔄 Using Netlify function directly to bypass Edge Function issues...');
+      console.log('🔄 Creating handyman with Netlify function...');
       response = await fetch('/.netlify/functions/admin-create-handyman', {
         method: 'POST',
         headers: {
@@ -2839,56 +2839,9 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
       console.log('🔍 Netlify function response status:', response.status);
 
-      // If Netlify function fails, try Edge Function as backup
-      if (!response.ok) {
-        console.log('🔄 Netlify function failed, trying Edge Function backup...');
-        response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
-        method: 'POST',
-        headers: {
-          'authorization': `Bearer ${session.access_token}`,
-          'apikey': supabase.supabaseKey
-        },
-        body: JSON.stringify({
-          name: fullName,
-          email: email,
-          phone: phone || null
-        })
-      });
-
-      // If Edge Function fails with 500 or auth issues, try Netlify function
-      if (!response.ok && (response.status === 500 || response.status === 401)) {
-        console.log('🔄 Edge Function failed, trying Netlify function backup...');
-        response = await fetch('/.netlify/functions/admin-create-handyman', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email: email,
-            password: generateRandomPassword(), // Generate random password
-            full_name: fullName,
-            phone: phone || null,
-            city: city || null,
-            skills: skills || null
-          })
-        });
-      }
-    } catch (edgeError) {
-      console.log('🔄 Edge Function error, trying Netlify function backup:', edgeError);
-      response = await fetch('/.netlify/functions/admin-create-handyman', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: email,
-          password: generateRandomPassword(), // Generate random password
-          full_name: fullName,
-          phone: phone || null,
-          city: city || null,
-          skills: skills || null
-        })
-      });
+    } catch (fetchError) {
+      console.error('🔄 Netlify function error:', fetchError);
+      throw new Error('Failed to connect to handyman creation service');
     }
 
     if (!response.ok) {
