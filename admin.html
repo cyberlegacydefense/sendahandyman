@@ -2725,7 +2725,13 @@ document.getElementById('handymanEmail')?.addEventListener('input', (e) => {
 document.getElementById('addHandymanForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  // FORCE DEBUG OUTPUT
+  console.log('🚨 HANDYMAN FORM SUBMITTED - DEBUG START 🚨');
+
   const email = document.getElementById('handymanEmail').value.trim().toLowerCase();
+
+  console.log('🔍 Raw email input:', document.getElementById('handymanEmail').value);
+  console.log('🔍 Processed email:', email);
   const fullName = document.getElementById('handymanFullName').value.trim();
   const phone = document.getElementById('handymanPhone').value.trim();
   const city = document.getElementById('handymanCity').value.trim();
@@ -2756,11 +2762,34 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   const existingHandymen = window.currentHandymenData || [];
 
   // Debug: Log all existing emails
-  console.log('🔍 Checking against existing emails:');
+  console.log('🔍 Checking against existing emails in handymen table:');
   existingHandymen.forEach((h, index) => {
-    console.log(`  ${index + 1}. ${h.full_name}: ${h.email} (original: "${h.email}")`);
+    console.log(`  ${index + 1}. ${h.full_name}: ${h.email} (ID: ${h.id})`);
   });
-  console.log(`🔍 New email to check: "${email}" (lowercase: "${email.toLowerCase()}")`);
+  console.log(`🔍 New email to check: "${email}"`);
+
+  // ADDITIONAL DEBUG: Check database directly for this specific email
+  console.log('🔍 Checking database directly for email conflicts...');
+  try {
+    const { data: directCheck, error: directError } = await supabase
+      .from('handymen')
+      .select('id, email, full_name, is_active, created_at')
+      .ilike('email', email);
+
+    console.log('🔍 Direct database check result:', directCheck);
+    if (directError) {
+      console.log('🔍 Direct database check error:', directError);
+    }
+
+    if (directCheck && directCheck.length > 0) {
+      console.log('🚨 FOUND CONFLICTING EMAILS IN DATABASE:');
+      directCheck.forEach((conflict, idx) => {
+        console.log(`  Conflict ${idx + 1}: ${conflict.full_name} - ${conflict.email} (ID: ${conflict.id}, Active: ${conflict.is_active})`);
+      });
+    }
+  } catch (dbError) {
+    console.log('🔍 Database check failed:', dbError);
+  }
 
   const duplicateEmail = existingHandymen.find(h => h.email?.toLowerCase() === email);
   if (duplicateEmail) {
@@ -2789,11 +2818,31 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       phone: phone || null
     });
 
-    // Try Edge Function first, fall back to Netlify function if needed
+    // Try Netlify function FIRST to bypass Edge Function issues
     let response;
     try {
-      console.log('🔄 Trying Supabase Edge Function first...');
-      response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
+      console.log('🔄 Using Netlify function directly to bypass Edge Function issues...');
+      response = await fetch('/.netlify/functions/admin-create-handyman', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: generateRandomPassword(),
+          full_name: fullName,
+          phone: phone || null,
+          city: city || null,
+          skills: skills || null
+        })
+      });
+
+      console.log('🔍 Netlify function response status:', response.status);
+
+      // If Netlify function fails, try Edge Function as backup
+      if (!response.ok) {
+        console.log('🔄 Netlify function failed, trying Edge Function backup...');
+        response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
         method: 'POST',
         headers: {
           'authorization': `Bearer ${session.access_token}`,
