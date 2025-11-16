@@ -2916,6 +2916,61 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
         if (handymanError) {
           console.error('❌ Direct handyman creation failed:', handymanError);
+
+          // Check if the error is due to the record already existing
+          if (handymanError.message?.includes('duplicate key value violates unique constraint')) {
+            console.log('🔍 Checking if handyman was created despite error...');
+            const { data: existingRecord, error: checkError } = await supabase
+              .from('handymen')
+              .select('*')
+              .eq('email', email.toLowerCase())
+              .single();
+
+            if (existingRecord && !checkError) {
+              console.log('✅ Handyman record found despite error:', existingRecord);
+              // The record was actually created successfully
+              const response = {
+                ok: true,
+                json: async () => ({
+                  success: true,
+                  handyman: {
+                    id: existingRecord.id,
+                    name: existingRecord.full_name,
+                    email: existingRecord.email,
+                    auth_user_id: authData.user?.id
+                  },
+                  credentials: {
+                    email: email,
+                    password: tempPassword
+                  }
+                })
+              };
+
+              // Continue with success flow
+              const data = await response.json();
+              console.log('✅ Using existing handyman record:', data);
+
+              const handymanInfo = data.handyman || data;
+              const credentials = data.credentials || {
+                email: email,
+                password: 'Contact admin for password'
+              };
+
+              showHandymanCreatedModal(
+                handymanInfo.name || handymanInfo.full_name || fullName,
+                credentials.email,
+                credentials.password,
+                handymanInfo.auth_user_id || authData.user?.id,
+                handymanInfo.id
+              );
+
+              document.getElementById('addHandymanForm').reset();
+              document.getElementById('addHandymanModal').classList.add('hidden');
+              loadHandymenData();
+              return;
+            }
+          }
+
           throw new Error(`Direct handyman creation failed: ${handymanError.message}`);
         }
 
