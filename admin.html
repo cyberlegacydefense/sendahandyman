@@ -2754,6 +2754,14 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
   // Check if email already exists in current handymen list
   const existingHandymen = window.currentHandymenData || [];
+
+  // Debug: Log all existing emails
+  console.log('🔍 Checking against existing emails:');
+  existingHandymen.forEach((h, index) => {
+    console.log(`  ${index + 1}. ${h.full_name}: ${h.email} (original: "${h.email}")`);
+  });
+  console.log(`🔍 New email to check: "${email}" (lowercase: "${email.toLowerCase()}")`);
+
   const duplicateEmail = existingHandymen.find(h => h.email?.toLowerCase() === email);
   if (duplicateEmail) {
     alert(`This email is already used by ${duplicateEmail.full_name || 'an existing handyman'}.\n\nPlease use a different email address.`);
@@ -2774,19 +2782,65 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
     console.log('User session verified, calling Edge Function...');
 
-    // Call the Edge Function directly with fetch
-    const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
-      method: 'POST',
-      headers: {
-        'authorization': `Bearer ${session.access_token}`,
-        'apikey': supabase.supabaseKey
-      },
-      body: JSON.stringify({
-        name: fullName,
-        email: email,
-        phone: phone || null
-      })
+    console.log('🔍 Attempting to create handyman with email:', email);
+    console.log('🔍 Full payload:', {
+      name: fullName,
+      email: email,
+      phone: phone || null
     });
+
+    // Try Edge Function first, fall back to Netlify function if needed
+    let response;
+    try {
+      console.log('🔄 Trying Supabase Edge Function first...');
+      response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-handyman`, {
+        method: 'POST',
+        headers: {
+          'authorization': `Bearer ${session.access_token}`,
+          'apikey': supabase.supabaseKey
+        },
+        body: JSON.stringify({
+          name: fullName,
+          email: email,
+          phone: phone || null
+        })
+      });
+
+      // If Edge Function fails with 500 or auth issues, try Netlify function
+      if (!response.ok && (response.status === 500 || response.status === 401)) {
+        console.log('🔄 Edge Function failed, trying Netlify function backup...');
+        response = await fetch('/.netlify/functions/admin-create-handyman', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email,
+            password: generateRandomPassword(), // Generate random password
+            full_name: fullName,
+            phone: phone || null,
+            city: city || null,
+            skills: skills || null
+          })
+        });
+      }
+    } catch (edgeError) {
+      console.log('🔄 Edge Function error, trying Netlify function backup:', edgeError);
+      response = await fetch('/.netlify/functions/admin-create-handyman', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: generateRandomPassword(), // Generate random password
+          full_name: fullName,
+          phone: phone || null,
+          city: city || null,
+          skills: skills || null
+        })
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -2807,15 +2861,22 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       throw new Error(data.error || 'Unknown error occurred');
     }
 
-    console.log('✅ Handyman created successfully:', data.handyman);
+    console.log('✅ Handyman created successfully:', data);
+
+    // Handle different response formats from Edge Function vs Netlify Function
+    const handymanInfo = data.handyman || data;
+    const credentials = data.credentials || {
+      email: email,
+      password: 'Check console or contact admin'
+    };
 
     // Show PostMyStyle-style success modal with generated credentials
     showHandymanCreatedModal(
-      data.handyman.name,
-      data.credentials.email,
-      data.credentials.password,
-      data.handyman.auth_user_id,
-      data.handyman.id
+      handymanInfo.name || handymanInfo.full_name || fullName,
+      credentials.email,
+      credentials.password,
+      handymanInfo.auth_user_id || data.auth_user_id,
+      handymanInfo.id || data.handyman_id
     );
 
     // Clear the form

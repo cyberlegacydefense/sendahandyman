@@ -54,14 +54,23 @@ serve(async (req) => {
       throw new Error("Invalid email format");
     }
 
-    const { data: existing } = await supabaseAdmin
+    // Check if email already exists (more detailed check)
+    const { data: existing, error: existingError } = await supabaseAdmin
       .from("handymen")
-      .select("id")
+      .select("id, email, full_name")
       .eq("email", email.toLowerCase())
       .maybeSingle();
 
+    console.log("Existing handyman check:", { existing, existingError, searchEmail: email.toLowerCase() });
+
     if (existing) {
-      throw new Error("Email already exists");
+      console.error(`Email conflict: ${email} already exists for handyman ${existing.full_name} (ID: ${existing.id})`);
+      throw new Error(`Email already exists: ${email} is registered to ${existing.full_name}`);
+    }
+
+    if (existingError && existingError.code !== 'PGRST116') {
+      console.error("Database check error:", existingError);
+      throw new Error("Database verification failed");
     }
 
     const adjectives = ["Quick", "Smart", "Brave", "Swift", "Bright"];
@@ -82,26 +91,63 @@ serve(async (req) => {
     });
 
     if (authError) {
-      throw new Error("Failed to create auth user");
+      console.error("Auth user creation failed:", authError);
+      throw new Error(`Failed to create auth user: ${authError.message}`);
     }
+
+    console.log("Auth user created successfully, creating handyman record...");
+
+    // Double-check for race condition before inserting
+    const { data: raceCheck } = await supabaseAdmin
+      .from("handymen")
+      .select("id, email, full_name")
+      .eq("email", email.toLowerCase())
+      .maybeSingle();
+
+    if (raceCheck) {
+      console.error("Race condition detected - email was just taken:", raceCheck);
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      throw new Error(`Email was just taken by ${raceCheck.full_name}. Please try a different email.`);
+    }
+
+    const handymanInsertData = {
+      user_id: authData.user.id,
+      email: email.toLowerCase(),
+      full_name: name,
+      phone: phone || null,
+      hourly_rate: 64.00,
+      onboarding_completed: false,
+      is_active: true
+    };
+
+    console.log("Inserting handyman data:", handymanInsertData);
 
     const { data: handymanData, error: handymanError } = await supabaseAdmin
       .from("handymen")
-      .insert({
-        user_id: authData.user.id,
-        email: email.toLowerCase(),
-        full_name: name,
-        phone: phone || null,
-        hourly_rate: 64.00,
-        onboarding_completed: false,
-        is_active: true
-      })
+      .insert(handymanInsertData)
       .select()
       .single();
 
     if (handymanError) {
+      console.error("Handyman creation failed:", handymanError);
+      console.error("Error details:", {
+        code: handymanError.code,
+        message: handymanError.message,
+        details: handymanError.details,
+        hint: handymanError.hint
+      });
+
+      // Clean up auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-      throw new Error("Failed to create handyman");
+
+      // Provide specific error messages
+      if (handymanError.message?.includes('duplicate key value violates unique constraint "handymen_email_key"')) {
+        throw new Error(`Failed to create handyman record: Email ${email.toLowerCase()} already exists in the database`);
+      } else if (handymanError.message?.includes('unique constraint')) {
+        throw new Error(`Failed to create handyman record: ${handymanError.message}`);
+      } else {
+        throw new Error(`Failed to create handyman record: ${handymanError.message}`);
+      }
     }
 
     return new Response(JSON.stringify({
