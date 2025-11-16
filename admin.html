@@ -2846,8 +2846,17 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       });
 
       if (error) {
-        console.error('Edge Function error:', error);
-        throw new Error(`Function call failed: ${error.message}`);
+        console.error('Edge Function error details:', error);
+        console.error('Error message:', error.message);
+        console.error('Error details:', error.details);
+        console.error('Full error object:', JSON.stringify(error, null, 2));
+
+        // Try to get more specific error from Edge Function response
+        if (error.context && error.context.body) {
+          console.error('Edge Function response body:', error.context.body);
+        }
+
+        throw new Error(`Function call failed: ${error.message || 'Edge Function returned a non-2xx status code'}`);
       }
 
       if (!data.success) {
@@ -2864,7 +2873,104 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
     } catch (fetchError) {
       console.error('🔄 Edge Function error:', fetchError);
-      throw new Error(`Failed to create handyman: ${fetchError.message}`);
+      console.log('🔄 Trying direct database approach as fallback...');
+
+      // FALLBACK: Direct database approach
+      try {
+        const tempPassword = generateSecurePassword();
+        console.log('🔄 Creating auth user directly...');
+
+        // Create auth user directly
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: email,
+          password: tempPassword,
+          options: {
+            emailRedirectTo: `${window.location.origin}/login.html`,
+            data: {
+              full_name: fullName,
+              user_type: 'handyman'
+            }
+          }
+        });
+
+        if (authError) {
+          console.error('❌ Direct auth creation failed:', authError);
+          throw new Error(`Direct auth creation failed: ${authError.message}`);
+        }
+
+        console.log('✅ Auth user created directly:', authData.user?.id);
+
+        // Create handyman record directly (this might still fail due to RLS, but let's try)
+        const { data: handyman, error: handymanError } = await supabase
+          .from('handymen')
+          .insert({
+            user_id: authData.user?.id,
+            email: email.toLowerCase(),
+            full_name: fullName,
+            phone: phone || null,
+            hourly_rate: 64.00,
+            onboarding_completed: false,
+            is_active: true
+          })
+          .select()
+          .single();
+
+        if (handymanError) {
+          console.error('❌ Direct handyman creation failed:', handymanError);
+          throw new Error(`Direct handyman creation failed: ${handymanError.message}`);
+        }
+
+        console.log('✅ Handyman created directly:', handyman);
+
+        // Create response object for success handling
+        const response = {
+          ok: true,
+          json: async () => ({
+            success: true,
+            handyman: {
+              id: handyman.id,
+              name: handyman.full_name,
+              email: handyman.email,
+              auth_user_id: authData.user?.id
+            },
+            credentials: {
+              email: email,
+              password: tempPassword
+            }
+          })
+        };
+
+        // Continue with success flow
+        const data = await response.json();
+        console.log('✅ Direct creation successful:', data);
+
+        // Continue to success handling
+        const handymanInfo = data.handyman || data;
+        const credentials = data.credentials || {
+          email: email,
+          password: 'Contact admin for password'
+        };
+
+        // Show success modal
+        showHandymanCreatedModal(
+          handymanInfo.name || handymanInfo.full_name || fullName,
+          credentials.email,
+          credentials.password,
+          handymanInfo.auth_user_id || data.auth_user_id,
+          handymanInfo.id || data.handyman_id
+        );
+
+        // Clear form and refresh
+        document.getElementById('addHandymanForm').reset();
+        closeAddHandymanModal();
+        loadHandymenData();
+
+        return; // Success! Exit the function
+
+      } catch (directError) {
+        console.error('❌ Direct approach also failed:', directError);
+        throw new Error(`All creation methods failed. Last error: ${directError.message}`);
+      }
     }
 
     if (!response.ok) {
