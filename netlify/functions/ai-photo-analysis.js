@@ -65,6 +65,12 @@ export const handler = async (event, context) => {
     }
 
     console.log(`🔍 Analyzing image: ${filename || 'unnamed'}`);
+    console.log('Image data info:', {
+      hasImage: !!image,
+      imageLength: image?.length,
+      imagePrefix: image?.substring(0, 50) + '...',
+      isBase64: image?.startsWith('data:image')
+    });
 
     // Call Claude API for image analysis
     const analysis = await analyzeImageWithClaude(image, filename);
@@ -135,6 +141,16 @@ GUIDELINES:
     return createMockAnalysis();
   }
 
+  // Temporarily use mock for testing - remove this after debugging
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('🧪 Using mock analysis for testing');
+    return createMockAnalysis();
+  }
+
+  console.log('🤖 Making Claude API call...');
+  console.log('API Key available:', !!process.env.CLAUDE_API_KEY);
+  console.log('Image media type:', getImageMediaType(base64Image));
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -171,6 +187,12 @@ GUIDELINES:
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('Claude API Response Error:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        body: errorText
+      });
       throw new Error(`Claude API error: ${response.status} - ${errorText}`);
     }
 
@@ -198,11 +220,20 @@ GUIDELINES:
     return analysis;
 
   } catch (error) {
-    console.error('Claude API error:', error);
+    console.error('Claude API error details:', {
+      message: error.message,
+      status: error.status,
+      stack: error.stack
+    });
+
+    // Log more details for debugging
+    if (error.response) {
+      console.error('API Response Error:', await error.response.text());
+    }
 
     // Return a generic analysis if AI fails
     return {
-      problem_description: "Unable to fully analyze the image. Please upload a clearer photo or contact us for assistance.",
+      problem_description: `API Error: ${error.message}. Using fallback analysis for testing.`,
       recommended_task: "General Repair Consultation",
       task_category: "general_repair",
       cost_estimate: "$120 - $200",
