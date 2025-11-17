@@ -2330,13 +2330,17 @@ async function viewHandymanDetails(handymanId) {
             metadata: f.metadata
           })));
 
-          onboardingFiles = storageFiles.map(file => ({
-            ...file,
-            bucket,
-            fullPath: path + file.name, // Full path for download
-            displayPath: path + file.name, // Path for display
-            originalFile: file // Keep original file data for debugging
-          }));
+          onboardingFiles = storageFiles.map(file => {
+            const isCorrupted = !file.id || !file.created_at || !file.updated_at;
+            return {
+              ...file,
+              bucket,
+              fullPath: path + file.name, // Full path for download
+              displayPath: path + file.name, // Path for display
+              originalFile: file, // Keep original file data for debugging
+              isCorrupted: isCorrupted
+            };
+          });
           break;
         } else {
           console.log(`📁 No files in ${bucket}/${path}`);
@@ -2436,16 +2440,17 @@ function populateHandymanDetails(handyman, metrics) {
     filesSection.innerHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         ${metrics.onboardingFiles.map(file => `
-          <div class="border border-slate-200 p-4 rounded-lg hover:bg-slate-50">
+          <div class="border border-slate-200 p-4 rounded-lg hover:bg-slate-50 ${file.isCorrupted ? 'bg-red-50 border-red-200' : ''}">
             <div class="flex items-center justify-between">
               <div>
-                <p class="font-semibold text-sm">${file.name}</p>
+                <p class="font-semibold text-sm">${file.name} ${file.isCorrupted ? '⚠️' : ''}</p>
                 <p class="text-xs text-slate-500">${file.metadata?.size ? (file.metadata.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</p>
-                <p class="text-xs text-slate-500">${new Date(file.updated_at).toLocaleDateString()}</p>
+                <p class="text-xs text-slate-500">${file.updated_at ? new Date(file.updated_at).toLocaleDateString() : 'Invalid date'}</p>
                 <p class="text-xs text-slate-400">📁 ${file.bucket}/${file.displayPath}</p>
+                ${file.isCorrupted ? '<p class="text-xs text-red-600 font-medium">⚠️ Corrupted file - incomplete upload</p>' : ''}
               </div>
               <div class="flex gap-2">
-                <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="text-blue-600 hover:text-blue-800 text-sm">
+                <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="${file.isCorrupted ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800'} text-sm" ${file.isCorrupted ? 'disabled' : ''}>
                   Download
                 </button>
                 <button onclick="showFileInfo('${file.bucket}', '${file.name}', ${JSON.stringify(file.originalFile).replace(/"/g, '&quot;')})" class="text-green-600 hover:text-green-800 text-sm">
