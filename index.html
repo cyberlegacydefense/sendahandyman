@@ -1126,12 +1126,24 @@
                 <div class="mt-6">
                     <label class="text-sm font-semibold">Selected Service</label>
                     <div id="selectedTaskDisplay" class="mt-2 p-4 bg-indigo-50 border border-indigo-200 rounded-lg hidden">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mb-4">
                             <div>
                                 <div id="selectedTaskName" class="font-semibold text-indigo-900"></div>
                                 <div id="selectedTaskPrice" class="text-sm text-indigo-700"></div>
                             </div>
                             <button id="changeTaskBtn" class="text-indigo-600 text-sm hover:text-indigo-800">Change</button>
+                        </div>
+
+                        <!-- Task Details -->
+                        <div id="selectedTaskDetails" class="grid md:grid-cols-2 gap-4 pt-4 border-t border-indigo-200">
+                            <div>
+                                <h4 class="font-semibold text-green-600 mb-2 text-sm">✅ What's Included:</h4>
+                                <ul id="selectedTaskIncluded" class="text-xs space-y-1 text-slate-700"></ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-orange-600 mb-2 text-sm">⚠️ Potential Add-ons:</h4>
+                                <ul id="selectedTaskAddons" class="text-xs space-y-1 text-slate-700"></ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3676,6 +3688,23 @@
             const serviceData = getServiceData(taskKey);
             selectedTaskName.textContent = serviceData.name;
             selectedTaskPrice.textContent = serviceData.price;
+
+            // Populate task details if available
+            const includedList = document.getElementById('selectedTaskIncluded');
+            const addonsList = document.getElementById('selectedTaskAddons');
+
+            if (includedList && serviceData.included) {
+                includedList.innerHTML = serviceData.included
+                    .map(item => `<li>• ${item}</li>`)
+                    .join('');
+            }
+
+            if (addonsList && serviceData.addons) {
+                addonsList.innerHTML = serviceData.addons
+                    .map(item => `<li>• ${item}</li>`)
+                    .join('');
+            }
+
             selectedTaskDisplay.classList.remove('hidden');
         }
 
@@ -3701,18 +3730,186 @@
 
     function getServiceData(taskKey) {
         const serviceMap = {
-            'tv_mount': { name: '📺 TV Wall Mount (32–65")', price: '~2.0 hr base • Starting at $160' },
-            'ceiling_fan': { name: '💡 Ceiling Fan Install/Replace', price: '~2.0 hr base • Starting at $160' },
-            'light_fixture': { name: '✨ Light Fixture / Chandelier Swap', price: '~1.5 hr base • Starting at $120' },
-            'faucet_showerhead': { name: '🚰 Faucet / Showerhead Replace', price: '~1.5 hr base • Starting at $120' },
-            'smart_doorbell': { name: '🔔 Smart Doorbell Install', price: '~1.25 hr base • Starting at $100' },
-            'curtains_blinds': { name: '🪟 Curtain Rods / Blinds', price: '~1.5 hr base • Starting at $120' },
-            'floating_shelf': { name: '📚 Floating Shelf Install', price: '~1.5 hr base • Starting at $120' },
-            'appliance_hookup': { name: '⚡ Appliance Hookup (W/D/DW)', price: '~2.0 hr base • Starting at $160' },
-            'furniture_assembly': { name: '🪑 Furniture Assembly (S–M)', price: '~2.0 hr base • Starting at $160' },
-            'closet_organizer': { name: '👕 Closet Organizer Install', price: '~2.5 hr base • Starting at $200' },
-            'premium_moveout': { name: '🏠 Premium Move-Out Removal (Includes Patching & Cleanup)', price: '~3.0 hr base • Starting at $300' },
-            'general_handyman': { name: '🔧 General Handyman (3+ hours)', price: '~3 hr minimum • Starting at $240' }
+            'tv_mount': {
+                name: '📺 TV Wall Mount (32–65")',
+                price: '~2.0 hr base • Starting at $160',
+                included: [
+                    'Mounting TV (32–65") on drywall with wood studs',
+                    'Using customer-supplied mount',
+                    'Cord cover (if provided)',
+                    'Level installation and cable management'
+                ],
+                addons: [
+                    '+$40: Mounting on brick, concrete, or over fireplace',
+                    '+$50: TVs larger than 65"',
+                    'New outlet/electrical work not included'
+                ]
+            },
+            'ceiling_fan': {
+                name: '💡 Ceiling Fan Install/Replace',
+                price: '~2.0 hr base • Starting at $160',
+                included: [
+                    'Remove old fixture and install new ceiling fan',
+                    'Using existing electrical junction box',
+                    'Basic wiring and switch connection',
+                    'Test all functions (lights, fan speeds)'
+                ],
+                addons: [
+                    '+$50: Installing new electrical box if needed',
+                    '+$30: Remote control setup',
+                    'New electrical wiring not included'
+                ]
+            },
+            'light_fixture': {
+                name: '✨ Light Fixture / Chandelier Swap',
+                price: '~1.5 hr base • Starting at $120',
+                included: [
+                    'Remove old fixture and install new light fixture',
+                    'Connect to existing wiring',
+                    'Test functionality and switches',
+                    'Basic fixture mounting'
+                ],
+                addons: [
+                    '+$40: Heavy chandeliers requiring additional support',
+                    '+$20: Dimmer switch installation',
+                    'New electrical wiring not included'
+                ]
+            },
+            'faucet_showerhead': {
+                name: '🚰 Faucet / Showerhead Replace',
+                price: '~1.5 hr base • Starting at $120',
+                included: [
+                    'Remove old faucet/showerhead',
+                    'Install new fixture using existing connections',
+                    'Test for leaks and proper water pressure',
+                    'Basic cleaning of work area'
+                ],
+                addons: [
+                    '+$50: New water supply lines if needed',
+                    '+$30: Shut-off valve replacement',
+                    'Plumbing modifications not included'
+                ]
+            },
+            'smart_doorbell': {
+                name: '🔔 Smart Doorbell Install',
+                price: '~1.25 hr base • Starting at $100',
+                included: [
+                    'Install smart doorbell using existing wiring',
+                    'Connect to home WiFi network',
+                    'Basic app setup and testing',
+                    'Mount doorbell and chime setup'
+                ],
+                addons: [
+                    '+$40: New doorbell wiring installation',
+                    '+$20: Transformer upgrade if needed',
+                    'Advanced smart home integration extra'
+                ]
+            },
+            'curtains_blinds': {
+                name: '🪟 Curtain Rods / Blinds',
+                price: '~1.5 hr base • Starting at $120',
+                included: [
+                    'Install curtain rods or blinds on drywall',
+                    'Mount brackets securely into studs',
+                    'Hang curtains or mount blinds',
+                    'Test operation and adjustments'
+                ],
+                addons: [
+                    '+$30: Installation on brick/concrete walls',
+                    '+$40: Motorized blind setup',
+                    'Custom cutting/hemming not included'
+                ]
+            },
+            'floating_shelf': {
+                name: '📚 Floating Shelf Install',
+                price: '~1.5 hr base • Starting at $120',
+                included: [
+                    'Install floating shelves into wall studs',
+                    'Level mounting for straight installation',
+                    'Secure mounting for typical shelf loads',
+                    'Test stability and load capacity'
+                ],
+                addons: [
+                    '+$20: Each additional shelf beyond first two',
+                    '+$40: Installation on brick/concrete walls',
+                    'Heavy-duty brackets for extra weight'
+                ]
+            },
+            'appliance_hookup': {
+                name: '⚡ Appliance Hookup (W/D/DW)',
+                price: '~2.0 hr base • Starting at $160',
+                included: [
+                    'Connect washer, dryer, or dishwasher to existing hookups',
+                    'Test all connections and functionality',
+                    'Basic leveling and adjustments',
+                    'Run test cycle to ensure proper operation'
+                ],
+                addons: [
+                    '+$80: New water line or electrical connection',
+                    '+$50: Vent installation or modification',
+                    'Major plumbing/electrical work separate'
+                ]
+            },
+            'furniture_assembly': {
+                name: '🪑 Furniture Assembly (S–M)',
+                price: '~2.0 hr base • Starting at $160',
+                included: [
+                    'Complete assembly of small-medium furniture',
+                    'Follow manufacturer instructions precisely',
+                    'Ensure all joints are secure and level',
+                    'Clean up packaging materials'
+                ],
+                addons: [
+                    '+$50: Large/complex furniture (beds, armoires)',
+                    '+$30: Wall mounting for safety',
+                    'Furniture moving/placement in home'
+                ]
+            },
+            'closet_organizer': {
+                name: '👕 Closet Organizer Install',
+                price: '~2.5 hr base • Starting at $200',
+                included: [
+                    'Install closet organization system components',
+                    'Mount shelves, rods, and organizer units',
+                    'Ensure level and secure installation',
+                    'Test all moving parts and adjustments'
+                ],
+                addons: [
+                    '+$50: Custom cutting or modifications',
+                    '+$30: Additional hardware or brackets',
+                    'Closet clean-out service available separately'
+                ]
+            },
+            'premium_moveout': {
+                name: '🏠 Premium Move-Out Removal (Includes Patching & Cleanup)',
+                price: '~3.0 hr base • Starting at $300',
+                included: [
+                    'Remove mounted items and hardware',
+                    'Patch all holes with spackling compound',
+                    'Sand smooth and touch-up paint',
+                    'Clean and sweep work areas'
+                ],
+                addons: [
+                    '+$100: Full room repainting',
+                    '+$50: Deep cleaning service',
+                    'Large furniture removal separate'
+                ]
+            },
+            'general_handyman': {
+                name: '🔧 General Handyman (3+ hours)',
+                price: '~3 hr minimum • Starting at $240',
+                included: [
+                    'Comprehensive handyman services',
+                    'Multiple small tasks in one visit',
+                    'Professional consultation and assessment',
+                    'Detailed work completion report'
+                ],
+                addons: [
+                    'Pricing varies by specific tasks requested',
+                    'Material costs additional',
+                    'Electrical/plumbing work may require specialist'
+                ]
+            }
         };
         return serviceMap[taskKey] || { name: 'Unknown Service', price: 'Price varies' };
     }
@@ -4330,7 +4527,16 @@
 
         if (bookServiceBtn) {
             bookServiceBtn.addEventListener('click', () => {
-                document.getElementById('tasks').scrollIntoView({ behavior: 'smooth' });
+                // Get the AI recommended service and pre-select it
+                const recommendedTask = document.getElementById('recommendedTask').textContent;
+
+                // Scroll to Select Your Service section
+                document.getElementById('book').scrollIntoView({ behavior: 'smooth' });
+
+                // Pre-select the recommended service after a short delay
+                setTimeout(() => {
+                    preSelectAIRecommendedService(recommendedTask);
+                }, 500);
             });
         }
 
@@ -4705,6 +4911,44 @@
                 }
             `;
             document.head.appendChild(style);
+        }
+    }
+
+    // Function to pre-select AI recommended service
+    function preSelectAIRecommendedService(recommendedTaskName) {
+        // Map AI task names to dropdown values
+        const taskMapping = {
+            'TV Wall Mount (32–65")': 'tv_mount',
+            'Ceiling Fan Install/Replace': 'ceiling_fan',
+            'Light Fixture / Chandelier Swap': 'light_fixture',
+            'Faucet / Showerhead Replace': 'faucet_showerhead',
+            'Smart Doorbell Install': 'smart_doorbell',
+            'Curtain Rods / Blinds': 'curtains_blinds',
+            'Floating Shelf Install': 'floating_shelf',
+            'Appliance Hookup (W/D/DW)': 'appliance_hookup',
+            'Furniture Assembly (S–M)': 'furniture_assembly',
+            'Closet Organizer Install': 'closet_organizer'
+        };
+
+        const taskCategory = document.getElementById('taskCategory');
+        const mappedValue = taskMapping[recommendedTaskName];
+
+        if (mappedValue && taskCategory) {
+            // Select the recommended service
+            taskCategory.value = mappedValue;
+
+            // Trigger the change event to populate the task details
+            const changeEvent = new Event('change', { bubbles: true });
+            taskCategory.dispatchEvent(changeEvent);
+
+            // Highlight the selection temporarily
+            taskCategory.style.background = '#f0f9ff';
+            taskCategory.style.borderColor = '#0ea5e9';
+
+            setTimeout(() => {
+                taskCategory.style.background = '';
+                taskCategory.style.borderColor = '';
+            }, 2000);
         }
     }
 
