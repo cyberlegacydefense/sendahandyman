@@ -397,9 +397,6 @@
         <div>
             <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Local handyman help — <span class="text-indigo-600">today or tomorrow</span>.</h1>
             <p class="mt-4 text-slate-600 text-lg">Skip the contractor shopping. Just pick your task and we dispatch the right pro. Upload photos, get an instant AI estimate, and reserve with your card. Get text updates throughout.</p>
-            <div class="mt-6 flex gap-3">
-                <a href="#how" class="rounded-xl bg-white px-5 py-3 font-semibold border border-slate-200">How it works</a>
-            </div>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
             <div class="carousel-container">
@@ -4445,15 +4442,17 @@
         // Set risk level with appropriate styling
         const riskLevel = document.getElementById('riskLevel');
         const riskText = result.risk_level || 'moderate';
-        const riskColor = {
-            'low': 'text-green-600',
-            'moderate': 'text-yellow-600',
-            'high': 'text-red-600',
-            'urgent': 'text-red-800'
-        }[riskText.toLowerCase()] || 'text-yellow-600';
+        const riskStyles = {
+            'low': 'text-green-800 bg-green-100 border border-green-200',
+            'moderate': 'text-yellow-800 bg-yellow-100 border border-yellow-200',
+            'high': 'text-red-800 bg-red-100 border border-red-200',
+            'urgent': 'text-red-900 bg-red-200 border border-red-300'
+        };
+
+        const styleClasses = riskStyles[riskText.toLowerCase()] || riskStyles['moderate'];
 
         riskLevel.innerHTML = `
-            <span class="px-3 py-1 rounded-full text-sm font-semibold ${riskColor} bg-current bg-opacity-10">
+            <span class="px-3 py-1 rounded-full text-sm font-semibold ${styleClasses}">
                 ${riskText.toUpperCase()}
             </span>
         `;
