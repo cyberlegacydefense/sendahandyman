@@ -141,11 +141,7 @@ GUIDELINES:
     return createMockAnalysis();
   }
 
-  // Temporarily use mock for testing - remove this after debugging
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('🧪 Using mock analysis for testing');
-    return createMockAnalysis();
-  }
+  // Note: Mock analysis removed - now using real Claude vision
 
   console.log('🤖 Making Claude API call...');
   console.log('API Key available:', !!process.env.CLAUDE_API_KEY);
