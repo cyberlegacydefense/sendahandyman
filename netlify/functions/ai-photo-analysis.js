@@ -7,23 +7,23 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 
-// Task categories with pricing (based on the existing site structure)
+// Task categories with exact pricing from current website
 const TASK_CATEGORIES = {
-  'tv_mount': { name: 'TV Wall Mount', price: '$160' },
-  'ceiling_fan': { name: 'Ceiling Fan Installation', price: '$190' },
-  'furniture_assembly': { name: 'Furniture Assembly', price: '$90' },
-  'blinds_installation': { name: 'Blinds & Curtains', price: '$120' },
-  'faucet_repair': { name: 'Faucet Installation/Repair', price: '$180' },
-  'door_repair': { name: 'Door Repair/Installation', price: '$150' },
-  'light_fixture': { name: 'Light Fixture Installation', price: '$140' },
-  'shelf_mounting': { name: 'Shelf Mounting', price: '$80' },
-  'drywall_repair': { name: 'Drywall Repair', price: '$120' },
-  'tile_repair': { name: 'Tile Repair', price: '$160' },
-  'electrical_repair': { name: 'Electrical Repair', price: '$200' },
-  'plumbing_repair': { name: 'Plumbing Repair', price: '$180' },
-  'painting': { name: 'Touch-up Painting', price: '$150' },
-  'caulking': { name: 'Caulking & Sealing', price: '$100' },
-  'general_repair': { name: 'General Repair', price: '$120' }
+  'tv_mount': { name: 'TV Wall Mount (32–65")', price: 'Starting at $160' },
+  'ceiling_fan': { name: 'Ceiling Fan Install/Replace', price: 'Starting at $160' },
+  'light_fixture': { name: 'Light Fixture / Chandelier Swap', price: 'Starting at $120' },
+  'faucet_repair': { name: 'Faucet / Showerhead Replace', price: 'Starting at $120' },
+  'smart_doorbell': { name: 'Smart Doorbell Install', price: 'Starting at $100' },
+  'blinds_installation': { name: 'Curtain Rods / Blinds', price: 'Starting at $120' },
+  'shelf_mounting': { name: 'Floating Shelf Install', price: 'Starting at $120' },
+  'appliance_hookup': { name: 'Appliance Hookup (W/D/DW)', price: 'Starting at $160' },
+  'furniture_assembly': { name: 'Furniture Assembly (S–M)', price: 'Starting at $160' },
+  'closet_organizer': { name: 'Closet Organizer Install', price: 'Starting at $200' },
+  'electrical_repair': { name: 'Electrical Repair', price: 'Starting at $160' },
+  'plumbing_repair': { name: 'Plumbing Repair', price: 'Starting at $120' },
+  'drywall_repair': { name: 'Drywall Repair', price: 'Starting at $120' },
+  'door_repair': { name: 'Door Repair/Installation', price: 'Starting at $120' },
+  'general_repair': { name: 'General Handyman Service', price: 'Starting at $120' }
 };
 
 export const handler = async (event, context) => {
