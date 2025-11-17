@@ -2206,25 +2206,27 @@ async function viewHandymanDetails(handymanId) {
     // Fetch task metrics - try multiple possible column names
     console.log('🔍 Fetching tasks for handyman:', handymanId);
 
-    // First try handyman_id
+    // First try handyman_id - fix SQL syntax
     let { data: tasks, error: tasksError } = await supabase
       .from('tasks')
-      .select('id, status, total_amount, created_at, category, name as customer_name, handyman_id, assigned_handyman_id')
+      .select('id, status, total_amount, created_at, category, name, handyman_id, assigned_handyman_id')
       .eq('handyman_id', handymanId)
       .order('created_at', { ascending: false });
 
     console.log('🔍 Tasks with handyman_id:', tasks?.length || 0, tasks);
+    if (tasksError) console.error('❌ Task query error:', tasksError);
 
     // If no tasks found, try assigned_handyman_id
     if (!tasks || tasks.length === 0) {
       console.log('🔍 Trying assigned_handyman_id column...');
       const { data: tasks2, error: tasksError2 } = await supabase
         .from('tasks')
-        .select('id, status, total_amount, created_at, category, name as customer_name, handyman_id, assigned_handyman_id')
+        .select('id, status, total_amount, created_at, category, name, handyman_id, assigned_handyman_id')
         .eq('assigned_handyman_id', handymanId)
         .order('created_at', { ascending: false });
 
       console.log('🔍 Tasks with assigned_handyman_id:', tasks2?.length || 0, tasks2);
+      if (tasksError2) console.error('❌ Task query error 2:', tasksError2);
       tasks = tasks2;
       tasksError = tasksError2;
     }
@@ -2242,16 +2244,18 @@ async function viewHandymanDetails(handymanId) {
     let onboardingFiles = [];
     console.log('🔍 Fetching files for handyman:', handymanId);
 
-    // Try different possible bucket names and paths
+    // Try different possible bucket names and paths - correct bucket name first
     const possiblePaths = [
-      { bucket: 'handyman-docs', path: `${handymanId}/` },
+      { bucket: 'handyman-documents', path: `${handyman.user_id}/` },
+      { bucket: 'handyman-documents', path: `${handymanId}/` },
       { bucket: 'handyman-docs', path: `${handyman.user_id}/` },
-      { bucket: 'handymen-files', path: `${handymanId}/` },
+      { bucket: 'handyman-docs', path: `${handymanId}/` },
       { bucket: 'handymen-files', path: `${handyman.user_id}/` },
-      { bucket: 'uploads', path: `handymen/${handymanId}/` },
+      { bucket: 'handymen-files', path: `${handymanId}/` },
       { bucket: 'uploads', path: `handymen/${handyman.user_id}/` },
-      { bucket: 'onboarding', path: `${handymanId}/` },
-      { bucket: 'onboarding', path: `${handyman.user_id}/` }
+      { bucket: 'uploads', path: `handymen/${handymanId}/` },
+      { bucket: 'onboarding', path: `${handyman.user_id}/` },
+      { bucket: 'onboarding', path: `${handymanId}/` }
     ];
 
     for (const { bucket, path } of possiblePaths) {
@@ -2409,7 +2413,7 @@ function populateHandymanDetails(handyman, metrics) {
           <tbody>
             ${metrics.recentTasks.map(task => `
               <tr class="border-b border-slate-100">
-                <td class="px-4 py-2 text-sm">${task.customer_name || 'N/A'}</td>
+                <td class="px-4 py-2 text-sm">${task.name || 'N/A'}</td>
                 <td class="px-4 py-2 text-sm">${task.category || 'N/A'}</td>
                 <td class="px-4 py-2 text-sm">$${parseFloat(task.total_amount || 0).toFixed(2)}</td>
                 <td class="px-4 py-2 text-sm">
