@@ -2203,12 +2203,33 @@ async function viewHandymanDetails(handymanId) {
       throw new Error('Failed to fetch handyman data');
     }
 
-    // Fetch task metrics
-    const { data: tasks, error: tasksError } = await supabase
+    // Fetch task metrics - try multiple possible column names
+    console.log('🔍 Fetching tasks for handyman:', handymanId);
+
+    // First try handyman_id
+    let { data: tasks, error: tasksError } = await supabase
       .from('tasks')
-      .select('id, status, total_amount, created_at, category, name as customer_name')
+      .select('id, status, total_amount, created_at, category, name as customer_name, handyman_id, assigned_handyman_id')
       .eq('handyman_id', handymanId)
       .order('created_at', { ascending: false });
+
+    console.log('🔍 Tasks with handyman_id:', tasks?.length || 0, tasks);
+
+    // If no tasks found, try assigned_handyman_id
+    if (!tasks || tasks.length === 0) {
+      console.log('🔍 Trying assigned_handyman_id column...');
+      const { data: tasks2, error: tasksError2 } = await supabase
+        .from('tasks')
+        .select('id, status, total_amount, created_at, category, name as customer_name, handyman_id, assigned_handyman_id')
+        .eq('assigned_handyman_id', handymanId)
+        .order('created_at', { ascending: false });
+
+      console.log('🔍 Tasks with assigned_handyman_id:', tasks2?.length || 0, tasks2);
+      tasks = tasks2;
+      tasksError = tasksError2;
+    }
+
+    console.log('🔍 Final tasks result:', tasks?.length || 0, 'tasks found');
 
     // Calculate metrics
     const totalTasks = tasks?.length || 0;
@@ -2217,17 +2238,46 @@ async function viewHandymanDetails(handymanId) {
       .reduce((sum, t) => sum + (parseFloat(t.total_amount) || 0), 0) || 0;
     const averageRating = 4.2; // Placeholder - would come from reviews table
 
-    // Fetch onboarding data from storage if available
+    // Fetch onboarding data from storage if available - try multiple bucket names
     let onboardingFiles = [];
-    try {
-      const { data: storageFiles, error: storageError } = await supabase.storage
-        .from('handyman-docs')
-        .list(`${handymanId}/`, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+    console.log('🔍 Fetching files for handyman:', handymanId);
 
-      onboardingFiles = storageFiles || [];
-    } catch (storageError) {
-      console.warn('Storage access failed:', storageError);
+    // Try different possible bucket names and paths
+    const possiblePaths = [
+      { bucket: 'handyman-docs', path: `${handymanId}/` },
+      { bucket: 'handyman-docs', path: `${handyman.user_id}/` },
+      { bucket: 'handymen-files', path: `${handymanId}/` },
+      { bucket: 'handymen-files', path: `${handyman.user_id}/` },
+      { bucket: 'uploads', path: `handymen/${handymanId}/` },
+      { bucket: 'uploads', path: `handymen/${handyman.user_id}/` },
+      { bucket: 'onboarding', path: `${handymanId}/` },
+      { bucket: 'onboarding', path: `${handyman.user_id}/` }
+    ];
+
+    for (const { bucket, path } of possiblePaths) {
+      try {
+        console.log(`🔍 Trying bucket: ${bucket}, path: ${path}`);
+        const { data: storageFiles, error: storageError } = await supabase.storage
+          .from(bucket)
+          .list(path, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+
+        if (storageFiles && storageFiles.length > 0) {
+          console.log(`✅ Found ${storageFiles.length} files in ${bucket}/${path}:`, storageFiles);
+          onboardingFiles = storageFiles.map(file => ({
+            ...file,
+            bucket,
+            path: path + file.name
+          }));
+          break;
+        } else {
+          console.log(`📁 No files in ${bucket}/${path}`);
+        }
+      } catch (storageError) {
+        console.log(`❌ Failed to access ${bucket}/${path}:`, storageError.message);
+      }
     }
+
+    console.log('🔍 Final files result:', onboardingFiles.length, 'files found');
 
     // Build and populate the details modal
     populateHandymanDetails(handyman, {
@@ -2321,10 +2371,11 @@ function populateHandymanDetails(handyman, metrics) {
             <div class="flex items-center justify-between">
               <div>
                 <p class="font-semibold text-sm">${file.name}</p>
-                <p class="text-xs text-slate-500">${(file.metadata?.size / 1024).toFixed(1)} KB</p>
+                <p class="text-xs text-slate-500">${file.metadata?.size ? (file.metadata.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</p>
                 <p class="text-xs text-slate-500">${new Date(file.updated_at).toLocaleDateString()}</p>
+                <p class="text-xs text-slate-400">📁 ${file.bucket}/${file.path}</p>
               </div>
-              <button onclick="downloadFile('${handyman.id}', '${file.name}')" class="text-blue-600 hover:text-blue-800 text-sm">
+              <button onclick="downloadFile('${file.bucket}', '${file.path}')" class="text-blue-600 hover:text-blue-800 text-sm">
                 Download
               </button>
             </div>
@@ -2400,14 +2451,16 @@ function getStatusColor(status) {
   }
 }
 
-async function downloadFile(handymanId, fileName) {
+async function downloadFile(bucket, filePath) {
   try {
+    console.log('🔗 Downloading file:', bucket, filePath);
     const { data, error } = await supabase.storage
-      .from('handyman-docs')
-      .download(`${handymanId}/${fileName}`);
+      .from(bucket)
+      .download(filePath);
 
     if (error) throw error;
 
+    const fileName = filePath.split('/').pop();
     const url = URL.createObjectURL(data);
     const a = document.createElement('a');
     a.href = url;
@@ -2416,9 +2469,11 @@ async function downloadFile(handymanId, fileName) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+
+    console.log('✅ File downloaded successfully:', fileName);
   } catch (error) {
-    console.error('Download failed:', error);
-    alert('Failed to download file');
+    console.error('❌ Download failed:', error);
+    alert('Failed to download file: ' + error.message);
   }
 }
 
