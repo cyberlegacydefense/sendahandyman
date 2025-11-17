@@ -3686,6 +3686,8 @@
 
         if (selectedTaskDisplay && selectedTaskName && selectedTaskPrice) {
             const serviceData = getServiceData(taskKey);
+            console.log('🔧 Service data for', taskKey, ':', serviceData);
+
             selectedTaskName.textContent = serviceData.name;
             selectedTaskPrice.textContent = serviceData.price;
 
@@ -3693,16 +3695,25 @@
             const includedList = document.getElementById('selectedTaskIncluded');
             const addonsList = document.getElementById('selectedTaskAddons');
 
+            console.log('📋 Task detail elements:', {
+                includedList: !!includedList,
+                addonsList: !!addonsList,
+                hasIncluded: !!serviceData.included,
+                hasAddons: !!serviceData.addons
+            });
+
             if (includedList && serviceData.included) {
                 includedList.innerHTML = serviceData.included
                     .map(item => `<li>• ${item}</li>`)
                     .join('');
+                console.log('✅ Populated included items:', serviceData.included.length);
             }
 
             if (addonsList && serviceData.addons) {
                 addonsList.innerHTML = serviceData.addons
                     .map(item => `<li>• ${item}</li>`)
                     .join('');
+                console.log('⚠️ Populated addon items:', serviceData.addons.length);
             }
 
             selectedTaskDisplay.classList.remove('hidden');
@@ -3911,7 +3922,12 @@
                 ]
             }
         };
-        return serviceMap[taskKey] || { name: 'Unknown Service', price: 'Price varies' };
+        return serviceMap[taskKey] || {
+            name: 'Unknown Service',
+            price: 'Price varies',
+            included: ['Service details will be provided upon selection'],
+            addons: ['Additional services available upon request']
+        };
     }
 
     function showStep(stepId) {
