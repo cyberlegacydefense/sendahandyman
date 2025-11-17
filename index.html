@@ -19,6 +19,247 @@
         gtag('config', 'AW-17598022946');
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Warm Minimalism Design System */
+        :root {
+            --color-warm-50: #fef9f3;
+            --color-warm-100: #fef0e5;
+            --color-warm-200: #fcdecb;
+            --color-warm-300: #f9c4a0;
+            --color-warm-400: #f5a373;
+            --color-warm-500: #f1834e;
+            --color-warm-600: #e76932;
+            --color-warm-700: #d14f20;
+            --color-warm-800: #a8401a;
+            --color-warm-900: #86371a;
+
+            --color-neutral-0: #fefefe;
+            --color-neutral-50: #f9f8f7;
+            --color-neutral-100: #f1efed;
+            --color-neutral-200: #e6e3e0;
+            --color-neutral-300: #d5d1cc;
+            --color-neutral-400: #b8b2ab;
+            --color-neutral-500: #9c958d;
+            --color-neutral-600: #7a736b;
+            --color-neutral-700: #5e5751;
+            --color-neutral-800: #473f3a;
+            --color-neutral-900: #2d251f;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--color-neutral-50);
+            color: var(--color-neutral-800);
+            line-height: 1.6;
+        }
+
+        /* Typography - Warm & Friendly */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Manrope', system-ui, sans-serif;
+            color: var(--color-neutral-900);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        /* Enhanced Typography Classes */
+        .font-display {
+            font-family: 'Manrope', system-ui, sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .font-body {
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.6;
+        }
+
+        .text-soft {
+            color: var(--color-neutral-600);
+        }
+
+        .text-subtle {
+            color: var(--color-neutral-500);
+        }
+
+        /* Custom Warm Color Classes */
+        .bg-warm-50 { background-color: var(--color-warm-50); }
+        .bg-warm-100 { background-color: var(--color-warm-100); }
+        .bg-warm-200 { background-color: var(--color-warm-200); }
+        .bg-warm-300 { background-color: var(--color-warm-300); }
+        .bg-warm-400 { background-color: var(--color-warm-400); }
+        .bg-warm-500 { background-color: var(--color-warm-500); }
+        .bg-warm-600 { background-color: var(--color-warm-600); }
+        .bg-warm-700 { background-color: var(--color-warm-700); }
+        .bg-warm-800 { background-color: var(--color-warm-800); }
+
+        .text-warm-50 { color: var(--color-warm-50); }
+        .text-warm-100 { color: var(--color-warm-100); }
+        .text-warm-200 { color: var(--color-warm-200); }
+        .text-warm-300 { color: var(--color-warm-300); }
+        .text-warm-400 { color: var(--color-warm-400); }
+        .text-warm-500 { color: var(--color-warm-500); }
+        .text-warm-600 { color: var(--color-warm-600); }
+        .text-warm-700 { color: var(--color-warm-700); }
+        .text-warm-800 { color: var(--color-warm-800); }
+
+        .border-warm-50 { border-color: var(--color-warm-50); }
+        .border-warm-100 { border-color: var(--color-warm-100); }
+        .border-warm-200 { border-color: var(--color-warm-200); }
+        .border-warm-300 { border-color: var(--color-warm-300); }
+        .border-warm-400 { border-color: var(--color-warm-400); }
+        .border-warm-500 { border-color: var(--color-warm-500); }
+        .border-warm-600 { border-color: var(--color-warm-600); }
+        .border-warm-700 { border-color: var(--color-warm-700); }
+        .border-warm-800 { border-color: var(--color-warm-800); }
+
+        /* Focus Ring Variants */
+        .focus\:ring-warm-500:focus {
+            --tw-ring-color: var(--color-warm-500);
+            --tw-ring-opacity: 0.5;
+        }
+
+        .bg-neutral-soft {
+            background-color: var(--color-neutral-0);
+        }
+
+        .bg-neutral-whisper {
+            background-color: var(--color-neutral-100);
+        }
+
+        /* Soft Shadows & Rounded Design */
+        .shadow-warm {
+            box-shadow: 0 4px 20px rgba(241, 131, 78, 0.08), 0 1px 4px rgba(241, 131, 78, 0.04);
+        }
+
+        .shadow-warm-sm {
+            box-shadow: 0 2px 8px rgba(241, 131, 78, 0.06), 0 1px 3px rgba(241, 131, 78, 0.03);
+        }
+
+        .shadow-warm-md {
+            box-shadow: 0 4px 16px rgba(241, 131, 78, 0.08), 0 2px 6px rgba(241, 131, 78, 0.04);
+        }
+
+        .shadow-warm-lg {
+            box-shadow: 0 8px 32px rgba(241, 131, 78, 0.1), 0 4px 12px rgba(241, 131, 78, 0.05);
+        }
+
+        .shadow-warm-xl {
+            box-shadow: 0 12px 48px rgba(241, 131, 78, 0.12), 0 6px 16px rgba(241, 131, 78, 0.06);
+        }
+
+        .shadow-warm-2xl {
+            box-shadow: 0 16px 64px rgba(241, 131, 78, 0.15), 0 8px 24px rgba(241, 131, 78, 0.08);
+        }
+
+        .shadow-soft-xl {
+            box-shadow: 0 8px 32px rgba(45, 37, 31, 0.06), 0 1px 8px rgba(45, 37, 31, 0.04);
+        }
+
+        .shadow-gentle {
+            box-shadow: 0 2px 12px rgba(45, 37, 31, 0.04), 0 1px 4px rgba(45, 37, 31, 0.02);
+        }
+
+        /* Soft Rounded Elements */
+        .rounded-warm {
+            border-radius: 16px;
+        }
+
+        .rounded-warm-lg {
+            border-radius: 24px;
+        }
+
+        .rounded-warm-xl {
+            border-radius: 32px;
+        }
+
+        /* Button Styles - Warm & Approachable */
+        .btn-warm-primary {
+            background: linear-gradient(135deg, var(--color-warm-500) 0%, var(--color-warm-600) 100%);
+            color: white;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(241, 131, 78, 0.2);
+        }
+
+        .btn-warm-primary:hover {
+            background: linear-gradient(135deg, var(--color-warm-600) 0%, var(--color-warm-700) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(241, 131, 78, 0.3);
+        }
+
+        .btn-warm-secondary {
+            background-color: var(--color-neutral-0);
+            color: var(--color-neutral-700);
+            border: 1.5px solid var(--color-neutral-200);
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-warm-secondary:hover {
+            background-color: var(--color-warm-50);
+            border-color: var(--color-warm-300);
+            color: var(--color-neutral-800);
+        }
+
+        .btn-warm-accent {
+            background: linear-gradient(135deg, var(--color-warm-600) 0%, var(--color-warm-700) 100%);
+            color: white;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(241, 131, 78, 0.25);
+        }
+
+        .btn-warm-accent:hover {
+            background: linear-gradient(135deg, var(--color-warm-700) 0%, var(--color-warm-800) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(241, 131, 78, 0.35);
+        }
+
+        /* Card Styles - Soft & Breathable */
+        .card-warm {
+            background-color: var(--color-neutral-0);
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(45, 37, 31, 0.04), 0 1px 8px rgba(45, 37, 31, 0.02);
+            border: 1px solid var(--color-neutral-200);
+            transition: all 0.3s ease;
+        }
+
+        .card-warm:hover {
+            box-shadow: 0 8px 32px rgba(45, 37, 31, 0.08), 0 2px 12px rgba(45, 37, 31, 0.04);
+            transform: translateY(-2px);
+        }
+
+        /* Override some default Tailwind styles for warmth */
+        .bg-white {
+            background-color: var(--color-neutral-0) !important;
+        }
+
+        .bg-gray-50, .bg-slate-50 {
+            background-color: var(--color-neutral-50) !important;
+        }
+
+        .text-slate-900 {
+            color: var(--color-neutral-900) !important;
+        }
+
+        .text-slate-700 {
+            color: var(--color-neutral-700) !important;
+        }
+
+        .text-slate-600 {
+            color: var(--color-neutral-600) !important;
+        }
+
+        /* Mobile-first breathing room */
+        @media (max-width: 768px) {
+            .mobile-breathe {
+                padding: 1.5rem !important;
+            }
+        }
+    </style>
+
     <script src="https://js.stripe.com/v3/"></script>
     <!-- Leaflet.js for interactive maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -347,8 +588,8 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-<header class="bg-white/80 backdrop-blur sticky top-0 z-40 border-b border-slate-100">
+<body class="bg-neutral-50 text-neutral-800">
+<header class="bg-neutral-soft/90 backdrop-blur sticky top-0 z-40 border-b border-neutral-200 shadow-gentle">
     <div class="max-w-6xl mx-auto px-4 py-3 relative">
         <div class="hidden md:flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -392,13 +633,13 @@
     </div>
 </header>
 
-<section class="bg-gradient-to-b from-white to-slate-50">
-    <div class="max-w-6xl mx-auto px-4 py-10 md:py-16 grid md:grid-cols-2 gap-10 items-center">
+<section class="bg-gradient-to-b from-neutral-0 to-warm-50">
+    <div class="max-w-6xl mx-auto px-6 py-12 md:py-20 grid md:grid-cols-2 gap-12 items-center">
         <div>
-            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">Local handyman help — <span class="text-indigo-600">today or tomorrow</span>.</h1>
-            <p class="mt-4 text-slate-600 text-lg">Skip the contractor shopping. Just pick your task and we dispatch the right pro. Upload photos, get an instant AI estimate, and reserve with your card. Get text updates throughout.</p>
+            <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">Local handyman help — <span class="text-warm-600">today or tomorrow</span>.</h1>
+            <p class="mt-6 text-neutral-600 text-xl leading-relaxed">Skip the contractor shopping. Just pick your task and we dispatch the right pro. Upload photos, get an instant AI estimate, and reserve with your card. Get text updates throughout.</p>
         </div>
-        <div class="bg-white rounded-2xl p-5 shadow-soft border border-slate-100">
+        <div class="card-warm p-8 shadow-warm-lg">
             <div class="carousel-container">
                 <div class="carousel-track">
                     <div class="carousel-slide" style="background-image: url('/images/Ceiling_Fan_Installation.png')"></div>
@@ -415,55 +656,55 @@
 </section>
 
 <!-- AI Photo Triage System -->
-<section class="py-12 bg-gradient-to-br from-blue-50 to-indigo-100 border-t border-slate-100" id="ai-triage">
-    <div class="max-w-6xl mx-auto px-4">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+<section class="py-16 md:py-20 bg-gradient-to-br from-warm-50 to-warm-100 border-t border-warm-200" id="ai-triage">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-800 mb-4">
                 🤖 AI Photo Diagnosis
             </h2>
-            <p class="text-xl text-slate-700 max-w-3xl mx-auto">
+            <p class="text-xl text-neutral-700 max-w-3xl mx-auto">
                 Upload a photo of your home repair issue and get an instant AI analysis with cost estimates and task recommendations. Our expert system analyzes your problem in seconds!
             </p>
         </div>
 
-        <div class="max-w-4xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-lg p-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="card-warm shadow-warm-lg p-10 md:p-12">
                 <!-- Photo Upload Area -->
-                <div id="photoUploadArea" class="border-2 border-dashed border-blue-300 rounded-xl p-4 md:p-8 text-center transition-all hover:border-blue-400 hover:bg-blue-50 touch-manipulation">
+                <div id="photoUploadArea" class="border-2 border-dashed border-warm-300 rounded-warm p-4 md:p-8 text-center transition-all hover:border-warm-400 hover:bg-warm-50 touch-manipulation">
                     <div id="uploadPrompt">
-                        <div class="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                            <svg class="w-6 h-6 md:w-8 md:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-warm-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+                            <svg class="w-6 h-6 md:w-8 md:h-8 text-warm-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-base md:text-lg font-semibold text-slate-900 mb-2">Upload Your Repair Photo</h3>
-                        <p class="text-sm md:text-base text-slate-600 mb-4 hidden md:block">Drag and drop your image here, or tap to capture/browse</p>
-                        <p class="text-sm text-slate-600 mb-4 md:hidden">Tap to take photo or browse your gallery</p>
+                        <h3 class="text-base md:text-lg font-semibold text-neutral-800 mb-2">Upload Your Repair Photo</h3>
+                        <p class="text-sm md:text-base text-neutral-600 mb-4 hidden md:block">Drag and drop your image here, or tap to capture/browse</p>
+                        <p class="text-sm text-neutral-600 mb-4 md:hidden">Tap to take photo or browse your gallery</p>
 
                         <!-- Mobile-optimized buttons -->
                         <div class="space-y-3 md:space-y-0 md:space-x-3 md:flex md:justify-center md:items-center">
-                            <button type="button" class="w-full md:w-auto bg-blue-600 text-white px-6 py-4 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base md:text-sm touch-manipulation active:scale-95">
+                            <button type="button" class="btn-warm-primary w-full md:w-auto px-6 py-4 md:py-3 font-semibold text-base md:text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                 📷 Take Photo
                             </button>
-                            <button type="button" id="browsePhotoBtn" class="w-full md:w-auto bg-slate-600 text-white px-6 py-4 md:py-3 rounded-lg hover:bg-slate-700 transition-colors font-semibold text-base md:text-sm touch-manipulation active:scale-95">
+                            <button type="button" id="browsePhotoBtn" class="btn-warm-secondary w-full md:w-auto px-6 py-4 md:py-3 font-semibold text-base md:text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                 🖼️ Browse Gallery
                             </button>
                         </div>
 
                         <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden" />
                         <input type="file" id="browseInput" accept="image/*" class="hidden" />
-                        <p class="text-xs md:text-sm text-slate-500 mt-3">Best results with good lighting • Max 5MB</p>
+                        <p class="text-xs md:text-sm text-neutral-500 mt-3">Best results with good lighting • Max 5MB</p>
                     </div>
 
                     <!-- Photo Preview -->
                     <div id="photoPreview" class="hidden">
-                        <img id="previewImage" class="max-w-full max-h-48 md:max-h-64 mx-auto rounded-lg shadow-md mb-4 object-contain" />
-                        <p class="text-xs text-slate-500 mb-4 md:hidden">Photo looks good? Tap to analyze or retake</p>
+                        <img id="previewImage" class="max-w-full max-h-48 md:max-h-64 mx-auto rounded-warm shadow-warm-md mb-4 object-contain" />
+                        <p class="text-xs text-neutral-500 mb-4 md:hidden">Photo looks good? Tap to analyze or retake</p>
                         <div class="space-y-3 md:space-y-0 md:flex md:justify-center md:gap-3">
-                            <button id="analyzeBtn" class="w-full md:w-auto bg-green-600 text-white px-6 py-4 md:py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold text-base md:text-sm touch-manipulation active:scale-95">
+                            <button id="analyzeBtn" class="btn-warm-primary w-full md:w-auto px-6 py-4 md:py-3 font-semibold text-base md:text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                 🔍 Analyze with AI
                             </button>
-                            <button id="retakeBtn" class="w-full md:w-auto bg-slate-500 text-white px-6 py-4 md:py-3 rounded-lg hover:bg-slate-600 transition-colors font-semibold text-base md:text-sm touch-manipulation active:scale-95">
+                            <button id="retakeBtn" class="btn-warm-secondary w-full md:w-auto px-6 py-4 md:py-3 font-semibold text-base md:text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                 📷 Take Different Photo
                             </button>
                         </div>
@@ -471,7 +712,7 @@
                 </div>
 
                 <!-- File Error Display -->
-                <div id="fileError" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <div id="fileError" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-warm">
                     <div class="flex items-start">
                         <svg class="w-5 h-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -482,10 +723,10 @@
                         </div>
                     </div>
                     <div class="mt-4 space-y-2 md:space-y-0 md:flex md:gap-2">
-                        <button id="compressPhotoBtn" class="hidden w-full md:w-auto bg-blue-600 text-white px-4 py-3 md:py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold touch-manipulation active:scale-95">
+                        <button id="compressPhotoBtn" class="hidden btn-warm-primary w-full md:w-auto px-4 py-3 md:py-2 text-sm font-semibold touch-manipulation active:scale-95 transition-all duration-200">
                             🗜️ Compress & Try Again
                         </button>
-                        <button id="dismissErrorBtn" class="w-full md:w-auto bg-gray-500 text-white px-4 py-3 md:py-2 rounded-lg hover:bg-gray-600 transition-colors text-sm font-semibold touch-manipulation active:scale-95">
+                        <button id="dismissErrorBtn" class="btn-warm-secondary w-full md:w-auto px-4 py-3 md:py-2 text-sm font-semibold touch-manipulation active:scale-95 transition-all duration-200">
                             Dismiss
                         </button>
                     </div>
@@ -493,15 +734,15 @@
 
                 <!-- Loading State -->
                 <div id="analysisLoading" class="hidden text-center py-8">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p class="text-lg text-slate-700">AI is analyzing your photo...</p>
-                    <p class="text-sm text-slate-500">This usually takes 5-10 seconds</p>
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-warm-600 mb-4"></div>
+                    <p class="text-lg text-neutral-700">AI is analyzing your photo...</p>
+                    <p class="text-sm text-neutral-500">This usually takes 5-10 seconds</p>
                 </div>
 
                 <!-- AI Analysis Results -->
                 <div id="analysisResults" class="hidden mt-8">
-                    <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
-                        <h3 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+                    <div class="bg-gradient-to-r from-warm-50 to-warm-100 rounded-warm p-6 border border-warm-200">
+                        <h3 class="text-xl font-bold text-warm-700 mb-4 flex items-center">
                             <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
@@ -510,46 +751,46 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <!-- Problem Description -->
-                            <div class="bg-white rounded-lg p-3 md:p-4 shadow-sm md:col-span-2">
-                                <h4 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Problem Identified</h4>
-                                <p id="problemDescription" class="text-slate-700 text-sm md:text-base"></p>
+                            <div class="bg-neutral-50 rounded-warm p-3 md:p-4 shadow-warm-sm md:col-span-2">
+                                <h4 class="font-semibold text-neutral-800 mb-2 text-sm md:text-base">Problem Identified</h4>
+                                <p id="problemDescription" class="text-neutral-700 text-sm md:text-base"></p>
                             </div>
 
                             <!-- Cost Estimate - Priority on mobile -->
-                            <div class="bg-white rounded-lg p-3 md:p-4 shadow-sm order-1 md:order-3">
-                                <h4 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Estimated Cost</h4>
-                                <p id="costEstimate" class="text-xl md:text-2xl font-bold text-green-600"></p>
+                            <div class="bg-neutral-50 rounded-warm p-3 md:p-4 shadow-warm-sm order-1 md:order-3">
+                                <h4 class="font-semibold text-neutral-800 mb-2 text-sm md:text-base">Estimated Cost</h4>
+                                <p id="costEstimate" class="text-xl md:text-2xl font-bold text-warm-600"></p>
                             </div>
 
                             <!-- Risk Assessment -->
-                            <div class="bg-white rounded-lg p-3 md:p-4 shadow-sm order-2">
-                                <h4 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Risk Level</h4>
+                            <div class="bg-neutral-50 rounded-warm p-3 md:p-4 shadow-warm-sm order-2">
+                                <h4 class="font-semibold text-neutral-800 mb-2 text-sm md:text-base">Risk Level</h4>
                                 <div id="riskLevel" class="flex items-center"></div>
                             </div>
 
                             <!-- Recommended Task -->
-                            <div class="bg-white rounded-lg p-3 md:p-4 shadow-sm md:col-span-2 order-3 md:order-1">
+                            <div class="bg-neutral-50 rounded-warm p-3 md:p-4 shadow-warm-sm md:col-span-2 order-3 md:order-1">
                                 <h4 class="font-semibold text-slate-900 mb-2 text-sm md:text-base">Recommended Service</h4>
-                                <p id="recommendedTask" class="text-slate-700 font-semibold text-sm md:text-base"></p>
+                                <p id="recommendedTask" class="text-neutral-700 font-semibold text-sm md:text-base"></p>
                             </div>
                         </div>
 
                         <!-- Urgency and Action -->
-                        <div id="urgencySection" class="mt-6 p-4 rounded-lg">
+                        <div id="urgencySection" class="mt-6 p-4 rounded-warm">
                             <h4 class="font-semibold mb-2">Urgency Assessment</h4>
-                            <p id="urgencyText" class="text-slate-700 mb-4"></p>
+                            <p id="urgencyText" class="text-neutral-700 mb-4"></p>
                             <div class="space-y-3 md:space-y-0 md:flex md:flex-wrap md:gap-3">
-                                <button id="bookServiceBtn" class="w-full md:w-auto bg-blue-600 text-white px-6 py-4 md:py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base md:text-sm touch-manipulation active:scale-95">
+                                <button id="bookServiceBtn" class="btn-warm-primary w-full md:w-auto px-6 py-4 md:py-3 font-semibold text-base md:text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                     📞 Book This Service Now
                                 </button>
-                                <button id="viewTasksBtn" class="w-full md:w-auto bg-slate-200 text-slate-700 px-6 py-4 md:py-3 rounded-lg hover:bg-slate-300 transition-colors font-semibold text-base md:text-sm touch-manipulation active:scale-95">
+                                <button id="viewTasksBtn" class="btn-warm-secondary w-full md:w-auto px-6 py-4 md:py-3 font-semibold text-base md:text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                     📋 View All Services
                                 </button>
                                 <div class="grid grid-cols-2 gap-2 md:contents">
-                                    <button id="analyzeAgainBtn" class="bg-green-600 text-white px-4 py-3 md:px-6 rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm touch-manipulation active:scale-95">
+                                    <button id="analyzeAgainBtn" class="btn-warm-primary px-4 py-3 md:px-6 font-semibold text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                         🔄 Analyze Again
                                     </button>
-                                    <button id="uploadNewPhotoBtn" class="bg-orange-600 text-white px-4 py-3 md:px-6 rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm touch-manipulation active:scale-95">
+                                    <button id="uploadNewPhotoBtn" class="btn-warm-accent px-4 py-3 md:px-6 font-semibold text-sm touch-manipulation active:scale-95 transition-all duration-200">
                                         📷 New Photo
                                     </button>
                                 </div>
@@ -559,10 +800,10 @@
                 </div>
 
                 <!-- Error State -->
-                <div id="analysisError" class="hidden mt-8 p-6 bg-red-50 border border-red-200 rounded-xl">
+                <div id="analysisError" class="hidden mt-8 p-6 bg-red-50 border border-red-200 rounded-warm">
                     <h3 class="text-lg font-semibold text-red-800 mb-2">Analysis Failed</h3>
                     <p class="text-red-700 mb-4">We couldn't analyze your photo. Please try again with a clearer image or contact us for assistance.</p>
-                    <button id="retryBtn" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                    <button id="retryBtn" class="bg-red-600 text-white px-6 py-3 rounded-warm hover:bg-red-700 transition-colors font-semibold">
                         Try Again
                     </button>
                 </div>
@@ -571,35 +812,35 @@
     </div>
 </section>
 
-<section class="py-10 border-t border-slate-100 bg-white" id="tasks">
-    <div class="max-w-6xl mx-auto px-4">
-        <h2 class="text-2xl md:text-3xl font-bold">Popular fixed-price tasks</h2>
-        <p class="text-slate-600 mt-2">Click any service to see what's included, then proceed to booking.</p>
-        <div class="mt-6 space-y-4">
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="tv_mount">
-                <div class="service-header p-4">
+<section class="py-16 md:py-20 border-t border-warm-200 bg-neutral-0" id="tasks">
+    <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">Popular fixed-price tasks</h2>
+        <p class="text-neutral-600 text-lg leading-relaxed">Click any service to see what's included, then proceed to booking.</p>
+        <div class="mt-10 space-y-6">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="tv_mount">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">📺 TV Wall Mount (32–65")</h3>
-                            <p class="text-sm text-slate-600">~2.0 hr base • Starting at $160</p>
+                            <p class="text-sm text-neutral-600">~2.0 hr base • Starting at $160</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Mounting TV (32–65") on drywall with wood studs</li>
                                     <li>• Using customer-supplied mount</li>
                                     <li>• Cord cover (if provided)</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$40: Mounting on brick, concrete, or over fireplace</li>
                                     <li>• +$50: TVs larger than 65"</li>
                                     <li>• New outlet/electrical work not included</li>
@@ -607,37 +848,37 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="tv_mount">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="tv_mount">
                                 Select TV Wall Mount Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="ceiling_fan">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="ceiling_fan">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">💡 Ceiling Fan Install/Replace</h3>
-                            <p class="text-sm text-slate-600">~2.0 hr base • Starting at $160</p>
+                            <p class="text-sm text-neutral-600">~2.0 hr base • Starting at $160</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Replacing existing fan or light fixture</li>
                                     <li>• Using existing wiring and fan-rated box</li>
                                     <li>• Assembling blades/light kit</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$50: No fan-rated box (requires replacement)</li>
                                     <li>• +$40: Ceilings higher than 10 ft</li>
                                     <li>• New wiring or switches not included</li>
@@ -645,36 +886,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="ceiling_fan">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="ceiling_fan">
                                 Select Ceiling Fan Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="light_fixture">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="light_fixture">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">✨ Light Fixture / Chandelier Swap</h3>
-                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                            <p class="text-sm text-neutral-600">~1.5 hr base • Starting at $120</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Remove old fixture, install new</li>
                                     <li>• Connect to existing wiring</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$200: Chandeliers over 25 lbs</li>
                                     <li>• +$30: Ceiling over 10 ft</li>
                                     <li>• Structural bracing or rewiring not included</li>
@@ -682,36 +923,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="light_fixture">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="light_fixture">
                                 Select Light Fixture Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="faucet_showerhead">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="faucet_showerhead">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🚰 Faucet / Showerhead Replace</h3>
-                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                            <p class="text-sm text-neutral-600">~1.5 hr base • Starting at $120</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Remove old fixture and install new</li>
                                     <li>• Connect to existing plumbing</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$40: Corroded plumbing requiring extra work</li>
                                     <li>• +$30: Removing sink/vanity for access</li>
                                     <li>• Leak repairs not included</li>
@@ -719,36 +960,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="faucet_showerhead">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="faucet_showerhead">
                                 Select Faucet/Showerhead Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="smart_doorbell">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="smart_doorbell">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🔔 Smart Doorbell Install</h3>
-                            <p class="text-sm text-slate-600">~1.25 hr base • Starting at $100</p>
+                            <p class="text-sm text-neutral-600">~1.25 hr base • Starting at $100</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Replace old doorbell or install wireless unit</li>
                                     <li>• Connect to existing wiring or Wi-Fi</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$30: No wiring, drilling required</li>
                                     <li>• +$40: Chime module/transformer replacement</li>
                                     <li>• Complex rewiring not included</li>
@@ -756,36 +997,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="smart_doorbell">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="smart_doorbell">
                                 Select Smart Doorbell Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="curtains_blinds">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="curtains_blinds">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🪟 Curtain Rods / Blinds</h3>
-                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                            <p class="text-sm text-neutral-600">~1.5 hr base • Starting at $120</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Install up to 2 rods OR 2 blinds</li>
                                     <li>• Mount to drywall with anchors</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$20: Each extra rod/blind beyond 2</li>
                                     <li>• +$40: Mounting on brick, tile, or concrete</li>
                                     <li>• Custom carpentry not included</li>
@@ -793,36 +1034,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="curtains_blinds">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="curtains_blinds">
                                 Select Curtains/Blinds Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="floating_shelf">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="floating_shelf">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">📚 Floating Shelf Install</h3>
-                            <p class="text-sm text-slate-600">~1.5 hr base • Starting at $120</p>
+                            <p class="text-sm text-neutral-600">~1.5 hr base • Starting at $120</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Install up to 2 shelves</li>
                                     <li>• Standard drywall mounting with anchors</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$20: Each extra shelf beyond 2</li>
                                     <li>• +$30: Shelves over 25 lbs or heavy-duty models</li>
                                     <li>• Masonry/tile installs not included</li>
@@ -830,36 +1071,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="floating_shelf">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="floating_shelf">
                                 Select Floating Shelf Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="appliance_hookup">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="appliance_hookup">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">⚡ Appliance Hookup (W/D/DW)</h3>
-                            <p class="text-sm text-slate-600">~2.0 hr base • Starting at $160</p>
+                            <p class="text-sm text-neutral-600">~2.0 hr base • Starting at $160</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Connect new appliance to existing hookups</li>
                                     <li>• Level and test basic function</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$40: Old appliance removal/disposal</li>
                                     <li>• +$30: New vent or supply line required</li>
                                     <li>• Plumbing/electrical modifications not included</li>
@@ -867,36 +1108,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="appliance_hookup">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="appliance_hookup">
                                 Select Appliance Hookup Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="furniture_assembly">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="furniture_assembly">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🪑 Furniture Assembly (S–M)</h3>
-                            <p class="text-sm text-slate-600">~2.0 hr base • Starting at $160</p>
+                            <p class="text-sm text-neutral-600">~2.0 hr base • Starting at $160</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Assembly of 1 major item or 2–3 small items</li>
                                     <li>• Standard flat-pack furniture</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$30: Large/complex pieces (beds, wardrobes, sectionals)</li>
                                     <li>• +$20 per extra small item</li>
                                     <li>• Wall anchoring not included unless specified</li>
@@ -904,36 +1145,36 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="furniture_assembly">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="furniture_assembly">
                                 Select Furniture Assembly Service
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="closet_organizer">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="closet_organizer">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">👕 Closet Organizer Install</h3>
-                            <p class="text-sm text-slate-600">~2.5 hr base • Starting at $200</p>
+                            <p class="text-sm text-neutral-600">~2.5 hr base • Starting at $200</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• Install standard closet kit (customer-supplied)</li>
                                     <li>• Mount to drywall with included hardware</li>
                                 </ul>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-orange-600 mb-2">⚠️ Potential Add-ons:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• +$50: Cutting/custom fitting required</li>
                                     <li>• +$40: Masonry or non-standard walls</li>
                                     <li>• Electrical/lighting not included</li>
@@ -941,7 +1182,7 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="closet_organizer">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="closet_organizer">
                                 Select Closet Organizer Service
                             </button>
                         </div>
@@ -950,17 +1191,17 @@
             </div>
 
             <!-- Premium Move-Out Removal Service -->
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="premium_moveout">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="premium_moveout">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🏠 Premium Move-Out Removal (Includes Patching & Cleanup)</h3>
-                            <p class="text-sm text-slate-600">~3.0 hr base • Starting at $300</p>
+                            <p class="text-sm text-neutral-600">~3.0 hr base • Starting at $300</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
+                <div class="service-details hidden border-t border-warm-200">
                     <div class="p-4 space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -1014,11 +1255,11 @@
                             </div>
                         </div>
 
-                        <div class="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="mt-4 p-3 bg-warm-50 border border-warm-200 rounded-warm">
                             <p class="text-sm text-green-700"><strong>Perfect for:</strong> Landlords preparing units for new tenants, renters maximizing security deposit returns, property managers handling turnovers, and anyone needing comprehensive move-out restoration.</p>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="premium_moveout">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="premium_moveout">
                                 Select Premium Move-Out Service
                             </button>
                         </div>
@@ -1026,22 +1267,22 @@
                 </div>
             </div>
 
-            <div class="service-card bg-white border border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors" data-task="general_handyman">
-                <div class="service-header p-4">
+            <div class="service-card card-warm cursor-pointer transition-all duration-200 hover:border-warm-300 hover:shadow-warm-lg" data-task="general_handyman">
+                <div class="service-header p-6">
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🔧 General Handyman (3+ hours)</h3>
-                            <p class="text-sm text-slate-600">~3 hr minimum • Starting at $240</p>
+                            <p class="text-sm text-neutral-600">~3 hr minimum • Starting at $240</p>
                         </div>
-                        <div class="expand-icon text-slate-400 transform transition-transform">▼</div>
+                        <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
                 </div>
-                <div class="service-details hidden border-t border-slate-100">
-                    <div class="p-4">
-                        <div class="grid md:grid-cols-2 gap-6">
+                <div class="service-details hidden border-t border-warm-200">
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <h4 class="font-semibold text-green-600 mb-2">✅ Included:</h4>
-                                <ul class="text-sm space-y-1 text-slate-700">
+                                <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
+                                <ul class="text-sm space-y-1 text-neutral-700">
                                     <li>• 3-hour minimum for general repairs & tasks</li>
                                     <li>• Basic tools and hardware</li>
                                     <li>• Multiple small tasks or one larger project</li>
@@ -1058,11 +1299,11 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <div class="mt-4 p-3 bg-warm-50 border border-warm-200 rounded-warm">
                             <p class="text-sm text-amber-700"><strong>Perfect for:</strong> Touch-up painting, caulking, door adjustments, squeaky hinges, loose handles, weatherstripping, minor drywall repairs, picture hanging, shelf brackets, cabinet adjustments, and other miscellaneous tasks.</p>
                         </div>
                         <div class="mt-6">
-                            <button class="select-service-btn w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors" data-task="general_handyman">
+                            <button class="select-service-btn btn-warm-primary w-full py-3 px-4 font-semibold transition-all duration-200" data-task="general_handyman">
                                 Select General Handyman Service
                             </button>
                         </div>
@@ -1125,7 +1366,7 @@
                 <p class="text-sm text-slate-600 mt-1">Choose a service from above or browse all options below.</p>
                 <div class="mt-6">
                     <label class="text-sm font-semibold">Selected Service</label>
-                    <div id="selectedTaskDisplay" class="mt-2 p-4 bg-indigo-50 border border-indigo-200 rounded-lg hidden">
+                    <div id="selectedTaskDisplay" class="mt-2 p-4 bg-warm-50 border border-warm-200 rounded-warm hidden">
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <div id="selectedTaskName" class="font-semibold text-indigo-900"></div>
@@ -1149,7 +1390,7 @@
                 </div>
                 <div class="mt-6">
                     <label class="text-sm font-semibold">Or select from all services</label>
-                    <select id="taskCategory" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-base">
+                    <select id="taskCategory" class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2 text-base focus:ring-2 focus:ring-warm-500">
                         <option value="">Browse all services…</option>
                         <option value="tv_mount">TV mounting</option>
                         <option value="ceiling_fan">Ceiling fan install</option>
@@ -1166,7 +1407,7 @@
                     </select>
                 </div>
                 <div class="mt-6">
-                    <button id="continueToTimingBtn" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <button id="continueToTimingBtn" class="btn-warm-primary w-full py-3 px-4 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200" disabled>
                         Continue to Timing
                     </button>
                 </div>
@@ -1179,15 +1420,15 @@
 
                 <div class="mt-6">
                     <label class="text-sm font-semibold">Preferred timing</label>
-                    <select id="taskWindow" required class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base">
+                    <select id="taskWindow" required class="mt-2 w-full rounded-warm border border-warm-200 px-3 py-2 text-base focus:ring-2 focus:ring-warm-500">
                         <option value="flexible">I'm flexible (best value)</option>
                     </select>
                 </div>
 
                 <div class="mt-4">
                     <label class="text-sm font-semibold">Or select a future date (up to 2 weeks) - 10% discount!</label>
-                    <input type="date" id="futureDate" class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base" />
-                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                    <input type="date" id="futureDate" class="mt-2 w-full rounded-warm border border-warm-200 px-3 py-2 text-base focus:ring-2 focus:ring-warm-500" />
+                    <div class="mt-3 p-3 bg-warm-50 border border-warm-200 rounded-warm text-sm text-warm-800">
                         <div class="font-semibold mb-2">📅 Booking Rules:</div>
                         <div class="space-y-1">
                             <div>✅ <strong>Mon-Fri:</strong> All slots + 10% discount</div>
@@ -1198,10 +1439,10 @@
                 </div>
 
                 <div class="mt-6 flex gap-3">
-                    <button id="backToTaskBtn" class="flex-1 bg-slate-200 text-slate-700 py-3 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
+                    <button id="backToTaskBtn" class="btn-warm-secondary flex-1 py-3 px-4 font-semibold transition-all duration-200">
                         ← Back
                     </button>
-                    <button id="continueToQuestionsBtn" class="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                    <button id="continueToQuestionsBtn" class="btn-warm-primary flex-1 py-3 px-4 font-semibold transition-all duration-200">
                         Continue
                     </button>
                 </div>
@@ -1213,7 +1454,7 @@
                 <p class="text-sm text-slate-600 mt-1">Help us understand your specific needs.</p>
 
                 <div id="taskQuestions" class="mt-6">
-                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="p-4 bg-warm-50 border border-warm-200 rounded-warm">
                         <h4 class="font-semibold text-blue-800 mb-3">📋 Quick questions about your task</h4>
                         <div id="questionsContainer" class="space-y-4"></div>
                     </div>
@@ -1221,22 +1462,22 @@
 
                 <div class="mt-6">
                     <label class="text-sm font-semibold">Describe your job <span class="text-red-600">*</span></label>
-                    <textarea id="taskDescription" rows="4" placeholder="Product link/model, wall/ceiling type, special requirements, access details..." class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base" required></textarea>
+                    <textarea id="taskDescription" rows="4" placeholder="Product link/model, wall/ceiling type, special requirements, access details..." class="mt-2 w-full rounded-warm border border-warm-200 px-3 py-2 text-base focus:ring-2 focus:ring-warm-500" required></textarea>
                     <p class="text-xs text-slate-600 mt-1">Required - Helps handyman bring the right tools and materials</p>
                 </div>
 
                 <div class="mt-6">
                     <label class="text-sm font-semibold">Upload photos (2–5 recommended)</label>
-                    <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base" />
+                    <input id="taskPhotos" type="file" accept="image/*" multiple class="mt-2 w-full rounded-warm border border-warm-200 px-3 py-2 text-base focus:ring-2 focus:ring-warm-500" />
                     <div id="photoThumbs" class="mt-3 flex flex-wrap gap-2"></div>
                     <p class="text-xs text-slate-500 mt-2">Photos help us provide accurate pricing and prepare your handyman</p>
                 </div>
 
                 <div class="mt-6 flex gap-3">
-                    <button id="backToTimingBtn" class="flex-1 bg-slate-200 text-slate-700 py-3 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
+                    <button id="backToTimingBtn" class="btn-warm-secondary flex-1 py-3 px-4 font-semibold transition-all duration-200">
                         ← Back
                     </button>
-                    <button id="getEstimateBtn" class="flex-1 relative overflow-hidden rounded-lg bg-slate-900 text-white px-4 py-3 font-semibold transition-all disabled:opacity-75">
+                    <button id="getEstimateBtn" class="btn-warm-primary flex-1 relative overflow-hidden px-4 py-3 font-semibold transition-all duration-200 disabled:opacity-75">
                         <div id="progressBg" class="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 transform -translate-x-full transition-transform duration-3000 ease-out"></div>
                         <span id="estimateText" class="relative z-10">🔧 Get Pricing</span>
                     </button>
@@ -1256,12 +1497,12 @@
                 <h3 class="text-xl md:text-2xl font-bold">Choose Your Price</h3>
                 <p class="text-sm text-slate-600 mb-4">Select your preferred option. All prices include everything.</p>
 
-                <div id="flexibleNotice" class="hidden mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div id="flexibleNotice" class="hidden mb-4 p-3 bg-warm-50 border border-warm-200 rounded-warm">
                     <p class="text-sm text-green-700">
                         💡 <strong>Great choice!</strong> You selected "I'm flexible" so we've found the best value timing.
                     </p>
                 </div>
-                <div id="futureDateNotice" class="hidden mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div id="futureDateNotice" class="hidden mb-4 p-3 bg-warm-50 border border-warm-200 rounded-warm">
                     <p class="text-sm text-blue-700">
                         📅 <strong>Future booking!</strong> Options for your selected date and nearby days.
                     </p>
@@ -1279,7 +1520,7 @@
                 </div>
 
                 <div class="mt-6">
-                    <button id="continueToInfoBtn" class="w-full rounded-lg bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50" disabled>
+                    <button id="continueToInfoBtn" class="btn-warm-primary w-full px-4 py-3 font-semibold disabled:opacity-50 transition-all duration-200" disabled>
                         Continue to Details
                     </button>
                 </div>
@@ -1291,7 +1532,7 @@
                 <p class="text-sm text-slate-600 mb-4">We need a few details to complete your booking.</p>
 
                 <!-- Additional Costs Notice -->
-                <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <div class="mb-6 p-4 bg-warm-50 border border-warm-200 rounded-warm">
                     <div class="flex items-start gap-3">
                         <div class="text-amber-600 text-lg">⚠️</div>
                         <div>
@@ -1311,37 +1552,37 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="text-sm font-semibold">Full name *</label>
-                            <input id="customerName" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" />
+                            <input id="customerName" required class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2.5 text-base focus:ring-2 focus:ring-warm-500" />
                         </div>
                         <div>
                             <label class="text-sm font-semibold">Mobile phone *</label>
-                            <input id="customerPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" placeholder="(555) 123-4567" />
+                            <input id="customerPhone" required class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2.5 text-base focus:ring-2 focus:ring-warm-500" placeholder="(555) 123-4567" />
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="text-sm font-semibold">Email *</label>
-                            <input type="email" id="customerEmail" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" />
+                            <input type="email" id="customerEmail" required class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2.5 text-base focus:ring-2 focus:ring-warm-500" />
                         </div>
                         <div>
                             <label class="text-sm font-semibold">ZIP code *</label>
-                            <input id="customerZip" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" placeholder="33467" />
+                            <input id="customerZip" required class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2.5 text-base focus:ring-2 focus:ring-warm-500" placeholder="33467" />
                         </div>
                     </div>
 
                     <div>
                         <label class="text-sm font-semibold">Service address</label>
-                        <input id="customerAddress" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base" placeholder="123 Main St, City, FL 33467" />
+                        <input id="customerAddress" class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2.5 text-base focus:ring-2 focus:ring-warm-500" placeholder="123 Main St, City, FL 33467" />
                         <p class="text-xs text-slate-500 mt-1">Where should the handyman go? (Optional if same as billing)</p>
                     </div>
                 </div>
 
                 <div class="mt-6 flex gap-3">
-                    <button id="backToPricingBtn" class="flex-1 bg-slate-200 text-slate-700 py-3 px-4 rounded-lg font-semibold hover:bg-slate-300 transition-colors">
+                    <button id="backToPricingBtn" class="btn-warm-secondary flex-1 py-3 px-4 font-semibold transition-all duration-200">
                         ← Back
                     </button>
-                    <button id="reserveBtn" class="flex-1 rounded-lg bg-indigo-600 text-white px-4 py-3 font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50" disabled>
+                    <button id="reserveBtn" class="btn-warm-primary flex-1 px-4 py-3 font-semibold disabled:opacity-50 transition-all duration-200" disabled>
                         💳 Secure Payment
                     </button>
                 </div>
@@ -1357,7 +1598,7 @@
             <h3 class="text-xl font-bold">Complete Payment</h3>
             <button id="closePayment" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
         </div>
-        <div class="mb-4 p-3 bg-slate-50 rounded-lg">
+        <div class="mb-4 p-3 bg-warm-50 rounded-warm">
             <div class="text-sm text-slate-600">Total amount</div>
             <div id="paymentAmount" class="text-2xl font-bold">$0</div>
             <div class="text-sm text-slate-600 mt-1">
@@ -1379,7 +1620,7 @@
         <div class="text-center mb-6">
             <div class="text-6xl mb-2">✅</div>
             <h3 class="text-xl font-bold mb-2 text-blue-600">Payment Authorized!</h3>
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <div class="bg-warm-50 border border-warm-200 rounded-warm p-3 mb-4">
                 <p class="text-sm text-blue-700">
                     <strong>✅ Payment method authorized</strong> - Funds are held on your card but you will only be charged after your handyman completes the work.
                     Please provide additional details below to dispatch your handyman.
@@ -1387,7 +1628,7 @@
             </div>
         </div>
         <form id="taskInfoForm">
-            <div class="bg-slate-50 rounded-lg p-4 mb-6">
+            <div class="bg-warm-50 rounded-warm p-4 mb-6">
                 <h4 class="font-semibold mb-3">Job Summary (from your request)</h4>
                 <div class="text-sm space-y-1">
                     <div><strong>Task ID:</strong> <span id="summaryTaskId" class="font-mono text-indigo-600">—</span></div>
@@ -1405,28 +1646,28 @@
             <div class="space-y-4">
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Complete Property Address *</label>
-                    <textarea id="propertyAddress" rows="3" placeholder="123 Main St, Unit 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <textarea id="propertyAddress" rows="3" placeholder="123 Main St, Unit 2B, Boca Raton, FL 33432" required class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2 focus:ring-2 focus:ring-warm-500"></textarea>
                     <p class="text-xs text-slate-500 mt-1">Include street number, name, city, and ZIP code</p>
                 </div>
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Best Contact Phone *</label>
-                    <input type="tel" id="contactPhone" required class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500" />
+                    <input type="tel" id="contactPhone" required class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2 focus:ring-2 focus:ring-warm-500" />
                 </div>
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Property Access Details</label>
-                    <textarea id="accessDetails" rows="3" placeholder="Gate code: 1234, Park in visitor spots, Ring doorbell..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <textarea id="accessDetails" rows="3" placeholder="Gate code: 1234, Park in visitor spots, Ring doorbell..." class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2 focus:ring-2 focus:ring-warm-500"></textarea>
                 </div>
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Pets & Special Considerations</label>
-                    <textarea id="petsAndSpecial" rows="2" placeholder="2 friendly dogs, alarm system code needed, delicate antiques nearby..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <textarea id="petsAndSpecial" rows="2" placeholder="2 friendly dogs, alarm system code needed, delicate antiques nearby..." class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2 focus:ring-2 focus:ring-warm-500"></textarea>
                 </div>
                 <div>
                     <label class="text-sm font-semibold text-gray-700">Additional Task Details</label>
-                    <textarea id="additionalDetails" rows="3" placeholder="TV model: Samsung 65", wall type: drywall, tools available on site..." class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <textarea id="additionalDetails" rows="3" placeholder="TV model: Samsung 65", wall type: drywall, tools available on site..." class="mt-1 w-full rounded-warm border border-warm-200 px-3 py-2 focus:ring-2 focus:ring-warm-500"></textarea>
                 </div>
             </div>
             <div class="mt-6">
-                <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">
+                <button type="submit" class="btn-warm-primary w-full px-5 py-3 font-semibold transition-all duration-200">
                     🚀 Dispatch Handyman
                 </button>
             </div>
@@ -1435,79 +1676,79 @@
 </div>
 
 <div id="finalSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
+    <div class="card-warm p-6 max-w-md w-full shadow-warm-xl text-center">
         <div class="text-6xl mb-4">🚀</div>
-        <h3 class="text-xl font-bold mb-2 text-green-600">Handyman Dispatched!</h3>
-        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-            <p class="text-sm text-green-700 mb-2">
+        <h3 class="text-xl font-bold mb-2 text-warm-600">Handyman Dispatched!</h3>
+        <div class="bg-warm-50 border border-warm-200 rounded-warm p-4 mb-4">
+            <p class="text-sm text-warm-700 mb-2">
                 <strong>✅ Payment authorized (hold placed)</strong><br>
                 <strong>✅ Job details sent to our team</strong><br>
                 <strong>✅ Notification sent to handyman dispatch</strong>
             </p>
-            <div class="mt-3 p-2 bg-white rounded border">
-                <div class="text-xs text-slate-500">Your Task ID</div>
-                <div id="finalTaskId" class="font-mono text-sm font-semibold text-indigo-600">—</div>
+            <div class="mt-3 p-2 bg-neutral-50 rounded-warm border border-warm-200">
+                <div class="text-xs text-neutral-500">Your Task ID</div>
+                <div id="finalTaskId" class="font-mono text-sm font-semibold text-warm-600">—</div>
             </div>
-            <div class="mt-3 p-2 bg-white rounded border">
-                <div class="text-xs text-slate-500">Amount Authorized (Hold)</div>
-                <div id="finalPaidAmount" class="text-lg font-bold text-blue-600">—</div>
+            <div class="mt-3 p-2 bg-neutral-50 rounded-warm border border-warm-200">
+                <div class="text-xs text-neutral-500">Amount Authorized (Hold)</div>
+                <div id="finalPaidAmount" class="text-lg font-bold text-warm-600">—</div>
             </div>
-            <p class="text-sm text-slate-600 mt-2">
+            <p class="text-sm text-neutral-600 mt-2">
                 You'll receive a text message with your technician's details and estimated arrival time within the next 15 minutes.
             </p>
         </div>
-        <button id="closeFinalSuccess" class="rounded-xl bg-indigo-600 text-white px-5 py-3 font-semibold hover:bg-indigo-700 transition-colors">Perfect!</button>
+        <button id="closeFinalSuccess" class="btn-warm-primary px-5 py-3 font-semibold transition-all duration-200">Perfect!</button>
     </div>
 </div>
 
-<section id="coverage" class="py-12 bg-white border-t border-b border-slate-100">
-    <div class="max-w-6xl mx-auto px-4">
-        <h2 class="text-2xl md:text-3xl font-bold">Coverage areas</h2>
-        <p class="mt-2 text-slate-600 mb-8">We provide professional handyman services in two major metropolitan areas</p>
+<section id="coverage" class="py-16 md:py-20 bg-neutral-50 border-t border-b border-warm-200">
+    <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-3xl md:text-4xl font-bold mb-3">Coverage areas</h2>
+        <p class="text-neutral-600 text-lg leading-relaxed mb-12">We provide professional handyman services in two major metropolitan areas</p>
 
         <!-- Coverage Area Tabs -->
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Tab Navigation -->
             <div class="lg:w-1/3">
-                <div class="flex lg:flex-col bg-slate-50 rounded-lg p-1">
-                    <button id="florida-tab" class="coverage-tab active flex-1 lg:flex-none py-3 px-4 rounded-lg font-semibold text-left transition-colors">
+                <div class="flex lg:flex-col bg-warm-100 rounded-warm p-1">
+                    <button id="florida-tab" class="coverage-tab active flex-1 lg:flex-none py-3 px-4 rounded-warm font-semibold text-left transition-colors">
                         🌴 South Florida
                     </button>
-                    <button id="austin-tab" class="coverage-tab flex-1 lg:flex-none py-3 px-4 rounded-lg font-semibold text-left transition-colors">
+                    <button id="austin-tab" class="coverage-tab flex-1 lg:flex-none py-3 px-4 rounded-warm font-semibold text-left transition-colors">
                         🤠 Austin & Central Texas
                     </button>
                 </div>
 
                 <!-- Area Details -->
                 <div id="florida-details" class="coverage-details mt-6">
-                    <h3 class="text-lg font-bold text-slate-900 mb-3">South Florida Metropolitan</h3>
-                    <div class="space-y-2 text-sm text-slate-600">
+                    <h3 class="text-lg font-bold text-neutral-800 mb-3">South Florida Metropolitan</h3>
+                    <div class="space-y-2 text-sm text-neutral-600">
                         <div>• Palm Beach County: West Palm Beach, Boca Raton, Delray Beach, Boynton Beach</div>
                         <div>• Broward County: Fort Lauderdale, Hollywood, Plantation, Aventura</div>
                         <div>• Miami-Dade County: Miami, Coral Gables, Kendall, Aventura</div>
                     </div>
-                    <div class="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                        <p class="text-sm text-green-700">✅ <strong>Fully operational</strong> - Same-day and next-day service available</p>
+                    <div class="mt-4 p-3 bg-warm-50 rounded-warm border border-warm-200">
+                        <p class="text-sm text-warm-700">✅ <strong>Fully operational</strong> - Same-day and next-day service available</p>
                     </div>
                 </div>
 
                 <div id="austin-details" class="coverage-details mt-6 hidden">
-                    <h3 class="text-lg font-bold text-slate-900 mb-3">Austin & Central Texas</h3>
-                    <div class="space-y-2 text-sm text-slate-600">
+                    <h3 class="text-lg font-bold text-neutral-800 mb-3">Austin & Central Texas</h3>
+                    <div class="space-y-2 text-sm text-neutral-600">
                         <div>• Austin Metro: Austin, Round Rock, Cedar Park, Pflugerville</div>
                         <div>• Travis County: Austin, Lakeway, Bee Cave, West Lake Hills</div>
                         <div>• Williamson County: Round Rock, Georgetown, Leander</div>
                     </div>
-                    <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <p class="text-sm text-blue-700">🚀 <strong>Now serving Austin!</strong> - Book your handyman service today</p>
+                    <div class="mt-4 p-3 bg-warm-50 rounded-warm border border-warm-200">
+                        <p class="text-sm text-warm-700">🚀 <strong>Now serving Austin!</strong> - Book your handyman service today</p>
                     </div>
                 </div>
             </div>
 
             <!-- Map Container -->
             <div class="lg:w-2/3">
-                <div id="coverage-map" class="h-80 bg-slate-100 rounded-lg border border-slate-200 relative overflow-hidden">
-                    <div class="absolute inset-0 flex items-center justify-center text-slate-500">
+                <div id="coverage-map" class="h-80 bg-warm-100 rounded-warm border border-warm-200 relative overflow-hidden">
+                    <div class="absolute inset-0 flex items-center justify-center text-neutral-500">
                         <div class="text-center">
                             <div class="text-2xl mb-2">🗺️</div>
                             <p class="text-sm">Interactive map loading...</p>
@@ -1519,10 +1760,10 @@
     </div>
 </section>
 
-<section id="faq" class="py-12">
-    <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-8">
-        <div><h3 class="text-xl font-bold">Is this a marketplace?</h3><p class="text-slate-600 mt-1">We're a vetted dispatch service. We send a qualified pro and back the work with standardized checklists and guidance.</p></div>
-        <div><h3 class="text-xl font-bold">How do premiums work?</h3><p class="text-slate-600 mt-1">Like airline pricing, same-day and evening windows include a clear premium. It's shown before you pay.</p></div>
+<section id="faq" class="py-16 md:py-20">
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12">
+        <div><h3 class="text-xl font-bold text-neutral-800">Is this a marketplace?</h3><p class="text-neutral-600 mt-1">We're a vetted dispatch service. We send a qualified pro and back the work with standardized checklists and guidance.</p></div>
+        <div><h3 class="text-xl font-bold text-neutral-800">How do premiums work?</h3><p class="text-neutral-600 mt-1">Like airline pricing, same-day and evening windows include a clear premium. It's shown before you pay.</p></div>
         <div><h3 class="text-xl font-bold">Do you charge before the job?</h3><p class="text-slate-600 mt-1">We place an authorization to secure your time. You're only charged after the tech confirms scope on site.</p></div>
         <div><h3 class="text-xl font-bold">Are pros background-checked?</h3><p class="text-slate-600 mt-1">Yes. We verify ID, experience, and insurance where applicable.</p></div>
     </div>
@@ -1535,7 +1776,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
         </svg>
     </button>
-    <div id="chatbot-window" class="hidden absolute bottom-16 right-0 bg-white rounded-lg shadow-2xl border border-slate-200 flex flex-col">
+    <div id="chatbot-window" class="hidden absolute bottom-16 right-0 card-warm shadow-warm-2xl border border-warm-200 flex flex-col">
         <div class="bg-indigo-600 text-white p-4 rounded-t-lg flex items-center justify-between">
             <div>
                 <h3 class="font-semibold">SendAHandyman Help</h3>
@@ -1554,15 +1795,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                     </svg>
                 </div>
-                <div class="bg-slate-100 rounded-lg p-3 max-w-xs">
+                <div class="bg-warm-100 rounded-warm p-3 max-w-xs">
                     <p class="text-sm text-slate-700">Hi! I'm here to help with questions about our handyman services. What can I help you with today?</p>
                 </div>
             </div>
         </div>
         <div class="border-t border-slate-200 p-4">
             <div class="flex space-x-2">
-                <input type="text" id="chatbot-input" placeholder="Type your question..." class="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="500" />
-                <button id="chatbot-send" class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Send</button>
+                <input type="text" id="chatbot-input" placeholder="Type your question..." class="flex-1 border border-warm-200 rounded-warm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-warm-500" maxlength="500" />
+                <button id="chatbot-send" class="btn-warm-primary px-4 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">Send</button>
             </div>
         </div>
     </div>
@@ -2217,7 +2458,7 @@
             label.className = 'block text-sm font-semibold text-slate-700';
             label.textContent = question.label;
             const select = document.createElement('select');
-            select.className = 'w-full rounded-lg border border-slate-200 px-3 py-2 text-sm';
+            select.className = 'w-full rounded-warm border border-warm-200 px-3 py-2 text-sm focus:ring-2 focus:ring-warm-500';
             select.id = `question_${question.id}`;
             select.addEventListener('change', updateEstimateWithAddons);
             const defaultOption = document.createElement('option');
@@ -3175,7 +3416,7 @@
             console.error('❌ Payment setup error:', error);
             paymentMessage.textContent = 'Unable to load payment form. Please try again or contact support.';
             paymentMessage.classList.remove('hidden');
-            paymentMessage.className = 'mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-lg';
+            paymentMessage.className = 'mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-warm';
             setTimeout(() => {
                 document.getElementById('paymentModal').classList.add('hidden');
             }, 3000);
@@ -3308,7 +3549,7 @@
 
                     // Show user-friendly confirmation message
                     const holdMessage = document.createElement('div');
-                    holdMessage.className = 'mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800';
+                    holdMessage.className = 'mt-4 p-4 bg-warm-50 border border-warm-200 rounded-warm text-warm-800';
                     holdMessage.innerHTML = `
                         <div class="flex items-center mb-2">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -3385,7 +3626,7 @@
             }
             paymentMessage.textContent = userMessage;
             paymentMessage.classList.remove('hidden');
-            paymentMessage.className = 'mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-lg border border-red-200';
+            paymentMessage.className = 'mt-4 text-sm text-red-600 p-3 bg-red-50 rounded-warm border border-red-200';
             submitBtn.disabled = false;
             btnText.textContent = 'Complete Payment';
         }
@@ -3631,7 +3872,7 @@
             if (sender === 'user') {
                 messageDiv.innerHTML = `
                     <div class="flex-1"></div>
-                    <div class="bg-indigo-600 text-white rounded-lg p-3 max-w-xs">
+                    <div class="bg-warm-600 text-white rounded-warm p-3 max-w-xs">
                         <p class="text-sm">${escapeHtml(content)}</p>
                     </div>
                     <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
@@ -3647,7 +3888,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                         </svg>
                     </div>
-                    <div class="bg-slate-100 rounded-lg p-3 max-w-xs ${isError ? 'border border-red-200 bg-red-50' : ''}">
+                    <div class="bg-warm-100 rounded-warm p-3 max-w-xs ${isError ? 'border border-red-200 bg-red-50' : ''}">
                         <p class="text-sm text-slate-700">${formatBotMessage(content)}</p>
                     </div>
                 `;
@@ -3664,7 +3905,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                     </svg>
                 </div>
-                <div class="bg-slate-100 rounded-lg p-3">
+                <div class="bg-warm-100 rounded-warm p-3">
                     <p class="text-sm text-slate-500 chatbot-typing">Typing</p>
                 </div>
             `;
@@ -4087,7 +4328,7 @@
             if (!warningDiv) {
                 warningDiv = document.createElement('div');
                 warningDiv.id = 'datePickerWarning';
-                warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 date-warning';
+                warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-warm text-xs text-red-700 date-warning';
                 dateInput.parentNode.appendChild(warningDiv);
             }
 
@@ -4118,13 +4359,13 @@
                 if (isSaturday(selectedDate)) {
                     warningDiv.textContent = '📅 SATURDAY: Only 8AM-12PM available • 30% premium (no discount)';
                     warningDiv.classList.remove('hidden');
-                    warningDiv.className = 'mt-2 p-2 bg-orange-50 border border-orange-200 rounded-lg text-xs text-orange-700 date-warning';
+                    warningDiv.className = 'mt-2 p-2 bg-orange-50 border border-orange-200 rounded-warm text-xs text-orange-700 date-warning';
 
                     setTimeout(() => {
                         alert('📅 SATURDAY BOOKING NOTICE\n\n• Only 8AM-12PM time slot available\n• 30% Saturday premium applies\n• NO 10% future booking discount\n\nNet result: +30% premium for Saturday service');
                     }, 100);
                 } else {
-                    warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 date-warning';
+                    warningDiv.className = 'hidden mt-2 p-2 bg-red-50 border border-red-200 rounded-warm text-xs text-red-700 date-warning';
                 }
             };
 
@@ -4312,7 +4553,7 @@
                         const url = URL.createObjectURL(file);
                         const img = document.createElement('img');
                         img.src = url;
-                        img.className = 'h-16 w-16 object-cover rounded-lg border';
+                        img.className = 'h-16 w-16 object-cover rounded-warm border border-warm-200';
                         thumbs.appendChild(img);
                     });
                 }
@@ -4909,11 +5150,11 @@
 
         // Style urgency section based on risk level
         if (riskText.toLowerCase() === 'urgent' || riskText.toLowerCase() === 'high') {
-            urgencySection.className = 'mt-6 p-4 rounded-lg bg-red-50 border border-red-200';
+            urgencySection.className = 'mt-6 p-4 rounded-warm bg-red-50 border border-red-200';
         } else if (riskText.toLowerCase() === 'moderate') {
-            urgencySection.className = 'mt-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200';
+            urgencySection.className = 'mt-6 p-4 rounded-warm bg-yellow-50 border border-yellow-200';
         } else {
-            urgencySection.className = 'mt-6 p-4 rounded-lg bg-green-50 border border-green-200';
+            urgencySection.className = 'mt-6 p-4 rounded-warm bg-warm-50 border border-warm-200';
         }
 
         // Show results
