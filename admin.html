@@ -2206,29 +2206,62 @@ async function viewHandymanDetails(handymanId) {
     // Fetch task metrics - try multiple possible column names
     console.log('🔍 Fetching tasks for handyman:', handymanId);
 
-    // First try handyman_id - fix SQL syntax
+    // First discover what columns actually exist in tasks table
+    console.log('🔍 Discovering tasks table structure...');
+    let { data: sampleTasks, error: sampleError } = await supabase
+      .from('tasks')
+      .select('*')
+      .limit(1);
+
+    console.log('📊 Tasks table columns available:', sampleTasks?.[0] ? Object.keys(sampleTasks[0]) : 'No tasks found');
+
+    // Try basic columns that should exist
     let { data: tasks, error: tasksError } = await supabase
       .from('tasks')
-      .select('id, status, total_amount, created_at, category, name, handyman_id, assigned_handyman_id')
+      .select('*')
       .eq('handyman_id', handymanId)
       .order('created_at', { ascending: false });
 
     console.log('🔍 Tasks with handyman_id:', tasks?.length || 0, tasks);
     if (tasksError) console.error('❌ Task query error:', tasksError);
 
-    // If no tasks found, try assigned_handyman_id
-    if (!tasks || tasks.length === 0) {
+    // If no tasks found or error, try assigned_handyman_id
+    if ((!tasks || tasks.length === 0) && !tasksError) {
       console.log('🔍 Trying assigned_handyman_id column...');
       const { data: tasks2, error: tasksError2 } = await supabase
         .from('tasks')
-        .select('id, status, total_amount, created_at, category, name, handyman_id, assigned_handyman_id')
+        .select('*')
         .eq('assigned_handyman_id', handymanId)
         .order('created_at', { ascending: false });
 
       console.log('🔍 Tasks with assigned_handyman_id:', tasks2?.length || 0, tasks2);
       if (tasksError2) console.error('❌ Task query error 2:', tasksError2);
-      tasks = tasks2;
-      tasksError = tasksError2;
+      if (tasks2) {
+        tasks = tasks2;
+        tasksError = tasksError2;
+      }
+    }
+
+    // If still no success, try other possible column names
+    if ((!tasks || tasks.length === 0) && !tasksError) {
+      console.log('🔍 Trying other possible column names...');
+      for (const columnName of ['handyman', 'worker_id', 'assigned_to', 'technician_id']) {
+        try {
+          const { data: tasks3, error: tasksError3 } = await supabase
+            .from('tasks')
+            .select('*')
+            .eq(columnName, handymanId)
+            .order('created_at', { ascending: false });
+
+          if (tasks3 && tasks3.length > 0) {
+            console.log(`✅ Found tasks using column: ${columnName}`, tasks3);
+            tasks = tasks3;
+            break;
+          }
+        } catch (e) {
+          console.log(`❌ Column ${columnName} doesn't exist`);
+        }
+      }
     }
 
     console.log('🔍 Final tasks result:', tasks?.length || 0, 'tasks found');
@@ -2240,22 +2273,43 @@ async function viewHandymanDetails(handymanId) {
       .reduce((sum, t) => sum + (parseFloat(t.total_amount) || 0), 0) || 0;
     const averageRating = 4.2; // Placeholder - would come from reviews table
 
-    // Fetch onboarding data from storage if available - try multiple bucket names
+    // Fetch onboarding data from storage if available - try comprehensive bucket discovery
     let onboardingFiles = [];
     console.log('🔍 Fetching files for handyman:', handymanId);
+    console.log('🔍 Handyman user_id:', handyman.user_id);
+    console.log('🔍 Handyman email:', handyman.email);
 
-    // Try different possible bucket names and paths - correct bucket name first
+    // First, let's discover what buckets exist
+    try {
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      console.log('📦 Available storage buckets:', buckets?.map(b => b.name) || 'None found');
+    } catch (e) {
+      console.log('❌ Could not list buckets:', e.message);
+    }
+
+    // Try comprehensive combinations - based on you saying files are organized by user_id
     const possiblePaths = [
+      // Primary suspects based on your description
       { bucket: 'handyman-documents', path: `${handyman.user_id}/` },
+      { bucket: 'handyman-documents', path: `${handyman.user_id}` }, // without trailing slash
+      { bucket: 'handyman-documents', path: '' }, // root level
+
+      // Try with handyman table ID as backup
       { bucket: 'handyman-documents', path: `${handymanId}/` },
+      { bucket: 'handyman-documents', path: `${handymanId}` },
+
+      // Other possible bucket names
       { bucket: 'handyman-docs', path: `${handyman.user_id}/` },
-      { bucket: 'handyman-docs', path: `${handymanId}/` },
-      { bucket: 'handymen-files', path: `${handyman.user_id}/` },
-      { bucket: 'handymen-files', path: `${handymanId}/` },
+      { bucket: 'handymen-documents', path: `${handyman.user_id}/` },
+      { bucket: 'documents', path: `${handyman.user_id}/` },
+      { bucket: 'documents', path: `handymen/${handyman.user_id}/` },
+      { bucket: 'uploads', path: `${handyman.user_id}/` },
       { bucket: 'uploads', path: `handymen/${handyman.user_id}/` },
-      { bucket: 'uploads', path: `handymen/${handymanId}/` },
-      { bucket: 'onboarding', path: `${handyman.user_id}/` },
-      { bucket: 'onboarding', path: `${handymanId}/` }
+      { bucket: 'files', path: `${handyman.user_id}/` },
+
+      // Try email-based paths
+      { bucket: 'handyman-documents', path: `${handyman.email}/` },
+      { bucket: 'uploads', path: `${handyman.email}/` }
     ];
 
     for (const { bucket, path } of possiblePaths) {
@@ -2413,9 +2467,9 @@ function populateHandymanDetails(handyman, metrics) {
           <tbody>
             ${metrics.recentTasks.map(task => `
               <tr class="border-b border-slate-100">
-                <td class="px-4 py-2 text-sm">${task.name || 'N/A'}</td>
-                <td class="px-4 py-2 text-sm">${task.category || 'N/A'}</td>
-                <td class="px-4 py-2 text-sm">$${parseFloat(task.total_amount || 0).toFixed(2)}</td>
+                <td class="px-4 py-2 text-sm">${task.name || task.customer_name || task.client_name || 'N/A'}</td>
+                <td class="px-4 py-2 text-sm">${task.category || task.service_type || task.type || 'N/A'}</td>
+                <td class="px-4 py-2 text-sm">$${parseFloat(task.total_amount || task.amount || task.cost || 0).toFixed(2)}</td>
                 <td class="px-4 py-2 text-sm">
                   <span class="px-2 py-1 rounded text-xs ${getStatusColor(task.status)}">
                     ${task.status || 'N/A'}
