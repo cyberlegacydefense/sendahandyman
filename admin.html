@@ -2444,9 +2444,14 @@ function populateHandymanDetails(handyman, metrics) {
                 <p class="text-xs text-slate-500">${new Date(file.updated_at).toLocaleDateString()}</p>
                 <p class="text-xs text-slate-400">📁 ${file.bucket}/${file.displayPath}</p>
               </div>
-              <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="text-blue-600 hover:text-blue-800 text-sm">
-                Download
-              </button>
+              <div class="flex gap-2">
+                <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="text-blue-600 hover:text-blue-800 text-sm">
+                  Download
+                </button>
+                <button onclick="showFileInfo('${file.bucket}', '${file.name}', ${JSON.stringify(file.originalFile).replace(/"/g, '&quot;')})" class="text-green-600 hover:text-green-800 text-sm">
+                  Info
+                </button>
+              </div>
             </div>
           </div>
         `).join('')}
@@ -2525,6 +2530,25 @@ async function downloadFile(bucket, filePath) {
     console.log('🔗 Downloading file from bucket:', bucket);
     console.log('🔗 File path:', filePath);
     console.log('🔗 Full download URL would be:', `${bucket}/${filePath}`);
+
+    // First, let's verify the file actually exists and get its info
+    console.log('🔍 Verifying file exists...');
+    try {
+      const { data: fileList, error: listError } = await supabase.storage
+        .from(bucket)
+        .list('', { search: filePath });
+
+      console.log('🔍 File search result:', fileList);
+
+      if (!fileList || fileList.length === 0) {
+        console.log('❌ File not found in search');
+        throw new Error(`File ${filePath} not found in bucket ${bucket}`);
+      } else {
+        console.log('✅ File found in verification:', fileList[0]);
+      }
+    } catch (verifyError) {
+      console.error('❌ File verification failed:', verifyError);
+    }
 
     // Clean up the file path - remove double slashes and fix path issues
     let cleanPath = filePath;
@@ -2647,6 +2671,30 @@ async function downloadFile(bucket, filePath) {
 
     alert(errorMessage + '\n\nPlease check the console for detailed error information.');
   }
+}
+
+function showFileInfo(bucket, fileName, fileData) {
+  console.log('📋 File Information:');
+  console.log('Bucket:', bucket);
+  console.log('File name:', fileName);
+  console.log('Full file data:', fileData);
+
+  const info = `
+File Information:
+=================
+Bucket: ${bucket}
+Name: ${fileName}
+ID: ${fileData.id || 'N/A'}
+Size: ${fileData.metadata?.size || 'Unknown'} bytes
+Created: ${fileData.created_at || 'N/A'}
+Updated: ${fileData.updated_at || 'N/A'}
+Last Accessed: ${fileData.last_accessed_at || 'N/A'}
+MIME Type: ${fileData.metadata?.mimetype || 'Unknown'}
+
+Full object: ${JSON.stringify(fileData, null, 2)}
+  `;
+
+  alert(info);
 }
 
 async function toggleHandymanStatus(handymanId) {
