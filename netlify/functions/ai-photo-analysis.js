@@ -146,9 +146,30 @@ GUIDELINES:
 
   // Note: Mock analysis removed - now using real Claude vision
 
+  // Check if image format is supported
+  const mediaType = getImageMediaType(base64Image);
   console.log('🤖 Making Claude API call...');
   console.log('API Key available:', !!process.env.CLAUDE_API_KEY);
-  console.log('Image media type:', getImageMediaType(base64Image));
+  console.log('Image media type:', mediaType);
+
+  if (!mediaType) {
+    // Detect actual format from data URI
+    const formatMatch = base64Image.match(/^data:image\/([a-zA-Z+]+);/);
+    const detectedFormat = formatMatch ? formatMatch[1].toLowerCase() : 'unknown';
+
+    console.error('❌ Unsupported image format:', detectedFormat);
+    return {
+      problem_description: `Sorry, ${detectedFormat.toUpperCase()} image format is not supported. Please upload your image in JPEG, PNG, WebP, or GIF format for AI analysis.`,
+      recommended_task: "General Repair Consultation",
+      task_category: "general_repair",
+      cost_estimate: "$120 - $200",
+      risk_level: "moderate",
+      urgency_notes: `Please convert your ${detectedFormat.toUpperCase()} image to a supported format (JPEG, PNG, WebP, or GIF) and try again. Alternatively, take a new photo directly with your camera.`,
+      confidence_level: "low",
+      error_type: "unsupported_format",
+      supported_formats: getSupportedFormats()
+    };
+  }
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -250,8 +271,21 @@ function getImageMediaType(base64Image) {
     return 'image/png';
   } else if (base64Image.startsWith('data:image/webp')) {
     return 'image/webp';
+  } else if (base64Image.startsWith('data:image/gif')) {
+    return 'image/gif';
   }
-  return 'image/jpeg'; // default
+
+  // Note: Claude API doesn't support AVIF format
+  // Return null for unsupported formats to trigger proper error handling
+  return null;
+}
+
+function getSupportedFormats() {
+  return ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+}
+
+function isFormatSupported(mediaType) {
+  return getSupportedFormats().includes(mediaType);
 }
 
 function createFallbackAnalysis(responseText) {

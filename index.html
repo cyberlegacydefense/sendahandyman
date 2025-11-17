@@ -680,6 +680,7 @@
                         <h3 class="text-base md:text-lg font-semibold text-neutral-800 mb-2">Upload Your Repair Photo</h3>
                         <p class="text-sm md:text-base text-neutral-600 mb-4 hidden md:block">Drag and drop your image here, or tap to capture/browse</p>
                         <p class="text-sm text-neutral-600 mb-4 md:hidden">Tap to take photo or browse your gallery</p>
+                        <p class="text-xs text-neutral-500 mb-2">Note: AVIF/HEIC files need conversion to JPG/PNG first</p>
 
                         <!-- Mobile-optimized buttons -->
                         <div class="space-y-3 md:space-y-0 md:space-x-3 md:flex md:justify-center md:items-center">
@@ -691,9 +692,9 @@
                             </button>
                         </div>
 
-                        <input type="file" id="photoInput" accept="image/*" capture="environment" class="hidden" />
-                        <input type="file" id="browseInput" accept="image/*" class="hidden" />
-                        <p class="text-xs md:text-sm text-neutral-500 mt-3">Best results with good lighting • Max 5MB</p>
+                        <input type="file" id="photoInput" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" capture="environment" class="hidden" />
+                        <input type="file" id="browseInput" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" class="hidden" />
+                        <p class="text-xs md:text-sm text-neutral-500 mt-3">Best results with good lighting • JPG, PNG, WebP, GIF • Max 5MB</p>
                     </div>
 
                     <!-- Photo Preview -->
@@ -4923,7 +4924,18 @@
 
         // Validate file type first
         if (!file.type.startsWith('image/')) {
-            showFileError('Invalid file type. Please select a photo (JPG, PNG, or WebP format).', false);
+            showFileError('Invalid file type. Please select a photo (JPG, PNG, WebP, or GIF format).', false);
+            return;
+        }
+
+        // Check for specific unsupported formats
+        const supportedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+        if (!supportedFormats.includes(file.type.toLowerCase())) {
+            const formatName = file.type.split('/')[1]?.toUpperCase() || 'Unknown';
+            showFileError(
+                `${formatName} format is not supported by our AI analysis. Please use JPG, PNG, WebP, or GIF format. You can convert your image using most photo editing apps or online converters.`,
+                false
+            );
             return;
         }
 
@@ -5085,6 +5097,13 @@
             }
 
             const result = await response.json();
+
+            // Check if this is an unsupported format error
+            if (result.error_type === 'unsupported_format') {
+                showFileError(result.urgency_notes, false);
+                return;
+            }
+
             displayAnalysisResult(result);
 
         } catch (error) {
@@ -5100,6 +5119,10 @@
                 userMessage = 'Connection timeout. Please check your internet connection and try again.';
             } else if (error.message.includes('429')) {
                 userMessage = 'Service temporarily busy. Please wait a moment and try again.';
+            } else if (error.message.includes('media type') || error.message.includes('does not match')) {
+                userMessage = 'Image format not supported. Please upload a JPG, PNG, WebP, or GIF image and try again.';
+            } else if (error.message.includes('invalid_request_error')) {
+                userMessage = 'Invalid image format detected. Please ensure your image is in JPG, PNG, WebP, or GIF format.';
             }
 
             showAnalysisError(userMessage);
