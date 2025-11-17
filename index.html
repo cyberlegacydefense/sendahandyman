@@ -423,6 +423,123 @@
     </div>
 </section>
 
+<!-- AI Photo Triage System -->
+<section class="py-12 bg-gradient-to-br from-blue-50 to-indigo-100 border-t border-slate-100" id="ai-triage">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+                🤖 AI Photo Diagnosis
+            </h2>
+            <p class="text-xl text-slate-700 max-w-3xl mx-auto">
+                Upload a photo of your home repair issue and get an instant AI analysis with cost estimates and task recommendations. Our expert system analyzes your problem in seconds!
+            </p>
+        </div>
+
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <!-- Photo Upload Area -->
+                <div id="photoUploadArea" class="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center transition-all hover:border-blue-400 hover:bg-blue-50">
+                    <div id="uploadPrompt">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900 mb-2">Upload Your Repair Photo</h3>
+                        <p class="text-slate-600 mb-4">Drag and drop your image here, or click to browse</p>
+                        <button type="button" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                            Choose Photo
+                        </button>
+                        <input type="file" id="photoInput" accept="image/*" class="hidden" />
+                        <p class="text-sm text-slate-500 mt-3">Supports JPG, PNG, WebP up to 10MB</p>
+                    </div>
+
+                    <!-- Photo Preview -->
+                    <div id="photoPreview" class="hidden">
+                        <img id="previewImage" class="max-w-full max-h-64 mx-auto rounded-lg shadow-md mb-4" />
+                        <div class="flex justify-center gap-3">
+                            <button id="analyzeBtn" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                                🔍 Analyze with AI
+                            </button>
+                            <button id="retakeBtn" class="bg-slate-500 text-white px-6 py-3 rounded-lg hover:bg-slate-600 transition-colors font-semibold">
+                                Upload Different Photo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="analysisLoading" class="hidden text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                    <p class="text-lg text-slate-700">AI is analyzing your photo...</p>
+                    <p class="text-sm text-slate-500">This usually takes 5-10 seconds</p>
+                </div>
+
+                <!-- AI Analysis Results -->
+                <div id="analysisResults" class="hidden mt-8">
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                        <h3 class="text-xl font-bold text-green-800 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            AI Analysis Complete
+                        </h3>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Problem Description -->
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <h4 class="font-semibold text-slate-900 mb-2">Problem Identified</h4>
+                                <p id="problemDescription" class="text-slate-700"></p>
+                            </div>
+
+                            <!-- Risk Assessment -->
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <h4 class="font-semibold text-slate-900 mb-2">Risk Level</h4>
+                                <div id="riskLevel" class="flex items-center"></div>
+                            </div>
+
+                            <!-- Recommended Task -->
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <h4 class="font-semibold text-slate-900 mb-2">Recommended Service</h4>
+                                <p id="recommendedTask" class="text-slate-700 font-semibold"></p>
+                            </div>
+
+                            <!-- Cost Estimate -->
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <h4 class="font-semibold text-slate-900 mb-2">Estimated Cost</h4>
+                                <p id="costEstimate" class="text-2xl font-bold text-green-600"></p>
+                            </div>
+                        </div>
+
+                        <!-- Urgency and Action -->
+                        <div id="urgencySection" class="mt-6 p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Urgency Assessment</h4>
+                            <p id="urgencyText" class="text-slate-700 mb-4"></p>
+                            <div class="flex gap-3">
+                                <button id="bookServiceBtn" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                    Book This Service Now
+                                </button>
+                                <button id="viewTasksBtn" class="bg-slate-200 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-300 transition-colors font-semibold">
+                                    View All Services
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="analysisError" class="hidden mt-8 p-6 bg-red-50 border border-red-200 rounded-xl">
+                    <h3 class="text-lg font-semibold text-red-800 mb-2">Analysis Failed</h3>
+                    <p class="text-red-700 mb-4">We couldn't analyze your photo. Please try again with a clearer image or contact us for assistance.</p>
+                    <button id="retryBtn" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors font-semibold">
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="py-10 border-t border-slate-100 bg-white" id="tasks">
     <div class="max-w-6xl mx-auto px-4">
         <h2 class="text-2xl md:text-3xl font-bold">Popular fixed-price tasks</h2>
@@ -4103,6 +4220,244 @@
             coverageMap.setView([30.4, -97.7], 9);
         }
     }
+
+    // AI Photo Triage System
+    let currentPhotoFile = null;
+
+    function initAIPhotoTriage() {
+        const photoInput = document.getElementById('photoInput');
+        const uploadPrompt = document.getElementById('uploadPrompt');
+        const photoPreview = document.getElementById('photoPreview');
+        const previewImage = document.getElementById('previewImage');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const retakeBtn = document.getElementById('retakeBtn');
+        const uploadArea = document.getElementById('photoUploadArea');
+        const choosePhotoBtn = uploadPrompt.querySelector('button');
+
+        // File input change handler
+        photoInput.addEventListener('change', handlePhotoSelection);
+
+        // Choose photo button click
+        choosePhotoBtn.addEventListener('click', () => photoInput.click());
+
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+
+        // Analysis button
+        analyzeBtn.addEventListener('click', analyzePhoto);
+
+        // Retake button
+        retakeBtn.addEventListener('click', resetPhotoUpload);
+
+        // Book service and view tasks buttons
+        const bookServiceBtn = document.getElementById('bookServiceBtn');
+        const viewTasksBtn = document.getElementById('viewTasksBtn');
+
+        if (bookServiceBtn) {
+            bookServiceBtn.addEventListener('click', () => {
+                document.getElementById('tasks').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        if (viewTasksBtn) {
+            viewTasksBtn.addEventListener('click', () => {
+                document.getElementById('tasks').scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.currentTarget.style.borderColor = '#2563eb';
+        e.currentTarget.style.backgroundColor = '#eff6ff';
+    }
+
+    function handleDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.currentTarget.style.borderColor = '#93c5fd';
+        e.currentTarget.style.backgroundColor = '';
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                handlePhotoFile(file);
+            } else {
+                alert('Please drop an image file (JPG, PNG, WebP)');
+            }
+        }
+
+        // Reset drag styling
+        handleDragLeave(e);
+    }
+
+    function handlePhotoSelection(e) {
+        const file = e.target.files[0];
+        if (file) {
+            handlePhotoFile(file);
+        }
+    }
+
+    function handlePhotoFile(file) {
+        // Validate file size (10MB max)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('File size must be less than 10MB');
+            return;
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file (JPG, PNG, WebP)');
+            return;
+        }
+
+        currentPhotoFile = file;
+
+        // Create preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewImage = document.getElementById('previewImage');
+            previewImage.src = e.target.result;
+
+            // Show preview, hide upload prompt
+            document.getElementById('uploadPrompt').classList.add('hidden');
+            document.getElementById('photoPreview').classList.remove('hidden');
+
+            // Hide any previous results
+            document.getElementById('analysisResults').classList.add('hidden');
+            document.getElementById('analysisError').classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function resetPhotoUpload() {
+        currentPhotoFile = null;
+        document.getElementById('photoInput').value = '';
+        document.getElementById('uploadPrompt').classList.remove('hidden');
+        document.getElementById('photoPreview').classList.add('hidden');
+        document.getElementById('analysisResults').classList.add('hidden');
+        document.getElementById('analysisError').classList.add('hidden');
+        document.getElementById('analysisLoading').classList.add('hidden');
+    }
+
+    async function analyzePhoto() {
+        if (!currentPhotoFile) {
+            alert('Please select a photo first');
+            return;
+        }
+
+        // Show loading state
+        document.getElementById('photoPreview').classList.add('hidden');
+        document.getElementById('analysisLoading').classList.remove('hidden');
+        document.getElementById('analysisResults').classList.add('hidden');
+        document.getElementById('analysisError').classList.add('hidden');
+
+        try {
+            // Convert image to base64
+            const base64Image = await fileToBase64(currentPhotoFile);
+
+            // Call AI analysis function
+            const response = await fetch('/.netlify/functions/ai-photo-analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: base64Image,
+                    filename: currentPhotoFile.name
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Analysis failed: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            displayAnalysisResult(result);
+
+        } catch (error) {
+            console.error('AI analysis error:', error);
+            showAnalysisError();
+        }
+    }
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    function displayAnalysisResult(result) {
+        // Hide loading state
+        document.getElementById('analysisLoading').classList.add('hidden');
+
+        // Populate result fields
+        document.getElementById('problemDescription').textContent = result.problem_description || 'Unable to identify specific problem';
+        document.getElementById('recommendedTask').textContent = result.recommended_task || 'General repair consultation';
+        document.getElementById('costEstimate').textContent = result.cost_estimate || '$80 - $200';
+
+        // Set risk level with appropriate styling
+        const riskLevel = document.getElementById('riskLevel');
+        const riskText = result.risk_level || 'moderate';
+        const riskColor = {
+            'low': 'text-green-600',
+            'moderate': 'text-yellow-600',
+            'high': 'text-red-600',
+            'urgent': 'text-red-800'
+        }[riskText.toLowerCase()] || 'text-yellow-600';
+
+        riskLevel.innerHTML = `
+            <span class="px-3 py-1 rounded-full text-sm font-semibold ${riskColor} bg-current bg-opacity-10">
+                ${riskText.toUpperCase()}
+            </span>
+        `;
+
+        // Set urgency assessment
+        const urgencyText = document.getElementById('urgencyText');
+        const urgencySection = document.getElementById('urgencySection');
+
+        urgencyText.textContent = result.urgency_notes || 'This repair should be addressed in a reasonable timeframe to prevent potential issues.';
+
+        // Style urgency section based on risk level
+        if (riskText.toLowerCase() === 'urgent' || riskText.toLowerCase() === 'high') {
+            urgencySection.className = 'mt-6 p-4 rounded-lg bg-red-50 border border-red-200';
+        } else if (riskText.toLowerCase() === 'moderate') {
+            urgencySection.className = 'mt-6 p-4 rounded-lg bg-yellow-50 border border-yellow-200';
+        } else {
+            urgencySection.className = 'mt-6 p-4 rounded-lg bg-green-50 border border-green-200';
+        }
+
+        // Show results
+        document.getElementById('analysisResults').classList.remove('hidden');
+    }
+
+    function showAnalysisError() {
+        document.getElementById('analysisLoading').classList.add('hidden');
+        document.getElementById('analysisError').classList.remove('hidden');
+
+        const retryBtn = document.getElementById('retryBtn');
+        retryBtn.addEventListener('click', () => {
+            document.getElementById('analysisError').classList.add('hidden');
+            document.getElementById('photoPreview').classList.remove('hidden');
+        });
+    }
+
+    // Initialize AI Photo Triage when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initAIPhotoTriage();
+    });
 
     console.log('📜 JavaScript finished loading');
 </script>
