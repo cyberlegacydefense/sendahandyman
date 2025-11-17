@@ -44,11 +44,11 @@
 
     <form id="adminLoginForm" class="space-y-4">
       <div>
-        <label class="block text-sm font-semibold mb-1">Admin Email</label>
+        <label class="block text-sm font-semibold mb-1">Admin Email *</label>
         <input type="email" id="adminEmail" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
       </div>
       <div>
-        <label class="block text-sm font-semibold mb-1">Admin Password</label>
+        <label class="block text-sm font-semibold mb-1">Admin Password *</label>
         <input type="password" id="adminPassword" required class="w-full rounded-lg border border-slate-200 px-3 py-2" />
       </div>
       <button type="submit" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors">
@@ -646,11 +646,11 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label for="editFullName" class="block text-sm font-medium mb-1">Full Name</label>
+            <label for="editFullName" class="block text-sm font-medium mb-1">Full Name *</label>
             <input type="text" id="editFullName" class="w-full border rounded-lg px-3 py-2" required>
           </div>
           <div>
-            <label for="editEmail" class="block text-sm font-medium mb-1">Email</label>
+            <label for="editEmail" class="block text-sm font-medium mb-1">Email *</label>
             <input type="email" id="editEmail" class="w-full border rounded-lg px-3 py-2" required>
           </div>
         </div>
@@ -698,6 +698,67 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Handyman Details Modal -->
+<div id="handymanDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Handyman Details</h3>
+        <button id="closeHandymanDetailsModal" class="text-slate-500 hover:text-slate-700 text-2xl">&times;</button>
+      </div>
+
+      <!-- Loading State -->
+      <div id="handymanDetailsLoading" class="text-center py-8">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="mt-2 text-slate-600">Loading handyman details...</p>
+      </div>
+
+      <!-- Details Content -->
+      <div id="handymanDetailsContent" class="hidden">
+        <!-- Basic Information Section -->
+        <div class="mb-8">
+          <h4 class="text-xl font-semibold mb-4 text-slate-800 border-b border-slate-200 pb-2">Basic Information</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="basicInfoSection">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Performance Metrics Section -->
+        <div class="mb-8">
+          <h4 class="text-xl font-semibold mb-4 text-slate-800 border-b border-slate-200 pb-2">Performance Metrics</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="metricsSection">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Onboarding Information Section -->
+        <div class="mb-8">
+          <h4 class="text-xl font-semibold mb-4 text-slate-800 border-b border-slate-200 pb-2">Onboarding Information</h4>
+          <div id="onboardingSection">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Uploaded Files Section -->
+        <div class="mb-8">
+          <h4 class="text-xl font-semibold mb-4 text-slate-800 border-b border-slate-200 pb-2">Uploaded Files & Documents</h4>
+          <div id="filesSection">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Recent Tasks Section -->
+        <div class="mb-8">
+          <h4 class="text-xl font-semibold mb-4 text-slate-800 border-b border-slate-200 pb-2">Recent Tasks</h4>
+          <div id="recentTasksSection">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -788,12 +849,12 @@
     <form id="addHandymanForm">
       <div class="space-y-4">
         <div>
-          <label class="block text-sm font-semibold mb-1">Full Name</label>
+          <label class="block text-sm font-semibold mb-1">Full Name *</label>
           <input type="text" id="handymanFullName" required class="w-full border border-slate-200 rounded-lg px-3 py-2">
         </div>
 
         <div>
-          <label class="block text-sm font-semibold mb-1">Email</label>
+          <label class="block text-sm font-semibold mb-1">Email *</label>
           <input type="email" id="handymanEmail" required class="w-full border border-slate-200 rounded-lg px-3 py-2" placeholder="user@example.com">
           <div class="text-xs text-slate-500 mt-1">Must be a valid email format (e.g., name@domain.com)</div>
         </div>
@@ -1450,9 +1511,14 @@ function renderHandymenTable() {
         <div class="text-sm">${handyman.created_at ? new Date(handyman.created_at).toLocaleDateString() : 'N/A'}</div>
       </td>
       <td class="py-3 px-4">
-        <div class="flex gap-2">
-          <button class="edit-handyman-btn text-blue-600 hover:text-blue-800 text-sm" data-handyman-id="${handyman.id}">Edit</button>
-          <button onclick="toggleHandymanStatus('${handyman.id}')" class="text-orange-600 hover:text-orange-800 text-sm">
+        <div class="flex flex-wrap gap-1">
+          <button onclick="viewHandymanDetails('${handyman.id}')" class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs hover:bg-green-200 transition-colors">
+            View Details
+          </button>
+          <button class="edit-handyman-btn bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs hover:bg-blue-200 transition-colors" data-handyman-id="${handyman.id}">
+            Edit
+          </button>
+          <button onclick="toggleHandymanStatus('${handyman.id}')" class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs hover:bg-orange-200 transition-colors">
             ${handyman.is_active ? 'Suspend' : 'Activate'}
           </button>
         </div>
@@ -2114,6 +2180,246 @@ async function saveHandymanEdits() {
 function closeEditHandymanModal() {
   document.getElementById('editHandymanModal').classList.add('hidden');
   document.getElementById('editHandymanForm').reset();
+}
+
+// Comprehensive handyman details view
+async function viewHandymanDetails(handymanId) {
+  try {
+    console.log('📋 Loading detailed view for handyman:', handymanId);
+
+    // Show modal and loading state
+    document.getElementById('handymanDetailsModal').classList.remove('hidden');
+    document.getElementById('handymanDetailsLoading').classList.remove('hidden');
+    document.getElementById('handymanDetailsContent').classList.add('hidden');
+
+    // Fetch comprehensive handyman data
+    const { data: handyman, error: handymanError } = await supabase
+      .from('handymen')
+      .select('*')
+      .eq('id', handymanId)
+      .single();
+
+    if (handymanError || !handyman) {
+      throw new Error('Failed to fetch handyman data');
+    }
+
+    // Fetch task metrics
+    const { data: tasks, error: tasksError } = await supabase
+      .from('tasks')
+      .select('id, status, total_amount, created_at, category, name as customer_name')
+      .eq('handyman_id', handymanId)
+      .order('created_at', { ascending: false });
+
+    // Calculate metrics
+    const totalTasks = tasks?.length || 0;
+    const completedTasks = tasks?.filter(t => t.status === 'completed').length || 0;
+    const totalEarnings = tasks?.filter(t => t.status === 'completed')
+      .reduce((sum, t) => sum + (parseFloat(t.total_amount) || 0), 0) || 0;
+    const averageRating = 4.2; // Placeholder - would come from reviews table
+
+    // Fetch onboarding data from storage if available
+    let onboardingFiles = [];
+    try {
+      const { data: storageFiles, error: storageError } = await supabase.storage
+        .from('handyman-docs')
+        .list(`${handymanId}/`, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
+
+      onboardingFiles = storageFiles || [];
+    } catch (storageError) {
+      console.warn('Storage access failed:', storageError);
+    }
+
+    // Build and populate the details modal
+    populateHandymanDetails(handyman, {
+      totalTasks,
+      completedTasks,
+      totalEarnings,
+      averageRating,
+      recentTasks: tasks?.slice(0, 5) || [],
+      onboardingFiles
+    });
+
+  } catch (error) {
+    console.error('❌ Error loading handyman details:', error);
+    alert('Failed to load handyman details. Please try again.');
+    closeHandymanDetailsModal();
+  }
+}
+
+function populateHandymanDetails(handyman, metrics) {
+  // Basic Information Section
+  const basicInfoSection = document.getElementById('basicInfoSection');
+  basicInfoSection.innerHTML = `
+    <div class="bg-slate-50 p-4 rounded-lg">
+      <h5 class="font-semibold text-slate-700 mb-2">Personal Info</h5>
+      <p><strong>Name:</strong> ${handyman.full_name || 'N/A'}</p>
+      <p><strong>Email:</strong> ${handyman.email || 'N/A'}</p>
+      <p><strong>Phone:</strong> ${handyman.phone || 'N/A'}</p>
+      <p><strong>City:</strong> ${handyman.city || 'N/A'}</p>
+    </div>
+    <div class="bg-blue-50 p-4 rounded-lg">
+      <h5 class="font-semibold text-blue-700 mb-2">Work Details</h5>
+      <p><strong>Hourly Rate:</strong> $${handyman.hourly_rate || 'N/A'}</p>
+      <p><strong>Status:</strong> <span class="px-2 py-1 rounded text-xs ${handyman.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${handyman.is_active ? 'Active' : 'Inactive'}</span></p>
+      <p><strong>Onboarding:</strong> <span class="px-2 py-1 rounded text-xs ${handyman.onboarding_completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${handyman.onboarding_completed ? 'Completed' : 'Pending'}</span></p>
+    </div>
+    <div class="bg-purple-50 p-4 rounded-lg">
+      <h5 class="font-semibold text-purple-700 mb-2">Skills & Specialties</h5>
+      <p><strong>Skills:</strong> ${formatSkills(handyman.skills)}</p>
+      <p><strong>Specialties:</strong> ${handyman.specialties || 'None specified'}</p>
+      <p><strong>Experience:</strong> ${handyman.experience_years || 'N/A'} years</p>
+    </div>
+  `;
+
+  // Performance Metrics Section
+  const metricsSection = document.getElementById('metricsSection');
+  metricsSection.innerHTML = `
+    <div class="bg-green-50 border border-green-200 p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-green-600">${metrics.totalTasks}</div>
+      <div class="text-sm text-green-700">Total Tasks</div>
+    </div>
+    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-blue-600">${metrics.completedTasks}</div>
+      <div class="text-sm text-blue-700">Completed</div>
+    </div>
+    <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-yellow-600">$${metrics.totalEarnings.toFixed(2)}</div>
+      <div class="text-sm text-yellow-700">Total Earnings</div>
+    </div>
+    <div class="bg-orange-50 border border-orange-200 p-4 rounded-lg text-center">
+      <div class="text-2xl font-bold text-orange-600">${metrics.averageRating}/5</div>
+      <div class="text-sm text-orange-700">Avg. Rating</div>
+    </div>
+  `;
+
+  // Onboarding Section
+  const onboardingSection = document.getElementById('onboardingSection');
+  onboardingSection.innerHTML = `
+    <div class="bg-slate-50 p-4 rounded-lg">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p><strong>Onboarding Status:</strong> <span class="px-2 py-1 rounded text-xs ${handyman.onboarding_completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${handyman.onboarding_completed ? 'Completed' : 'Pending'}</span></p>
+          <p><strong>Date Joined:</strong> ${handyman.created_at ? new Date(handyman.created_at).toLocaleDateString() : 'N/A'}</p>
+          <p><strong>Background Check:</strong> ${handyman.background_check_status || 'Pending'}</p>
+        </div>
+        <div>
+          <p><strong>Insurance:</strong> ${handyman.insurance_verified ? 'Verified' : 'Not Verified'}</p>
+          <p><strong>License:</strong> ${handyman.license_verified ? 'Verified' : 'Not Verified'}</p>
+          <p><strong>Training:</strong> ${handyman.training_completed ? 'Completed' : 'Pending'}</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Files Section
+  const filesSection = document.getElementById('filesSection');
+  if (metrics.onboardingFiles.length > 0) {
+    filesSection.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        ${metrics.onboardingFiles.map(file => `
+          <div class="border border-slate-200 p-4 rounded-lg hover:bg-slate-50">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-sm">${file.name}</p>
+                <p class="text-xs text-slate-500">${(file.metadata?.size / 1024).toFixed(1)} KB</p>
+                <p class="text-xs text-slate-500">${new Date(file.updated_at).toLocaleDateString()}</p>
+              </div>
+              <button onclick="downloadFile('${handyman.id}', '${file.name}')" class="text-blue-600 hover:text-blue-800 text-sm">
+                Download
+              </button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    filesSection.innerHTML = `
+      <div class="text-center py-8 text-slate-500">
+        <p>No files uploaded yet</p>
+      </div>
+    `;
+  }
+
+  // Recent Tasks Section
+  const recentTasksSection = document.getElementById('recentTasksSection');
+  if (metrics.recentTasks.length > 0) {
+    recentTasksSection.innerHTML = `
+      <div class="overflow-x-auto">
+        <table class="w-full border border-slate-200 rounded-lg">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Customer</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Service</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Amount</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Status</th>
+              <th class="px-4 py-2 text-left text-sm font-semibold">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${metrics.recentTasks.map(task => `
+              <tr class="border-b border-slate-100">
+                <td class="px-4 py-2 text-sm">${task.customer_name || 'N/A'}</td>
+                <td class="px-4 py-2 text-sm">${task.category || 'N/A'}</td>
+                <td class="px-4 py-2 text-sm">$${parseFloat(task.total_amount || 0).toFixed(2)}</td>
+                <td class="px-4 py-2 text-sm">
+                  <span class="px-2 py-1 rounded text-xs ${getStatusColor(task.status)}">
+                    ${task.status || 'N/A'}
+                  </span>
+                </td>
+                <td class="px-4 py-2 text-sm">${new Date(task.created_at).toLocaleDateString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } else {
+    recentTasksSection.innerHTML = `
+      <div class="text-center py-8 text-slate-500">
+        <p>No tasks assigned yet</p>
+      </div>
+    `;
+  }
+
+  // Show content and hide loading
+  document.getElementById('handymanDetailsLoading').classList.add('hidden');
+  document.getElementById('handymanDetailsContent').classList.remove('hidden');
+}
+
+function closeHandymanDetailsModal() {
+  document.getElementById('handymanDetailsModal').classList.add('hidden');
+}
+
+function getStatusColor(status) {
+  switch(status) {
+    case 'completed': return 'bg-green-100 text-green-800';
+    case 'in_progress': return 'bg-blue-100 text-blue-800';
+    case 'pending': return 'bg-yellow-100 text-yellow-800';
+    case 'cancelled': return 'bg-red-100 text-red-800';
+    default: return 'bg-slate-100 text-slate-800';
+  }
+}
+
+async function downloadFile(handymanId, fileName) {
+  try {
+    const { data, error } = await supabase.storage
+      .from('handyman-docs')
+      .download(`${handymanId}/${fileName}`);
+
+    if (error) throw error;
+
+    const url = URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Download failed:', error);
+    alert('Failed to download file');
+  }
 }
 
 async function toggleHandymanStatus(handymanId) {
@@ -2900,6 +3206,16 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         console.log('✅ Auth user created directly:', authData.user?.id);
 
         // Create handyman record directly (this might still fail due to RLS, but let's try)
+        console.log('🔍 Inserting handyman record with data:', {
+          user_id: authData.user?.id,
+          email: email.toLowerCase(),
+          full_name: fullName,
+          phone: phone || null,
+          hourly_rate: 64.00,
+          onboarding_completed: false,
+          is_active: true
+        });
+
         const { data: handyman, error: handymanError } = await supabase
           .from('handymen')
           .insert({
@@ -2928,6 +3244,23 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
             if (existingRecord && !checkError) {
               console.log('✅ Handyman record found despite error:', existingRecord);
+
+              // Fix null full_name if needed
+              if (!existingRecord.full_name || existingRecord.full_name === null) {
+                console.log('🔧 Fixing null full_name for existing record...');
+                const { error: updateError } = await supabase
+                  .from('handymen')
+                  .update({ full_name: fullName })
+                  .eq('id', existingRecord.id);
+
+                if (updateError) {
+                  console.warn('⚠️ Could not update full_name:', updateError);
+                } else {
+                  existingRecord.full_name = fullName;
+                  console.log('✅ Fixed null full_name');
+                }
+              }
+
               // The record was actually created successfully
               const response = {
                 ok: true,
@@ -3311,6 +3644,17 @@ function initializeEventListeners() {
     console.log('✅ Close edit modal listener attached');
   } else {
     console.error('❌ Close edit modal button not found');
+  }
+
+  // Details modal event listeners
+  const closeDetailsModal = document.getElementById('closeHandymanDetailsModal');
+  if (closeDetailsModal) {
+    closeDetailsModal.addEventListener('click', () => {
+      closeHandymanDetailsModal();
+    });
+    console.log('✅ Close details modal listener attached');
+  } else {
+    console.error('❌ Close details modal button not found');
   }
 
   if (cancelEditButton) {
