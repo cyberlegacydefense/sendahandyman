@@ -2324,7 +2324,8 @@ async function viewHandymanDetails(handymanId) {
           onboardingFiles = storageFiles.map(file => ({
             ...file,
             bucket,
-            path: path + file.name
+            fullPath: path + file.name, // Full path for download
+            displayPath: path + file.name // Path for display
           }));
           break;
         } else {
@@ -2431,9 +2432,9 @@ function populateHandymanDetails(handyman, metrics) {
                 <p class="font-semibold text-sm">${file.name}</p>
                 <p class="text-xs text-slate-500">${file.metadata?.size ? (file.metadata.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</p>
                 <p class="text-xs text-slate-500">${new Date(file.updated_at).toLocaleDateString()}</p>
-                <p class="text-xs text-slate-400">📁 ${file.bucket}/${file.path}</p>
+                <p class="text-xs text-slate-400">📁 ${file.bucket}/${file.displayPath}</p>
               </div>
-              <button onclick="downloadFile('${file.bucket}', '${file.path}')" class="text-blue-600 hover:text-blue-800 text-sm">
+              <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="text-blue-600 hover:text-blue-800 text-sm">
                 Download
               </button>
             </div>
@@ -2511,14 +2512,30 @@ function getStatusColor(status) {
 
 async function downloadFile(bucket, filePath) {
   try {
-    console.log('🔗 Downloading file:', bucket, filePath);
+    console.log('🔗 Downloading file from bucket:', bucket);
+    console.log('🔗 File path:', filePath);
+    console.log('🔗 Full download URL would be:', `${bucket}/${filePath}`);
+
+    // Clean up the file path - remove double slashes and fix path issues
+    let cleanPath = filePath;
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+
+    console.log('🔗 Clean path:', cleanPath);
+
     const { data, error } = await supabase.storage
       .from(bucket)
-      .download(filePath);
+      .download(cleanPath);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Storage download error:', error);
+      throw error;
+    }
 
-    const fileName = filePath.split('/').pop();
+    const fileName = cleanPath.split('/').pop() || 'download';
+    console.log('🔗 Extracted filename:', fileName);
+
     const url = URL.createObjectURL(data);
     const a = document.createElement('a');
     a.href = url;
@@ -2531,6 +2548,11 @@ async function downloadFile(bucket, filePath) {
     console.log('✅ File downloaded successfully:', fileName);
   } catch (error) {
     console.error('❌ Download failed:', error);
+    console.error('❌ Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
     alert('Failed to download file: ' + error.message);
   }
 }
