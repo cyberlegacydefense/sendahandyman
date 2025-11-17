@@ -4142,9 +4142,11 @@
                 const taskKey = e.target.value;
                 console.log('📝 Task category changed to:', taskKey);
                 if (taskKey) {
+                    selectService(taskKey); // This will show the service details
                     showTaskQuestions(taskKey);
                 } else {
                     document.getElementById('taskQuestions').classList.add('hidden');
+                    document.getElementById('selectedTaskDisplay').classList.add('hidden');
                 }
             });
             console.log('✅ Task category dropdown listener added');
