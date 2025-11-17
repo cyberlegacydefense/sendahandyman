@@ -2321,11 +2321,21 @@ async function viewHandymanDetails(handymanId) {
 
         if (storageFiles && storageFiles.length > 0) {
           console.log(`✅ Found ${storageFiles.length} files in ${bucket}/${path}:`, storageFiles);
+          console.log('🔍 File details:', storageFiles.map(f => ({
+            name: f.name,
+            id: f.id,
+            updated_at: f.updated_at,
+            created_at: f.created_at,
+            last_accessed_at: f.last_accessed_at,
+            metadata: f.metadata
+          })));
+
           onboardingFiles = storageFiles.map(file => ({
             ...file,
             bucket,
             fullPath: path + file.name, // Full path for download
-            displayPath: path + file.name // Path for display
+            displayPath: path + file.name, // Path for display
+            originalFile: file // Keep original file data for debugging
           }));
           break;
         } else {
@@ -2524,15 +2534,88 @@ async function downloadFile(bucket, filePath) {
 
     console.log('🔗 Clean path:', cleanPath);
 
-    const { data, error } = await supabase.storage
+    // Try direct download first
+    console.log('🔗 Attempting direct download...');
+    let { data, error } = await supabase.storage
       .from(bucket)
       .download(cleanPath);
 
+    // If direct download fails, try alternative approaches
     if (error) {
-      console.error('❌ Storage download error:', error);
-      throw error;
+      console.log('🔗 Direct download failed, trying alternative approaches...');
+      console.error('❌ First download attempt error:', error);
+
+      // Try getting public URL instead
+      try {
+        console.log('🔗 Trying to get public URL...');
+        const { data: urlData } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(cleanPath);
+
+        if (urlData && urlData.publicUrl) {
+          console.log('🔗 Public URL:', urlData.publicUrl);
+
+          // Try to fetch the file directly
+          const response = await fetch(urlData.publicUrl);
+          if (response.ok) {
+            const blob = await response.blob();
+            const fileName = cleanPath.split('/').pop() || 'download';
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            console.log('✅ File downloaded via public URL:', fileName);
+            return;
+          }
+        }
+      } catch (publicUrlError) {
+        console.error('❌ Public URL approach failed:', publicUrlError);
+      }
+
+      // Try creating signed URL
+      try {
+        console.log('🔗 Trying to create signed URL...');
+        const { data: signedUrlData, error: signedError } = await supabase.storage
+          .from(bucket)
+          .createSignedUrl(cleanPath, 60); // 60 seconds expiry
+
+        if (signedUrlData && signedUrlData.signedUrl) {
+          console.log('🔗 Signed URL:', signedUrlData.signedUrl);
+
+          const response = await fetch(signedUrlData.signedUrl);
+          if (response.ok) {
+            const blob = await response.blob();
+            const fileName = cleanPath.split('/').pop() || 'download';
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            console.log('✅ File downloaded via signed URL:', fileName);
+            return;
+          }
+        } else if (signedError) {
+          console.error('❌ Signed URL error:', signedError);
+        }
+      } catch (signedUrlError) {
+        console.error('❌ Signed URL approach failed:', signedUrlError);
+      }
+
+      throw error; // Re-throw original error if all approaches fail
     }
 
+    // Original direct download succeeded
     const fileName = cleanPath.split('/').pop() || 'download';
     console.log('🔗 Extracted filename:', fileName);
 
@@ -2547,13 +2630,22 @@ async function downloadFile(bucket, filePath) {
 
     console.log('✅ File downloaded successfully:', fileName);
   } catch (error) {
-    console.error('❌ Download failed:', error);
+    console.error('❌ All download methods failed:', error);
     console.error('❌ Error details:', {
       name: error.name,
       message: error.message,
       stack: error.stack
     });
-    alert('Failed to download file: ' + error.message);
+
+    // Provide more helpful error message
+    let errorMessage = 'Download failed. ';
+    if (error.message === '{}' || error.message === '') {
+      errorMessage += 'This might be a permissions issue or the file may not exist.';
+    } else {
+      errorMessage += error.message;
+    }
+
+    alert(errorMessage + '\n\nPlease check the console for detailed error information.');
   }
 }
 
