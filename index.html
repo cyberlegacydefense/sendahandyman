@@ -1220,8 +1220,9 @@
                 </div>
 
                 <div class="mt-6">
-                    <label class="text-sm font-semibold">Describe your job</label>
-                    <textarea id="taskDescription" rows="4" placeholder="Product link/model, wall/ceiling type, special requirements, access details..." class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base"></textarea>
+                    <label class="text-sm font-semibold">Describe your job <span class="text-red-600">*</span></label>
+                    <textarea id="taskDescription" rows="4" placeholder="Product link/model, wall/ceiling type, special requirements, access details..." class="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-base" required></textarea>
+                    <p class="text-xs text-slate-600 mt-1">Required - Helps handyman bring the right tools and materials</p>
                 </div>
 
                 <div class="mt-6">
@@ -2433,6 +2434,22 @@
             if (!data.category) {
                 console.error('❌ Missing required fields');
                 alert('Please select a task category first');
+                return;
+            }
+
+            if (!data.description || data.description.trim() === '') {
+                console.error('❌ Missing job description');
+                alert('Please describe your job. This helps our handyman bring the right tools and materials.');
+
+                // Focus on the description field and highlight it
+                const descriptionField = document.getElementById('taskDescription');
+                if (descriptionField) {
+                    descriptionField.focus();
+                    descriptionField.style.borderColor = '#ef4444';
+                    setTimeout(() => {
+                        descriptionField.style.borderColor = '';
+                    }, 3000);
+                }
                 return;
             }
             if (data.futureDate) {
@@ -3994,6 +4011,34 @@
         }
     }
 
+    function validateTaskDescription() {
+        const descriptionField = document.getElementById('taskDescription');
+        const getEstimateBtn = document.getElementById('getEstimateBtn');
+
+        if (!descriptionField || !getEstimateBtn) return;
+
+        const description = descriptionField.value.trim();
+        const isValid = description.length > 0;
+
+        // Update button state
+        getEstimateBtn.disabled = !isValid;
+
+        // Update field styling
+        if (description.length > 0) {
+            descriptionField.style.borderColor = '';
+        } else {
+            // Only show red border if user has started typing and then cleared it
+            if (descriptionField.dataset.touched === 'true') {
+                descriptionField.style.borderColor = '#ef4444';
+            }
+        }
+
+        // Mark field as touched when user starts typing
+        if (description.length > 0 && !descriptionField.dataset.touched) {
+            descriptionField.dataset.touched = 'true';
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 DOM Content Loaded - Initializing app...');
         console.log('📊 App Version:', APP_VERSION);
@@ -4282,6 +4327,13 @@
             console.log('✅ Get estimate button listener added');
         } else {
             console.error('❌ Get estimate button not found');
+        }
+
+        // Add validation for task description field
+        const taskDescriptionField = document.getElementById('taskDescription');
+        if (taskDescriptionField) {
+            taskDescriptionField.addEventListener('input', validateTaskDescription);
+            console.log('✅ Task description validation listener added');
         }
         const reserveBtn = document.getElementById('reserveBtn');
         if (reserveBtn) {
