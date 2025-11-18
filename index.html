@@ -4783,6 +4783,8 @@
     let currentPhotoFile = null;
 
     function initAIPhotoTriage() {
+        console.log('🤖 Initializing AI Photo Triage...');
+
         const photoInput = document.getElementById('photoInput');
         const browseInput = document.getElementById('browseInput');
         const uploadPrompt = document.getElementById('uploadPrompt');
@@ -4791,12 +4793,27 @@
         const analyzeBtn = document.getElementById('analyzeBtn');
         const retakeBtn = document.getElementById('retakeBtn');
         const uploadArea = document.getElementById('photoUploadArea');
-        const takePhotoBtn = uploadPrompt.querySelector('button:first-of-type');
+        const takePhotoBtn = uploadPrompt?.querySelector('button:first-of-type');
         const browsePhotoBtn = document.getElementById('browsePhotoBtn');
+
+        // Debug element availability
+        console.log('Elements found:', {
+            photoInput: !!photoInput,
+            browseInput: !!browseInput,
+            uploadPrompt: !!uploadPrompt,
+            browsePhotoBtn: !!browsePhotoBtn,
+            takePhotoBtn: !!takePhotoBtn
+        });
+
+        if (!photoInput || !browseInput || !browsePhotoBtn) {
+            console.error('❌ Critical AI photo elements missing!');
+            return;
+        }
 
         // File input change handlers
         photoInput.addEventListener('change', handlePhotoSelection);
         browseInput.addEventListener('change', handlePhotoSelection);
+        console.log('✅ Photo input event listeners added');
 
         // Mobile-specific button handlers
         takePhotoBtn.addEventListener('click', () => {
@@ -4912,18 +4929,25 @@
     }
 
     function handlePhotoSelection(e) {
+        console.log('📷 Photo selection triggered:', e.target.id, e.target.files.length);
         const file = e.target.files[0];
         if (file) {
+            console.log('📷 File selected:', file.name, file.type, `${(file.size/1024/1024).toFixed(2)}MB`);
             handlePhotoFile(file);
+        } else {
+            console.log('❌ No file selected');
         }
     }
 
     function handlePhotoFile(file) {
+        console.log('📷 Processing photo file:', file.name);
+
         // Hide any previous errors
         hideFileError();
 
         // Validate file type first
         if (!file.type.startsWith('image/')) {
+            console.log('❌ Invalid file type:', file.type);
             showFileError('Invalid file type. Please select a photo (JPG, PNG, WebP, or GIF format).', false);
             return;
         }
