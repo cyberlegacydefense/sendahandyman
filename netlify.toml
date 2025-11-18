@@ -10,6 +10,11 @@ functions = "netlify/functions"
 # Node.js version for serverless functions
 NODE_VERSION = "18"
 
+# Function-specific configuration
+[functions]
+# Extend timeout for AI photo analysis (default is 10s, max is 26s for starter plans)
+ai-photo-analysis = { timeout = 26 }
+
 # Redirect rules (optional)
 [[redirects]]
 from = "/dashboard"

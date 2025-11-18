@@ -737,7 +737,7 @@
                 <div id="analysisLoading" class="hidden text-center py-8">
                     <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-warm-600 mb-4"></div>
                     <p class="text-lg text-neutral-700">AI is analyzing your photo...</p>
-                    <p class="text-sm text-neutral-500">This usually takes 5-10 seconds</p>
+                    <p class="text-sm text-neutral-500">This may take 10-45 seconds depending on image size and network speed</p>
                 </div>
 
                 <!-- AI Analysis Results -->
@@ -5106,17 +5106,24 @@
             // Convert image to base64
             const base64Image = await fileToBase64(currentPhotoFile);
 
-            // Call AI analysis function
-            const response = await fetch('/.netlify/functions/ai-photo-analysis', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    image: base64Image,
-                    filename: currentPhotoFile.name
-                })
-            });
+            // Call AI analysis function with extended timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+
+            try {
+                const response = await fetch('/.netlify/functions/ai-photo-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: base64Image,
+                        filename: currentPhotoFile.name
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
 
             if (!response.ok) {
                 throw new Error(`Analysis failed: ${response.statusText}`);
@@ -5139,7 +5146,11 @@
             let userMessage = 'Analysis temporarily unavailable. Please try again in a moment.';
 
             // Check for specific error types
-            if (error.message.includes('413') || error.message.includes('too large')) {
+            if (error.name === 'AbortError' || error.message.includes('aborted')) {
+                userMessage = 'Analysis timed out after 45 seconds. This can happen with large images or slow connections. Try compressing your image or check your internet connection.';
+            } else if (error.message.includes('Failed to fetch') || error.message.includes('ERR_TIMED_OUT')) {
+                userMessage = 'Connection timeout or network issue. Please check your internet connection and try again. Large images may take longer to analyze.';
+            } else if (error.message.includes('413') || error.message.includes('too large')) {
                 userMessage = 'Photo is too large for analysis. Please try a smaller image or use the compression option.';
             } else if (error.message.includes('timeout') || error.message.includes('network')) {
                 userMessage = 'Connection timeout. Please check your internet connection and try again.';
