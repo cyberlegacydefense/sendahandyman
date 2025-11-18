@@ -7,23 +7,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization"
 };
 
-// Task categories with exact pricing from current website
+// Task categories with exact pricing from current website (as of Nov 2024)
 const TASK_CATEGORIES = {
-  'tv_mount': { name: 'TV Wall Mount (32–65")', price: 'Starting at $160' },
-  'ceiling_fan': { name: 'Ceiling Fan Install/Replace', price: 'Starting at $160' },
-  'light_fixture': { name: 'Light Fixture / Chandelier Swap', price: 'Starting at $120' },
-  'faucet_repair': { name: 'Faucet / Showerhead Replace', price: 'Starting at $120' },
-  'smart_doorbell': { name: 'Smart Doorbell Install', price: 'Starting at $100' },
-  'blinds_installation': { name: 'Curtain Rods / Blinds', price: 'Starting at $120' },
-  'shelf_mounting': { name: 'Floating Shelf Install', price: 'Starting at $120' },
-  'appliance_hookup': { name: 'Appliance Hookup (W/D/DW)', price: 'Starting at $160' },
-  'furniture_assembly': { name: 'Furniture Assembly (S–M)', price: 'Starting at $160' },
-  'closet_organizer': { name: 'Closet Organizer Install', price: 'Starting at $200' },
-  'electrical_repair': { name: 'Electrical Repair', price: 'Starting at $160' },
-  'plumbing_repair': { name: 'Plumbing Repair', price: 'Starting at $120' },
-  'drywall_repair': { name: 'Drywall Repair', price: 'Starting at $120' },
-  'door_repair': { name: 'Door Repair/Installation', price: 'Starting at $120' },
-  'general_repair': { name: 'General Handyman Service', price: 'Starting at $120' }
+  'tv_mount': { name: 'TV Wall Mount (32–65")', price: 'Starting at $160', hours: '~2.0 hr base' },
+  'ceiling_fan': { name: 'Ceiling Fan Install/Replace', price: 'Starting at $160', hours: '~2.0 hr base' },
+  'light_fixture': { name: 'Light Fixture / Chandelier Swap', price: 'Starting at $120', hours: '~1.5 hr base' },
+  'faucet_showerhead': { name: 'Faucet / Showerhead Replace', price: 'Starting at $120', hours: '~1.5 hr base' },
+  'smart_doorbell': { name: 'Smart Doorbell Install', price: 'Starting at $100', hours: '~1.25 hr base' },
+  'curtains_blinds': { name: 'Curtain Rods / Blinds', price: 'Starting at $120', hours: '~1.5 hr base' },
+  'floating_shelf': { name: 'Floating Shelf Install', price: 'Starting at $120', hours: '~1.5 hr base' },
+  'appliance_hookup': { name: 'Appliance Hookup (W/D/DW)', price: 'Starting at $160', hours: '~2.0 hr base' },
+  'furniture_assembly': { name: 'Furniture Assembly (S–M)', price: 'Starting at $160', hours: '~2.0 hr base' },
+  'closet_organizer': { name: 'Closet Organizer Install', price: 'Starting at $200', hours: '~2.5 hr base' },
+  'premium_moveout': { name: 'Premium Move-out Repairs', price: 'Starting at $300', hours: '~3.0 hr base' },
+  'general_handyman': { name: 'General Handyman (3+ hours)', price: 'Starting at $240', hours: '~3 hr minimum' }
 };
 
 export const handler = async (event, context) => {
@@ -113,19 +110,37 @@ ANALYSIS REQUIREMENTS:
 1. First describe EXACTLY what you see in the image in detail
 2. Examine the image for visible damage, wear, or repair needs
 3. Identify the specific problem and its severity
-4. Recommend the most appropriate task category from the list above
-5. Assess risk level: low, moderate, high, or urgent
-6. Provide cost estimates based on our Florida market pricing
-7. Include urgency notes for homeowner guidance
+4. CRITICAL: Only recommend services from our EXACT list above - use the exact task_category key
+5. If the issue doesn't fit our specific services, recommend "general_handyman" and explain limitations
+6. Use EXACT pricing from the list - never make up prices
+7. Assess risk level: low, moderate, high, or urgent
+8. Include urgency notes for homeowner guidance
 
-IMPORTANT: If you only see unclear shapes or cannot identify the specific item, state "Image quality insufficient for accurate analysis" and recommend uploading a clearer, well-lit photo from a different angle.
+SERVICE MATCHING RULES:
+- FENCE/GATE repairs → "general_handyman" ($240+ for 3+ hour jobs)
+- DRYWALL holes/patches → "general_handyman" (we don't offer specific drywall service)
+- PAINTING → "general_handyman" (we don't offer standalone painting)
+- PLUMBING beyond faucets → "general_handyman"
+- ELECTRICAL beyond doorbell → "general_handyman"
+- ROOF/GUTTERS → NOT OFFERED - explain we don't do roofing
+- MAJOR CONSTRUCTION → NOT OFFERED - recommend contractors
+
+OUT-OF-SCOPE HANDLING:
+If the repair is outside our service list (roofing, major plumbing, HVAC, etc.), respond with:
+- problem_description: Clearly identify the issue
+- recommended_task: "Service not offered"
+- task_category: "out_of_scope"
+- cost_estimate: "Not available - outside our service area"
+- urgency_notes: "For [specific issue], we recommend contacting a specialized [type] contractor. This falls outside our handyman services."
+
+IMPORTANT: Always use EXACT pricing from the task list. Never estimate or modify prices.
 
 RESPONSE FORMAT (JSON only):
 {
   "problem_description": "Clear description of the identified issue",
-  "recommended_task": "Most appropriate task category name",
-  "task_category": "category_key_from_list",
-  "cost_estimate": "Price range (e.g., '$120 - $180')",
+  "recommended_task": "EXACT name from task list OR 'Service not offered'",
+  "task_category": "EXACT key from list OR 'out_of_scope'",
+  "cost_estimate": "EXACT price from list OR 'Not available - outside our service area'",
   "risk_level": "low/moderate/high/urgent",
   "urgency_notes": "Professional guidance on timing and next steps",
   "confidence_level": "high/medium/low"
@@ -134,9 +149,9 @@ RESPONSE FORMAT (JSON only):
 GUIDELINES:
 - Be conservative with risk assessments - safety first
 - Consider Florida-specific factors (humidity, weather)
-- If unclear, recommend general consultation
+- If unclear, recommend general_handyman consultation
 - Focus on visible issues, avoid speculation
-- Provide practical, actionable advice`;
+- Always use exact service names and pricing from our list`;
 
   // Check if API key is available
   if (!process.env.CLAUDE_API_KEY) {
@@ -292,23 +307,30 @@ function createFallbackAnalysis(responseText) {
   // Try to extract useful information from non-JSON response
   const lowerText = responseText.toLowerCase();
 
-  let taskCategory = 'general_repair';
+  let taskCategory = 'general_handyman';
   let riskLevel = 'moderate';
 
-  // Basic keyword matching
-  if (lowerText.includes('electrical') || lowerText.includes('wire') || lowerText.includes('outlet')) {
-    taskCategory = 'electrical_repair';
-    riskLevel = 'high';
-  } else if (lowerText.includes('plumbing') || lowerText.includes('leak') || lowerText.includes('faucet')) {
-    taskCategory = 'plumbing_repair';
-  } else if (lowerText.includes('drywall') || lowerText.includes('wall') || lowerText.includes('hole')) {
-    taskCategory = 'drywall_repair';
-  } else if (lowerText.includes('tile') || lowerText.includes('grout')) {
-    taskCategory = 'tile_repair';
-  } else if (lowerText.includes('door')) {
-    taskCategory = 'door_repair';
-  } else if (lowerText.includes('paint')) {
-    taskCategory = 'painting';
+  // Basic keyword matching to our actual services
+  if (lowerText.includes('tv') || lowerText.includes('mount') || lowerText.includes('bracket')) {
+    taskCategory = 'tv_mount';
+  } else if (lowerText.includes('fan') || lowerText.includes('ceiling fan')) {
+    taskCategory = 'ceiling_fan';
+  } else if (lowerText.includes('light') || lowerText.includes('fixture') || lowerText.includes('chandelier')) {
+    taskCategory = 'light_fixture';
+  } else if (lowerText.includes('faucet') || lowerText.includes('showerhead')) {
+    taskCategory = 'faucet_showerhead';
+  } else if (lowerText.includes('doorbell') || lowerText.includes('ring')) {
+    taskCategory = 'smart_doorbell';
+  } else if (lowerText.includes('curtain') || lowerText.includes('blind') || lowerText.includes('rod')) {
+    taskCategory = 'curtains_blinds';
+  } else if (lowerText.includes('shelf') || lowerText.includes('floating')) {
+    taskCategory = 'floating_shelf';
+  } else if (lowerText.includes('appliance') || lowerText.includes('washer') || lowerText.includes('dryer')) {
+    taskCategory = 'appliance_hookup';
+  } else if (lowerText.includes('furniture') || lowerText.includes('assembly') || lowerText.includes('ikea')) {
+    taskCategory = 'furniture_assembly';
+  } else if (lowerText.includes('closet') || lowerText.includes('organizer')) {
+    taskCategory = 'closet_organizer';
   }
 
   return {
@@ -326,9 +348,9 @@ function validateAndEnhanceAnalysis(analysis) {
   // Ensure all required fields exist
   const required = {
     problem_description: "Home repair issue identified in photo",
-    recommended_task: "General Repair Consultation",
-    task_category: "general_repair",
-    cost_estimate: "$120 - $200",
+    recommended_task: "General Handyman (3+ hours)",
+    task_category: "general_handyman",
+    cost_estimate: "Starting at $240",
     risk_level: "moderate",
     urgency_notes: "Professional assessment recommended",
     confidence_level: "medium"
@@ -341,11 +363,19 @@ function validateAndEnhanceAnalysis(analysis) {
     }
   });
 
-  // Validate task category exists
+  // Handle out-of-scope services
+  if (analysis.task_category === "out_of_scope") {
+    analysis.recommended_task = "Service not offered";
+    analysis.cost_estimate = "Not available - outside our service area";
+    return analysis;
+  }
+
+  // Validate task category exists in our service list
   if (!TASK_CATEGORIES[analysis.task_category]) {
-    analysis.task_category = "general_repair";
-    analysis.recommended_task = "General Repair Consultation";
-    analysis.cost_estimate = "$120 - $200";
+    console.warn(`Unknown task category: ${analysis.task_category}, defaulting to general_handyman`);
+    analysis.task_category = "general_handyman";
+    analysis.recommended_task = "General Handyman (3+ hours)";
+    analysis.cost_estimate = "Starting at $240";
   }
 
   // Ensure cost estimate matches task category if available

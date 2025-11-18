@@ -5171,7 +5171,25 @@
         // Populate result fields
         document.getElementById('problemDescription').textContent = result.problem_description || 'Unable to identify specific problem';
         document.getElementById('recommendedTask').textContent = result.recommended_task || 'General repair consultation';
-        document.getElementById('costEstimate').textContent = result.cost_estimate || '$80 - $200';
+        document.getElementById('costEstimate').textContent = result.cost_estimate || 'Starting at $240';
+
+        // Handle out-of-scope services
+        const isOutOfScope = result.task_category === 'out_of_scope';
+        const bookServiceBtn = document.getElementById('bookServiceBtn');
+
+        if (isOutOfScope) {
+            bookServiceBtn.textContent = '🔍 Find Specialized Contractor';
+            bookServiceBtn.classList.remove('btn-warm-primary');
+            bookServiceBtn.classList.add('bg-gray-500', 'text-white', 'rounded-warm');
+            bookServiceBtn.onclick = () => {
+                alert('This service falls outside our handyman offerings. We recommend searching for specialized contractors for this type of work.');
+            };
+        } else {
+            bookServiceBtn.textContent = '📞 Book This Service Now';
+            bookServiceBtn.classList.remove('bg-gray-500');
+            bookServiceBtn.classList.add('btn-warm-primary');
+            bookServiceBtn.onclick = () => bookAIRecommendedService(result.task_category);
+        }
 
         // Set risk level with appropriate styling
         const riskLevel = document.getElementById('riskLevel');
