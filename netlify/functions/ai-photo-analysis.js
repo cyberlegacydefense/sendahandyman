@@ -187,6 +187,10 @@ GUIDELINES:
   }
 
   try {
+    // Create an AbortController for the Claude API call
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -217,8 +221,11 @@ GUIDELINES:
           }
         ],
         system: systemPrompt
-      })
+      }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -257,9 +264,25 @@ GUIDELINES:
   } catch (error) {
     console.error('Claude API error details:', {
       message: error.message,
+      name: error.name,
       status: error.status,
       stack: error.stack
     });
+
+    // Handle specific error types
+    if (error.name === 'AbortError') {
+      console.error('Claude API timeout after 20 seconds');
+      return {
+        problem_description: "AI analysis timed out due to high server load. This is a temporary issue.",
+        recommended_task: "General Handyman (3+ hours)",
+        task_category: "general_handyman",
+        cost_estimate: "Starting at $240",
+        risk_level: "moderate",
+        urgency_notes: "Our AI service is experiencing high demand. For immediate assistance, please call us directly or try again in a few minutes.",
+        confidence_level: "low",
+        error_type: "timeout"
+      };
+    }
 
     // Log more details for debugging
     if (error.response) {
@@ -268,12 +291,12 @@ GUIDELINES:
 
     // Return a generic analysis if AI fails
     return {
-      problem_description: `API Error: ${error.message}. Using fallback analysis for testing.`,
-      recommended_task: "General Repair Consultation",
-      task_category: "general_repair",
-      cost_estimate: "$120 - $200",
+      problem_description: `AI service temporarily unavailable (${error.message}). Our system is being updated for better performance.`,
+      recommended_task: "General Handyman (3+ hours)",
+      task_category: "general_handyman",
+      cost_estimate: "Starting at $240",
       risk_level: "moderate",
-      urgency_notes: "For a proper assessment, we recommend scheduling a consultation with one of our handymen.",
+      urgency_notes: "For immediate assistance, please call us directly. Our AI analysis will be back online shortly.",
       confidence_level: "low"
     };
   }
