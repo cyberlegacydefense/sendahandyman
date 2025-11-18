@@ -4630,6 +4630,8 @@
         console.log('🎯 All event listeners initialized successfully');
         initializeChatbot();
         initializeCoverageMap();
+        optimizeForMobile();
+        initAIPhotoTriage();
     });
 
     // Coverage Map Functionality
@@ -5364,11 +5366,6 @@
         }
     }
 
-    // Initialize AI Photo Triage when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        optimizeForMobile();
-        initAIPhotoTriage();
-    });
 
     console.log('📜 JavaScript finished loading');
 </script>
