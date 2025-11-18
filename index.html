@@ -1010,7 +1010,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">🪟 Curtain Rods / Blinds</h3>
-                            <p class="text-sm text-neutral-600">~1.5 hr base • Starting at $120</p>
+                            <p class="text-sm text-neutral-600">Per item pricing • Starting at $80</p>
                         </div>
                         <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
@@ -1021,8 +1021,8 @@
                             <div>
                                 <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
                                 <ul class="text-sm space-y-1 text-neutral-700">
-                                    <li>• Install up to 2 rods OR 2 blinds</li>
-                                    <li>• Mount to drywall with anchors</li>
+                                    <li>• Per-item pricing: $80 for 1st, +$40 each additional</li>
+                                    <li>• Professional mounting with proper hardware</li>
                                 </ul>
                             </div>
                             <div>
@@ -1047,7 +1047,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <h3 class="font-semibold text-lg">📚 Floating Shelf Install</h3>
-                            <p class="text-sm text-neutral-600">~1.5 hr base • Starting at $120</p>
+                            <p class="text-sm text-neutral-600">Per item pricing • Starting at $80</p>
                         </div>
                         <div class="expand-icon text-neutral-400 transform transition-transform duration-200">▼</div>
                     </div>
@@ -1058,15 +1058,15 @@
                             <div>
                                 <h4 class="font-semibold text-warm-600 mb-2">✅ Included:</h4>
                                 <ul class="text-sm space-y-1 text-neutral-700">
-                                    <li>• Install up to 2 shelves</li>
-                                    <li>• Standard drywall mounting with anchors</li>
+                                    <li>• Per-item pricing: $80 for 1st, +$40 each additional</li>
+                                    <li>• Professional mounting with proper hardware</li>
                                 </ul>
                             </div>
                             <div>
                                 <h4 class="font-semibold text-warm-700 mb-2">⚠️ Potential Add-ons:</h4>
                                 <ul class="text-sm space-y-1 text-neutral-700">
-                                    <li>• +$20: Each extra shelf beyond 2</li>
-                                    <li>• +$30: Shelves over 25 lbs or heavy-duty models</li>
+                                    <li>• Quantity: 1 shelf $80, 2 shelves $120, 3+ shelves $40 each</li>
+                                    <li>• +$30: Heavy-duty mounting for shelves over 25 lbs</li>
                                     <li>• Masonry/tile installs not included</li>
                                 </ul>
                             </div>
@@ -2068,16 +2068,22 @@
             ]
         },
         curtains_blinds: {
-            hours: 1.5,
+            hours: 1,
+            perItem: true,
+            itemLabel: "blind/curtain rod",
             label: "Curtain Rods / Blinds",
             questions: [
                 {
                     id: 'quantity',
-                    label: 'How many rods/blinds?',
+                    label: 'How many blinds/curtain rods?',
+                    type: 'quantity',
                     options: [
-                        { value: 'standard', label: '1-2 items (included)', addon: 0 },
-                        { value: 'medium', label: '3-4 items', addon: 40 },
-                        { value: 'large', label: '5+ items', addon: 80 }
+                        { value: '1', label: '1 blind/rod', hours: 1.0, price: 80 },
+                        { value: '2', label: '2 blinds/rods', hours: 1.5, price: 120 },
+                        { value: '3', label: '3 blinds/rods', hours: 2.0, price: 160 },
+                        { value: '4', label: '4 blinds/rods', hours: 2.5, price: 200 },
+                        { value: '5', label: '5 blinds/rods', hours: 3.0, price: 240 },
+                        { value: '6', label: '6 blinds/rods', hours: 3.5, price: 280 }
                     ]
                 },
                 {
@@ -2091,16 +2097,22 @@
             ]
         },
         floating_shelf: {
-            hours: 1.5,
+            hours: 1,
+            perItem: true,
+            itemLabel: "floating shelf",
             label: "Floating Shelf Install",
             questions: [
                 {
                     id: 'quantity',
-                    label: 'How many shelves?',
+                    label: 'How many floating shelves?',
+                    type: 'quantity',
                     options: [
-                        { value: 'standard', label: '1-2 shelves (included)', addon: 0 },
-                        { value: 'medium', label: '3-4 shelves', addon: 40 },
-                        { value: 'large', label: '5+ items', addon: 80 }
+                        { value: '1', label: '1 shelf', hours: 1.0, price: 80 },
+                        { value: '2', label: '2 shelves', hours: 1.5, price: 120 },
+                        { value: '3', label: '3 shelves', hours: 2.0, price: 160 },
+                        { value: '4', label: '4 shelves', hours: 2.5, price: 200 },
+                        { value: '5', label: '5 shelves', hours: 3.0, price: 240 },
+                        { value: '6', label: '6 shelves', hours: 3.5, price: 280 }
                     ]
                 },
                 {
@@ -2469,8 +2481,17 @@
             question.options.forEach(option => {
                 const optionElement = document.createElement('option');
                 optionElement.value = option.value;
-                optionElement.textContent = option.label + (option.addon > 0 ? ` (+$${option.addon})` : '');
-                optionElement.dataset.addon = option.addon;
+
+                // Handle quantity pricing differently
+                if (question.type === 'quantity' && option.price) {
+                    optionElement.textContent = `${option.label} - $${option.price}`;
+                    optionElement.dataset.price = option.price;
+                    optionElement.dataset.hours = option.hours;
+                } else {
+                    optionElement.textContent = option.label + (option.addon > 0 ? ` (+$${option.addon})` : '');
+                    optionElement.dataset.addon = option.addon;
+                }
+
                 select.appendChild(optionElement);
             });
             questionDiv.appendChild(label);
@@ -2489,13 +2510,38 @@
             const select = document.getElementById(`question_${question.id}`);
             if (select && select.value) {
                 const selectedOption = select.options[select.selectedIndex];
-                const addon = parseInt(selectedOption.dataset.addon) || 0;
-                console.log(`📊 Question ${question.id}: selected "${select.value}" with addon ${addon}`);
-                totalAddons += addon;
+
+                // Handle quantity pricing (replaces base price) vs regular addons
+                if (question.type === 'quantity' && selectedOption.dataset.price) {
+                    // Quantity pricing is handled in pricing calculation, not as addon
+                    console.log(`📊 Question ${question.id}: quantity pricing "${select.value}" with base price ${selectedOption.dataset.price}`);
+                } else {
+                    const addon = parseInt(selectedOption.dataset.addon) || 0;
+                    console.log(`📊 Question ${question.id}: selected "${select.value}" with addon ${addon}`);
+                    totalAddons += addon;
+                }
             }
         });
         console.log('💰 Total addons calculated:', totalAddons);
         return totalAddons;
+    }
+
+    // Get quantity-based pricing for per-item services
+    function getQuantityPricing(taskKey) {
+        const task = TASKS[taskKey];
+        if (!task || !task.perItem) return null;
+
+        const quantityQuestion = task.questions?.find(q => q.type === 'quantity');
+        if (!quantityQuestion) return null;
+
+        const select = document.getElementById(`question_${quantityQuestion.id}`);
+        if (!select || !select.value) return null;
+
+        const selectedOption = select.options[select.selectedIndex];
+        return {
+            price: parseInt(selectedOption.dataset.price) || 0,
+            hours: parseFloat(selectedOption.dataset.hours) || task.hours
+        };
     }
 
     function updateEstimateWithAddons() {
@@ -2503,6 +2549,12 @@
         if (!taskKey) return;
         const addons = calculateAddons(taskKey);
         console.log('Current add-ons total:', addons);
+
+        // Log quantity pricing if applicable
+        const quantityPricing = getQuantityPricing(taskKey);
+        if (quantityPricing) {
+            console.log('Quantity pricing:', quantityPricing);
+        }
     }
 
     function calculatePricing(hours, window, rush = false, addons = 0, selectedDate = null) {
@@ -4077,32 +4129,36 @@
             },
             'curtains_blinds': {
                 name: '🪟 Curtain Rods / Blinds',
-                price: '~1.5 hr base • Starting at $120',
+                price: 'Per item pricing • Starting at $80',
                 included: [
-                    'Install curtain rods or blinds on drywall',
+                    'Professional installation per item',
                     'Mount brackets securely into studs',
                     'Hang curtains or mount blinds',
                     'Test operation and adjustments'
                 ],
                 addons: [
-                    '+$30: Installation on brick/concrete walls',
-                    '+$40: Motorized blind setup',
+                    '1 item: $80 (1 hour)',
+                    '2 items: $120 (1.5 hours)',
+                    '3+ items: $40 per additional (+30 min)',
+                    '+$40: Installation on brick/concrete walls',
                     'Custom cutting/hemming not included'
                 ]
             },
             'floating_shelf': {
                 name: '📚 Floating Shelf Install',
-                price: '~1.5 hr base • Starting at $120',
+                price: 'Per item pricing • Starting at $80',
                 included: [
-                    'Install floating shelves into wall studs',
+                    'Professional installation per shelf',
                     'Level mounting for straight installation',
                     'Secure mounting for typical shelf loads',
                     'Test stability and load capacity'
                 ],
                 addons: [
-                    '+$20: Each additional shelf beyond first two',
-                    '+$40: Installation on brick/concrete walls',
-                    'Heavy-duty brackets for extra weight'
+                    '1 shelf: $80 (1 hour)',
+                    '2 shelves: $120 (1.5 hours)',
+                    '3+ shelves: $40 per additional (+30 min)',
+                    '+$30: Heavy-duty brackets for extra weight',
+                    '+$40: Installation on brick/concrete walls'
                 ]
             },
             'appliance_hookup': {
