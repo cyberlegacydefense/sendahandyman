@@ -5110,20 +5110,19 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
 
-            try {
-                const response = await fetch('/.netlify/functions/ai-photo-analysis', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        image: base64Image,
-                        filename: currentPhotoFile.name
-                    }),
-                    signal: controller.signal
-                });
+            const response = await fetch('/.netlify/functions/ai-photo-analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    image: base64Image,
+                    filename: currentPhotoFile.name
+                }),
+                signal: controller.signal
+            });
 
-                clearTimeout(timeoutId);
+            clearTimeout(timeoutId);
 
             if (!response.ok) {
                 throw new Error(`Analysis failed: ${response.statusText}`);
