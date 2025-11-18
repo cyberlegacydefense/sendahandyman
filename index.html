@@ -694,7 +694,7 @@
 
                         <input type="file" id="photoInput" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" capture="environment" class="hidden" />
                         <input type="file" id="browseInput" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" class="hidden" />
-                        <p class="text-xs md:text-sm text-neutral-500 mt-3">Best results with good lighting • JPG, PNG, WebP, GIF • Max 5MB</p>
+                        <p class="text-xs md:text-sm text-neutral-500 mt-3">Best results with good lighting • JPG, PNG, WebP, GIF • Max 3.7MB (auto-compression available)</p>
                     </div>
 
                     <!-- Photo Preview -->
@@ -4939,11 +4939,15 @@
             return;
         }
 
-        // Check file size - be more generous but offer compression
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        // Check file size - account for base64 encoding expansion (~33% increase)
+        // API limit is 5MB after base64, so we need to limit uploads to ~3.7MB before encoding
+        const maxSizeBeforeEncoding = 3.7 * 1024 * 1024; // ~3.7MB raw = ~5MB after base64
+
+        if (file.size > maxSizeBeforeEncoding) {
             const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            const estimatedEncodedSizeMB = (file.size * 1.33 / (1024 * 1024)).toFixed(1);
             showFileError(
-                `Photo is ${sizeMB}MB. For faster upload and analysis, we recommend photos under 5MB. Would you like us to compress it automatically?`,
+                `Photo is ${sizeMB}MB (${estimatedEncodedSizeMB}MB after processing). Our AI requires photos under 3.7MB for analysis. Would you like us to compress it automatically?`,
                 true,
                 file
             );
@@ -4994,21 +4998,43 @@
             // Show a simple loading indicator
             const loadingMsg = document.createElement('div');
             loadingMsg.id = 'compressionLoading';
-            loadingMsg.className = 'mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-700 text-sm';
+            loadingMsg.className = 'mt-4 p-3 bg-warm-50 border border-warm-200 rounded-warm text-warm-700 text-sm';
             loadingMsg.innerHTML = '🗜️ Compressing photo... This may take a moment.';
             document.getElementById('photoUploadArea').appendChild(loadingMsg);
 
-            // Use more aggressive compression on mobile for faster processing
-            const quality = isMobileDevice() ? 0.6 : 0.7;
-            const maxWidth = isMobileDevice() ? 1280 : 1920;
+            // Use more aggressive compression for AI analysis (need to stay under 5MB after base64)
+            const quality = 0.5; // More aggressive compression for AI analysis
+            const maxWidth = 1280; // Smaller max width to ensure size reduction
             const compressedFile = await compressImage(file, quality, maxWidth);
 
             // Remove loading message
             const loading = document.getElementById('compressionLoading');
             if (loading) loading.remove();
 
-            // Process compressed file
-            handlePhotoFile(compressedFile);
+            // Verify compressed file is small enough for AI analysis
+            const compressedSizeMB = (compressedFile.size / (1024 * 1024)).toFixed(1);
+            const estimatedEncodedSize = compressedFile.size * 1.33;
+
+            if (estimatedEncodedSize > 5 * 1024 * 1024) {
+                // Still too large, try more aggressive compression
+                console.log(`First compression: ${compressedSizeMB}MB still too large, trying more aggressive compression...`);
+                const veryCompressedFile = await compressImage(file, 0.3, 960); // Very aggressive
+
+                const finalSizeMB = (veryCompressedFile.size / (1024 * 1024)).toFixed(1);
+                const finalEncodedSize = veryCompressedFile.size * 1.33;
+
+                if (finalEncodedSize > 5 * 1024 * 1024) {
+                    showFileError(`Even after compression, the image (${finalSizeMB}MB) is too large for AI analysis. Please try a smaller image or take a new photo.`, false);
+                    return;
+                }
+
+                console.log(`✅ Aggressive compression successful: ${finalSizeMB}MB`);
+                handlePhotoFile(veryCompressedFile);
+            } else {
+                console.log(`✅ Compression successful: ${compressedSizeMB}MB`);
+                // Process compressed file
+                handlePhotoFile(compressedFile);
+            }
 
         } catch (error) {
             const loading = document.getElementById('compressionLoading');
