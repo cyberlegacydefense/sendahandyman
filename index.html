@@ -5328,6 +5328,41 @@
         }
     }
 
+    // Function to book AI recommended service (from "Book This Service" button)
+    function bookAIRecommendedService(taskCategory) {
+        console.log('📅 Booking AI recommended service:', taskCategory);
+
+        // Use the existing selectService function to populate the form
+        selectService(taskCategory);
+
+        // Scroll to the booking section
+        const bookingSection = document.getElementById('bookingSection');
+        if (bookingSection) {
+            bookingSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Show a brief confirmation message
+        const confirmMsg = document.createElement('div');
+        confirmMsg.innerHTML = `
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-green-800">
+                ✅ Service selected based on AI analysis. Please review details below and book your appointment.
+            </div>
+        `;
+
+        // Insert confirmation above the booking form
+        const taskDetails = document.getElementById('taskDetails');
+        if (taskDetails && taskDetails.style.display !== 'none') {
+            taskDetails.insertAdjacentElement('beforebegin', confirmMsg);
+
+            // Remove confirmation after 5 seconds
+            setTimeout(() => {
+                if (confirmMsg.parentNode) {
+                    confirmMsg.remove();
+                }
+            }, 5000);
+        }
+    }
+
     // Function to pre-select AI recommended service
     function preSelectAIRecommendedService(recommendedTaskName) {
         // Map AI task names to dropdown values
@@ -5341,7 +5376,8 @@
             'Floating Shelf Install': 'floating_shelf',
             'Appliance Hookup (W/D/DW)': 'appliance_hookup',
             'Furniture Assembly (S–M)': 'furniture_assembly',
-            'Closet Organizer Install': 'closet_organizer'
+            'Closet Organizer Install': 'closet_organizer',
+            'General Handyman (3+ hours)': 'general_handyman'
         };
 
         const taskCategory = document.getElementById('taskCategory');
