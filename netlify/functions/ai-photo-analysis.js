@@ -117,7 +117,8 @@ ANALYSIS REQUIREMENTS:
 8. Include urgency notes for homeowner guidance
 
 SERVICE MATCHING RULES:
-- FENCE/GATE repairs → "general_handyman" ($240+ for 3+ hour jobs)
+- FENCE/GATE repairs (collapsed, broken, damaged fencing) → ALWAYS use "general_handyman" ($240+ for 3+ hour jobs)
+- FENCE posts, pickets, privacy fences, wood fencing → "general_handyman"
 - DRYWALL holes/patches → "general_handyman" (we don't offer specific drywall service)
 - PAINTING → "general_handyman" (we don't offer standalone painting)
 - PLUMBING beyond faucets → "general_handyman"
@@ -125,8 +126,12 @@ SERVICE MATCHING RULES:
 - ROOF/GUTTERS → NOT OFFERED - explain we don't do roofing
 - MAJOR CONSTRUCTION → NOT OFFERED - recommend contractors
 
+IMPORTANT: FENCE repairs of ANY type (collapsed, damaged, broken posts, etc.) are ALWAYS "general_handyman" - NEVER "out_of_scope"
+
 OUT-OF-SCOPE HANDLING:
-If the repair is outside our service list (roofing, major plumbing, HVAC, etc.), respond with:
+Only use this for repairs we truly cannot do (roofing, major plumbing, HVAC, structural foundation, etc.).
+FENCING is NOT out-of-scope - always use "general_handyman" for fence issues.
+If the repair is outside our service list, respond with:
 - problem_description: Clearly identify the issue
 - recommended_task: "Service not offered"
 - task_category: "out_of_scope"
@@ -340,6 +345,8 @@ function createFallbackAnalysis(responseText) {
     taskCategory = 'ceiling_fan';
   } else if (lowerText.includes('light') || lowerText.includes('fixture') || lowerText.includes('chandelier')) {
     taskCategory = 'light_fixture';
+  } else if (lowerText.includes('fence') || lowerText.includes('fencing') || lowerText.includes('gate') || lowerText.includes('picket') || lowerText.includes('privacy fence') || lowerText.includes('collapsed') || lowerText.includes('fence post')) {
+    taskCategory = 'general_handyman'; // Fence repairs always go to general handyman
   } else if (lowerText.includes('faucet') || lowerText.includes('showerhead')) {
     taskCategory = 'faucet_showerhead';
   } else if (lowerText.includes('doorbell') || lowerText.includes('ring')) {
