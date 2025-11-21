@@ -75,7 +75,7 @@ serve(async (req) => {
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase(),
       password: tempPassword,
-      email_confirm: true,
+      email_confirm: false, // Create unconfirmed first
       user_metadata: {
         full_name: name,
         user_type: "handyman"
@@ -92,20 +92,28 @@ serve(async (req) => {
       throw new Error(`Failed to create auth user: ${authError.message}`);
     }
 
-    console.log("Auth user created successfully, confirming email...");
+    console.log("Auth user created successfully, forcing email confirmation...");
 
-    // Double-check email confirmation
-    if (!authData.user.email_confirmed_at) {
-      console.log("Email not auto-confirmed, manually confirming...");
-      const { error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
-        authData.user.id,
-        { email_confirm: true }
-      );
-      if (confirmError) {
-        console.error("Email confirmation failed:", confirmError);
-      } else {
-        console.log("Email manually confirmed successfully");
+    // Force email confirmation using admin API
+    console.log("Manually confirming email for user:", authData.user.id);
+    const { data: updatedUser, error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
+      authData.user.id,
+      {
+        email_confirm: true,
+        user_metadata: {
+          ...authData.user.user_metadata,
+          full_name: name,
+          user_type: "handyman"
+        }
       }
+    );
+
+    if (confirmError) {
+      console.error("Email confirmation failed:", confirmError);
+      throw new Error(`Failed to confirm email: ${confirmError.message}`);
+    } else {
+      console.log("Email manually confirmed successfully");
+      console.log("Updated user data:", updatedUser);
     }
 
     console.log("Creating handyman record...");
