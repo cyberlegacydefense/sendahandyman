@@ -79,6 +79,10 @@ serve(async (req) => {
       user_metadata: {
         full_name: name,
         user_type: "handyman"
+      },
+      app_metadata: {
+        user_type: "handyman",
+        created_by_admin: true
       }
     });
 
@@ -88,7 +92,23 @@ serve(async (req) => {
       throw new Error(`Failed to create auth user: ${authError.message}`);
     }
 
-    console.log("Auth user created successfully, creating handyman record...");
+    console.log("Auth user created successfully, confirming email...");
+
+    // Double-check email confirmation
+    if (!authData.user.email_confirmed_at) {
+      console.log("Email not auto-confirmed, manually confirming...");
+      const { error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
+        authData.user.id,
+        { email_confirm: true }
+      );
+      if (confirmError) {
+        console.error("Email confirmation failed:", confirmError);
+      } else {
+        console.log("Email manually confirmed successfully");
+      }
+    }
+
+    console.log("Creating handyman record...");
 
     const handymanInsertData = {
       user_id: authData.user.id,
@@ -107,6 +127,10 @@ serve(async (req) => {
       .insert(handymanInsertData)
       .select()
       .single();
+
+    if (handymanData) {
+      console.log("Handyman record created successfully:", handymanData);
+    }
 
     if (handymanError) {
       console.error("Handyman creation failed:", handymanError);
