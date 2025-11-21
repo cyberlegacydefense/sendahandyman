@@ -43,16 +43,23 @@ serve(async (req) => {
       throw new Error("Access denied");
     }
 
-    const { name, email, phone } = await req.json();
+    const requestBody = await req.json();
+    console.log("Request body received:", requestBody);
+
+    const { name, email, phone } = requestBody;
 
     if (!name || !email) {
+      console.error("Missing required fields:", { name: !!name, email: !!email });
       throw new Error("Name and email required");
     }
 
+    console.log("Validating email:", email);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
+      console.error("Email regex validation failed for:", email);
       throw new Error("Invalid email format");
     }
+    console.log("Email validation passed");
 
     // Note: Removed duplicate check to prevent constraint violations
     // The database constraint will handle duplicates appropriately
@@ -64,6 +71,7 @@ serve(async (req) => {
                         nouns[Math.floor(Math.random() * nouns.length)] +
                         numbers;
 
+    console.log("Creating auth user with email:", email.toLowerCase());
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase(),
       password: tempPassword,
@@ -76,6 +84,7 @@ serve(async (req) => {
 
     if (authError) {
       console.error("Auth user creation failed:", authError);
+      console.error("Auth error details:", JSON.stringify(authError, null, 2));
       throw new Error(`Failed to create auth user: ${authError.message}`);
     }
 
@@ -142,9 +151,14 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    console.error("Function error:", error);
+    console.error("Error stack:", error.stack);
+
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: error.message,
+      details: error.toString(),
+      timestamp: new Date().toISOString()
     }), {
       headers: {
         ...corsHeaders,
