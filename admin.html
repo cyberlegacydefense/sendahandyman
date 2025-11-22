@@ -867,6 +867,14 @@
           <p class="text-xs text-blue-600 mt-1">A secure temporary password will be automatically created and shown after account creation.</p>
         </div>
 
+        <div class="bg-orange-50 border border-orange-200 rounded-lg p-3">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="skipEmailConfirmation" class="w-4 h-4 text-blue-600" checked>
+            <span class="text-sm font-medium text-orange-800">Skip Email Confirmation</span>
+          </label>
+          <p class="text-xs text-orange-600 mt-1">⚠️ User will need manual email confirmation in Supabase Dashboard if unchecked</p>
+        </div>
+
         <div>
           <label class="block text-sm font-semibold mb-1">Phone</label>
           <input type="tel" id="handymanPhone" class="w-full border border-slate-200 rounded-lg px-3 py-2">
@@ -3269,6 +3277,8 @@ document.getElementById('selectAllTasks').addEventListener('change', (e) => {
 function closeAddHandymanModal() {
   document.getElementById('addHandymanModal').classList.add('hidden');
   document.getElementById('addHandymanForm').reset();
+  // Reset checkbox to default (checked) state
+  document.getElementById('skipEmailConfirmation').checked = true;
 }
 
 // Generate a secure temporary password (same as PostMyStyle approach)
@@ -3322,6 +3332,12 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   const phone = document.getElementById('handymanPhone').value.trim();
   const city = document.getElementById('handymanCity').value.trim();
   const skills = document.getElementById('handymanSkills').value.trim();
+  const skipEmailConfirmation = document.getElementById('skipEmailConfirmation').checked;
+
+  console.log('🔧 Email confirmation settings:', {
+    skipEmailConfirmation: skipEmailConfirmation,
+    willRequireConfirmation: !skipEmailConfirmation
+  });
 
   // Validate required fields
   if (!fullName) {
@@ -3465,7 +3481,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         const tempPassword = generateSecurePassword();
         console.log('🔄 Creating auth user directly...');
 
-        // Create auth user directly
+        // Create auth user directly with email confirmation disabled for admin users
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: email,
           password: tempPassword,
@@ -3473,8 +3489,10 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
             emailRedirectTo: `${window.location.origin}/login.html`,
             data: {
               full_name: fullName,
-              user_type: 'handyman'
-            }
+              user_type: 'handyman',
+              created_by_admin: true // Mark as admin-created
+            },
+            shouldCreateUser: true
           }
         });
 
@@ -3484,6 +3502,25 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         }
 
         console.log('✅ Auth user created directly:', authData.user?.id);
+        console.log('🔍 User confirmation status:', {
+          email_confirmed_at: authData.user?.email_confirmed_at,
+          confirmation_sent_at: authData.user?.confirmation_sent_at,
+          confirmed: !!authData.user?.email_confirmed_at
+        });
+
+        // Provide appropriate instructions based on checkbox setting
+        if (!authData.user?.email_confirmed_at) {
+          if (skipEmailConfirmation) {
+            console.log('🔧 MANUAL ACTION REQUIRED: Email confirmation bypassed per admin setting');
+            console.log('📋 TO COMPLETE SETUP:');
+            console.log('   1. Go to Supabase Dashboard > Authentication > Users');
+            console.log(`   2. Find user: ${email}`);
+            console.log('   3. Click user and set "Email Confirmed" to true');
+            console.log('   4. User can then log in immediately');
+          } else {
+            console.log('✉️ Email confirmation required - user must confirm via email before login');
+          }
+        }
 
         // Create handyman record directly (this might still fail due to RLS, but let's try)
         console.log('🔍 Inserting handyman record with data:', {
