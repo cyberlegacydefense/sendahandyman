@@ -1260,15 +1260,27 @@
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
 
+    console.log('🔐 Attempting login for:', email);
+
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
+      console.error('🚨 Authentication failed:', error);
       document.getElementById('loginError').textContent = error.message;
       document.getElementById('loginError').classList.remove('hidden');
       return;
     }
 
-    await loadHandymanData(data.user.id);
+    console.log('✅ Authentication successful for user:', data.user.id);
+    console.log('👤 User data:', data.user);
+
+    try {
+      await loadHandymanData(data.user.id);
+    } catch (err) {
+      console.error('🚨 Failed to load handyman data:', err);
+      document.getElementById('loginError').textContent = 'Failed to load dashboard. Please check console for details.';
+      document.getElementById('loginError').classList.remove('hidden');
+    }
   });
 
   // Logout
@@ -1295,6 +1307,8 @@
 
   // Load handyman data
   async function loadHandymanData(userId) {
+    console.log('🔍 Loading handyman data for user_id:', userId);
+
     const { data: handyman, error } = await supabase
       .from('handymen')
       .select('*')
@@ -1302,12 +1316,32 @@
       .single();
 
     if (error) {
-      console.error('Error loading handyman:', error);
-      return;
+      console.error('🚨 Error loading handyman record:', error);
+      console.error('🔍 Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      throw new Error(`No handyman record found for user ${userId}: ${error.message}`);
+    }
+
+    if (!handyman) {
+      console.error('🚨 No handyman record returned for user_id:', userId);
+      throw new Error(`No handyman record exists for user ${userId}`);
     }
 
     currentHandyman = handyman;
-    console.log('Loaded handyman data:', handyman);
+    console.log('✅ Loaded handyman data:', handyman);
+    console.log('🔍 Handyman record details:', {
+      id: handyman.id,
+      user_id: handyman.user_id,
+      full_name: handyman.full_name,
+      email: handyman.email,
+      is_active: handyman.is_active,
+      onboarding_completed: handyman.onboarding_completed
+    });
+
     const displayName = handyman.full_name || 'Handyman';
     const phone = handyman.phone ? ` • ${handyman.phone}` : '';
     document.getElementById('handymanName').textContent = `${displayName}${phone}`;
