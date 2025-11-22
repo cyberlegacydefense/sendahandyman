@@ -3528,6 +3528,12 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
               // Fix null full_name if needed
               if (!existingRecord.full_name || existingRecord.full_name === null) {
                 console.log('🔧 Fixing null full_name for existing record...');
+                console.log('🔍 Full name to update:', {
+                  fullName: fullName,
+                  type: typeof fullName,
+                  length: fullName?.length,
+                  existingRecordId: existingRecord.id
+                });
                 const { error: updateError } = await supabase
                   .from('handymen')
                   .update({ full_name: fullName })

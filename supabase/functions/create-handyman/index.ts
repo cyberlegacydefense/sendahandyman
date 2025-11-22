@@ -162,9 +162,49 @@ serve(async (req) => {
       // Clean up auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
 
-      // Provide specific error messages
+      // Handle duplicate email gracefully
       if (handymanError.message?.includes('duplicate key value violates unique constraint "handymen_email_key"')) {
-        throw new Error(`Failed to create handyman record: Email ${email.toLowerCase()} already exists in the database`);
+        console.log("Duplicate email detected, checking existing record...");
+
+        // Check if the existing record has null full_name and fix it
+        const { data: existingHandyman, error: fetchError } = await supabaseAdmin
+          .from("handymen")
+          .select("*")
+          .eq("email", email.toLowerCase())
+          .single();
+
+        if (!fetchError && existingHandyman) {
+          console.log("Found existing handyman record:", existingHandyman);
+
+          // If full_name is null, update it
+          if (!existingHandyman.full_name) {
+            console.log("Updating null full_name for existing record...");
+            const { error: updateError } = await supabaseAdmin
+              .from("handymen")
+              .update({ full_name: name })
+              .eq("id", existingHandyman.id);
+
+            if (updateError) {
+              console.error("Failed to update full_name:", updateError);
+            } else {
+              console.log("Successfully updated full_name");
+              existingHandyman.full_name = name;
+            }
+          }
+
+          return {
+            success: true,
+            handyman: {
+              id: existingHandyman.id,
+              name: existingHandyman.full_name || name,
+              email: existingHandyman.email,
+              auth_user_id: existingHandyman.user_id
+            },
+            message: "Handyman already exists, updated missing information"
+          };
+        }
+
+        throw new Error(`Email ${email.toLowerCase()} already exists but could not retrieve record`);
       } else if (handymanError.message?.includes('unique constraint')) {
         throw new Error(`Failed to create handyman record: ${handymanError.message}`);
       } else {
