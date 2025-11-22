@@ -129,6 +129,12 @@ serve(async (req) => {
     };
 
     console.log("Inserting handyman data:", handymanInsertData);
+    console.log("Full name field specifically:", {
+      name: name,
+      full_name: handymanInsertData.full_name,
+      name_type: typeof name,
+      name_length: name?.length
+    });
 
     const { data: handymanData, error: handymanError } = await supabaseAdmin
       .from("handymen")
@@ -138,6 +144,10 @@ serve(async (req) => {
 
     if (handymanData) {
       console.log("Handyman record created successfully:", handymanData);
+      console.log("Checking full_name in returned data:", {
+        returned_full_name: handymanData.full_name,
+        all_fields: Object.keys(handymanData)
+      });
     }
 
     if (handymanError) {
