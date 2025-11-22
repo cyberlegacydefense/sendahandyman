@@ -1365,8 +1365,7 @@
 
     // Check if onboarding is complete
     if (!handyman.onboarding_completed) {
-      console.log('📝 Showing onboarding wizard because onboarding_completed is:', handyman.onboarding_completed);
-      console.log('💡 If you want to skip onboarding and go directly to dashboard, open browser console and run: skipOnboarding()');
+      console.log('📝 Showing onboarding wizard - new user needs to complete setup');
       showOnboarding();
     } else {
       console.log('📊 Showing dashboard because onboarding is complete');
@@ -3365,38 +3364,6 @@
     }
   }
 
-  // Helper function for testing - allows bypassing onboarding
-  window.skipOnboarding = async function() {
-    if (!currentHandyman) {
-      console.error('❌ No handyman data loaded. Please login first.');
-      return;
-    }
-
-    console.log('🔧 Manually setting onboarding_completed to true for testing...');
-
-    try {
-      const { error } = await supabase
-        .from('handymen')
-        .update({ onboarding_completed: true })
-        .eq('id', currentHandyman.id);
-
-      if (error) {
-        console.error('❌ Failed to update onboarding status:', error);
-        return;
-      }
-
-      console.log('✅ Onboarding marked as complete. Redirecting to dashboard...');
-
-      // Update local data
-      currentHandyman.onboarding_completed = true;
-
-      // Show dashboard
-      showDashboard();
-
-    } catch (err) {
-      console.error('❌ Error updating onboarding status:', err);
-    }
-  };
 
   // Start
   initializeApp();
