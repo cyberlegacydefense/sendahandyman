@@ -3463,20 +3463,18 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       // FALLBACK: Direct database approach
       try {
         const tempPassword = generateSecurePassword();
-        console.log('🔄 Creating auth user directly with admin privileges...');
+        console.log('🔄 Creating auth user directly...');
 
-        // Create auth user using admin API to ensure email is confirmed
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: email.toLowerCase(),
+        // Create auth user directly
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: email,
           password: tempPassword,
-          email_confirm: true, // Admin creates confirmed users
-          user_metadata: {
-            full_name: fullName,
-            user_type: 'handyman'
-          },
-          app_metadata: {
-            user_type: 'handyman',
-            created_by_admin: true
+          options: {
+            emailRedirectTo: `${window.location.origin}/login.html`,
+            data: {
+              full_name: fullName,
+              user_type: 'handyman'
+            }
           }
         });
 
@@ -3485,8 +3483,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
           throw new Error(`Direct auth creation failed: ${authError.message}`);
         }
 
-        console.log('✅ Auth user created directly with admin API:', authData.user?.id);
-        console.log('🔍 User email confirmed:', authData.user?.email_confirmed_at ? 'YES' : 'NO');
+        console.log('✅ Auth user created directly:', authData.user?.id);
 
         // Create handyman record directly (this might still fail due to RLS, but let's try)
         console.log('🔍 Inserting handyman record with data:', {
