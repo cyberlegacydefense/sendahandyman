@@ -218,7 +218,9 @@ serve(async (req) => {
           };
         }
 
-        throw new Error(`Email ${email.toLowerCase()} already exists but could not retrieve record`);
+        console.log(`Duplicate key error but no record found for ${email.toLowerCase()}, possibly due to timing/race condition`);
+        console.log("This suggests a transient issue - record may have been created and deleted");
+        throw new Error(`Transient duplicate key error for ${email.toLowerCase()}. Please try again or contact admin.`);
       } else if (handymanError.message?.includes('unique constraint')) {
         throw new Error(`Failed to create handyman record: ${handymanError.message}`);
       } else {
