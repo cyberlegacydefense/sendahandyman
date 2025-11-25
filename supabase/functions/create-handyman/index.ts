@@ -61,8 +61,22 @@ serve(async (req) => {
     }
     console.log("Email validation passed");
 
-    // Note: Removed duplicate check to prevent constraint violations
-    // The database constraint will handle duplicates appropriately
+    // Check for existing email before proceeding
+    console.log("🔍 Checking for existing email in handymen table:", email.toLowerCase());
+    const { data: existingCheck, error: checkError } = await supabaseAdmin
+      .from("handymen")
+      .select("id, email, full_name")
+      .eq("email", email.toLowerCase())
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("🚨 Error checking for existing email:", checkError);
+    } else if (existingCheck) {
+      console.log("🚨 Found existing handyman with this email:", existingCheck);
+      throw new Error(`Email ${email.toLowerCase()} already exists in handymen table`);
+    } else {
+      console.log("✅ No existing handyman found with this email, proceeding...");
+    }
 
     const adjectives = ["Quick", "Smart", "Brave", "Swift", "Bright"];
     const nouns = ["Tiger", "Eagle", "Wolf", "Lion", "Bear"];
@@ -233,14 +247,23 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("Function error:", error);
-    console.error("Error stack:", error.stack);
+    console.error("🚨 EDGE FUNCTION ERROR:", error);
+    console.error("🔍 Error type:", typeof error);
+    console.error("🔍 Error name:", error.name);
+    console.error("🔍 Error message:", error.message);
+    console.error("🔍 Error stack:", error.stack);
+    console.error("🔍 Full error object:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
 
     return new Response(JSON.stringify({
       success: false,
       error: error.message,
+      errorType: error.name,
       details: error.toString(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      debugInfo: {
+        stack: error.stack,
+        props: Object.getOwnPropertyNames(error)
+      }
     }), {
       headers: {
         ...corsHeaders,
