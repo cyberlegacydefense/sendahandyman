@@ -3513,10 +3513,11 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
           if (skipEmailConfirmation) {
             console.log('🔧 MANUAL ACTION REQUIRED: Email confirmation bypassed per admin setting');
             console.log('📋 TO COMPLETE SETUP:');
-            console.log('   1. Go to Supabase Dashboard > Authentication > Users');
-            console.log(`   2. Find user: ${email}`);
-            console.log('   3. Click user and set "Email Confirmed" to true');
-            console.log('   4. User can then log in immediately');
+            console.log('   1. Go to Supabase Dashboard > SQL Editor');
+            console.log('   2. Run these queries to confirm email and fix full_name:');
+            console.log(`   UPDATE auth.users SET email_confirmed_at = NOW() WHERE email = '${email}';`);
+            console.log(`   UPDATE handymen SET full_name = '${fullName}' WHERE email = '${email}';`);
+            console.log('   3. User can then log in immediately');
           } else {
             console.log('✉️ Email confirmation required - user must confirm via email before login');
           }
