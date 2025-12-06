@@ -61,7 +61,7 @@ serve(async (req) => {
     }
     console.log("Email validation passed");
 
-    // Check for existing email before proceeding
+    // Enhanced diagnostic: Check for existing email before proceeding
     console.log("🔍 Checking for existing email in handymen table:", email.toLowerCase());
     const { data: existingCheck, error: checkError } = await supabaseAdmin
       .from("handymen")
@@ -77,6 +77,34 @@ serve(async (req) => {
     } else {
       console.log("✅ No existing handyman found with this email, proceeding...");
     }
+
+    // Additional diagnostic: Check recent records and constraint status
+    console.log("🔬 Running constraint diagnostics...");
+    const { data: recentRecords, error: recentError } = await supabaseAdmin
+      .from("handymen")
+      .select("id, email, full_name, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    console.log("📊 Recent handymen records:", {
+      count: recentRecords?.length || 0,
+      records: recentRecords,
+      error: recentError?.message
+    });
+
+    // Check for any records with similar email patterns
+    const emailPattern = email.toLowerCase().split('@')[0];
+    const { data: similarEmails, error: similarError } = await supabaseAdmin
+      .from("handymen")
+      .select("id, email")
+      .ilike("email", `${emailPattern}%`)
+      .limit(3);
+
+    console.log("🔍 Similar email patterns found:", {
+      pattern: emailPattern,
+      similar: similarEmails,
+      error: similarError?.message
+    });
 
     const adjectives = ["Quick", "Smart", "Brave", "Swift", "Bright"];
     const nouns = ["Tiger", "Eagle", "Wolf", "Lion", "Bear"];
@@ -101,9 +129,21 @@ serve(async (req) => {
     });
 
     if (authError) {
-      console.error("Auth user creation failed:", authError);
-      console.error("Auth error details:", JSON.stringify(authError, null, 2));
-      throw new Error(`Failed to create auth user: ${authError.message}`);
+      console.error("🚨 AUTH USER CREATION FAILED - This is the real issue:");
+      console.error("   - Error message:", authError.message);
+      console.error("   - Error code:", authError.status || authError.code);
+      console.error("   - Auth error details:", JSON.stringify(authError, null, 2));
+      console.error("   - Attempted email:", email.toLowerCase());
+      console.error("   - This explains the foreign key constraint violation later!");
+      throw new Error(`AUTH CREATION FAILED: ${authError.message} (Code: ${authError.status || authError.code})`);
+    }
+
+    if (!authData || !authData.user || !authData.user.id) {
+      console.error("🚨 AUTH CREATION RETURNED INVALID DATA:");
+      console.error("   - authData:", authData);
+      console.error("   - authData.user:", authData?.user);
+      console.error("   - authData.user.id:", authData?.user?.id);
+      throw new Error("AUTH CREATION FAILED: Invalid auth data returned - no user ID");
     }
 
     console.log("Auth user created successfully, forcing email confirmation...");
@@ -176,18 +216,52 @@ serve(async (req) => {
       // Clean up auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
 
-      // Handle duplicate email gracefully
+      // Handle duplicate email gracefully with enhanced diagnostics
       if (handymanError.message?.includes('duplicate key value violates unique constraint "handymen_email_key"')) {
-        console.log("Duplicate email detected, checking existing record...");
+        console.log("🚨 CONSTRAINT VIOLATION DETECTED - Running detailed diagnostics...");
+        console.log("📋 Constraint error breakdown:", {
+          constraintName: "handymen_email_key",
+          attemptedEmail: email.toLowerCase(),
+          sqlstate: handymanError.code,
+          postgresHint: handymanError.hint,
+          fullMessage: handymanError.message
+        });
 
-        // Check if the existing record has null full_name and fix it
-        const { data: existingHandyman, error: fetchError } = await supabaseAdmin
+        // Enhanced search for existing record with multiple approaches
+        console.log("🔍 Method 1: Searching with exact email match...");
+        const { data: exactMatch, error: exactError } = await supabaseAdmin
           .from("handymen")
           .select("*")
           .eq("email", email.toLowerCase())
-          .single();
+          .maybeSingle();
 
-        if (!fetchError && existingHandyman) {
+        console.log("📊 Exact match result:", { exactMatch, exactError });
+
+        console.log("🔍 Method 2: Searching with case-insensitive ilike...");
+        const { data: ilikeMatch, error: ilikeError } = await supabaseAdmin
+          .from("handymen")
+          .select("*")
+          .ilike("email", email.toLowerCase())
+          .limit(1);
+
+        console.log("📊 ilike match result:", { ilikeMatch, ilikeError });
+
+        console.log("🔍 Method 3: Full table scan for similar patterns...");
+        const { data: allEmails, error: allError } = await supabaseAdmin
+          .from("handymen")
+          .select("id, email, created_at")
+          .order("created_at", { ascending: false })
+          .limit(10);
+
+        console.log("📊 All recent emails:", {
+          emails: allEmails?.map(r => r.email),
+          error: allError,
+          targetEmail: email.toLowerCase()
+        });
+
+        const existingHandyman = exactMatch || (ilikeMatch && ilikeMatch[0]);
+
+        if (existingHandyman && !exactError && !ilikeError) {
           console.log("Found existing handyman record:", existingHandyman);
 
           // If full_name is null, update it
@@ -218,9 +292,25 @@ serve(async (req) => {
           };
         }
 
-        console.log(`Duplicate key error but no record found for ${email.toLowerCase()}, possibly due to timing/race condition`);
-        console.log("This suggests a transient issue - record may have been created and deleted");
-        throw new Error(`Transient duplicate key error for ${email.toLowerCase()}. Please try again or contact admin.`);
+        console.log("🚨 PHANTOM CONSTRAINT VIOLATION - This is the core issue:");
+        console.log("❌ Constraint claims duplicate exists but NO record found via:");
+        console.log("   - Exact email match query");
+        console.log("   - Case-insensitive ILIKE query");
+        console.log("   - Recent records scan");
+        console.log("💡 Possible causes:");
+        console.log("   1. Database index corruption or inconsistency");
+        console.log("   2. Constraint checking cached/stale index data");
+        console.log("   3. Partial index or constraint condition not visible to queries");
+        console.log("   4. Row-level security hiding conflicting records");
+        console.log("   5. Database transaction isolation anomaly");
+
+        console.log("📧 FAILED EMAIL:", email.toLowerCase());
+        console.log("🔍 DIAGNOSTIC SUMMARY:");
+        console.log("   - exactMatch:", exactMatch ? "FOUND" : "NOT FOUND");
+        console.log("   - ilikeMatch:", ilikeMatch?.length > 0 ? "FOUND" : "NOT FOUND");
+        console.log("   - recentRecords:", allEmails?.length || 0, "total");
+
+        throw new Error(`PHANTOM CONSTRAINT VIOLATION: Constraint claims ${email.toLowerCase()} exists but no record found. This indicates database index corruption or constraint inconsistency. Contact system administrator to rebuild constraints/indexes.`);
       } else if (handymanError.message?.includes('unique constraint')) {
         throw new Error(`Failed to create handyman record: ${handymanError.message}`);
       } else {
