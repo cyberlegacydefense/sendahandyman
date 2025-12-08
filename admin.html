@@ -2917,14 +2917,19 @@ async function viewHandymanDetails(handymanId) {
           })));
 
           onboardingFiles = storageFiles.map(file => {
-            const isCorrupted = !file.id || !file.created_at || !file.updated_at;
+            // Enhanced corruption detection
+            const isCorrupted = checkFileCorruption(file);
+            const fileType = getFileType(file.name);
+
             return {
               ...file,
               bucket,
-              fullPath: path + file.name, // Full path for download
-              displayPath: path + file.name, // Path for display
-              originalFile: file, // Keep original file data for debugging
-              isCorrupted: isCorrupted
+              fullPath: path + file.name,
+              displayPath: path + file.name,
+              originalFile: file,
+              isCorrupted: isCorrupted,
+              fileType: fileType,
+              corruptionReasons: isCorrupted ? getCorruptionReasons(file) : null
             };
           });
           break;
@@ -3020,38 +3025,42 @@ function populateHandymanDetails(handyman, metrics) {
     </div>
   `;
 
-  // Files Section
+  // Files Section with Enhanced Viewing
   const filesSection = document.getElementById('filesSection');
   if (metrics.onboardingFiles.length > 0) {
     filesSection.innerHTML = `
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        ${metrics.onboardingFiles.map(file => `
-          <div class="border border-slate-200 p-4 rounded-lg hover:bg-slate-50 ${file.isCorrupted ? 'bg-red-50 border-red-200' : ''}">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-semibold text-sm">${file.name} ${file.isCorrupted ? '⚠️' : ''}</p>
-                <p class="text-xs text-slate-500">${file.metadata?.size ? (file.metadata.size / 1024).toFixed(1) + ' KB' : 'Unknown size'}</p>
-                <p class="text-xs text-slate-500">${file.updated_at ? new Date(file.updated_at).toLocaleDateString() : 'Invalid date'}</p>
-                <p class="text-xs text-slate-400">📁 ${file.bucket}/${file.displayPath}</p>
-                ${file.isCorrupted ? '<p class="text-xs text-red-600 font-medium">⚠️ Corrupted file - incomplete upload</p>' : ''}
-              </div>
-              <div class="flex gap-2">
-                <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="${file.isCorrupted ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:text-blue-800'} text-sm" ${file.isCorrupted ? 'disabled' : ''}>
-                  Download
-                </button>
-                <button onclick="showFileInfo('${file.bucket}', '${file.name}', ${JSON.stringify(file.originalFile).replace(/"/g, '&quot;')})" class="text-green-600 hover:text-green-800 text-sm">
-                  Info
-                </button>
-              </div>
-            </div>
-          </div>
-        `).join('')}
+      <div class="space-y-4">
+        <!-- File Categories -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button onclick="filterFilesByCategory('all')" class="file-filter-btn active px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+            All (${metrics.onboardingFiles.length})
+          </button>
+          <button onclick="filterFilesByCategory('image')" class="file-filter-btn px-3 py-1 text-sm rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200">
+            Images (${metrics.onboardingFiles.filter(f => getFileType(f.name) === 'image').length})
+          </button>
+          <button onclick="filterFilesByCategory('document')" class="file-filter-btn px-3 py-1 text-sm rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200">
+            Documents (${metrics.onboardingFiles.filter(f => getFileType(f.name) === 'document').length})
+          </button>
+          <button onclick="filterFilesByCategory('pdf')" class="file-filter-btn px-3 py-1 text-sm rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200">
+            PDFs (${metrics.onboardingFiles.filter(f => getFileType(f.name) === 'pdf').length})
+          </button>
+          <button onclick="filterFilesByCategory('corrupted')" class="file-filter-btn px-3 py-1 text-sm rounded-full bg-red-100 text-red-600 hover:bg-red-200">
+            Corrupted (${metrics.onboardingFiles.filter(f => f.isCorrupted).length})
+          </button>
+        </div>
+
+        <!-- File Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="fileGrid">
+          ${metrics.onboardingFiles.map(file => createFileCard(file)).join('')}
+        </div>
       </div>
     `;
   } else {
     filesSection.innerHTML = `
-      <div class="text-center py-8 text-slate-500">
-        <p>No files uploaded yet</p>
+      <div class="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border-2 border-dashed border-slate-300">
+        <div class="text-4xl mb-2">📁</div>
+        <p class="font-medium">No files uploaded yet</p>
+        <p class="text-sm">Documents and files will appear here once uploaded</p>
       </div>
     `;
   }
@@ -3264,28 +3273,394 @@ async function downloadFile(bucket, filePath) {
   }
 }
 
+// Enhanced file corruption detection
+function checkFileCorruption(file) {
+  if (!file) return true;
+
+  // Check for essential metadata
+  const hasId = file.id && file.id !== '';
+  const hasValidDates = file.created_at && file.updated_at;
+  const hasValidName = file.name && file.name !== '';
+
+  // Check for incomplete uploads (size issues)
+  const hasValidSize = file.metadata?.size !== undefined && file.metadata?.size !== null;
+
+  // Check for minimum file size (corrupted files often have 0 bytes or very small sizes)
+  const hasReasonableSize = !hasValidSize || file.metadata.size > 0;
+
+  // File is corrupted if any essential data is missing
+  return !hasId || !hasValidDates || !hasValidName || !hasReasonableSize;
+}
+
+// Get specific corruption reasons for debugging
+function getCorruptionReasons(file) {
+  const reasons = [];
+
+  if (!file.id || file.id === '') {
+    reasons.push('Missing or empty file ID');
+  }
+
+  if (!file.created_at) {
+    reasons.push('Missing creation date');
+  }
+
+  if (!file.updated_at) {
+    reasons.push('Missing update date');
+  }
+
+  if (!file.name || file.name === '') {
+    reasons.push('Missing or empty filename');
+  }
+
+  if (file.metadata?.size === undefined || file.metadata?.size === null) {
+    reasons.push('Missing size information');
+  } else if (file.metadata.size === 0) {
+    reasons.push('Zero-byte file (empty)');
+  }
+
+  return reasons;
+}
+
+// Enhanced file type detection
+function getFileType(fileName) {
+  if (!fileName) return 'unknown';
+
+  const extension = fileName.toLowerCase().split('.').pop();
+
+  const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'tiff', 'ico'];
+  const documentTypes = ['doc', 'docx', 'txt', 'rtf', 'odt'];
+  const pdfTypes = ['pdf'];
+  const videoTypes = ['mp4', 'avi', 'mov', 'mkv', 'wmv', 'flv', 'webm'];
+  const audioTypes = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'm4a'];
+  const archiveTypes = ['zip', 'rar', '7z', 'tar', 'gz'];
+  const spreadsheetTypes = ['xls', 'xlsx', 'csv', 'ods'];
+  const presentationTypes = ['ppt', 'pptx', 'odp'];
+
+  if (imageTypes.includes(extension)) return 'image';
+  if (documentTypes.includes(extension)) return 'document';
+  if (pdfTypes.includes(extension)) return 'pdf';
+  if (videoTypes.includes(extension)) return 'video';
+  if (audioTypes.includes(extension)) return 'audio';
+  if (archiveTypes.includes(extension)) return 'archive';
+  if (spreadsheetTypes.includes(extension)) return 'spreadsheet';
+  if (presentationTypes.includes(extension)) return 'presentation';
+
+  return 'unknown';
+}
+
+// Get file icon based on type
+function getFileIcon(fileName, fileType = null) {
+  const type = fileType || getFileType(fileName);
+
+  const icons = {
+    image: '🖼️',
+    document: '📄',
+    pdf: '📕',
+    video: '🎥',
+    audio: '🎵',
+    archive: '🗜️',
+    spreadsheet: '📊',
+    presentation: '📽️',
+    unknown: '📋'
+  };
+
+  return icons[type] || icons.unknown;
+}
+
+// Format file size
+function formatFileSize(bytes) {
+  if (!bytes || bytes === 0) return 'Unknown size';
+
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  let i = 0;
+  let size = bytes;
+
+  while (size >= 1024 && i < sizes.length - 1) {
+    size /= 1024;
+    i++;
+  }
+
+  return `${size.toFixed(1)} ${sizes[i]}`;
+}
+
+// Create enhanced file card
+function createFileCard(file) {
+  const fileType = getFileType(file.name);
+  const icon = getFileIcon(file.name, fileType);
+  const size = formatFileSize(file.metadata?.size);
+  const isImage = fileType === 'image';
+  const isPdf = fileType === 'pdf';
+  const isCorrupted = file.isCorrupted;
+
+  return `
+    <div class="file-card border border-slate-200 rounded-lg hover:shadow-md transition-shadow ${isCorrupted ? 'bg-red-50 border-red-200' : 'bg-white'}" data-file-type="${fileType}" data-corrupted="${isCorrupted}">
+      <div class="p-4">
+        <!-- File Header -->
+        <div class="flex items-start justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <div class="text-2xl">${icon}</div>
+            <div>
+              <p class="font-medium text-sm truncate max-w-[150px]" title="${file.name}">
+                ${file.name}
+                ${isCorrupted ? ' ⚠️' : ''}
+              </p>
+              <p class="text-xs text-slate-500">${size}</p>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 uppercase font-medium">${fileType}</div>
+        </div>
+
+        <!-- File Preview/Thumbnail -->
+        ${isImage && !isCorrupted ? `
+          <div class="mb-3">
+            <div class="bg-slate-100 rounded-lg p-2 text-center text-xs text-slate-500 min-h-[80px] flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors" onclick="previewFile('${file.bucket}', '${file.fullPath}', '${file.name}', 'image')">
+              <div>
+                <div class="text-lg mb-1">${icon}</div>
+                Click to preview
+              </div>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- File Details -->
+        <div class="text-xs text-slate-500 space-y-1 mb-3">
+          <p><strong>Date:</strong> ${file.updated_at ? new Date(file.updated_at).toLocaleDateString() : 'Invalid date'}</p>
+          <p><strong>Path:</strong> <code class="bg-slate-100 px-1 rounded text-xs">${file.bucket}/${file.displayPath}</code></p>
+          ${isCorrupted ? `
+            <div class="bg-red-50 border border-red-200 rounded p-2 mt-2">
+              <p class="text-red-600 font-medium text-xs">⚠️ File Corruption Detected</p>
+              ${file.corruptionReasons ? `
+                <ul class="text-red-500 text-xs mt-1 list-disc list-inside">
+                  ${file.corruptionReasons.map(reason => `<li>${reason}</li>`).join('')}
+                </ul>
+              ` : ''}
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-2 text-xs">
+          ${!isCorrupted ? `
+            <button onclick="downloadFile('${file.bucket}', '${file.fullPath}')" class="flex-1 bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded transition-colors">
+              Download
+            </button>
+          ` : `
+            <button class="flex-1 bg-gray-100 text-gray-400 px-2 py-1 rounded cursor-not-allowed" disabled>
+              Corrupted
+            </button>
+          `}
+
+          ${isImage && !isCorrupted ? `
+            <button onclick="previewFile('${file.bucket}', '${file.fullPath}', '${file.name}', 'image')" class="bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded transition-colors">
+              Preview
+            </button>
+          ` : ''}
+
+          ${isPdf && !isCorrupted ? `
+            <button onclick="previewFile('${file.bucket}', '${file.fullPath}', '${file.name}', 'pdf')" class="bg-purple-100 text-purple-700 hover:bg-purple-200 px-2 py-1 rounded transition-colors">
+              View PDF
+            </button>
+          ` : ''}
+
+          <button onclick="showFileInfo('${file.bucket}', '${file.name}', ${JSON.stringify(file.originalFile).replace(/"/g, '&quot;')})" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-2 py-1 rounded transition-colors">
+            Info
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Filter files by category
+function filterFilesByCategory(category) {
+  const fileCards = document.querySelectorAll('.file-card');
+  const filterBtns = document.querySelectorAll('.file-filter-btn');
+
+  // Update button states
+  filterBtns.forEach(btn => {
+    btn.classList.remove('active', 'bg-blue-100', 'text-blue-800');
+    btn.classList.add('bg-slate-100', 'text-slate-600');
+  });
+
+  event.target.classList.add('active', 'bg-blue-100', 'text-blue-800');
+  event.target.classList.remove('bg-slate-100', 'text-slate-600');
+
+  // Filter files
+  fileCards.forEach(card => {
+    const fileType = card.dataset.fileType;
+    const isCorrupted = card.dataset.corrupted === 'true';
+
+    let show = false;
+
+    if (category === 'all') {
+      show = true;
+    } else if (category === 'corrupted') {
+      show = isCorrupted;
+    } else {
+      show = fileType === category && !isCorrupted;
+    }
+
+    if (show) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// Preview file (images and PDFs)
+async function previewFile(bucket, filePath, fileName, fileType) {
+  try {
+    console.log('🔍 Previewing file:', fileName, 'Type:', fileType);
+
+    // Clean up the file path
+    let cleanPath = filePath;
+    if (cleanPath.startsWith('/')) {
+      cleanPath = cleanPath.substring(1);
+    }
+
+    // Get signed URL for preview
+    const { data: signedUrlData, error: signedError } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(cleanPath, 60); // 60 seconds expiry
+
+    if (signedError || !signedUrlData?.signedUrl) {
+      throw new Error('Failed to create preview URL: ' + (signedError?.message || 'Unknown error'));
+    }
+
+    const previewUrl = signedUrlData.signedUrl;
+    console.log('🔗 Preview URL created:', previewUrl);
+
+    if (fileType === 'image') {
+      // Show image in modal
+      const modal = document.getElementById('photoModal');
+      const modalTitle = document.getElementById('photoModalTitle');
+      const modalImage = document.getElementById('photoModalImage');
+
+      modalTitle.textContent = fileName;
+      modalImage.src = previewUrl;
+      modalImage.onload = () => {
+        modal.classList.remove('hidden');
+      };
+      modalImage.onerror = () => {
+        alert('Failed to load image preview. The file may be corrupted.');
+      };
+
+    } else if (fileType === 'pdf') {
+      // Open PDF in new window
+      window.open(previewUrl, '_blank');
+
+    } else {
+      alert('Preview not supported for this file type');
+    }
+
+  } catch (error) {
+    console.error('❌ Preview failed:', error);
+    alert('Failed to preview file: ' + error.message);
+  }
+}
+
 function showFileInfo(bucket, fileName, fileData) {
   console.log('📋 File Information:');
   console.log('Bucket:', bucket);
   console.log('File name:', fileName);
   console.log('Full file data:', fileData);
 
-  const info = `
-File Information:
-=================
-Bucket: ${bucket}
-Name: ${fileName}
-ID: ${fileData.id || 'N/A'}
-Size: ${fileData.metadata?.size || 'Unknown'} bytes
-Created: ${fileData.created_at || 'N/A'}
-Updated: ${fileData.updated_at || 'N/A'}
-Last Accessed: ${fileData.last_accessed_at || 'N/A'}
-MIME Type: ${fileData.metadata?.mimetype || 'Unknown'}
+  const fileType = getFileType(fileName);
+  const icon = getFileIcon(fileName);
+  const size = formatFileSize(fileData.metadata?.size);
 
-Full object: ${JSON.stringify(fileData, null, 2)}
+  // Recheck corruption status with current data
+  const isCorrupted = checkFileCorruption(fileData);
+  const corruptionReasons = isCorrupted ? getCorruptionReasons(fileData) : null;
+
+  let corruptionInfo = '';
+  if (isCorrupted && corruptionReasons?.length > 0) {
+    corruptionInfo = `
+⚠️ CORRUPTION DETAILS:
+${corruptionReasons.map(reason => `   • ${reason}`).join('\n')}
+
+🔧 SUGGESTED ACTIONS:
+   • Re-upload the file if possible
+   • Check original source file integrity
+   • Contact support if issue persists
+`;
+  }
+
+  const info = `
+File Information
+================
+📄 Name: ${fileName}
+${icon} Type: ${fileType.charAt(0).toUpperCase() + fileType.slice(1)}
+📊 Size: ${size}
+🗂️ Bucket: ${bucket}
+🆔 ID: ${fileData.id || 'N/A'}
+📅 Created: ${fileData.created_at || 'N/A'}
+🔄 Updated: ${fileData.updated_at || 'N/A'}
+👁️ Last Accessed: ${fileData.last_accessed_at || 'N/A'}
+🏷️ MIME Type: ${fileData.metadata?.mimetype || 'Unknown'}
+
+${isCorrupted ? '⚠️ WARNING: This file appears to be corrupted or incomplete' : '✅ File appears to be healthy'}
+${corruptionInfo}
+Full technical details:
+${JSON.stringify(fileData, null, 2)}
   `;
 
-  alert(info);
+  // Create a more user-friendly modal instead of alert for better readability
+  showFileInfoModal(info, fileName, isCorrupted);
+}
+
+// Create a dedicated modal for file information
+function showFileInfoModal(info, fileName, isCorrupted) {
+  // Remove existing modal if any
+  const existingModal = document.getElementById('fileInfoModal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'fileInfoModal';
+  modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+
+  modal.innerHTML = `
+    <div class="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+      <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+        <h3 class="text-lg font-semibold ${isCorrupted ? 'text-red-600' : 'text-slate-800'}">
+          ${isCorrupted ? '⚠️' : '📄'} File Information: ${fileName}
+        </h3>
+        <button onclick="closeFileInfoModal()" class="text-slate-400 hover:text-slate-600 text-2xl">&times;</button>
+      </div>
+      <div class="p-4 overflow-y-auto">
+        <pre class="whitespace-pre-wrap text-sm ${isCorrupted ? 'text-red-900' : 'text-slate-700'} font-mono bg-slate-50 p-4 rounded-lg">${info}</pre>
+      </div>
+      <div class="p-4 border-t border-slate-200 flex justify-end gap-2">
+        ${isCorrupted ? `
+          <button onclick="alert('Contact your system administrator to resolve file corruption issues.')" class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded hover:bg-yellow-200 transition-colors">
+            Get Help
+          </button>
+        ` : ''}
+        <button onclick="closeFileInfoModal()" class="bg-slate-100 text-slate-700 px-4 py-2 rounded hover:bg-slate-200 transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeFileInfoModal();
+    }
+  });
+}
+
+function closeFileInfoModal() {
+  const modal = document.getElementById('fileInfoModal');
+  if (modal) {
+    modal.remove();
+  }
 }
 
 async function toggleHandymanStatus(handymanId) {
