@@ -3466,9 +3466,27 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
       console.log('✅ Handyman created successfully:', data.handyman);
 
-      // SUCCESS - Show success message and refresh
+      // SUCCESS - Show password and close modal
+      const handyman = data.handyman;
+      const credentials = data.credentials;
+
+      // Show success message with password
+      alert(`✅ Handyman Created Successfully!
+
+Name: ${handyman.full_name || handyman.name}
+Email: ${handyman.email}
+Password: ${credentials.password}
+
+The handyman can now log in with these credentials.`);
+
+      // Reset form and close modal
       const form = document.getElementById('addHandymanForm');
       if (form) form.reset();
+
+      // Close the modal
+      document.getElementById('addHandymanModal').classList.add('hidden');
+
+      // Refresh the handymen list
       loadHandymenData();
       return; // Exit here on success
 
