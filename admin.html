@@ -3686,18 +3686,6 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   } catch (error) {
     console.error('❌ Error creating handyman:', error);
 
-    // Show error message to user
-    alert(`Failed to create handyman: ${error.message}`);
-
-    // Re-enable form if needed
-    const submitBtn = document.querySelector('#addHandymanForm button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Create Handyman';
-    }
-  } catch (error) {
-    console.error('❌ Error creating handyman:', error);
-
     let errorMessage = error.message;
 
     // Provide more specific error messages
