@@ -117,7 +117,7 @@ serve(async (req) => {
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase(),
       password: tempPassword,
-      email_confirm: false, // Create unconfirmed first
+      email_confirm: true, // Skip email confirmation to avoid rate limits
       user_metadata: {
         full_name: name,
         user_type: "handyman"
