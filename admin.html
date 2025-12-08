@@ -3466,11 +3466,10 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 
       console.log('✅ Handyman created successfully:', data.handyman);
 
-      // Create response object to match existing success handling
-      const response = {
-        ok: true,
-        json: async () => data
-      };
+      // SUCCESS - Show success message and refresh
+      document.getElementById('handymanForm').reset();
+      loadHandymenData();
+      return; // Exit here on success
 
     } catch (fetchError) {
       console.error('🔄 Edge Function error:', fetchError);
@@ -3684,49 +3683,18 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       }
     }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Edge Function error response:', errorText);
-      let errorData;
-      try {
-        errorData = JSON.parse(errorText);
-      } catch (e) {
-        console.error('❌ Failed to parse error response as JSON:', e);
-        throw new Error(`Edge Function call failed (${response.status}): ${errorText}`);
-      }
-      throw new Error(errorData.error || errorData.details || 'Edge Function call failed');
+  } catch (error) {
+    console.error('❌ Error creating handyman:', error);
+
+    // Show error message to user
+    alert(`Failed to create handyman: ${error.message}`);
+
+    // Re-enable form if needed
+    const submitBtn = document.querySelector('#addHandymanForm button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Handyman';
     }
-
-    const data = await response.json();
-
-    if (!data.success) {
-      throw new Error(data.error || 'Unknown error occurred');
-    }
-
-    console.log('✅ Handyman created successfully:', data);
-
-    // Handle different response formats from Edge Function vs Netlify Function
-    const handymanInfo = data.handyman || data;
-    const credentials = data.credentials || {
-      email: email,
-      password: 'Check console or contact admin'
-    };
-
-    // Show PostMyStyle-style success modal with generated credentials
-    showHandymanCreatedModal(
-      handymanInfo.name || handymanInfo.full_name || fullName,
-      credentials.email,
-      credentials.password,
-      handymanInfo.auth_user_id || data.auth_user_id,
-      handymanInfo.id || data.handyman_id
-    );
-
-    // Clear the form
-    document.getElementById('addHandymanForm').reset();
-
-    closeAddHandymanModal();
-    loadHandymenData(); // Refresh the table
-
   } catch (error) {
     console.error('❌ Error creating handyman:', error);
 
