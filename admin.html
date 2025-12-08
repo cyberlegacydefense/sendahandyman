@@ -635,65 +635,455 @@
 
 <!-- Edit Handyman Modal -->
 <div id="editHandymanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto">
+  <div class="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
     <div class="p-6">
+      <!-- Header -->
       <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold">Edit Handyman</h3>
-        <button id="closeEditHandymanModal" class="text-slate-500 hover:text-slate-700">✕</button>
+        <h3 class="text-2xl font-bold">Edit Handyman Profile</h3>
+        <button id="closeEditHandymanModal" class="text-slate-500 hover:text-slate-700 text-xl">✕</button>
       </div>
-      <form id="editHandymanForm" class="space-y-4">
+
+      <!-- Tab Navigation -->
+      <div class="border-b border-slate-200 mb-6">
+        <nav class="flex space-x-8">
+          <button type="button" class="edit-tab active py-2 px-1 border-b-2 border-blue-600 text-blue-600 font-medium" data-tab="basic">
+            Basic Info
+          </button>
+          <button type="button" class="edit-tab py-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700" data-tab="personal">
+            Personal Details
+          </button>
+          <button type="button" class="edit-tab py-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700" data-tab="work">
+            Work & Skills
+          </button>
+          <button type="button" class="edit-tab py-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700" data-tab="documents">
+            Documents & Files
+          </button>
+          <button type="button" class="edit-tab py-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700" data-tab="financial">
+            Financial & Tax
+          </button>
+          <button type="button" class="edit-tab py-2 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700" data-tab="agreements">
+            Agreements
+          </button>
+        </nav>
+      </div>
+
+      <form id="editHandymanForm" class="space-y-6">
         <input type="hidden" id="editHandymanId">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="editFullName" class="block text-sm font-medium mb-1">Full Name *</label>
-            <input type="text" id="editFullName" class="w-full border rounded-lg px-3 py-2" required>
+        <!-- Basic Info Tab -->
+        <div id="edit-tab-basic" class="edit-tab-content">
+          <h4 class="text-lg font-semibold mb-4">Basic Information</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="editFullName" class="block text-sm font-medium mb-1">Full Name *</label>
+              <input type="text" id="editFullName" class="w-full border rounded-lg px-3 py-2" required>
+            </div>
+            <div>
+              <label for="editLegalName" class="block text-sm font-medium mb-1">Legal Name</label>
+              <input type="text" id="editLegalName" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editEmail" class="block text-sm font-medium mb-1">Email *</label>
+              <input type="email" id="editEmail" class="w-full border rounded-lg px-3 py-2" required>
+            </div>
+            <div>
+              <label for="editPhone" class="block text-sm font-medium mb-1">Phone</label>
+              <input type="tel" id="editPhone" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editCity" class="block text-sm font-medium mb-1">City</label>
+              <input type="text" id="editCity" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editZip" class="block text-sm font-medium mb-1">ZIP Code</label>
+              <input type="text" id="editZip" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editServiceState" class="block text-sm font-medium mb-1">Service State</label>
+              <input type="text" id="editServiceState" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editActiveStatus" class="block text-sm font-medium mb-1">Status</label>
+              <select id="editActiveStatus" class="w-full border rounded-lg px-3 py-2">
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label for="editEmail" class="block text-sm font-medium mb-1">Email *</label>
-            <input type="email" id="editEmail" class="w-full border rounded-lg px-3 py-2" required>
+          <div class="mt-4">
+            <label for="editBio" class="block text-sm font-medium mb-1">Bio</label>
+            <textarea id="editBio" class="w-full border rounded-lg px-3 py-2" rows="3"></textarea>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="editPhone" class="block text-sm font-medium mb-1">Phone</label>
-            <input type="tel" id="editPhone" class="w-full border rounded-lg px-3 py-2">
-          </div>
-          <div>
-            <label for="editHourlyRate" class="block text-sm font-medium mb-1">Hourly Rate ($)</label>
-            <input type="number" id="editHourlyRate" class="w-full border rounded-lg px-3 py-2" step="0.01" min="0">
+        <!-- Personal Details Tab -->
+        <div id="edit-tab-personal" class="edit-tab-content hidden">
+          <h4 class="text-lg font-semibold mb-4">Personal Details</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="editDateOfBirth" class="block text-sm font-medium mb-1">Date of Birth</label>
+              <input type="date" id="editDateOfBirth" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editDriversLicense" class="block text-sm font-medium mb-1">Driver's License</label>
+              <input type="text" id="editDriversLicense" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editEmergencyContactName" class="block text-sm font-medium mb-1">Emergency Contact Name</label>
+              <input type="text" id="editEmergencyContactName" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editEmergencyContactPhone" class="block text-sm font-medium mb-1">Emergency Contact Phone</label>
+              <input type="tel" id="editEmergencyContactPhone" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editEmergencyContactRelation" class="block text-sm font-medium mb-1">Emergency Contact Relation</label>
+              <input type="text" id="editEmergencyContactRelation" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editBackgroundCheckStatus" class="block text-sm font-medium mb-1">Background Check Status</label>
+              <select id="editBackgroundCheckStatus" class="w-full border rounded-lg px-3 py-2">
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label for="editSkills" class="block text-sm font-medium mb-1">Skills (comma-separated)</label>
-          <input type="text" id="editSkills" class="w-full border rounded-lg px-3 py-2"
-                 placeholder="e.g. Plumbing, Electrical, Painting">
+        <!-- Work & Skills Tab -->
+        <div id="edit-tab-work" class="edit-tab-content hidden">
+          <h4 class="text-lg font-semibold mb-4">Work & Skills</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="editHourlyRate" class="block text-sm font-medium mb-1">Hourly Rate ($)</label>
+              <input type="number" id="editHourlyRate" class="w-full border rounded-lg px-3 py-2" step="0.01" min="0">
+            </div>
+            <div>
+              <label for="editYearsExperience" class="block text-sm font-medium mb-1">Years of Experience</label>
+              <input type="number" id="editYearsExperience" class="w-full border rounded-lg px-3 py-2" min="0">
+            </div>
+            <div>
+              <label for="editOnboardingStatus" class="block text-sm font-medium mb-1">Onboarding Status</label>
+              <select id="editOnboardingStatus" class="w-full border rounded-lg px-3 py-2">
+                <option value="false">Pending</option>
+                <option value="true">Completed</option>
+              </select>
+            </div>
+            <div>
+              <label for="editOnboardingStep" class="block text-sm font-medium mb-1">Onboarding Step</label>
+              <input type="number" id="editOnboardingStep" class="w-full border rounded-lg px-3 py-2" min="1">
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="editSkills" class="block text-sm font-medium mb-1">Skills (comma-separated)</label>
+            <input type="text" id="editSkills" class="w-full border rounded-lg px-3 py-2" placeholder="e.g. Plumbing, Electrical, Painting">
+          </div>
+
+          <div class="mt-4">
+            <label for="editServiceAreas" class="block text-sm font-medium mb-1">Service Areas (comma-separated)</label>
+            <input type="text" id="editServiceAreas" class="w-full border rounded-lg px-3 py-2" placeholder="e.g. Miami, Fort Lauderdale">
+          </div>
+
+          <div class="mt-4">
+            <h5 class="font-medium mb-2">Equipment & Tools</h5>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editHasVehicle" class="rounded">
+                <span class="text-sm">Has Vehicle</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editHasTools" class="rounded">
+                <span class="text-sm">Has Tools</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editHasSmartphone" class="rounded">
+                <span class="text-sm">Has Smartphone</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editHasPpe" class="rounded">
+                <span class="text-sm">Has PPE</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editHasLadder" class="rounded">
+                <span class="text-sm">Has Ladder</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="editAdditionalEquipment" class="block text-sm font-medium mb-1">Additional Equipment</label>
+            <textarea id="editAdditionalEquipment" class="w-full border rounded-lg px-3 py-2" rows="2"></textarea>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="editOnboardingStatus" class="block text-sm font-medium mb-1">Onboarding Status</label>
-            <select id="editOnboardingStatus" class="w-full border rounded-lg px-3 py-2">
-              <option value="false">Pending</option>
-              <option value="true">Completed</option>
-            </select>
-          </div>
-          <div>
-            <label for="editActiveStatus" class="block text-sm font-medium mb-1">Active Status</label>
-            <select id="editActiveStatus" class="w-full border rounded-lg px-3 py-2">
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
+        <!-- Documents & Files Tab -->
+        <div id="edit-tab-documents" class="edit-tab-content hidden">
+          <h4 class="text-lg font-semibold mb-4">Documents & Files</h4>
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="editProfilePhotoUrl" class="block text-sm font-medium mb-1">Profile Photo URL</label>
+                <input type="url" id="editProfilePhotoUrl" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editGovIdUrl" class="block text-sm font-medium mb-1">Government ID URL</label>
+                <input type="url" id="editGovIdUrl" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editInsuranceProofUrl" class="block text-sm font-medium mb-1">Insurance Proof URL</label>
+                <input type="url" id="editInsuranceProofUrl" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editW9FormUrl" class="block text-sm font-medium mb-1">W9 Form URL</label>
+                <input type="url" id="editW9FormUrl" class="w-full border rounded-lg px-3 py-2">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="editInsuranceProvider" class="block text-sm font-medium mb-1">Insurance Provider</label>
+                <input type="text" id="editInsuranceProvider" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editInsuranceExpiry" class="block text-sm font-medium mb-1">Insurance Expiry Date</label>
+                <input type="date" id="editInsuranceExpiry" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editInsuranceStatus" class="block text-sm font-medium mb-1">Insurance Status</label>
+                <select id="editInsuranceStatus" class="w-full border rounded-lg px-3 py-2">
+                  <option value="">Not Set</option>
+                  <option value="pending">Pending</option>
+                  <option value="verified">Verified</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </div>
+              <div>
+                <label for="editLicenses" class="block text-sm font-medium mb-1">Licenses</label>
+                <textarea id="editLicenses" class="w-full border rounded-lg px-3 py-2" rows="2"></textarea>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label for="editLicenseFiles" class="block text-sm font-medium mb-1">License Files (JSON)</label>
+              <textarea id="editLicenseFiles" class="w-full border rounded-lg px-3 py-2" rows="3" placeholder="JSON format for license files"></textarea>
+            </div>
           </div>
         </div>
 
-        <div class="flex gap-3 pt-4">
-          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            Save Changes
+        <!-- Financial & Tax Tab -->
+        <div id="edit-tab-financial" class="edit-tab-content hidden">
+          <h4 class="text-lg font-semibold mb-4">Financial & Tax Information</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="editTaxClassification" class="block text-sm font-medium mb-1">Tax Classification</label>
+              <select id="editTaxClassification" class="w-full border rounded-lg px-3 py-2">
+                <option value="1099">1099 Contractor</option>
+                <option value="w2">W2 Employee</option>
+              </select>
+            </div>
+            <div>
+              <label for="editTaxIdType" class="block text-sm font-medium mb-1">Tax ID Type</label>
+              <select id="editTaxIdType" class="w-full border rounded-lg px-3 py-2">
+                <option value="ssn">SSN</option>
+                <option value="ein">EIN</option>
+              </select>
+            </div>
+            <div>
+              <label for="editTaxId" class="block text-sm font-medium mb-1">Tax ID</label>
+              <input type="text" id="editTaxId" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editBankName" class="block text-sm font-medium mb-1">Bank Name</label>
+              <input type="text" id="editBankName" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editAccountType" class="block text-sm font-medium mb-1">Account Type</label>
+              <select id="editAccountType" class="w-full border rounded-lg px-3 py-2">
+                <option value="">Select Type</option>
+                <option value="checking">Checking</option>
+                <option value="savings">Savings</option>
+              </select>
+            </div>
+            <div>
+              <label for="editRoutingNumber" class="block text-sm font-medium mb-1">Routing Number</label>
+              <input type="text" id="editRoutingNumber" class="w-full border rounded-lg px-3 py-2">
+            </div>
+            <div>
+              <label for="editAccountNumber" class="block text-sm font-medium mb-1">Account Number</label>
+              <input type="text" id="editAccountNumber" class="w-full border rounded-lg px-3 py-2">
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h5 class="font-medium mb-2">Tax & Financial Status</h5>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editW9Uploaded" class="rounded">
+                <span class="text-sm">W9 Uploaded</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editTaxAcknowledgment" class="rounded">
+                <span class="text-sm">Tax Acknowledgment</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editAgreed1099" class="rounded">
+                <span class="text-sm">Agreed to 1099</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editAgreedTaxes" class="rounded">
+                <span class="text-sm">Agreed to Taxes</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="editAgreedBankInfo" class="rounded">
+                <span class="text-sm">Agreed to Bank Info</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Agreements Tab -->
+        <div id="edit-tab-agreements" class="edit-tab-content hidden">
+          <h4 class="text-lg font-semibold mb-4">Agreements & Compliance</h4>
+
+          <div class="space-y-6">
+            <div>
+              <h5 class="font-medium mb-2">Service Agreements</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editAgreedToServiceTerms" class="rounded">
+                  <span class="text-sm">Agreed to Service Terms</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editServiceAgreementSigned" class="rounded">
+                  <span class="text-sm">Service Agreement Signed</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editComplianceAcknowledged" class="rounded">
+                  <span class="text-sm">Compliance Acknowledged</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editWorkflowReviewed" class="rounded">
+                  <span class="text-sm">Workflow Reviewed</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editReadyToStart" class="rounded">
+                  <span class="text-sm">Ready to Start</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <h5 class="font-medium mb-2">Code of Conduct</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editCodeOfConductAgreed" class="rounded">
+                  <span class="text-sm">Code of Conduct</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editDressCodeAgreed" class="rounded">
+                  <span class="text-sm">Dress Code</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editCommunicationStandardsAgreed" class="rounded">
+                  <span class="text-sm">Communication Standards</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editPhotoDocumentationAgreed" class="rounded">
+                  <span class="text-sm">Photo Documentation</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editNoUpsellAgreed" class="rounded">
+                  <span class="text-sm">No Upselling</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <h5 class="font-medium mb-2">Safety & Training</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editSafetyTrainingCompleted" class="rounded">
+                  <span class="text-sm">Safety Training Completed</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editHazardReportingAcknowledged" class="rounded">
+                  <span class="text-sm">Hazard Reporting</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editRefuseUnsafeWorkAcknowledged" class="rounded">
+                  <span class="text-sm">Refuse Unsafe Work</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editAgreedSafetyPolicy" class="rounded">
+                  <span class="text-sm">Agreed Safety Policy</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <h5 class="font-medium mb-2">Quality & Reviews</h5>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editReviewImpactUnderstood" class="rounded">
+                  <span class="text-sm">Review Impact Understood</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editQualityCommitmentAgreed" class="rounded">
+                  <span class="text-sm">Quality Commitment</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editCommunityRespectAgreed" class="rounded">
+                  <span class="text-sm">Community Respect</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editAgreedReviewPolicy" class="rounded">
+                  <span class="text-sm">Agreed Review Policy</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editAgreedQualityStandards" class="rounded">
+                  <span class="text-sm">Agreed Quality Standards</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="checkbox" id="editAgreedReputation" class="rounded">
+                  <span class="text-sm">Agreed Reputation</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label for="editWelcomeCallScheduled" class="block text-sm font-medium mb-1">Welcome Call Date</label>
+                <input type="date" id="editWelcomeCallScheduled" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editWelcomeCallTime" class="block text-sm font-medium mb-1">Welcome Call Time</label>
+                <input type="text" id="editWelcomeCallTime" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editServiceAgreementDate" class="block text-sm font-medium mb-1">Service Agreement Date</label>
+                <input type="datetime-local" id="editServiceAgreementDate" class="w-full border rounded-lg px-3 py-2">
+              </div>
+              <div>
+                <label for="editAverageRating" class="block text-sm font-medium mb-1">Average Rating</label>
+                <input type="number" id="editAverageRating" class="w-full border rounded-lg px-3 py-2" step="0.01" min="0" max="5">
+              </div>
+              <div>
+                <label for="editTotalReviews" class="block text-sm font-medium mb-1">Total Reviews</label>
+                <input type="number" id="editTotalReviews" class="w-full border rounded-lg px-3 py-2" min="0">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex gap-3 pt-6 border-t">
+          <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            Save All Changes
           </button>
-          <button type="button" id="cancelEditHandyman" class="bg-slate-300 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-400 transition-colors">
+          <button type="button" id="cancelEditHandyman" class="bg-slate-300 text-slate-700 px-6 py-2 rounded-lg hover:bg-slate-400 transition-colors font-medium">
             Cancel
           </button>
         </div>
@@ -1973,61 +2363,22 @@ async function editHandyman(handymanId) {
 
     console.log('📋 Handyman data loaded:', handyman);
 
-    // Check if form elements exist
-    const formElements = {
-      editHandymanId: document.getElementById('editHandymanId'),
-      editFullName: document.getElementById('editFullName'),
-      editEmail: document.getElementById('editEmail'),
-      editPhone: document.getElementById('editPhone'),
-      editHourlyRate: document.getElementById('editHourlyRate'),
-      editSkills: document.getElementById('editSkills'),
-      editOnboardingStatus: document.getElementById('editOnboardingStatus'),
-      editActiveStatus: document.getElementById('editActiveStatus')
-    };
+    // Initialize tab switching
+    initializeEditModalTabs();
 
-    // Check which elements are missing
-    const missingElements = Object.entries(formElements)
-      .filter(([name, element]) => !element)
-      .map(([name]) => name);
+    // Populate all form fields with handyman data
+    populateEditForm(handyman);
 
-    if (missingElements.length > 0) {
-      console.error('❌ Missing form elements:', missingElements);
-      alert(`Error: Missing form elements: ${missingElements.join(', ')}`);
-      return;
-    }
-
-    console.log('✅ All form elements found');
-
-    // Populate form with current data
-    formElements.editHandymanId.value = handyman.id;
-    formElements.editFullName.value = handyman.full_name || '';
-    formElements.editEmail.value = handyman.email || '';
-    formElements.editPhone.value = handyman.phone || '';
-    formElements.editHourlyRate.value = handyman.hourly_rate || '';
-
-    // Handle skills (could be array or string)
-    let skillsValue = '';
-    if (handyman.skills) {
-      if (Array.isArray(handyman.skills)) {
-        skillsValue = handyman.skills.join(', ');
-      } else if (typeof handyman.skills === 'string') {
-        skillsValue = handyman.skills;
-      }
-    }
-    formElements.editSkills.value = skillsValue;
-
-    formElements.editOnboardingStatus.value = handyman.onboarding_completed ? 'true' : 'false';
-    formElements.editActiveStatus.value = handyman.is_active ? 'true' : 'false';
-
-    console.log('✅ Form populated with data');
-
-    // Show modal
+    // Show modal and reset to first tab
     const modal = document.getElementById('editHandymanModal');
     if (!modal) {
       console.error('❌ Edit modal not found!');
       alert('Error: Edit modal not found in DOM');
       return;
     }
+
+    // Reset to first tab
+    switchEditTab('basic');
 
     modal.classList.remove('hidden');
     console.log('✅ Edit modal opened');
@@ -2038,29 +2389,214 @@ async function editHandyman(handymanId) {
   }
 }
 
+// Initialize tab switching functionality for edit modal
+function initializeEditModalTabs() {
+  // Add event listeners to tab buttons if not already added
+  const tabButtons = document.querySelectorAll('.edit-tab');
+
+  tabButtons.forEach(button => {
+    // Remove existing listeners to avoid duplicates
+    button.removeEventListener('click', handleTabClick);
+    button.addEventListener('click', handleTabClick);
+  });
+}
+
+function handleTabClick(e) {
+  const tabName = e.target.getAttribute('data-tab');
+  switchEditTab(tabName);
+}
+
+// Switch between tabs in edit modal
+function switchEditTab(tabName) {
+  // Hide all tab contents
+  const tabContents = document.querySelectorAll('.edit-tab-content');
+  tabContents.forEach(content => {
+    content.classList.add('hidden');
+  });
+
+  // Remove active class from all tabs
+  const tabButtons = document.querySelectorAll('.edit-tab');
+  tabButtons.forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.remove('border-blue-600', 'text-blue-600');
+    tab.classList.add('border-transparent', 'text-slate-500');
+  });
+
+  // Show selected tab content
+  const selectedContent = document.getElementById(`edit-tab-${tabName}`);
+  if (selectedContent) {
+    selectedContent.classList.remove('hidden');
+  }
+
+  // Activate selected tab button
+  const selectedTab = document.querySelector(`.edit-tab[data-tab="${tabName}"]`);
+  if (selectedTab) {
+    selectedTab.classList.add('active');
+    selectedTab.classList.add('border-blue-600', 'text-blue-600');
+    selectedTab.classList.remove('border-transparent', 'text-slate-500');
+  }
+}
+
+// Populate all edit form fields
+function populateEditForm(handyman) {
+  // Helper function to safely set value
+  function setValue(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      if (element.type === 'checkbox') {
+        element.checked = Boolean(value);
+      } else {
+        element.value = value || '';
+      }
+    }
+  }
+
+  // Helper function to set date values
+  function setDateValue(elementId, dateValue) {
+    const element = document.getElementById(elementId);
+    if (element && dateValue) {
+      try {
+        const date = new Date(dateValue);
+        if (element.type === 'date') {
+          element.value = date.toISOString().split('T')[0];
+        } else if (element.type === 'datetime-local') {
+          element.value = date.toISOString().slice(0, 16);
+        } else {
+          element.value = dateValue;
+        }
+      } catch (e) {
+        element.value = '';
+      }
+    }
+  }
+
+  // Basic Info Tab
+  setValue('editHandymanId', handyman.id);
+  setValue('editFullName', handyman.full_name);
+  setValue('editEmail', handyman.email);
+  setValue('editPhone', handyman.phone);
+  setValue('editHourlyRate', handyman.hourly_rate);
+  setValue('editOnboardingStatus', handyman.onboarding_completed ? 'true' : 'false');
+  setValue('editActiveStatus', handyman.is_active ? 'true' : 'false');
+
+  // Handle skills (could be array or string)
+  let skillsValue = '';
+  if (handyman.skills) {
+    if (Array.isArray(handyman.skills)) {
+      skillsValue = handyman.skills.join(', ');
+    } else if (typeof handyman.skills === 'string') {
+      skillsValue = handyman.skills;
+    }
+  }
+  setValue('editSkills', skillsValue);
+
+  // Personal Details Tab
+  setValue('editFirstName', handyman.first_name);
+  setValue('editLastName', handyman.last_name);
+  setValue('editMiddleName', handyman.middle_name);
+  setValue('editPreferredName', handyman.preferred_name);
+  setValue('editGender', handyman.gender);
+  setValue('editLanguages', Array.isArray(handyman.languages) ? handyman.languages.join(', ') : handyman.languages);
+  setValue('editEmergencyContact', handyman.emergency_contact_name);
+  setValue('editEmergencyPhone', handyman.emergency_contact_phone);
+  setValue('editEmergencyRelation', handyman.emergency_contact_relationship);
+  setDateValue('editDateOfBirth', handyman.date_of_birth);
+
+  // Address fields
+  setValue('editStreetAddress', handyman.street_address);
+  setValue('editCity', handyman.city);
+  setValue('editState', handyman.state);
+  setValue('editZipCode', handyman.zip_code);
+  setValue('editCountry', handyman.country);
+
+  // Work & Skills Tab
+  setValue('editSpecialties', Array.isArray(handyman.specialties) ? handyman.specialties.join(', ') : handyman.specialties);
+  setValue('editCertifications', Array.isArray(handyman.certifications) ? handyman.certifications.join(', ') : handyman.certifications);
+  setValue('editYearsExperience', handyman.years_of_experience);
+  setValue('editAvailability', handyman.availability_schedule);
+  setValue('editServiceRadius', handyman.service_radius_miles);
+  setValue('editVehicleInfo', handyman.vehicle_info);
+  setValue('editToolsOwned', handyman.tools_owned);
+  setValue('editLicenseNumber', handyman.license_number);
+  setValue('editLicenseState', handyman.license_state);
+  setValue('editBondedStatus', handyman.is_bonded);
+  setValue('editInsuredStatus', handyman.is_insured);
+
+  // Documents & Files Tab
+  setValue('editProfilePhoto', handyman.profile_photo_url);
+  setValue('editDriversLicense', handyman.drivers_license_url);
+  setValue('editInsuranceCert', handyman.insurance_certificate_url);
+  setValue('editBackgroundCheck', handyman.background_check_url);
+  setValue('editReferences', handyman.references_json);
+  setValue('editPortfolio', handyman.portfolio_json);
+  setValue('editResume', handyman.resume_url);
+  setValue('editOtherDocs', handyman.other_documents_json);
+
+  // Financial & Tax Tab
+  setValue('editSsn', handyman.ssn_last_four);
+  setValue('editTaxId', handyman.tax_id_number);
+  setValue('editTaxIdType', handyman.tax_id_type);
+  setValue('editW9Status', handyman.w9_completed);
+  setValue('editPaymentMethod', handyman.preferred_payment_method);
+  setValue('editBankName', handyman.bank_name);
+  setValue('editAccountType', handyman.account_type);
+  setValue('editRoutingNumber', handyman.routing_number);
+  setValue('editAccountNumber', handyman.account_number);
+  setValue('editPaypalEmail', handyman.paypal_email);
+  setValue('editVenmoUsername', handyman.venmo_username);
+  setValue('editTaxRate', handyman.default_tax_rate);
+
+  // Agreements Tab
+  setValue('editServiceAgreement', handyman.service_agreement_signed);
+  setValue('editNda', handyman.nda_signed);
+  setValue('editInsuranceWaiver', handyman.insurance_waiver_signed);
+  setValue('editDataPrivacy', handyman.data_privacy_consent);
+  setValue('editMarketingConsent', handyman.marketing_consent);
+  setDateValue('editAgreementDate', handyman.service_agreement_date);
+  setDateValue('editNdaDate', handyman.nda_date);
+  setDateValue('editInsuranceWaiverDate', handyman.insurance_waiver_date);
+
+  // Additional fields
+  setValue('editRating', handyman.rating);
+  setValue('editNotes', handyman.admin_notes);
+  setValue('editProfileComplete', handyman.profile_completion_percentage);
+  setDateValue('editCreatedAt', handyman.created_at);
+  setDateValue('editUpdatedAt', handyman.updated_at);
+
+  console.log('✅ All form fields populated with data');
+}
+
 async function saveHandymanEdits() {
   try {
-    const handymanId = document.getElementById('editHandymanId').value;
-    const fullName = document.getElementById('editFullName').value.trim();
-    const email = document.getElementById('editEmail').value.trim();
-    const phone = document.getElementById('editPhone').value.trim();
-    const hourlyRate = parseFloat(document.getElementById('editHourlyRate').value) || null;
-    const skillsInput = document.getElementById('editSkills').value.trim();
-    const onboardingCompleted = document.getElementById('editOnboardingStatus').value === 'true';
-    const isActive = document.getElementById('editActiveStatus').value === 'true';
+    // Helper function to get form value
+    function getValue(elementId) {
+      const element = document.getElementById(elementId);
+      if (!element) return null;
 
-    console.log('💾 Saving handyman edits:', {
-      handymanId,
-      fullName,
-      email,
-      phone,
-      hourlyRate,
-      skillsInput,
-      onboardingCompleted,
-      isActive
-    });
+      if (element.type === 'checkbox') {
+        return element.checked;
+      } else if (element.value === '') {
+        return null;
+      } else if (element.type === 'number') {
+        const num = parseFloat(element.value);
+        return isNaN(num) ? null : num;
+      }
+      return element.value.trim();
+    }
+
+    // Helper function to process comma-separated arrays
+    function processArrayField(value) {
+      if (!value) return null;
+      const array = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+      return array.length > 0 ? array : null;
+    }
+
+    const handymanId = getValue('editHandymanId');
 
     // Validate required fields
+    const fullName = getValue('editFullName');
+    const email = getValue('editEmail');
+
     if (!fullName || !email) {
       alert('Full name and email are required');
       return;
@@ -2071,31 +2607,108 @@ async function saveHandymanEdits() {
       return;
     }
 
-    // Process skills
-    let skills = null;
-    if (skillsInput) {
-      skills = skillsInput.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    }
+    console.log('💾 Collecting comprehensive handyman data for save...');
 
-    console.log('🔄 Updating handyman in database...');
+    // Build comprehensive update object
+    const updateData = {
+      // Basic Info
+      full_name: fullName,
+      email: email.toLowerCase(),
+      phone: getValue('editPhone'),
+      hourly_rate: getValue('editHourlyRate'),
+      skills: processArrayField(getValue('editSkills')),
+      onboarding_completed: getValue('editOnboardingStatus') === 'true',
+      is_active: getValue('editActiveStatus') === 'true',
 
-    // Check current user session first
+      // Personal Details
+      first_name: getValue('editFirstName'),
+      last_name: getValue('editLastName'),
+      middle_name: getValue('editMiddleName'),
+      preferred_name: getValue('editPreferredName'),
+      gender: getValue('editGender'),
+      date_of_birth: getValue('editDateOfBirth'),
+      languages: processArrayField(getValue('editLanguages')),
+      emergency_contact_name: getValue('editEmergencyContact'),
+      emergency_contact_phone: getValue('editEmergencyPhone'),
+      emergency_contact_relationship: getValue('editEmergencyRelation'),
+
+      // Address
+      street_address: getValue('editStreetAddress'),
+      city: getValue('editCity'),
+      state: getValue('editState'),
+      zip_code: getValue('editZipCode'),
+      country: getValue('editCountry'),
+
+      // Work & Skills
+      specialties: processArrayField(getValue('editSpecialties')),
+      certifications: processArrayField(getValue('editCertifications')),
+      years_of_experience: getValue('editYearsExperience'),
+      availability_schedule: getValue('editAvailability'),
+      service_radius_miles: getValue('editServiceRadius'),
+      vehicle_info: getValue('editVehicleInfo'),
+      tools_owned: getValue('editToolsOwned'),
+      license_number: getValue('editLicenseNumber'),
+      license_state: getValue('editLicenseState'),
+      is_bonded: getValue('editBondedStatus'),
+      is_insured: getValue('editInsuredStatus'),
+
+      // Documents & Files
+      profile_photo_url: getValue('editProfilePhoto'),
+      drivers_license_url: getValue('editDriversLicense'),
+      insurance_certificate_url: getValue('editInsuranceCert'),
+      background_check_url: getValue('editBackgroundCheck'),
+      references_json: getValue('editReferences'),
+      portfolio_json: getValue('editPortfolio'),
+      resume_url: getValue('editResume'),
+      other_documents_json: getValue('editOtherDocs'),
+
+      // Financial & Tax
+      ssn_last_four: getValue('editSsn'),
+      tax_id_number: getValue('editTaxId'),
+      tax_id_type: getValue('editTaxIdType'),
+      w9_completed: getValue('editW9Status'),
+      preferred_payment_method: getValue('editPaymentMethod'),
+      bank_name: getValue('editBankName'),
+      account_type: getValue('editAccountType'),
+      routing_number: getValue('editRoutingNumber'),
+      account_number: getValue('editAccountNumber'),
+      paypal_email: getValue('editPaypalEmail'),
+      venmo_username: getValue('editVenmoUsername'),
+      default_tax_rate: getValue('editTaxRate'),
+
+      // Agreements
+      service_agreement_signed: getValue('editServiceAgreement'),
+      nda_signed: getValue('editNda'),
+      insurance_waiver_signed: getValue('editInsuranceWaiver'),
+      data_privacy_consent: getValue('editDataPrivacy'),
+      marketing_consent: getValue('editMarketingConsent'),
+      service_agreement_date: getValue('editAgreementDate'),
+      nda_date: getValue('editNdaDate'),
+      insurance_waiver_date: getValue('editInsuranceWaiverDate'),
+
+      // Additional fields
+      rating: getValue('editRating'),
+      admin_notes: getValue('editNotes'),
+      profile_completion_percentage: getValue('editProfileComplete')
+    };
+
+    // Remove null/undefined values to avoid overwriting existing data with nulls
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === null || updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+
+    console.log('💾 Comprehensive update payload prepared:', updateData);
+
+    // Check current user session
     const { data: session } = await supabase.auth.getSession();
     console.log('🔐 Current session:', {
       user: session.session?.user?.id,
       email: session.session?.user?.email
     });
 
-    // Check admin user role and permissions
-    const { data: adminUser, error: adminError } = await supabase
-      .from('admin_users')
-      .select('*')
-      .eq('id', session.session?.user?.id)
-      .single();
-
-    console.log('👑 Admin user data:', { adminUser, adminError });
-
-    // First, let's verify the record exists and we can read it
+    // Verify existing record
     const { data: existingRecord, error: readError } = await supabase
       .from('handymen')
       .select('*')
@@ -2103,7 +2716,6 @@ async function saveHandymanEdits() {
 
     console.log('🔍 Record check before update:', {
       found: existingRecord?.length > 0,
-      record: existingRecord?.[0],
       readError
     });
 
@@ -2111,20 +2723,7 @@ async function saveHandymanEdits() {
       throw new Error('Handyman record not found or not accessible for updates');
     }
 
-    // Since RLS policies are inconsistently blocking updates, use Edge Function for all admin updates
-    console.log('🚀 Using Edge Function for reliable admin updates...');
-
-    const updateData = {
-      full_name: fullName,
-      email: email.toLowerCase(),
-      phone: phone || null,
-      hourly_rate: hourlyRate,
-      skills: skills,
-      onboarding_completed: onboardingCompleted,
-      is_active: isActive
-    };
-
-    console.log('🔍 Update payload:', updateData);
+    console.log('🚀 Using Edge Function for comprehensive admin update...');
 
     const response = await fetch('/.netlify/functions/admin-update-handyman', {
       method: 'POST',
@@ -2151,28 +2750,7 @@ async function saveHandymanEdits() {
       throw new Error(edgeResult.error || 'Update failed');
     }
 
-    // Verify the update worked by reading the record again
-    const { data: verifyRecord, error: verifyError } = await supabase
-      .from('handymen')
-      .select('*')
-      .eq('id', handymanId)
-      .single();
-
-    if (!verifyError && verifyRecord) {
-      console.log('🔍 Verification - Record after update:', {
-        expectedName: fullName,
-        actualName: verifyRecord.full_name,
-        nameUpdated: verifyRecord.full_name === fullName,
-        expectedPhone: phone || null,
-        actualPhone: verifyRecord.phone,
-        phoneUpdated: verifyRecord.phone === (phone || null),
-        expectedEmail: email.toLowerCase(),
-        actualEmail: verifyRecord.email,
-        emailUpdated: verifyRecord.email === email.toLowerCase()
-      });
-    }
-
-    console.log('✅ Handyman updated successfully');
+    console.log('✅ Comprehensive handyman update completed successfully');
 
     // Close modal and refresh data
     closeEditHandymanModal();
