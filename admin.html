@@ -3467,7 +3467,8 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       console.log('✅ Handyman created successfully:', data.handyman);
 
       // SUCCESS - Show success message and refresh
-      document.getElementById('handymanForm').reset();
+      const form = document.getElementById('addHandymanForm');
+      if (form) form.reset();
       loadHandymenData();
       return; // Exit here on success
 
