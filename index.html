@@ -214,7 +214,7 @@
         }
 
         .hide {
-            display: none;
+            display: none !important;
         }
 
         .show {
@@ -393,8 +393,8 @@
     </main>
 
     <!-- AI Photo Analysis Modal -->
-    <div id="photoModal" class="hide fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4">
-        <div class="modal-content max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div id="photoModal" class="hide fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4" onclick="closePhotoModalIfClickedOutside(event)">
+        <div class="modal-content max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-xl font-bold">AI Photo Analysis</h3>
@@ -733,8 +733,14 @@
         }
 
         function closePhotoModal() {
-            document.getElementById('photoModal').classList.add('hide');
-            resetPhotoModal();
+            console.log('🔄 Closing photo modal...');
+            const modal = document.getElementById('photoModal');
+            if (modal) {
+                modal.classList.add('hide');
+                modal.style.display = 'none'; // Force hide with inline style
+                resetPhotoModal();
+                console.log('✅ Photo modal closed');
+            }
         }
 
         function resetPhotoModal() {
@@ -907,6 +913,25 @@
             // Show expanded service menu
         }
 
+        // Handle click outside modal to close
+        function closePhotoModalIfClickedOutside(event) {
+            if (event.target === event.currentTarget) {
+                console.log('🖱️ Clicked outside modal, closing...');
+                closePhotoModal();
+            }
+        }
+
+        // Handle escape key to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('photoModal');
+                if (modal && !modal.classList.contains('hide')) {
+                    console.log('⌨️ Escape key pressed, closing modal...');
+                    closePhotoModal();
+                }
+            }
+        });
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('SendAHandyman Uber-style interface loaded');
@@ -914,7 +939,14 @@
             // Ensure landing screen is visible and other screens are hidden
             document.getElementById('landingScreen').classList.remove('hide');
             document.getElementById('serviceFlow').classList.add('hide');
-            document.getElementById('photoModal').classList.add('hide');
+
+            // Force hide photo modal with multiple methods
+            const photoModal = document.getElementById('photoModal');
+            if (photoModal) {
+                photoModal.classList.add('hide');
+                photoModal.style.display = 'none'; // Force hide with inline style
+                console.log('🔒 Photo modal force hidden');
+            }
 
             // Reset current step
             currentStep = 'landing';
