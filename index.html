@@ -62,8 +62,8 @@
         .main-search-container {
             background: var(--uber-white);
             border-radius: 16px;
-            box-shadow: 0 2px 40px rgba(0, 0, 0, 0.12);
-            border: 1px solid var(--uber-gray-100);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--uber-gray-200);
         }
 
         .search-input {
@@ -81,15 +81,16 @@
 
         .service-card {
             background: var(--uber-white);
-            border: 1px solid var(--uber-gray-200);
-            border-radius: 12px;
+            border: 2px solid var(--uber-gray-200);
+            border-radius: 16px;
             transition: all 0.2s ease;
             cursor: pointer;
         }
 
         .service-card:hover {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-color: var(--uber-gray-300);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--uber-black);
+            transform: translateY(-2px);
         }
 
         .service-card:active {
@@ -260,8 +261,8 @@
         <div class="max-w-7xl mx-auto px-4 py-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman" class="h-8 w-auto">
-                    <span class="font-bold text-lg hidden md:block">SendAHandyman</span>
+                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman" class="h-12 w-auto">
+                    <span class="font-bold text-xl">SendAHandyman</span>
                 </div>
 
                 <nav class="hidden md:flex items-center gap-6">
@@ -286,10 +287,10 @@
             <!-- Hero Section -->
             <div class="flex-1 flex flex-col justify-center px-4 py-12">
                 <div class="max-w-2xl mx-auto text-center mb-8">
-                    <h1 class="text-4xl md:text-5xl font-bold text-black mb-4">
+                    <h1 class="text-4xl md:text-6xl font-bold text-black mb-6 leading-tight">
                         What do you need help with?
                     </h1>
-                    <p class="text-xl text-gray-600 mb-8">
+                    <p class="text-xl md:text-2xl text-gray-600 mb-12 font-medium">
                         Fix anything with SendAHandyman
                     </p>
                 </div>
@@ -321,39 +322,39 @@
                 </div>
 
                 <!-- Quick Service Categories -->
-                <div class="max-w-4xl mx-auto mb-8">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-                        <div class="service-card p-4 text-center" onclick="selectService('plumbing')">
-                            <div class="text-3xl mb-2">🔧</div>
-                            <div class="font-semibold text-sm">Plumbing</div>
+                <div class="max-w-5xl mx-auto mb-12">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                        <div class="service-card p-6 text-center" onclick="selectService('light-plumbing')">
+                            <div class="text-4xl mb-3">🚿</div>
+                            <div class="font-semibold text-base">Light Plumbing</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="selectService('electrical')">
-                            <div class="text-3xl mb-2">⚡</div>
-                            <div class="font-semibold text-sm">Electrical</div>
+                        <div class="service-card p-6 text-center" onclick="selectService('electrical')">
+                            <div class="text-4xl mb-3">⚡</div>
+                            <div class="font-semibold text-base">Electrical</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="selectService('mounting')">
-                            <div class="text-3xl mb-2">📺</div>
-                            <div class="font-semibold text-sm">TV Mounting</div>
+                        <div class="service-card p-6 text-center" onclick="selectService('mounting')">
+                            <div class="text-4xl mb-3">📺</div>
+                            <div class="font-semibold text-base">TV Mounting</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="selectService('furniture')">
-                            <div class="text-3xl mb-2">🪑</div>
-                            <div class="font-semibold text-sm">Furniture</div>
+                        <div class="service-card p-6 text-center" onclick="selectService('furniture')">
+                            <div class="text-4xl mb-3">🪑</div>
+                            <div class="font-semibold text-base">Furniture</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="selectService('painting')">
-                            <div class="text-3xl mb-2">🎨</div>
-                            <div class="font-semibold text-sm">Painting</div>
+                        <div class="service-card p-6 text-center" onclick="selectService('painting')">
+                            <div class="text-4xl mb-3">🎨</div>
+                            <div class="font-semibold text-base">Painting</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="selectService('hvac')">
-                            <div class="text-3xl mb-2">🌡️</div>
-                            <div class="font-semibold text-sm">HVAC</div>
+                        <div class="service-card p-6 text-center" onclick="selectService('appliances')">
+                            <div class="text-4xl mb-3">🔌</div>
+                            <div class="font-semibold text-base">Appliances</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="selectService('flooring')">
-                            <div class="text-3xl mb-2">🏠</div>
-                            <div class="font-semibold text-sm">Flooring</div>
+                        <div class="service-card p-6 text-center" onclick="selectService('repair')">
+                            <div class="text-4xl mb-3">🔨</div>
+                            <div class="font-semibold text-base">General Repair</div>
                         </div>
-                        <div class="service-card p-4 text-center" onclick="showAllServices()">
-                            <div class="text-3xl mb-2">➕</div>
-                            <div class="font-semibold text-sm">More...</div>
+                        <div class="service-card p-6 text-center" onclick="showAllServices()">
+                            <div class="text-4xl mb-3">➕</div>
+                            <div class="font-semibold text-base">More...</div>
                         </div>
                     </div>
                 </div>
@@ -510,13 +511,13 @@
 
         function getCategoryDisplay(category) {
             const categories = {
-                'plumbing': '🔧 Plumbing',
+                'light-plumbing': '🚿 Light Plumbing',
                 'electrical': '⚡ Electrical',
                 'mounting': '📺 TV Mounting',
                 'furniture': '🪑 Furniture Assembly',
                 'painting': '🎨 Painting',
-                'hvac': '🌡️ HVAC',
-                'flooring': '🏠 Flooring'
+                'appliances': '🔌 Appliances',
+                'repair': '🔨 General Repair'
             };
             return categories[category] || category;
         }
@@ -729,7 +730,16 @@
 
         // Photo Modal Functions
         function showPhotoModal() {
-            document.getElementById('photoModal').classList.remove('hide');
+            console.log('📷 Opening photo modal...');
+            const modal = document.getElementById('photoModal');
+            if (modal) {
+                modal.classList.remove('hide');
+                modal.style.display = 'flex'; // Force display
+                resetPhotoModal(); // Reset to upload prompt
+                console.log('✅ Photo modal opened');
+            } else {
+                console.error('❌ Photo modal not found');
+            }
         }
 
         function closePhotoModal() {
@@ -910,7 +920,120 @@
         }
 
         function showAllServices() {
-            // Show expanded service menu
+            const content = document.getElementById('serviceContent');
+            document.getElementById('landingScreen').classList.add('hide');
+            document.getElementById('serviceFlow').classList.remove('hide');
+            currentStep = 'services';
+
+            content.innerHTML = `
+                <div class="slide-up">
+                    <h2 class="text-2xl font-bold mb-2">All Services</h2>
+                    <p class="text-gray-600 mb-6">Choose the service you need help with</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="service-card p-4" onclick="selectService('light-plumbing')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🚿</div>
+                                <div>
+                                    <div class="font-semibold">Light Plumbing</div>
+                                    <div class="text-sm text-gray-600">Faucets, toilets, minor leaks</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('electrical')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">⚡</div>
+                                <div>
+                                    <div class="font-semibold">Electrical</div>
+                                    <div class="text-sm text-gray-600">Outlets, switches, light fixtures</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('mounting')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">📺</div>
+                                <div>
+                                    <div class="font-semibold">TV Mounting</div>
+                                    <div class="text-sm text-gray-600">Wall mounting, cable management</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('furniture')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🪑</div>
+                                <div>
+                                    <div class="font-semibold">Furniture Assembly</div>
+                                    <div class="text-sm text-gray-600">IKEA, office furniture, beds</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('painting')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🎨</div>
+                                <div>
+                                    <div class="font-semibold">Painting</div>
+                                    <div class="text-sm text-gray-600">Touch-ups, small rooms, trim</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('appliances')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🔌</div>
+                                <div>
+                                    <div class="font-semibold">Appliances</div>
+                                    <div class="text-sm text-gray-600">Installation, basic repairs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('repair')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🔨</div>
+                                <div>
+                                    <div class="font-semibold">General Repair</div>
+                                    <div class="text-sm text-gray-600">Doors, windows, drywall</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('installation')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🛠️</div>
+                                <div>
+                                    <div class="font-semibold">Installations</div>
+                                    <div class="text-sm text-gray-600">Shelves, blinds, hardware</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('outdoor')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">🏡</div>
+                                <div>
+                                    <div class="font-semibold">Outdoor</div>
+                                    <div class="text-sm text-gray-600">Deck repairs, outdoor fixtures</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="service-card p-4" onclick="selectService('other')">
+                            <div class="flex items-center gap-3">
+                                <div class="text-2xl">❓</div>
+                                <div>
+                                    <div class="font-semibold">Other</div>
+                                    <div class="text-sm text-gray-600">Describe your specific need</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            updateProgress(25);
         }
 
         // Handle click outside modal to close
