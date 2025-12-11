@@ -1467,13 +1467,25 @@
 
             const resultsDiv = document.getElementById('analysisResults');
 
+            // Check if this is a fallback/error response
+            const isFallbackResponse = result.confidence_level === 'low' &&
+                                       (result.problem_description.includes('temporarily unavailable') ||
+                                        result.problem_description.includes('Claude API error'));
+
             // Enhanced verbose AI analysis display
             resultsDiv.innerHTML = `
                 <div class="space-y-4">
                     <!-- Problem Description -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 class="font-semibold text-blue-900 mb-2">🔍 Problem Identified</h4>
-                        <p class="text-blue-800">${result.problem_description || 'Analysis completed successfully'}</p>
+                    <div class="${isFallbackResponse ? 'bg-orange-50 border border-orange-200' : 'bg-blue-50 border border-blue-200'} rounded-lg p-4">
+                        <h4 class="font-semibold ${isFallbackResponse ? 'text-orange-900' : 'text-blue-900'} mb-2">
+                            ${isFallbackResponse ? '⚠️ Service Update' : '🔍 Problem Identified'}
+                        </h4>
+                        <p class="${isFallbackResponse ? 'text-orange-800' : 'text-blue-800'}">
+                            ${isFallbackResponse
+                                ? 'Our AI analysis service is temporarily experiencing high demand. We\'ve provided a standard estimate below, but for the most accurate assessment, please call us directly.'
+                                : (result.problem_description || 'Analysis completed successfully')
+                            }
+                        </p>
                     </div>
 
                     <!-- Recommended Task -->
@@ -1511,12 +1523,26 @@
 
                     <!-- Action Buttons -->
                     <div class="space-y-3 mt-6">
-                        <button onclick="useAnalysisResults()" class="btn-primary w-full py-3">
-                            Book ${result.recommended_task || 'Service'} - ${result.cost_estimate || '$85-120'}
-                        </button>
-                        <button onclick="retakePhoto()" class="btn-secondary w-full py-2">
-                            📷 Take Different Photo
-                        </button>
+                        ${isFallbackResponse ? `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <button onclick="useAnalysisResults()" class="btn-primary py-3">
+                                    📞 Call for Accurate Quote
+                                </button>
+                                <button onclick="useAnalysisResults()" class="btn-secondary py-3">
+                                    Book Standard Service - ${result.cost_estimate || '$240'}
+                                </button>
+                            </div>
+                            <button onclick="retakePhoto()" class="btn-secondary w-full py-2">
+                                🔄 Try AI Analysis Again
+                            </button>
+                        ` : `
+                            <button onclick="useAnalysisResults()" class="btn-primary w-full py-3">
+                                Book ${result.recommended_task || 'Service'} - ${result.cost_estimate || '$85-120'}
+                            </button>
+                            <button onclick="retakePhoto()" class="btn-secondary w-full py-2">
+                                📷 Take Different Photo
+                            </button>
+                        `}
                     </div>
                 </div>
             `;
