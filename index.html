@@ -910,6 +910,16 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('SendAHandyman Uber-style interface loaded');
+
+            // Ensure landing screen is visible and other screens are hidden
+            document.getElementById('landingScreen').classList.remove('hide');
+            document.getElementById('serviceFlow').classList.add('hide');
+            document.getElementById('photoModal').classList.add('hide');
+
+            // Reset current step
+            currentStep = 'landing';
+
+            console.log('✅ Landing page initialized correctly');
         });
     </script>
 </body>
