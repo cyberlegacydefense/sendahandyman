@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - SendAHandyman</title>
+    <meta name="description" content="Frequently asked questions about SendAHandyman services, pricing, and booking process.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --uber-black: #000000;
+            --uber-white: #ffffff;
+            --uber-gray-50: #f9fafb;
+            --uber-gray-100: #f3f4f6;
+            --uber-gray-200: #e5e7eb;
+            --uber-gray-600: #4b5563;
+            --uber-blue: #3b82f6;
+            --uber-green: #10b981;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--uber-gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .faq-question {
+            padding: 24px 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--uber-black);
+        }
+
+        .faq-question:hover {
+            color: var(--uber-blue);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: var(--uber-gray-600);
+            line-height: 1.6;
+        }
+
+        .faq-answer.open {
+            max-height: 500px;
+            padding-bottom: 24px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-icon.rotated {
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="/images/favicon.png" alt="SendAHandyman" class="h-9 w-auto">
+                    <span class="font-bold text-xl">SendAHandyman</span>
+                </div>
+                <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    Book Service
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-12">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4">Frequently Asked Questions</h1>
+            <p class="text-xl text-gray-600">Everything you need to know about SendAHandyman services</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm">
+            <!-- General Questions -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-bold mb-6 text-blue-600">General Questions</h2>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What services does SendAHandyman offer?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        We offer a wide range of handyman services including light plumbing (faucets, toilets), electrical work (outlets, switches), TV mounting, furniture assembly, painting, general repairs, ceiling fan installation, and curtain rod/blind mounting. We serve Palm Beach, Broward, and Miami-Dade counties.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How does the AI photo analysis work?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        Upload photos of your repair issue and our AI analyzes them to identify the problem, recommend the best service, estimate costs, and assess urgency. This helps us provide accurate quotes and dispatch the right technician with proper tools and parts.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What areas do you serve?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        We primarily serve Palm Beach, Broward, and Miami-Dade counties in South Florida. This includes cities like Miami, Fort Lauderdale, West Palm Beach, Boca Raton, Hollywood, Coral Springs, Plantation, Aventura, and surrounding areas.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking & Scheduling -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-bold mb-6 text-blue-600">Booking & Scheduling</h2>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I book same-day service?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        To ensure proper scheduling with our handymen, we require bookings to be made at least one day in advance. You can book for tomorrow onwards with available time slots: 8AM-12PM, 12PM-4PM, and 4PM-8PM.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What time slots are available?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        We offer three convenient time blocks: 8AM-12PM (morning), 12PM-4PM (afternoon), and 4PM-8PM (evening). Weekend availability may be limited, and Saturday services include a premium charge.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Do you work on weekends?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        Saturday services are available with a 30% premium charge and limited to 8AM-12PM slots only. We do not provide services on Sundays. Future weekday bookings receive a 10% discount.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing -->
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-2xl font-bold mb-6 text-blue-600">Pricing</h2>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How is pricing calculated?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        Our base rate is $80/hour. Pricing varies based on timing: future bookings get 10% discount, next-day service has 20% premium, same-day current block has 30% premium, and evening slots (4PM-8PM) include 35% premium. All pricing is transparent and shown upfront.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Are there any hidden fees?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        No hidden fees! All costs including labor, time-based premiums, and any applicable discounts are clearly displayed before you book. Materials and parts are charged separately at cost if needed.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What payment methods do you accept?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        We accept all major credit cards, debit cards, and secure online payments through our platform. Payment is processed securely after service completion.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Quality -->
+            <div class="p-6">
+                <h2 class="text-2xl font-bold mb-6 text-blue-600">Service Quality</h2>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Are your handymen vetted and insured?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! All our handymen are background-checked, vetted professionals with proven experience. They carry insurance and are equipped with the necessary tools and expertise for quality work.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What if I'm not satisfied with the work?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        Customer satisfaction is our priority. If you're not completely satisfied with the work, contact us immediately and we'll work to resolve any issues or arrange for corrections at no additional charge.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I prepare for the handyman's visit?</span>
+                        <div class="faq-icon text-2xl">+</div>
+                    </div>
+                    <div class="faq-answer">
+                        Clear the work area of personal items, ensure easy access to the repair location, and have any specific materials ready if discussed beforehand. Our technician will bring standard tools and common parts.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="text-center mt-12 bg-white rounded-xl p-8 shadow-sm">
+            <h3 class="text-2xl font-bold mb-4">Still have questions?</h3>
+            <p class="text-gray-600 mb-6">Can't find what you're looking for? Contact our support team.</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="mailto:info@sendahandyman.com" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    📧 Email Support
+                </a>
+                <a href="index.html" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                    🔧 Book Service Now
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-gray-100 text-sm text-gray-600">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <img src="/images/favicon.png" alt="SendAHandyman Logo" class="h-8 w-auto">
+                <span>© 2024 SendAHandyman v 3.0.0</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="privacy.html" class="hover:text-gray-900">Privacy</a>
+                <a href="terms.html" class="hover:text-gray-900">Terms</a>
+                <a href="mailto:info@sendahandyman.com" class="hover:text-gray-900">Contact</a>
+                <a href="faq.html" class="hover:text-gray-900">FAQ</a>
+                <a href="index-original.html" class="hover:text-gray-900">Classic View</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('.faq-icon');
+
+            // Close all other open FAQs
+            document.querySelectorAll('.faq-answer.open').forEach(openAnswer => {
+                if (openAnswer !== answer) {
+                    openAnswer.classList.remove('open');
+                    openAnswer.previousElementSibling.querySelector('.faq-icon').textContent = '+';
+                    openAnswer.previousElementSibling.querySelector('.faq-icon').classList.remove('rotated');
+                }
+            });
+
+            // Toggle current FAQ
+            if (answer.classList.contains('open')) {
+                answer.classList.remove('open');
+                icon.textContent = '+';
+                icon.classList.remove('rotated');
+            } else {
+                answer.classList.add('open');
+                icon.textContent = '×';
+                icon.classList.add('rotated');
+            }
+        }
+    </script>
+</body>
+</html>
