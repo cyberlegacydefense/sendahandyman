@@ -689,6 +689,12 @@
             serviceData.category = category;
             serviceData.categoryDisplay = getCategoryDisplay(category);
             showServiceDetails();
+
+            // Update textarea placeholder if it exists
+            const textarea = document.getElementById('detailDescription');
+            if (textarea) {
+                textarea.placeholder = getDescriptionPlaceholder(category);
+            }
         }
 
         function getCategoryDisplay(category) {
@@ -707,6 +713,24 @@
                 'other': '❓ Other'
             };
             return categories[category] || category;
+        }
+
+        function getDescriptionPlaceholder(category) {
+            const placeholders = {
+                'light-plumbing': 'Kitchen sink is dripping under the counter...',
+                'electrical': 'Need to install a new outlet in the bedroom wall...',
+                'mounting': 'Want to mount 55" TV above the fireplace...',
+                'furniture': 'IKEA dresser needs assembly, have all parts...',
+                'painting': 'Touch up paint needed on bedroom walls...',
+                'appliances': 'Dishwasher not draining properly...',
+                'repair': 'Squeaky door hinge needs fixing...',
+                'ceiling-fan': 'Install new ceiling fan in living room, existing wiring available...',
+                'curtains-blinds': 'Mount curtain rods above bedroom windows...',
+                'installation': 'Need help installing bathroom towel rack...',
+                'outdoor': 'Patio fence post is loose and wobbly...',
+                'other': 'Describe your repair or project...'
+            };
+            return placeholders[category] || 'Describe your repair or project...';
         }
 
         function showServiceDetails() {
@@ -729,7 +753,7 @@
                             <textarea
                                 id="detailDescription"
                                 class="w-full border border-gray-300 rounded-lg p-3 h-24"
-                                placeholder="Kitchen sink is dripping under the counter..."
+                                placeholder="${getDescriptionPlaceholder(serviceData.category)}"
                                 onchange="updateServiceData('detailedDescription', this.value)"
                             >${serviceData.description || ''}</textarea>
                         </div>
