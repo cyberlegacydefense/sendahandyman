@@ -455,20 +455,16 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
                             <span class="location-indicator" id="locationIndicator">Detecting location...</span>
-
-                            <!-- Handyman Map Button -->
-                            <div id="handymanMapButton" style="display: none;" class="ml-auto">
-                                <button onclick="showHandymanDistribution()" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
-                                    🗺️ Coverage Map
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quick Service Categories -->
-                <div class="max-w-5xl mx-auto mb-12">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <!-- Main Content Area with Service Categories and Map -->
+                <div class="max-w-7xl mx-auto mb-12">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Service Categories (Left Side) -->
+                        <div class="lg:col-span-2">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                         <div class="service-card p-6 text-center" onclick="selectService('light-plumbing')">
                             <div class="text-4xl mb-3">🚿</div>
                             <div class="font-semibold text-base">Light Plumbing</div>
@@ -505,6 +501,38 @@
                              onkeypress="handleEnterKey(event, showAllServices)">
                             <div class="text-4xl mb-3">➕</div>
                             <div class="font-semibold text-base">More...</div>
+                        </div>
+                    </div>
+                        </div>
+
+                        <!-- Handyman Map (Right Side) -->
+                        <div class="lg:col-span-1">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                                <h3 class="font-semibold mb-4 text-gray-800">Available Handymen</h3>
+
+                                <!-- Map Container -->
+                                <div id="mainHandymanMap" class="w-full h-64 rounded-lg border border-gray-300 mb-4" style="display: none;">
+                                    <!-- Leaflet map will be initialized here -->
+                                </div>
+
+                                <!-- Map Loading State -->
+                                <div id="mapLoadingState" class="w-full h-64 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center mb-4">
+                                    <div class="text-center text-gray-500">
+                                        <div class="text-3xl mb-2">📍</div>
+                                        <div class="text-sm">Detecting location...</div>
+                                    </div>
+                                </div>
+
+                                <!-- Selected Handyman Details (Compact) -->
+                                <div id="compactHandymanDetails" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3" style="display: none;">
+                                    <!-- Compact handyman details will appear here -->
+                                </div>
+
+                                <!-- Handymen List (Compact) -->
+                                <div id="compactHandymanList" class="space-y-2" style="display: none;">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1952,8 +1980,8 @@
                     console.log('📍 Location updated:', address);
                     showToast(`Location detected: ${address}`, 'success');
 
-                    // Show handyman map button once location is determined
-                    showHandymanMapButton();
+                    // Initialize main page map
+                    initializeMainPageMap();
                 } else {
                     element.textContent = `${address} (Outside service area)`;
                     element.style.color = '#f59e0b';
@@ -2008,8 +2036,8 @@
                 element.style.color = ''; // Default color
                 console.log('📍 Using fallback location');
 
-                // Show handyman map button once location is determined
-                showHandymanMapButton();
+                // Initialize main page map
+                initializeMainPageMap();
             }
         }
 
@@ -2293,13 +2321,301 @@
             }
         }
 
-        // Handyman Distribution Map Functions
-        function showHandymanMapButton() {
-            const button = document.getElementById('handymanMapButton');
-            if (button) {
-                button.style.display = 'block';
-                console.log('🗺️ Handyman map button shown');
+        // Main Page Map Functions
+        let mainPageMap = null;
+        let mainPageMarkers = [];
+        let selectedMainPageMarker = null;
+
+        async function initializeMainPageMap() {
+            try {
+                console.log('🗺️ Initializing main page map...');
+
+                // Get user location
+                const userLocation = await getUserLocationForMap();
+
+                // Hide loading state and show map
+                document.getElementById('mapLoadingState').style.display = 'none';
+                document.getElementById('mainHandymanMap').style.display = 'block';
+
+                // Initialize map
+                if (mainPageMap) {
+                    mainPageMap.remove();
+                }
+
+                mainPageMap = L.map('mainHandymanMap', {
+                    zoomControl: false,
+                    scrollWheelZoom: false
+                }).setView(userLocation, 11);
+
+                // Add map tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(mainPageMap);
+
+                // Add user location marker
+                const userIcon = L.divIcon({
+                    className: 'user-location-marker',
+                    html: `<div style="background: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                });
+
+                L.marker(userLocation, { icon: userIcon })
+                    .addTo(mainPageMap)
+                    .bindPopup('📍 Your Location');
+
+                // Generate and add handyman markers
+                const handymenData = generateAnonymousHandymanLocations(userLocation);
+                addMainPageHandymanMarkers(handymenData);
+
+                // Show compact list
+                updateCompactHandymanList(handymenData);
+                document.getElementById('compactHandymanList').style.display = 'block';
+
+                console.log('✅ Main page map initialized');
+
+            } catch (error) {
+                console.error('❌ Error initializing main page map:', error);
+                document.getElementById('mapLoadingState').innerHTML = `
+                    <div class="text-center text-red-500">
+                        <div class="text-2xl mb-1">❌</div>
+                        <div class="text-xs">Map unavailable</div>
+                    </div>
+                `;
             }
+        }
+
+        function generateAnonymousHandymanLocations(userLocation) {
+            const [userLat, userLng] = userLocation;
+
+            // Anonymous handyman data with just city and skills
+            const handymenData = [
+                // Miami-Dade handymen
+                { id: "h1", city: "Miami", lat: 25.7617, lng: -80.1918, status: "available", rating: 4.8, experience: 5, specialties: ["Plumbing", "Electrical"] },
+                { id: "h2", city: "Coral Gables", lat: 25.7214, lng: -80.2683, status: "available", rating: 4.9, experience: 8, specialties: ["Painting", "General Repair"] },
+                { id: "h3", city: "Aventura", lat: 25.9565, lng: -80.1389, status: "busy", rating: 4.7, experience: 3, specialties: ["TV Mounting", "Furniture Assembly"] },
+                { id: "h4", city: "Homestead", lat: 25.4687, lng: -80.4776, status: "available", rating: 4.6, experience: 6, specialties: ["Ceiling Fan", "Electrical"] },
+
+                // Broward handymen
+                { id: "h5", city: "Fort Lauderdale", lat: 26.1224, lng: -80.1373, status: "available", rating: 4.8, experience: 7, specialties: ["Plumbing", "General Repair"] },
+                { id: "h6", city: "Hollywood", lat: 26.0112, lng: -80.1495, status: "available", rating: 4.5, experience: 4, specialties: ["Painting", "Appliances"] },
+                { id: "h7", city: "Coral Springs", lat: 26.2712, lng: -80.2706, status: "busy", rating: 4.7, experience: 5, specialties: ["Furniture Assembly", "Mounting"] },
+                { id: "h8", city: "Plantation", lat: 26.1267, lng: -80.2331, status: "available", rating: 4.9, experience: 9, specialties: ["Electrical", "Ceiling Fan"] },
+
+                // Palm Beach handymen
+                { id: "h9", city: "West Palm Beach", lat: 26.7153, lng: -80.0534, status: "available", rating: 4.8, experience: 6, specialties: ["General Repair", "Painting"] },
+                { id: "h10", city: "Boca Raton", lat: 26.3683, lng: -80.1289, status: "available", rating: 4.9, experience: 10, specialties: ["Plumbing", "Electrical"] },
+                { id: "h11", city: "Wellington", lat: 26.6584, lng: -80.2417, status: "busy", rating: 4.6, experience: 4, specialties: ["Furniture Assembly", "Mounting"] },
+                { id: "h12", city: "Jupiter", lat: 26.9342, lng: -80.0942, status: "available", rating: 4.7, experience: 7, specialties: ["Appliances", "General Repair"] }
+            ];
+
+            // Add slight location variance
+            return handymenData.map(handyman => ({
+                ...handyman,
+                lat: handyman.lat + (Math.random() - 0.5) * 0.02,
+                lng: handyman.lng + (Math.random() - 0.5) * 0.02
+            }));
+        }
+
+        function addMainPageHandymanMarkers(handymenData) {
+            // Clear existing markers
+            mainPageMarkers.forEach(marker => mainPageMap.removeLayer(marker));
+            mainPageMarkers = [];
+
+            handymenData.forEach(handyman => {
+                const isAvailable = handyman.status === 'available';
+
+                const markerIcon = L.divIcon({
+                    className: 'handyman-marker',
+                    html: `
+                        <div style="
+                            background: ${isAvailable ? '#10b981' : '#6b7280'};
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 50%;
+                            border: 2px solid white;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 8px;
+                            font-weight: bold;
+                        ">
+                            🔨
+                        </div>
+                    `,
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                });
+
+                const marker = L.marker([handyman.lat, handyman.lng], {
+                    icon: markerIcon,
+                    handymanData: handyman
+                }).addTo(mainPageMap);
+
+                // Click handler
+                marker.on('click', () => {
+                    selectMainPageHandyman(handyman, marker);
+                });
+
+                mainPageMarkers.push(marker);
+            });
+        }
+
+        function selectMainPageHandyman(handyman, marker) {
+            console.log('🎯 Main page handyman selected:', handyman.city);
+
+            // Reset previous selection
+            if (selectedMainPageMarker) {
+                selectedMainPageMarker.setIcon(createCompactHandymanIcon(selectedMainPageMarker.options.handymanData.status, false));
+            }
+
+            // Highlight selected marker
+            selectedMainPageMarker = marker;
+            marker.setIcon(createCompactHandymanIcon(handyman.status, true));
+
+            // Show compact details
+            const detailsContainer = document.getElementById('compactHandymanDetails');
+            detailsContainer.style.display = 'block';
+            detailsContainer.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-medium text-sm">${handyman.city}</span>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                                handyman.status === 'available'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-100 text-gray-600'
+                            }">
+                                ${handyman.status === 'available' ? '✅ Available' : '🔒 Busy'}
+                            </span>
+                        </div>
+                        <div class="text-xs text-gray-600 mb-2">
+                            ⭐ ${handyman.rating} • ${handyman.experience}y exp • ~${Math.round(Math.random() * 5 + 1)} mi
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            ${handyman.specialties.slice(0, 2).map(specialty =>
+                                `<span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded text-xs">${specialty}</span>`
+                            ).join('')}
+                            ${handyman.specialties.length > 2 ? `<span class="text-gray-500 text-xs">+${handyman.specialties.length - 2}</span>` : ''}
+                        </div>
+                    </div>
+                    <button onclick="clearMainPageHandymanSelection()" class="text-gray-400 hover:text-gray-600 ml-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-2">
+                    <button onclick="bookMainPageHandyman('${handyman.id}')"
+                            class="w-full ${handyman.status === 'available'
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'} py-1.5 px-3 rounded transition-colors text-sm"
+                            ${handyman.status !== 'available' ? 'disabled' : ''}>
+                        ${handyman.status === 'available' ? 'Select & Continue' : 'Currently Unavailable'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function createCompactHandymanIcon(status, isSelected = false) {
+            const isAvailable = status === 'available';
+            const size = isSelected ? 24 : 18;
+            const borderWidth = isSelected ? 3 : 2;
+
+            return L.divIcon({
+                className: 'handyman-marker',
+                html: `
+                    <div style="
+                        background: ${isAvailable ? '#10b981' : '#6b7280'};
+                        width: ${size}px;
+                        height: ${size}px;
+                        border-radius: 50%;
+                        border: ${borderWidth}px solid ${isSelected ? '#3b82f6' : 'white'};
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-size: ${size > 18 ? '10px' : '8px'};
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">
+                        🔨
+                    </div>
+                `,
+                iconSize: [size, size],
+                iconAnchor: [size/2, size/2]
+            });
+        }
+
+        function updateCompactHandymanList(handymenData) {
+            const list = document.getElementById('compactHandymanList');
+            const availableHandymen = handymenData.filter(h => h.status === 'available');
+
+            list.innerHTML = `
+                <div class="text-xs font-medium text-gray-600 mb-2">
+                    ${availableHandymen.length} Available Now
+                </div>
+                ${availableHandymen.slice(0, 3).map(handyman => `
+                    <div class="bg-gray-50 p-2 rounded border cursor-pointer hover:bg-blue-50 transition-colors"
+                         onclick="selectMainPageHandymanFromList('${handyman.id}')">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium truncate">${handyman.city}</div>
+                                <div class="text-xs text-gray-600">⭐ ${handyman.rating} • ${handyman.specialties[0]}</div>
+                            </div>
+                            <div class="text-xs text-green-600 ml-2">
+                                ~${Math.round(Math.random() * 5 + 1)}mi
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+                ${availableHandymen.length > 3 ? `
+                    <div class="text-xs text-gray-500 text-center pt-2">
+                        +${availableHandymen.length - 3} more available
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function selectMainPageHandymanFromList(handymanId) {
+            const marker = mainPageMarkers.find(m => m.options.handymanData.id === handymanId);
+            if (marker) {
+                selectMainPageHandyman(marker.options.handymanData, marker);
+            }
+        }
+
+        function clearMainPageHandymanSelection() {
+            if (selectedMainPageMarker) {
+                selectedMainPageMarker.setIcon(createCompactHandymanIcon(selectedMainPageMarker.options.handymanData.status, false));
+                selectedMainPageMarker = null;
+            }
+            document.getElementById('compactHandymanDetails').style.display = 'none';
+        }
+
+        function bookMainPageHandyman(handymanId) {
+            const handymanData = mainPageMarkers.find(m => m.options.handymanData.id === handymanId)?.options.handymanData;
+            if (handymanData && handymanData.status === 'available') {
+                console.log('📅 Booking from main page map:', handymanData.city);
+
+                // Store selected handyman data
+                serviceData.selectedHandyman = handymanData;
+                serviceData.preferredArea = handymanData.city;
+
+                showToast(`Handyman selected in ${handymanData.city}! Let's get started.`, 'success');
+
+                // Proceed to service selection
+                setTimeout(() => {
+                    startServiceFlow();
+                }, 1000);
+            }
+        }
+
+        // Legacy modal functions (keep for compatibility)
+        function showHandymanMapButton() {
+            // No longer needed - map is directly embedded
         }
 
         function showHandymanDistribution() {
@@ -2449,22 +2765,22 @@
 
             const handymenData = [
                 // Miami-Dade handymen
-                { name: "Carlos Rodriguez", city: "Miami", lat: 25.7617, lng: -80.1918, status: "available", rating: 4.8, experience: 5, specialties: ["Plumbing", "Electrical"] },
-                { name: "Maria Santos", city: "Coral Gables", lat: 25.7214, lng: -80.2683, status: "available", rating: 4.9, experience: 8, specialties: ["Painting", "General Repair"] },
-                { name: "Jose Martinez", city: "Aventura", lat: 25.9565, lng: -80.1389, status: "busy", rating: 4.7, experience: 3, specialties: ["TV Mounting", "Furniture Assembly"] },
-                { name: "Ana Garcia", city: "Homestead", lat: 25.4687, lng: -80.4776, status: "available", rating: 4.6, experience: 6, specialties: ["Ceiling Fan", "Electrical"] },
+                { id: "m1", city: "Miami", lat: 25.7617, lng: -80.1918, status: "available", rating: 4.8, experience: 5, specialties: ["Plumbing", "Electrical"] },
+                { id: "m2", city: "Coral Gables", lat: 25.7214, lng: -80.2683, status: "available", rating: 4.9, experience: 8, specialties: ["Painting", "General Repair"] },
+                { id: "m3", city: "Aventura", lat: 25.9565, lng: -80.1389, status: "busy", rating: 4.7, experience: 3, specialties: ["TV Mounting", "Furniture Assembly"] },
+                { id: "m4", city: "Homestead", lat: 25.4687, lng: -80.4776, status: "available", rating: 4.6, experience: 6, specialties: ["Ceiling Fan", "Electrical"] },
 
                 // Broward handymen
-                { name: "Mike Johnson", city: "Fort Lauderdale", lat: 26.1224, lng: -80.1373, status: "available", rating: 4.8, experience: 7, specialties: ["Plumbing", "General Repair"] },
-                { name: "David Wilson", city: "Hollywood", lat: 26.0112, lng: -80.1495, status: "available", rating: 4.5, experience: 4, specialties: ["Painting", "Appliances"] },
-                { name: "Sarah Brown", city: "Coral Springs", lat: 26.2712, lng: -80.2706, status: "busy", rating: 4.7, experience: 5, specialties: ["Furniture Assembly", "Mounting"] },
-                { name: "Robert Davis", city: "Plantation", lat: 26.1267, lng: -80.2331, status: "available", rating: 4.9, experience: 9, specialties: ["Electrical", "Ceiling Fan"] },
+                { id: "m5", city: "Fort Lauderdale", lat: 26.1224, lng: -80.1373, status: "available", rating: 4.8, experience: 7, specialties: ["Plumbing", "General Repair"] },
+                { id: "m6", city: "Hollywood", lat: 26.0112, lng: -80.1495, status: "available", rating: 4.5, experience: 4, specialties: ["Painting", "Appliances"] },
+                { id: "m7", city: "Coral Springs", lat: 26.2712, lng: -80.2706, status: "busy", rating: 4.7, experience: 5, specialties: ["Furniture Assembly", "Mounting"] },
+                { id: "m8", city: "Plantation", lat: 26.1267, lng: -80.2331, status: "available", rating: 4.9, experience: 9, specialties: ["Electrical", "Ceiling Fan"] },
 
                 // Palm Beach handymen
-                { name: "Lisa Thompson", city: "West Palm Beach", lat: 26.7153, lng: -80.0534, status: "available", rating: 4.8, experience: 6, specialties: ["General Repair", "Painting"] },
-                { name: "James Miller", city: "Boca Raton", lat: 26.3683, lng: -80.1289, status: "available", rating: 4.9, experience: 10, specialties: ["Plumbing", "Electrical"] },
-                { name: "Jennifer Lee", city: "Wellington", lat: 26.6584, lng: -80.2417, status: "busy", rating: 4.6, experience: 4, specialties: ["Furniture Assembly", "Mounting"] },
-                { name: "Mark White", city: "Jupiter", lat: 26.9342, lng: -80.0942, status: "available", rating: 4.7, experience: 7, specialties: ["Appliances", "General Repair"] }
+                { id: "m9", city: "West Palm Beach", lat: 26.7153, lng: -80.0534, status: "available", rating: 4.8, experience: 6, specialties: ["General Repair", "Painting"] },
+                { id: "m10", city: "Boca Raton", lat: 26.3683, lng: -80.1289, status: "available", rating: 4.9, experience: 10, specialties: ["Plumbing", "Electrical"] },
+                { id: "m11", city: "Wellington", lat: 26.6584, lng: -80.2417, status: "busy", rating: 4.6, experience: 4, specialties: ["Furniture Assembly", "Mounting"] },
+                { id: "m12", city: "Jupiter", lat: 26.9342, lng: -80.0942, status: "available", rating: 4.7, experience: 7, specialties: ["Appliances", "General Repair"] }
             ];
 
             // Add slight location variance for realism
@@ -2477,7 +2793,7 @@
         }
 
         function selectHandyman(handyman, marker) {
-            console.log('🎯 Handyman selected:', handyman.name);
+            console.log('🎯 Handyman selected:', handyman.city);
 
             // Reset previous selection
             if (selectedHandymanMarker) {
@@ -2495,7 +2811,7 @@
                 <div class="flex items-start justify-between">
                     <div class="flex-1">
                         <div class="flex items-center gap-3 mb-2">
-                            <h4 class="font-semibold text-lg">${handyman.name}</h4>
+                            <h4 class="font-semibold text-lg">${handyman.city} Handyman</h4>
                             <span class="px-2 py-1 rounded-full text-xs font-medium ${
                                 handyman.status === 'available'
                                     ? 'bg-green-100 text-green-800'
@@ -2531,7 +2847,7 @@
                                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'} py-2 px-4 rounded transition-colors"
                             ${handyman.status !== 'available' ? 'disabled' : ''}>
-                        ${handyman.status === 'available' ? 'Book ' + handyman.name : 'Currently Unavailable'}
+                        ${handyman.status === 'available' ? 'Book This Handyman' : 'Currently Unavailable'}
                     </button>
                     <button onclick="showHandymanProfile('${handyman.id}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded transition-colors">
                         View Profile
@@ -2602,8 +2918,8 @@
                      onclick="selectHandymanFromList('${handyman.id}')">
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="font-medium">${handyman.name}</div>
-                            <div class="text-sm text-gray-600">${handyman.city} • ⭐ ${handyman.rating} • ${handyman.experience}y exp</div>
+                            <div class="font-medium">${handyman.city} Handyman</div>
+                            <div class="text-sm text-gray-600">⭐ ${handyman.rating} • ${handyman.experience}y exp • ${handyman.specialties[0]}</div>
                         </div>
                         <div class="text-sm ${handyman.status === 'available' ? 'text-green-600' : 'text-gray-500'}">
                             ~${Math.round(Math.random() * 5 + 1)} mi
@@ -2637,7 +2953,7 @@
                 // Store selected handyman data
                 serviceData.selectedHandyman = handyman;
 
-                showToast(`Great! Starting booking process with ${handyman.name}`, 'success');
+                showToast(`Great! Starting booking process with ${handyman.city} handyman`, 'success');
 
                 // Proceed to service flow with handyman selected
                 setTimeout(() => {
@@ -2649,7 +2965,7 @@
         function showHandymanProfile(handymanId) {
             const handyman = handymanMarkers.find(m => m.options.handymanData.id === handymanId)?.options.handymanData;
             if (handyman) {
-                showToast(`${handyman.name}'s full profile coming soon!`, 'info');
+                showToast(`Handyman profile coming soon!`, 'info');
             }
         }
 
