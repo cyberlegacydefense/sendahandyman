@@ -30,6 +30,14 @@
 
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Leaflet CSS and JS for interactive maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -677,20 +685,24 @@
                     </button>
                 </div>
 
-                <!-- Map Container -->
-                <div class="bg-gray-100 rounded-lg p-6 mb-6">
-                    <div id="handymanMapContainer" class="w-full h-96 bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                        <div class="text-center">
-                            <div class="text-4xl mb-4">🗺️</div>
-                            <div class="text-lg font-semibold mb-2">Handyman Coverage Map</div>
-                            <div class="text-gray-600">Loading handyman locations...</div>
-                        </div>
+                <!-- Interactive Map Container -->
+                <div class="bg-white rounded-lg border border-gray-300 mb-6">
+                    <div id="handymanMapContainer" class="w-full h-96 rounded-lg overflow-hidden">
+                        <!-- Leaflet map will be initialized here -->
                     </div>
                 </div>
 
-                <!-- Handyman List -->
-                <div id="handymanList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Will be populated by JavaScript -->
+                <!-- Selected Handyman Details -->
+                <div id="selectedHandymanDetails" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4" style="display: none;">
+                    <!-- Handyman details will appear here when clicked -->
+                </div>
+
+                <!-- Available Handymen List -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-semibold mb-3">Available Handymen in Your Area</h4>
+                    <div id="handymanList" class="space-y-3">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
                 </div>
 
                 <div class="mt-6 text-center">
@@ -2318,130 +2330,326 @@
             }
         }
 
+        let handymanMap = null;
+        let handymanMarkers = [];
+        let selectedHandymanMarker = null;
+
         async function loadHandymanDistribution() {
             try {
-                console.log('📊 Loading handyman distribution data...');
+                console.log('🗺️ Loading Uber-style handyman map...');
 
-                // Create simple map visualization using city data
-                const mapContainer = document.getElementById('handymanMapContainer');
-                const handymanList = document.getElementById('handymanList');
+                // Get user's detected location for map center
+                const userLocation = await getUserLocationForMap();
 
-                // Mock data for South Florida handymen distribution
-                const handymenData = [
-                    {
-                        city: "Miami",
-                        county: "Miami-Dade",
-                        count: 12,
-                        available: 8,
-                        avgRating: 4.7,
-                        serviceAreas: ["miami", "coral-gables", "aventura", "homestead"]
-                    },
-                    {
-                        city: "Fort Lauderdale",
-                        county: "Broward",
-                        count: 9,
-                        available: 6,
-                        avgRating: 4.6,
-                        serviceAreas: ["fort-lauderdale", "hollywood", "coral-springs", "plantation"]
-                    },
-                    {
-                        city: "West Palm Beach",
-                        county: "Palm Beach",
-                        count: 8,
-                        available: 5,
-                        avgRating: 4.8,
-                        serviceAreas: ["west-palm-beach", "boca-raton", "wellington", "jupiter"]
-                    },
-                    {
-                        city: "Hollywood",
-                        county: "Broward",
-                        count: 6,
-                        available: 4,
-                        avgRating: 4.5,
-                        serviceAreas: ["hollywood", "hallandale", "pembroke-pines"]
-                    },
-                    {
-                        city: "Boca Raton",
-                        county: "Palm Beach",
-                        count: 7,
-                        available: 5,
-                        avgRating: 4.9,
-                        serviceAreas: ["boca-raton", "delray-beach", "highland-beach"]
-                    }
-                ];
+                // Initialize Leaflet map
+                if (handymanMap) {
+                    handymanMap.remove(); // Clean up existing map
+                }
 
-                // Create simple visual map
-                mapContainer.innerHTML = `
-                    <div class="w-full h-full relative bg-blue-50 rounded-lg flex items-center justify-center overflow-hidden">
-                        <div class="text-center">
-                            <div class="text-6xl mb-4">🗺️</div>
-                            <div class="text-xl font-bold text-gray-700 mb-2">South Florida Service Coverage</div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                                ${handymenData.map(area => `
-                                    <div class="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
-                                        <div class="text-lg font-semibold text-gray-800">${area.city}</div>
-                                        <div class="text-sm text-gray-600">${area.county} County</div>
-                                        <div class="mt-2 text-green-600 font-medium">${area.available}/${area.count} Available</div>
-                                        <div class="text-xs text-yellow-600">⭐ ${area.avgRating}</div>
-                                    </div>
-                                `).join('')}
+                handymanMap = L.map('handymanMapContainer').setView(userLocation, 11);
+
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(handymanMap);
+
+                // Add user location marker
+                const userIcon = L.divIcon({
+                    className: 'user-location-marker',
+                    html: `<div style="background: #3b82f6; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                });
+
+                L.marker(userLocation, { icon: userIcon })
+                    .addTo(handymanMap)
+                    .bindPopup('📍 Your Location')
+                    .openPopup();
+
+                // Generate realistic handyman locations around South Florida
+                const handymenData = generateHandymanLocations(userLocation);
+
+                // Clear existing markers
+                handymanMarkers.forEach(marker => handymanMap.removeLayer(marker));
+                handymanMarkers = [];
+
+                // Add handyman markers
+                handymenData.forEach((handyman, index) => {
+                    const isAvailable = handyman.status === 'available';
+
+                    const markerIcon = L.divIcon({
+                        className: 'handyman-marker',
+                        html: `
+                            <div style="
+                                background: ${isAvailable ? '#10b981' : '#6b7280'};
+                                width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                color: white;
+                                font-size: 12px;
+                                font-weight: bold;
+                            ">
+                                🔨
                             </div>
-                        </div>
-                    </div>
-                `;
+                        `,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+
+                    const marker = L.marker([handyman.lat, handyman.lng], {
+                        icon: markerIcon,
+                        handymanData: handyman
+                    }).addTo(handymanMap);
+
+                    // Click handler for handyman markers
+                    marker.on('click', () => {
+                        selectHandyman(handyman, marker);
+                    });
+
+                    handymanMarkers.push(marker);
+                });
 
                 // Populate handyman list
-                handymanList.innerHTML = handymenData.map(area => `
-                    <div class="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-semibold text-lg">${area.city}</h4>
-                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                                ${area.available} Available
-                            </span>
-                        </div>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">County:</span>
-                                <span>${area.county}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Total Handymen:</span>
-                                <span>${area.count}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Avg Rating:</span>
-                                <span class="text-yellow-600">⭐ ${area.avgRating}</span>
-                            </div>
-                            <div class="mt-3">
-                                <div class="text-gray-600 text-xs mb-1">Service Areas:</div>
-                                <div class="flex flex-wrap gap-1">
-                                    ${area.serviceAreas.slice(0, 3).map(area =>
-                                        `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${area.replace('-', ' ')}</span>`
-                                    ).join('')}
-                                    ${area.serviceAreas.length > 3 ? `<span class="text-gray-500 text-xs">+${area.serviceAreas.length - 3} more</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-3 pt-3 border-t border-gray-100">
-                            <button onclick="selectAreaAndBook('${area.city}')" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm">
-                                Book Handyman in ${area.city}
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                updateHandymanList(handymenData);
 
-                console.log('✅ Handyman distribution loaded successfully');
+                console.log('✅ Uber-style handyman map loaded successfully');
 
             } catch (error) {
-                console.error('❌ Error loading handyman distribution:', error);
+                console.error('❌ Error loading handyman map:', error);
                 const mapContainer = document.getElementById('handymanMapContainer');
                 mapContainer.innerHTML = `
-                    <div class="text-center text-red-600">
-                        <div class="text-4xl mb-2">❌</div>
-                        <div>Error loading handyman data</div>
-                        <div class="text-sm mt-2">Please try again later</div>
+                    <div class="flex items-center justify-center h-full text-center text-red-600">
+                        <div>
+                            <div class="text-4xl mb-2">❌</div>
+                            <div>Error loading map</div>
+                            <div class="text-sm mt-2">Please try again later</div>
+                        </div>
                     </div>
                 `;
+            }
+        }
+
+        async function getUserLocationForMap() {
+            try {
+                const position = await getCurrentPosition();
+                return [position.coords.latitude, position.coords.longitude];
+            } catch (error) {
+                console.log('Using default South Florida location for map');
+                return [26.1224, -80.1373]; // Fort Lauderdale center
+            }
+        }
+
+        function generateHandymanLocations(userLocation) {
+            const [userLat, userLng] = userLocation;
+
+            const handymenData = [
+                // Miami-Dade handymen
+                { name: "Carlos Rodriguez", city: "Miami", lat: 25.7617, lng: -80.1918, status: "available", rating: 4.8, experience: 5, specialties: ["Plumbing", "Electrical"] },
+                { name: "Maria Santos", city: "Coral Gables", lat: 25.7214, lng: -80.2683, status: "available", rating: 4.9, experience: 8, specialties: ["Painting", "General Repair"] },
+                { name: "Jose Martinez", city: "Aventura", lat: 25.9565, lng: -80.1389, status: "busy", rating: 4.7, experience: 3, specialties: ["TV Mounting", "Furniture Assembly"] },
+                { name: "Ana Garcia", city: "Homestead", lat: 25.4687, lng: -80.4776, status: "available", rating: 4.6, experience: 6, specialties: ["Ceiling Fan", "Electrical"] },
+
+                // Broward handymen
+                { name: "Mike Johnson", city: "Fort Lauderdale", lat: 26.1224, lng: -80.1373, status: "available", rating: 4.8, experience: 7, specialties: ["Plumbing", "General Repair"] },
+                { name: "David Wilson", city: "Hollywood", lat: 26.0112, lng: -80.1495, status: "available", rating: 4.5, experience: 4, specialties: ["Painting", "Appliances"] },
+                { name: "Sarah Brown", city: "Coral Springs", lat: 26.2712, lng: -80.2706, status: "busy", rating: 4.7, experience: 5, specialties: ["Furniture Assembly", "Mounting"] },
+                { name: "Robert Davis", city: "Plantation", lat: 26.1267, lng: -80.2331, status: "available", rating: 4.9, experience: 9, specialties: ["Electrical", "Ceiling Fan"] },
+
+                // Palm Beach handymen
+                { name: "Lisa Thompson", city: "West Palm Beach", lat: 26.7153, lng: -80.0534, status: "available", rating: 4.8, experience: 6, specialties: ["General Repair", "Painting"] },
+                { name: "James Miller", city: "Boca Raton", lat: 26.3683, lng: -80.1289, status: "available", rating: 4.9, experience: 10, specialties: ["Plumbing", "Electrical"] },
+                { name: "Jennifer Lee", city: "Wellington", lat: 26.6584, lng: -80.2417, status: "busy", rating: 4.6, experience: 4, specialties: ["Furniture Assembly", "Mounting"] },
+                { name: "Mark White", city: "Jupiter", lat: 26.9342, lng: -80.0942, status: "available", rating: 4.7, experience: 7, specialties: ["Appliances", "General Repair"] }
+            ];
+
+            // Add slight location variance for realism
+            return handymenData.map(handyman => ({
+                ...handyman,
+                lat: handyman.lat + (Math.random() - 0.5) * 0.02, // ±0.01 degree variance
+                lng: handyman.lng + (Math.random() - 0.5) * 0.02,
+                id: Math.random().toString(36).substr(2, 9)
+            }));
+        }
+
+        function selectHandyman(handyman, marker) {
+            console.log('🎯 Handyman selected:', handyman.name);
+
+            // Reset previous selection
+            if (selectedHandymanMarker) {
+                selectedHandymanMarker.setIcon(createHandymanIcon(selectedHandymanMarker.options.handymanData.status, false));
+            }
+
+            // Highlight selected marker
+            selectedHandymanMarker = marker;
+            marker.setIcon(createHandymanIcon(handyman.status, true));
+
+            // Show handyman details
+            const detailsContainer = document.getElementById('selectedHandymanDetails');
+            detailsContainer.style.display = 'block';
+            detailsContainer.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h4 class="font-semibold text-lg">${handyman.name}</h4>
+                            <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                                handyman.status === 'available'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-gray-100 text-gray-600'
+                            }">
+                                ${handyman.status === 'available' ? '✅ Available' : '🔒 Busy'}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm mb-3">
+                            <div><span class="text-gray-600">Location:</span> ${handyman.city}</div>
+                            <div><span class="text-gray-600">Rating:</span> <span class="text-yellow-600">⭐ ${handyman.rating}</span></div>
+                            <div><span class="text-gray-600">Experience:</span> ${handyman.experience} years</div>
+                            <div><span class="text-gray-600">Distance:</span> ~${Math.round(Math.random() * 5 + 1)} miles</div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="text-gray-600 text-sm">Specialties: </span>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                ${handyman.specialties.map(specialty =>
+                                    `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${specialty}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="clearHandymanSelection()" class="text-gray-400 hover:text-gray-600 ml-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button onclick="bookHandyman('${handyman.id}')"
+                            class="flex-1 ${handyman.status === 'available'
+                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'} py-2 px-4 rounded transition-colors"
+                            ${handyman.status !== 'available' ? 'disabled' : ''}>
+                        ${handyman.status === 'available' ? 'Book ' + handyman.name : 'Currently Unavailable'}
+                    </button>
+                    <button onclick="showHandymanProfile('${handyman.id}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded transition-colors">
+                        View Profile
+                    </button>
+                </div>
+            `;
+
+            // Center map on selected handyman
+            handymanMap.setView([handyman.lat, handyman.lng], 13);
+        }
+
+        function createHandymanIcon(status, isSelected = false) {
+            const isAvailable = status === 'available';
+            const size = isSelected ? 32 : 24;
+            const borderWidth = isSelected ? 3 : 2;
+
+            return L.divIcon({
+                className: 'handyman-marker',
+                html: `
+                    <div style="
+                        background: ${isAvailable ? '#10b981' : '#6b7280'};
+                        width: ${size}px;
+                        height: ${size}px;
+                        border-radius: 50%;
+                        border: ${borderWidth}px solid ${isSelected ? '#3b82f6' : 'white'};
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: white;
+                        font-size: ${size > 24 ? '14px' : '12px'};
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">
+                        🔨
+                    </div>
+                `,
+                iconSize: [size, size],
+                iconAnchor: [size/2, size/2]
+            });
+        }
+
+        function updateHandymanList(handymenData) {
+            const handymanList = document.getElementById('handymanList');
+            const availableHandymen = handymenData.filter(h => h.status === 'available');
+            const busyHandymen = handymenData.filter(h => h.status === 'busy');
+
+            handymanList.innerHTML = `
+                ${availableHandymen.length > 0 ? `
+                    <div class="mb-4">
+                        <h5 class="text-sm font-medium text-green-700 mb-2">✅ Available Now (${availableHandymen.length})</h5>
+                        ${availableHandymen.map(handyman => createHandymanListItem(handyman)).join('')}
+                    </div>
+                ` : ''}
+
+                ${busyHandymen.length > 0 ? `
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-600 mb-2">🔒 Currently Busy (${busyHandymen.length})</h5>
+                        ${busyHandymen.map(handyman => createHandymanListItem(handyman)).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function createHandymanListItem(handyman) {
+            return `
+                <div class="bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer"
+                     onclick="selectHandymanFromList('${handyman.id}')">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-medium">${handyman.name}</div>
+                            <div class="text-sm text-gray-600">${handyman.city} • ⭐ ${handyman.rating} • ${handyman.experience}y exp</div>
+                        </div>
+                        <div class="text-sm ${handyman.status === 'available' ? 'text-green-600' : 'text-gray-500'}">
+                            ~${Math.round(Math.random() * 5 + 1)} mi
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectHandymanFromList(handymanId) {
+            const marker = handymanMarkers.find(m => m.options.handymanData.id === handymanId);
+            if (marker) {
+                selectHandyman(marker.options.handymanData, marker);
+            }
+        }
+
+        function clearHandymanSelection() {
+            if (selectedHandymanMarker) {
+                selectedHandymanMarker.setIcon(createHandymanIcon(selectedHandymanMarker.options.handymanData.status, false));
+                selectedHandymanMarker = null;
+            }
+            document.getElementById('selectedHandymanDetails').style.display = 'none';
+        }
+
+        function bookHandyman(handymanId) {
+            const handyman = handymanMarkers.find(m => m.options.handymanData.id === handymanId)?.options.handymanData;
+            if (handyman && handyman.status === 'available') {
+                console.log('📅 Booking handyman:', handyman.name);
+                closeHandymanMap();
+
+                // Store selected handyman data
+                serviceData.selectedHandyman = handyman;
+
+                showToast(`Great! Starting booking process with ${handyman.name}`, 'success');
+
+                // Proceed to service flow with handyman selected
+                setTimeout(() => {
+                    startServiceFlow();
+                }, 1000);
+            }
+        }
+
+        function showHandymanProfile(handymanId) {
+            const handyman = handymanMarkers.find(m => m.options.handymanData.id === handymanId)?.options.handymanData;
+            if (handyman) {
+                showToast(`${handyman.name}'s full profile coming soon!`, 'info');
             }
         }
 
@@ -2461,12 +2669,17 @@
             }, 1000);
         }
 
-        // Handle escape key to close modal
+        // Handle escape key to close modals
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
-                const modal = document.getElementById('photoModal');
-                if (modal && !modal.classList.contains('hide')) {
-                    console.log('⌨️ Escape key pressed, closing modal...');
+                const photoModal = document.getElementById('photoModal');
+                const handymanModal = document.getElementById('handymanMapModal');
+
+                if (handymanModal && !handymanModal.classList.contains('hide')) {
+                    console.log('⌨️ Escape key pressed, closing handyman map...');
+                    closeHandymanMap();
+                } else if (photoModal && !photoModal.classList.contains('hide')) {
+                    console.log('⌨️ Escape key pressed, closing photo modal...');
                     closePhotoModal();
                 }
             }
