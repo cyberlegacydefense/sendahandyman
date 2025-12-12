@@ -447,6 +447,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
                             <span class="location-indicator" id="locationIndicator">Detecting location...</span>
+
+                            <!-- Handyman Map Button -->
+                            <div id="handymanMapButton" style="display: none;" class="ml-auto">
+                                <button onclick="showHandymanDistribution()" class="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors">
+                                    🗺️ Coverage Map
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -652,6 +659,44 @@
                         </div>
                     </div>
                     <button onclick="dismissPhotoError()" class="btn-secondary mt-3 px-4 py-2">Dismiss</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Handyman Distribution Map Modal -->
+    <div id="handymanMapModal" class="hide fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4" onclick="closeHandymanMapIfClickedOutside(event)">
+        <div class="modal-content max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold">Available Handymen in Your Area</h3>
+                    <button onclick="closeHandymanMap()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Map Container -->
+                <div class="bg-gray-100 rounded-lg p-6 mb-6">
+                    <div id="handymanMapContainer" class="w-full h-96 bg-white rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🗺️</div>
+                            <div class="text-lg font-semibold mb-2">Handyman Coverage Map</div>
+                            <div class="text-gray-600">Loading handyman locations...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Handyman List -->
+                <div id="handymanList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div class="mt-6 text-center">
+                    <button onclick="closeHandymanMap()" class="btn-secondary px-6 py-2">
+                        Close Map
+                    </button>
                 </div>
             </div>
         </div>
@@ -1894,6 +1939,9 @@
                     element.style.color = '#22c55e';
                     console.log('📍 Location updated:', address);
                     showToast(`Location detected: ${address}`, 'success');
+
+                    // Show handyman map button once location is determined
+                    showHandymanMapButton();
                 } else {
                     element.textContent = `${address} (Outside service area)`;
                     element.style.color = '#f59e0b';
@@ -1947,6 +1995,9 @@
                 element.textContent = 'Palm Beach, Broward & Miami-Dade';
                 element.style.color = ''; // Default color
                 console.log('📍 Using fallback location');
+
+                // Show handyman map button once location is determined
+                showHandymanMapButton();
             }
         }
 
@@ -2228,6 +2279,186 @@
                 console.log('🖱️ Clicked outside modal, closing...');
                 closePhotoModal();
             }
+        }
+
+        // Handyman Distribution Map Functions
+        function showHandymanMapButton() {
+            const button = document.getElementById('handymanMapButton');
+            if (button) {
+                button.style.display = 'block';
+                console.log('🗺️ Handyman map button shown');
+            }
+        }
+
+        function showHandymanDistribution() {
+            console.log('🗺️ Opening handyman distribution map...');
+            const modal = document.getElementById('handymanMapModal');
+            if (modal) {
+                modal.classList.remove('hide');
+                modal.style.display = 'flex';
+                loadHandymanDistribution();
+                console.log('✅ Handyman map modal opened');
+            }
+        }
+
+        function closeHandymanMap() {
+            console.log('🔄 Closing handyman map...');
+            const modal = document.getElementById('handymanMapModal');
+            if (modal) {
+                modal.classList.add('hide');
+                modal.style.display = 'none';
+                console.log('✅ Handyman map closed');
+            }
+        }
+
+        function closeHandymanMapIfClickedOutside(event) {
+            if (event.target === event.currentTarget) {
+                console.log('🖱️ Clicked outside handyman map, closing...');
+                closeHandymanMap();
+            }
+        }
+
+        async function loadHandymanDistribution() {
+            try {
+                console.log('📊 Loading handyman distribution data...');
+
+                // Create simple map visualization using city data
+                const mapContainer = document.getElementById('handymanMapContainer');
+                const handymanList = document.getElementById('handymanList');
+
+                // Mock data for South Florida handymen distribution
+                const handymenData = [
+                    {
+                        city: "Miami",
+                        county: "Miami-Dade",
+                        count: 12,
+                        available: 8,
+                        avgRating: 4.7,
+                        serviceAreas: ["miami", "coral-gables", "aventura", "homestead"]
+                    },
+                    {
+                        city: "Fort Lauderdale",
+                        county: "Broward",
+                        count: 9,
+                        available: 6,
+                        avgRating: 4.6,
+                        serviceAreas: ["fort-lauderdale", "hollywood", "coral-springs", "plantation"]
+                    },
+                    {
+                        city: "West Palm Beach",
+                        county: "Palm Beach",
+                        count: 8,
+                        available: 5,
+                        avgRating: 4.8,
+                        serviceAreas: ["west-palm-beach", "boca-raton", "wellington", "jupiter"]
+                    },
+                    {
+                        city: "Hollywood",
+                        county: "Broward",
+                        count: 6,
+                        available: 4,
+                        avgRating: 4.5,
+                        serviceAreas: ["hollywood", "hallandale", "pembroke-pines"]
+                    },
+                    {
+                        city: "Boca Raton",
+                        county: "Palm Beach",
+                        count: 7,
+                        available: 5,
+                        avgRating: 4.9,
+                        serviceAreas: ["boca-raton", "delray-beach", "highland-beach"]
+                    }
+                ];
+
+                // Create simple visual map
+                mapContainer.innerHTML = `
+                    <div class="w-full h-full relative bg-blue-50 rounded-lg flex items-center justify-center overflow-hidden">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">🗺️</div>
+                            <div class="text-xl font-bold text-gray-700 mb-2">South Florida Service Coverage</div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                                ${handymenData.map(area => `
+                                    <div class="bg-white p-4 rounded-lg shadow border border-gray-200 text-center">
+                                        <div class="text-lg font-semibold text-gray-800">${area.city}</div>
+                                        <div class="text-sm text-gray-600">${area.county} County</div>
+                                        <div class="mt-2 text-green-600 font-medium">${area.available}/${area.count} Available</div>
+                                        <div class="text-xs text-yellow-600">⭐ ${area.avgRating}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Populate handyman list
+                handymanList.innerHTML = handymenData.map(area => `
+                    <div class="bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-semibold text-lg">${area.city}</h4>
+                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                                ${area.available} Available
+                            </span>
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">County:</span>
+                                <span>${area.county}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Handymen:</span>
+                                <span>${area.count}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Avg Rating:</span>
+                                <span class="text-yellow-600">⭐ ${area.avgRating}</span>
+                            </div>
+                            <div class="mt-3">
+                                <div class="text-gray-600 text-xs mb-1">Service Areas:</div>
+                                <div class="flex flex-wrap gap-1">
+                                    ${area.serviceAreas.slice(0, 3).map(area =>
+                                        `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">${area.replace('-', ' ')}</span>`
+                                    ).join('')}
+                                    ${area.serviceAreas.length > 3 ? `<span class="text-gray-500 text-xs">+${area.serviceAreas.length - 3} more</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gray-100">
+                            <button onclick="selectAreaAndBook('${area.city}')" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors text-sm">
+                                Book Handyman in ${area.city}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                console.log('✅ Handyman distribution loaded successfully');
+
+            } catch (error) {
+                console.error('❌ Error loading handyman distribution:', error);
+                const mapContainer = document.getElementById('handymanMapContainer');
+                mapContainer.innerHTML = `
+                    <div class="text-center text-red-600">
+                        <div class="text-4xl mb-2">❌</div>
+                        <div>Error loading handyman data</div>
+                        <div class="text-sm mt-2">Please try again later</div>
+                    </div>
+                `;
+            }
+        }
+
+        function selectAreaAndBook(city) {
+            console.log(`🎯 User selected ${city} for booking`);
+            closeHandymanMap();
+
+            // Update service data with selected area
+            serviceData.preferredArea = city;
+
+            // Show toast and proceed to service selection
+            showToast(`Great! We'll prioritize handymen in ${city} for your booking`, 'success');
+
+            // Trigger service selection flow
+            setTimeout(() => {
+                startServiceFlow();
+            }, 1000);
         }
 
         // Handle escape key to close modal
