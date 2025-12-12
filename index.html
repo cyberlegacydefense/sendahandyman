@@ -1369,17 +1369,26 @@
                 return;
             }
 
-            if (file.size > 3.7 * 1024 * 1024) {
-                showPhotoError('File size too large. Please choose a smaller image.');
+            // Check file size - account for base64 encoding expansion (~33% increase)
+            // API limit is 5MB after base64, so we need to limit uploads to ~3.7MB before encoding
+            const maxSizeBeforeEncoding = 3.7 * 1024 * 1024; // ~3.7MB raw = ~5MB after base64
+
+            if (file.size > maxSizeBeforeEncoding) {
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+                const estimatedEncodedSizeMB = (file.size * 1.33 / (1024 * 1024)).toFixed(1);
+                showPhotoErrorWithCompression(
+                    `Photo is ${sizeMB}MB (${estimatedEncodedSizeMB}MB after processing). Our AI requires photos under 3.7MB for analysis. Would you like us to compress it automatically?`,
+                    file
+                );
                 return;
             }
 
-            // Compress image if it's larger than 500KB for better reliability
+            // Auto-compress images larger than 500KB for better reliability
             if (file.size > 500 * 1024) {
-                console.log(`📦 Compressing image from ${(file.size / 1024).toFixed(1)}KB`);
+                console.log(`📦 Auto-compressing image from ${(file.size / 1024).toFixed(1)}KB`);
                 showToast('Optimizing image for faster upload...', 'info', 2000);
 
-                compressImage(file, 0.8).then(compressedFile => {
+                compressImage(file, 0.7, 1920).then(compressedFile => {
                     console.log(`📦 Compressed to ${(compressedFile.size / 1024).toFixed(1)}KB`);
                     displayImagePreview(compressedFile);
                     currentPhoto = compressedFile;
@@ -1404,47 +1413,109 @@
             reader.readAsDataURL(file);
         }
 
-        function compressImage(file, quality = 0.8) {
+        function compressImage(file, quality = 0.7, maxWidth = 1920) {
             return new Promise((resolve) => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 const img = new Image();
 
                 img.onload = function() {
-                    // Calculate new dimensions to keep under 1000px on longest side
-                    const maxSize = 1000;
-                    let { width, height } = img;
+                    // Calculate new dimensions
+                    const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+                    const newWidth = img.width * ratio;
+                    const newHeight = img.height * ratio;
 
-                    if (width > height && width > maxSize) {
-                        height = (height * maxSize) / width;
-                        width = maxSize;
-                    } else if (height > maxSize) {
-                        width = (width * maxSize) / height;
-                        height = maxSize;
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
 
                     // Draw and compress
-                    ctx.drawImage(img, 0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
 
-                    canvas.toBlob(
-                        (blob) => {
-                            // Create new File object with compressed data
-                            const compressedFile = new File([blob], file.name, {
-                                type: blob.type,
-                                lastModified: Date.now()
-                            });
-                            resolve(compressedFile);
-                        },
-                        file.type,
-                        quality
-                    );
+                    canvas.toBlob(function(blob) {
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        resolve(compressedFile);
+                    }, 'image/jpeg', quality);
                 };
 
                 img.src = URL.createObjectURL(file);
             });
+        }
+
+        function showPhotoErrorWithCompression(message, originalFile) {
+            const errorMessage = document.getElementById('photoErrorMessage');
+
+            errorMessage.innerHTML = `
+                <div class="mb-4">${message}</div>
+                <div class="flex gap-3 justify-center flex-wrap">
+                    <button onclick="compressLargeFile('${originalFile.name}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                        🗜️ Compress Photo
+                    </button>
+                    <button onclick="retakePhoto()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm">
+                        📷 Choose Different Photo
+                    </button>
+                    <button onclick="dismissPhotoError()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                        ✕ Cancel
+                    </button>
+                </div>
+            `;
+            document.getElementById('photoError').classList.remove('hide');
+
+            // Store the file for compression
+            window.pendingCompressionFile = originalFile;
+        }
+
+        async function compressLargeFile() {
+            if (!window.pendingCompressionFile) {
+                showToast('No file available for compression', 'error');
+                return;
+            }
+
+            const file = window.pendingCompressionFile;
+            dismissPhotoError();
+            showToast('Compressing large image...', 'info', 3000);
+
+            try {
+                // First compression attempt
+                console.log(`🗜️ Compressing ${(file.size / (1024 * 1024)).toFixed(1)}MB file...`);
+                const compressedFile = await compressImage(file, 0.7, 1920);
+                const compressedSizeMB = (compressedFile.size / (1024 * 1024)).toFixed(1);
+                console.log(`📦 First compression: ${compressedSizeMB}MB`);
+
+                // Check if still too large after first compression
+                const estimatedEncodedSize = compressedFile.size * 1.33;
+
+                if (estimatedEncodedSize > 5 * 1024 * 1024) {
+                    // Still too large, try more aggressive compression
+                    console.log(`First compression: ${compressedSizeMB}MB still too large, trying more aggressive compression...`);
+                    showToast('Applying stronger compression...', 'info', 3000);
+
+                    const veryCompressedFile = await compressImage(file, 0.3, 960); // Very aggressive
+                    const finalSizeMB = (veryCompressedFile.size / (1024 * 1024)).toFixed(1);
+                    const finalEncodedSize = veryCompressedFile.size * 1.33;
+
+                    if (finalEncodedSize > 5 * 1024 * 1024) {
+                        showPhotoError(`Even after compression, the image (${finalSizeMB}MB) is too large for AI analysis. Please try a smaller image or take a new photo.`);
+                        return;
+                    }
+
+                    displayImagePreview(veryCompressedFile);
+                    currentPhoto = veryCompressedFile;
+                    showToast(`Photo compressed from ${(file.size / (1024 * 1024)).toFixed(1)}MB to ${finalSizeMB}MB`, 'success');
+                } else {
+                    displayImagePreview(compressedFile);
+                    currentPhoto = compressedFile;
+                    showToast(`Photo compressed from ${(file.size / (1024 * 1024)).toFixed(1)}MB to ${compressedSizeMB}MB`, 'success');
+                }
+
+            } catch (error) {
+                console.error('Compression failed:', error);
+                showPhotoError('Compression failed. Please try a different photo or reduce the file size manually.');
+            } finally {
+                window.pendingCompressionFile = null;
+            }
         }
 
         function retakePhoto() {
