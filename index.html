@@ -118,6 +118,10 @@
             font-weight: 600;
             transition: all 0.2s ease;
             cursor: pointer;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-primary:hover {
@@ -502,6 +506,14 @@
                     </div>
                 </div>
 
+                <!-- Availability Indicator -->
+                <div class="max-w-2xl mx-auto text-center mb-8">
+                    <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full">
+                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span class="font-semibold text-sm">Available tomorrow onwards</span>
+                    </div>
+                </div>
+
                 <!-- Map and Handyman List Section -->
                 <div class="max-w-7xl mx-auto mb-12">
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -554,14 +566,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Availability Indicator -->
-                <div class="max-w-2xl mx-auto text-center">
-                    <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full">
-                        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span class="font-semibold text-sm">Available tomorrow onwards</span>
                     </div>
                 </div>
             </div>
