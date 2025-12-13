@@ -780,6 +780,178 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoamNyeXFjZWdybGdsYmZteHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEwNTU2ODcsImV4cCI6MjA0NjYzMTY4N30.BKfSkI98W7TmMgF88J5vCy8CHg4XvH3CGc2DGC8XGVw';
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Pricing constants (from original site)
+        const RATE = 80;
+        const PREMIUM_CURRENT_BLOCK = 0.30;
+        const PREMIUM_NEXT_BLOCK = 0.20;
+        const PREMIUM_EVENING_BLOCK = 0.35;
+        const PREMIUM_SATURDAY = 0.30;
+        const DISCOUNT_FUTURE = 0.10;
+
+        // Service types with proper pricing
+        const TASKS = {
+            'ceiling-fan': {
+                hours: 2.0,
+                label: "Ceiling Fan Install/Replace",
+                basePrice: 160,
+                questions: [
+                    {
+                        id: 'replacing',
+                        label: 'Replacing existing fan or light?',
+                        options: [
+                            { value: 'fan', label: 'Yes, existing fan', addon: 0 },
+                            { value: 'light', label: 'Yes, existing light fixture', addon: 0 },
+                            { value: 'new', label: 'New installation', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'fan_box',
+                        label: 'Is ceiling box fan-rated?',
+                        options: [
+                            { value: 'yes', label: 'Yes/Don\'t know', addon: 0 },
+                            { value: 'no', label: 'No, needs replacement', addon: 50 }
+                        ]
+                    },
+                    {
+                        id: 'ceiling_height',
+                        label: 'Ceiling height?',
+                        options: [
+                            { value: 'standard', label: 'Under 10 feet', addon: 0 },
+                            { value: 'high', label: 'Over 10 feet', addon: 40 }
+                        ]
+                    }
+                ]
+            },
+            'light-plumbing': {
+                hours: 1.5,
+                label: "Light Plumbing (Faucet/Toilet)",
+                basePrice: 120,
+                questions: []
+            },
+            'electrical': {
+                hours: 1.5,
+                label: "Light Electrical (Outlets/Switches)",
+                basePrice: 120,
+                questions: []
+            },
+            'tv-mounting': {
+                hours: 2.0,
+                label: "TV Wall Mount (32–65\")",
+                basePrice: 160,
+                questions: []
+            },
+            'furniture-assembly': {
+                hours: 2.0,
+                label: "Furniture Assembly (S–M)",
+                basePrice: 160,
+                questions: []
+            },
+            'painting': {
+                hours: 2.5,
+                label: "Small Painting Project",
+                basePrice: 200,
+                questions: []
+            },
+            'general-repair': {
+                hours: 1.5,
+                label: "General Repair",
+                basePrice: 120,
+                questions: []
+            },
+            'blinds': {
+                hours: 1.5,
+                label: "Curtain Rod/Blinds Mount",
+                basePrice: 120,
+                questions: []
+            }
+        };
+
+        // Pricing calculation function (matching original site logic)
+        function calculatePricing(hours, window = 'tomorrow_am', rush = false, addons = 0, selectedDate = null) {
+            const base = hours * RATE;
+            let premiums = [];
+            let total = base + addons;
+            const isToday = window.startsWith('today');
+            const isTomorrow = window.startsWith('tomorrow');
+            const isMonday = window.startsWith('monday');
+            const isFuture = selectedDate !== null;
+            const isEveningBlock = window.includes('eve');
+            const now = new Date();
+            let bookingDate;
+
+            if (isFuture && selectedDate) {
+                bookingDate = new Date(selectedDate + 'T00:00:00');
+            } else if (isToday) {
+                bookingDate = now;
+            } else if (isTomorrow) {
+                bookingDate = new Date(now);
+                bookingDate.setDate(bookingDate.getDate() + 1);
+            } else if (isMonday) {
+                bookingDate = new Date(now);
+                bookingDate.setDate(bookingDate.getDate() + 2); // Skip Sunday
+            }
+
+            // Evening block premium
+            if (isEveningBlock) {
+                total *= (1 + PREMIUM_EVENING_BLOCK);
+                premiums.push({ label: 'Evening', amount: Math.round(base * PREMIUM_EVENING_BLOCK) });
+            }
+
+            // Next-day premium for tomorrow
+            if (isTomorrow) {
+                total *= (1 + PREMIUM_NEXT_BLOCK);
+                premiums.push({ label: 'Next Day', amount: Math.round(base * PREMIUM_NEXT_BLOCK) });
+            }
+
+            // Saturday premium
+            if (bookingDate && isSaturday(bookingDate)) {
+                total *= (1 + PREMIUM_SATURDAY);
+                premiums.push({ label: 'Saturday', amount: Math.round(base * PREMIUM_SATURDAY) });
+            }
+
+            // Future booking discount (3+ days out)
+            if (isFuture && selectedDate) {
+                const daysDiff = Math.floor((bookingDate - now) / (1000 * 60 * 60 * 24));
+                if (daysDiff >= 3) {
+                    total *= (1 - DISCOUNT_FUTURE);
+                    premiums.push({ label: 'Future Discount', amount: -Math.round(base * DISCOUNT_FUTURE) });
+                }
+            }
+
+            return {
+                base: base,
+                total: Math.round(total),
+                premiums: premiums,
+                hours: hours
+            };
+        }
+
+        function updatePricingDisplay(taskKey) {
+            if (!taskKey || !TASKS[taskKey]) return;
+
+            const task = TASKS[taskKey];
+            const basePricing = calculatePricing(task.hours, 'tomorrow_am');
+            const eveningPricing = calculatePricing(task.hours, 'tomorrow_eve');
+
+            // Update main price display
+            const priceDisplay = document.getElementById('servicePriceDisplay');
+            if (priceDisplay) {
+                priceDisplay.textContent = `$${task.basePrice}`;
+            }
+
+            // Update tomorrow pricing
+            const tomorrowDisplay = document.getElementById('tomorrowPricing');
+            if (tomorrowDisplay) {
+                tomorrowDisplay.textContent = `$${basePricing.total}`;
+            }
+
+            // Update premium pricing (evening)
+            const premiumDisplay = document.getElementById('premiumPricing');
+            if (premiumDisplay) {
+                premiumDisplay.textContent = `$${eveningPricing.total}`;
+            }
+        }
+
         // Navigation functions
         function handleSearchKeyPress(event) {
             if (event.key === 'Enter') {
@@ -798,6 +970,10 @@
         function selectService(category) {
             serviceData.category = category;
             serviceData.categoryDisplay = getCategoryDisplay(category);
+
+            // Update pricing displays based on selected service
+            updatePricingDisplay(category);
+
             showServiceDetails();
 
             // Update textarea placeholder if it exists
@@ -915,31 +1091,11 @@
                     <p class="text-gray-600 mb-6">Choose your preferred time slot</p>
 
                     <div class="space-y-4">
-                        <div class="service-card p-4" onclick="selectSchedule('asap')">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <div class="font-semibold">ASAP</div>
-                                    <div class="text-sm text-gray-600">Today if available</div>
-                                </div>
-                                <div class="text-orange-600">⚡</div>
-                            </div>
-                        </div>
-
-                        <div class="service-card p-4" onclick="selectSchedule('today')">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <div class="font-semibold">Today</div>
-                                    <div class="text-sm text-gray-600">Select time slot</div>
-                                </div>
-                                <div class="text-blue-600">📅</div>
-                            </div>
-                        </div>
-
                         <div class="service-card p-4" onclick="selectSchedule('tomorrow')">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <div class="font-semibold">Tomorrow</div>
-                                    <div class="text-sm text-gray-600">Select time slot</div>
+                                    <div class="text-sm text-gray-600">Earliest available</div>
                                     <div class="text-xs text-green-600 mt-1">🎯 Most handymen available</div>
                                 </div>
                                 <div class="text-green-600">⭐</div>
@@ -989,7 +1145,7 @@
                             <span class="ai-badge">AI</span>
                             <span class="font-semibold">${serviceData.categoryDisplay || 'Service Request'}</span>
                         </div>
-                        <div class="text-3xl font-bold mb-2">$85 - $120</div>
+                        <div class="text-3xl font-bold mb-2" id="servicePriceDisplay">$160</div>
                         <div class="text-lg opacity-90 mb-4">Estimated cost range</div>
                         <div class="text-sm opacity-80">
                             • 1-2 hours estimated duration<br>
@@ -1005,7 +1161,7 @@
                                     <div class="font-semibold">Standard Service</div>
                                     <div class="text-sm text-gray-600">Basic repair • ⭐⭐⭐⭐ 4.8 avg rating</div>
                                 </div>
-                                <div class="text-xl font-bold">$85-120</div>
+                                <div class="text-xl font-bold" id="tomorrowPricing">$144</div>
                             </div>
                         </div>
 
@@ -1016,12 +1172,12 @@
                                     <div class="text-sm text-gray-600">Expert + warranty • ⭐⭐⭐⭐⭐ 4.9 avg rating</div>
                                     <div class="text-xs text-green-600 mt-1">✅ 90-day guarantee</div>
                                 </div>
-                                <div class="text-xl font-bold">$120-160</div>
+                                <div class="text-xl font-bold" id="premiumPricing">$216</div>
                             </div>
                         </div>
                     </div>
 
-                    <button onclick="proceedToBooking()" class="btn-primary w-full py-4 text-lg">
+                    <button onclick="proceedToBooking()" class="btn-primary w-full py-4 text-lg" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
                         Continue to Booking
                     </button>
                 </div>
@@ -1030,6 +1186,21 @@
 
         function selectServiceLevel(level) {
             serviceData.serviceLevel = level;
+
+            // Update visual selection state
+            document.querySelectorAll('.service-card').forEach(card => {
+                card.classList.remove('selected', 'bg-blue-50', 'border-blue-300');
+            });
+
+            // Add selected state to clicked card
+            event.target.closest('.service-card').classList.add('selected', 'bg-blue-50', 'border-blue-300');
+
+            // Show the Continue to Booking button
+            const bookingBtn = document.querySelector('button[onclick="proceedToBooking()"]');
+            if (bookingBtn) {
+                bookingBtn.style.display = 'block';
+                bookingBtn.style.opacity = '1';
+            }
         }
 
         function proceedToBooking() {
@@ -1058,19 +1229,16 @@
                 availableTimeSlots = timeSlots;
                 hideLoading();
 
-                // Show sticky bottom bar on mobile
-                showStickyBottomBar('Select Time Slot', 'selectFirstAvailableSlot()');
-            }, 800);
+                // Build the template with actual timeSlots data
+                content.innerHTML = `
+                    <div class="slide-up">
+                        <h2 class="text-2xl font-bold mb-2">Choose Time & Date</h2>
+                        <p class="text-gray-600 mb-6">Select when you'd like your ${serviceData.categoryDisplay} service</p>
 
-            content.innerHTML = `
-                <div class="slide-up">
-                    <h2 class="text-2xl font-bold mb-2">Choose Time & Date</h2>
-                    <p class="text-gray-600 mb-6">Select when you'd like your ${serviceData.categoryDisplay} service</p>
-
-                    <div class="space-y-4 mb-8">
-                        ${timeSlots.map((slot, index) => `
-                            <div class="service-card p-4 cursor-pointer" onclick="selectTimeSlotByIndex(${index})">
-                                <div class="flex justify-between items-center">
+                        <div class="space-y-4 mb-8">
+                            ${timeSlots.map((slot, index) => `
+                                <div class="service-card p-4 cursor-pointer" onclick="selectTimeSlotByIndex(${index})">
+                                    <div class="flex justify-between items-center">
                                     <div>
                                         <div class="font-semibold">${slot.windowLabel}</div>
                                         <div class="text-sm text-gray-600">${slot.badge || ''}</div>
@@ -1095,7 +1263,11 @@
                         Back to Service Details
                     </button>
                 </div>
-            `;
+                `;
+
+                // Show sticky bottom bar on mobile
+                showStickyBottomBar('Select Time Slot', 'selectFirstAvailableSlot()');
+            }, 800);
         }
 
         function selectTimeSlotByIndex(index) {
@@ -1788,7 +1960,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                             <h5 class="font-semibold text-gray-900 mb-2">💰 Cost Estimate</h5>
-                            <p class="text-lg font-bold text-gray-800">${result.cost_estimate || '$85-120'}</p>
+                            <p class="text-lg font-bold text-gray-800">${result.cost_estimate || '$160'}</p>
                         </div>
                         <div class="bg-${result.risk_level === 'high' || result.risk_level === 'urgent' ? 'red' : result.risk_level === 'moderate' ? 'yellow' : 'green'}-50 border border-${result.risk_level === 'high' || result.risk_level === 'urgent' ? 'red' : result.risk_level === 'moderate' ? 'yellow' : 'green'}-200 rounded-lg p-4">
                             <h5 class="font-semibold text-${result.risk_level === 'high' || result.risk_level === 'urgent' ? 'red' : result.risk_level === 'moderate' ? 'yellow' : 'green'}-900 mb-2">⚠️ Risk Level</h5>
@@ -1827,7 +1999,7 @@
                             </button>
                         ` : `
                             <button onclick="useAnalysisResults()" class="btn-primary w-full py-3">
-                                Book ${result.recommended_task || 'Service'} - ${result.cost_estimate || '$85-120'}
+                                Book ${result.recommended_task || 'Service'} - ${result.cost_estimate || '$160'}
                             </button>
                             <button onclick="retakePhoto()" class="btn-secondary w-full py-2">
                                 📷 Take Different Photo
