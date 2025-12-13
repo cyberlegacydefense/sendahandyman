@@ -510,7 +510,7 @@
                 <div class="max-w-2xl mx-auto text-center mb-8">
                     <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full">
                         <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span class="font-semibold text-sm">Available tomorrow onwards</span>
+                        <span class="font-semibold text-sm" id="availabilityText">Available tomorrow onwards</span>
                     </div>
                 </div>
 
@@ -952,6 +952,34 @@
             }
         }
 
+        // Availability text update function
+        function updateAvailabilityText() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const availabilityElement = document.getElementById('availabilityText');
+            const scheduleElement = document.getElementById('scheduleEarliestDay');
+
+            if (isSunday(tomorrow)) {
+                // If tomorrow is Sunday, show Monday
+                if (availabilityElement) {
+                    availabilityElement.textContent = 'Available Monday onwards';
+                }
+                if (scheduleElement) {
+                    scheduleElement.textContent = 'Monday';
+                }
+            } else {
+                // Normal case
+                if (availabilityElement) {
+                    availabilityElement.textContent = 'Available tomorrow onwards';
+                }
+                if (scheduleElement) {
+                    scheduleElement.textContent = 'Tomorrow';
+                }
+            }
+        }
+
         // Navigation functions
         function handleSearchKeyPress(event) {
             if (event.key === 'Enter') {
@@ -1094,7 +1122,7 @@
                         <div class="service-card p-4" onclick="selectSchedule('tomorrow')">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <div class="font-semibold">Tomorrow</div>
+                                    <div class="font-semibold" id="scheduleEarliestDay">Tomorrow</div>
                                     <div class="text-sm text-gray-600">Earliest available</div>
                                     <div class="text-xs text-green-600 mt-1">🎯 Most handymen available</div>
                                 </div>
@@ -1126,6 +1154,11 @@
                     </div>
                 </div>
             `;
+
+            // Update availability text after DOM is updated
+            setTimeout(() => {
+                updateAvailabilityText();
+            }, 0);
         }
 
         function selectSchedule(schedule) {
@@ -2092,9 +2125,19 @@
             try {
                 // Check if geolocation is supported
                 if (!navigator.geolocation) {
+                    console.log('📍 Geolocation not supported');
                     setFallbackLocation(locationElement);
                     return;
                 }
+
+                // Check for HTTPS requirement
+                if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                    console.log('📍 HTTPS required for geolocation');
+                    setFallbackLocation(locationElement);
+                    return;
+                }
+
+                console.log('📍 Requesting location permission...');
 
                 // Request user's location with timeout
                 const position = await getCurrentPosition();
@@ -2108,6 +2151,17 @@
 
             } catch (error) {
                 console.log('📍 Location detection failed:', error.message);
+                console.log('📍 Error details:', error);
+
+                // Specific error messages for debugging
+                if (error.code === 1) {
+                    console.log('📍 User denied location permission');
+                } else if (error.code === 2) {
+                    console.log('📍 Location unavailable');
+                } else if (error.code === 3) {
+                    console.log('📍 Location timeout');
+                }
+
                 setFallbackLocation(locationElement);
             }
         }
@@ -3285,6 +3339,9 @@
 
             // Initialize location detection
             detectUserLocation();
+
+            // Update availability text based on day of week
+            updateAvailabilityText();
 
             // Ensure landing screen is visible and other screens are hidden
             document.getElementById('landingScreen').classList.remove('hide');
