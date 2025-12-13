@@ -898,7 +898,7 @@
             }
 
             // Next-day premium for tomorrow
-            if (isTomorrow) {
+            if (isTomorrow || window.includes('day1_') || window.includes('day2_')) {
                 total *= (1 + PREMIUM_NEXT_BLOCK);
                 premiums.push({ label: 'Next Day', amount: Math.round(base * PREMIUM_NEXT_BLOCK) });
             }
@@ -1152,7 +1152,7 @@
 
                     <div class="mt-8 p-4 bg-blue-50 rounded-lg">
                         <div class="text-sm">
-                            <div class="font-semibold mb-1">Available today:</div>
+                            <div class="font-semibold mb-1">Available time slots:</div>
                             <div class="flex gap-2 flex-wrap">
                                 <span class="bg-white px-2 py-1 rounded text-xs">9-11 AM</span>
                                 <span class="bg-white px-2 py-1 rounded text-xs">11-1 PM</span>
@@ -1529,72 +1529,79 @@
         }
 
         function generateTimeSlots() {
+            console.log('🕒 generateTimeSlots called');
             const now = new Date();
             const timeSlots = [];
-            const hours = 2; // Default service duration
+            const task = TASKS[serviceData.category];
+            const hours = task ? task.hours : 2;
 
-            // Define time blocks
+            console.log('🕒 Task details:', { category: serviceData.category, hours });
+
+            // Define time blocks: 8AM-12PM, 12PM-4PM, 4PM-8PM (premium)
             const timeBlocks = [
-                { key: 'am', label: '8AM-12PM' },
-                { key: 'pm', label: '12PM-4PM' },
-                { key: 'eve', label: '4PM-8PM' }
+                { key: 'am', label: '8AM-12PM', start: 8, end: 12, premium: false },
+                { key: 'pm', label: '12PM-4PM', start: 12, end: 16, premium: false },
+                { key: 'eve', label: '4PM-8PM', start: 16, end: 20, premium: true }
             ];
 
-            // NEVER offer same-day service - always start with tomorrow
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            // Get next business day (skip Sunday, ensure at least 1 business day gap)
+            function getNextBusinessDay(fromDate, daysToAdd = 1) {
+                const nextDate = new Date(fromDate);
+                nextDate.setDate(nextDate.getDate() + daysToAdd);
 
-            if (!isSunday(tomorrow)) {
-                timeBlocks.forEach(block => {
-                    const tomorrowWindow = `tomorrow_${block.key}`;
-                    const pricing = calculatePricing(hours, tomorrowWindow);
-                    timeSlots.push({
-                        window: tomorrowWindow,
-                        windowLabel: `Tomorrow (${block.label})`,
-                        pricing: pricing,
-                        badge: isSaturday(tomorrow) ? 'Saturday Premium' : 'Next Day',
-                        premiums: pricing.premiums
-                    });
-                });
+                // If it lands on Sunday, move to Monday
+                if (isSunday(nextDate)) {
+                    nextDate.setDate(nextDate.getDate() + 1);
+                }
+
+                return nextDate;
             }
 
-            // Add Monday slots if tomorrow is Sunday (skip Sunday)
-            if (isSunday(tomorrow)) {
-                const monday = new Date(tomorrow);
-                monday.setDate(monday.getDate() + 1);
+            // For Saturday (today), earliest should be Tuesday (skip Sunday Monday)
+            // For other days, earliest should be tomorrow (if not Sunday)
+            const firstAvailableDay = getNextBusinessDay(now, 1);
+            const secondAvailableDay = getNextBusinessDay(firstAvailableDay, 1);
 
-                timeBlocks.forEach(block => {
-                    const mondayWindow = `monday_${block.key}`;
-                    const pricing = calculatePricing(hours, mondayWindow);
-                    timeSlots.push({
-                        window: mondayWindow,
-                        windowLabel: `Monday (${block.label})`,
-                        pricing: pricing,
-                        badge: 'Future Booking',
-                        premiums: pricing.premiums
-                    });
+            console.log('🕒 Available days:', {
+                today: now.toDateString(),
+                todayIsWeekday: now.getDay(),
+                firstAvailable: firstAvailableDay.toDateString(),
+                secondAvailable: secondAvailableDay.toDateString()
+            });
+
+            // Add first available day slots (no future discount)
+            timeBlocks.forEach(block => {
+                const window = `day1_${block.key}`;
+                const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, 0, null);
+                const dayName = firstAvailableDay.toLocaleDateString('en-US', { weekday: 'long' });
+
+                timeSlots.push({
+                    window: window,
+                    windowLabel: `${dayName} (${block.label})`,
+                    pricing: pricing,
+                    badge: isSaturday(firstAvailableDay) ? 'Saturday Premium' : 'Next Available',
+                    premiums: pricing.premiums,
+                    date: firstAvailableDay.toISOString().split('T')[0]
                 });
-            }
+            });
 
-            // Add day after Monday if needed (Tuesday onwards)
-            const dayAfterTomorrow = new Date(tomorrow);
-            dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 1);
+            // Add second available day slots (no future discount)
+            timeBlocks.forEach(block => {
+                const window = `day2_${block.key}`;
+                const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, 0, null);
+                const dayName = secondAvailableDay.toLocaleDateString('en-US', { weekday: 'long' });
 
-            if (!isSunday(dayAfterTomorrow)) {
-                const dayName = dayAfterTomorrow.toLocaleDateString('en-US', { weekday: 'long' });
-                timeBlocks.forEach(block => {
-                    const futureWindow = `future_${block.key}`;
-                    const pricing = calculatePricing(hours, futureWindow, false, 0, dayAfterTomorrow.toISOString().split('T')[0]);
-                    timeSlots.push({
-                        window: futureWindow,
-                        windowLabel: `${dayName} (${block.label})`,
-                        pricing: pricing,
-                        badge: 'Future Booking - Best Value',
-                        premiums: pricing.premiums
-                    });
+                timeSlots.push({
+                    window: window,
+                    windowLabel: `${dayName} (${block.label})`,
+                    pricing: pricing,
+                    badge: isSaturday(secondAvailableDay) ? 'Saturday Premium' : 'Standard',
+                    premiums: pricing.premiums,
+                    date: secondAvailableDay.toISOString().split('T')[0]
                 });
-            }
+            });
 
+            console.log('🕒 Generated time slots:', timeSlots.length);
             return timeSlots;
         }
 
