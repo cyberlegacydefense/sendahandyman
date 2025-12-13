@@ -954,6 +954,7 @@
 
         // Availability text update function
         function updateAvailabilityText() {
+            console.log('📅 updateAvailabilityText called');
             const now = new Date();
             const tomorrow = new Date(now);
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -961,8 +962,15 @@
             const availabilityElement = document.getElementById('availabilityText');
             const scheduleElement = document.getElementById('scheduleEarliestDay');
 
+            console.log('📅 Elements found:', {
+                availability: !!availabilityElement,
+                schedule: !!scheduleElement,
+                isTomorrowSunday: isSunday(tomorrow)
+            });
+
             if (isSunday(tomorrow)) {
                 // If tomorrow is Sunday, show Monday
+                console.log('📅 Tomorrow is Sunday, updating to Monday');
                 if (availabilityElement) {
                     availabilityElement.textContent = 'Available Monday onwards';
                 }
@@ -971,6 +979,7 @@
                 }
             } else {
                 // Normal case
+                console.log('📅 Tomorrow is not Sunday, keeping Tomorrow');
                 if (availabilityElement) {
                     availabilityElement.textContent = 'Available tomorrow onwards';
                 }
@@ -2120,7 +2129,9 @@
 
         // Location detection functions
         async function detectUserLocation() {
+            console.log('📍 detectUserLocation called');
             const locationElement = document.getElementById('locationIndicator');
+            console.log('📍 Location element found:', !!locationElement);
 
             try {
                 // Check if geolocation is supported
@@ -3342,6 +3353,17 @@
 
             // Update availability text based on day of week
             updateAvailabilityText();
+
+            // Debug: Test Sunday logic with actual date
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            console.log('🗓️ Debug info:', {
+                today: now.toDateString(),
+                tomorrow: tomorrow.toDateString(),
+                tomorrowDay: tomorrow.getDay(),
+                isTomorrowSunday: tomorrow.getDay() === 0
+            });
 
             // Ensure landing screen is visible and other screens are hidden
             document.getElementById('landingScreen').classList.remove('hide');
