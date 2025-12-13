@@ -1420,14 +1420,6 @@
             }, 2000);
         }
 
-        // Original pricing logic from the main site
-        const RATE = 80;
-        const PREMIUM_CURRENT_BLOCK = 0.30;
-        const PREMIUM_NEXT_BLOCK = 0.20;
-        const PREMIUM_EVENING_BLOCK = 0.35;
-        const PREMIUM_SATURDAY = 0.30;
-        const DISCOUNT_FUTURE = 0.10;
-
         function getCurrentBlock() {
             const now = new Date();
             const hour = now.getHours();
