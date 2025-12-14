@@ -1255,6 +1255,13 @@
         let currentBookingStep = 1;
 
         function showBookingFlow() {
+            console.log('🚀 showBookingFlow called - this should generate proper time slots');
+            console.log('📅 Current date and context:', {
+                now: new Date().toString(),
+                dayOfWeek: new Date().getDay(), // 0=Sunday, 6=Saturday
+                serviceData: serviceData
+            });
+
             const content = document.getElementById('serviceContent');
             document.getElementById('landingScreen').classList.add('hide');
             document.getElementById('serviceFlow').classList.remove('hide');
@@ -1269,6 +1276,11 @@
             setTimeout(() => {
                 const timeSlots = generateTimeSlots();
                 availableTimeSlots = timeSlots;
+                console.log('🕒 ACTUAL TIME SLOTS GENERATED:', timeSlots.map(slot => ({
+                    label: slot.windowLabel,
+                    price: slot.pricing.total,
+                    badge: slot.badge
+                })));
                 hideLoading();
 
                 // Build the template with actual timeSlots data
