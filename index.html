@@ -1463,10 +1463,16 @@
                 // Complete the booking flow
                 setTimeout(() => {
                     // Store the service data for the original site
-                    sessionStorage.setItem('prefilledService', JSON.stringify(serviceData));
+                    const bookingData = {
+                        ...serviceData,
+                        selectedTimeSlot: serviceData.selectedTimeSlot,
+                        pricing: serviceData.pricing,
+                        timestamp: new Date().toISOString()
+                    };
+                    sessionStorage.setItem('prefilledService', JSON.stringify(bookingData));
 
-                    // Redirect to the original booking interface
-                    window.location.href = 'index-original.html';
+                    // Redirect to the original booking interface with pricing step
+                    window.location.href = 'index-original.html#booking-step-pricing';
                 }, 1500);
             }, 2000);
         }

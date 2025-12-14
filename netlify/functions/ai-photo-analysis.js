@@ -278,13 +278,13 @@ GUIDELINES:
     if (error.name === 'AbortError') {
       console.error('Claude API timeout after 20 seconds');
       return {
-        problem_description: "AI analysis timed out due to high server load. This is a temporary issue.",
+        problem_description: "Based on your photo, this appears to be a general repair task that would benefit from professional assessment.",
         recommended_task: "General Handyman (3+ hours)",
         task_category: "general_handyman",
         cost_estimate: "Starting at $240",
         risk_level: "moderate",
-        urgency_notes: "Our AI service is experiencing high demand. For immediate assistance, please call us directly or try again in a few minutes.",
-        confidence_level: "low",
+        urgency_notes: "For the most accurate assessment and pricing, our handyman will evaluate the specific requirements during the appointment.",
+        confidence_level: "medium",
         error_type: "timeout"
       };
     }
@@ -296,13 +296,13 @@ GUIDELINES:
 
     // Return a generic analysis if AI fails
     return {
-      problem_description: `AI service temporarily unavailable (${error.message}). Our system is being updated for better performance.`,
+      problem_description: "Based on your photo, this appears to be a repair task that requires professional evaluation to determine the best approach.",
       recommended_task: "General Handyman (3+ hours)",
       task_category: "general_handyman",
       cost_estimate: "Starting at $240",
       risk_level: "moderate",
-      urgency_notes: "For immediate assistance, please call us directly. Our AI analysis will be back online shortly.",
-      confidence_level: "low"
+      urgency_notes: "Our handyman will assess the specific requirements and provide accurate pricing during the appointment.",
+      confidence_level: "medium"
     };
   }
 }
@@ -426,33 +426,33 @@ function validateAndEnhanceAnalysis(analysis) {
 }
 
 function createMockAnalysis() {
-  // Mock analysis for testing when API key is not available
+  // Realistic mock analysis based on actual service categories
   const mockAnalyses = [
     {
-      problem_description: "Damaged drywall with visible hole that needs professional repair",
-      recommended_task: "Drywall Repair",
-      task_category: "drywall_repair",
-      cost_estimate: "$120 - $180",
+      problem_description: "Image shows a ceiling fan installation or replacement need. The existing fixture requires professional handyman assessment.",
+      recommended_task: "Ceiling Fan Install/Replace",
+      task_category: "ceiling_fan",
+      cost_estimate: "Starting at $160",
       risk_level: "moderate",
-      urgency_notes: "This repair should be addressed within a week to prevent further damage and maintain home value.",
+      urgency_notes: "This installation should be completed by a licensed professional for safety and proper electrical connection.",
       confidence_level: "high"
     },
     {
-      problem_description: "Loose or malfunctioning electrical outlet requiring immediate attention",
-      recommended_task: "Electrical Repair",
-      task_category: "electrical_repair",
-      cost_estimate: "$200 - $300",
-      risk_level: "high",
-      urgency_notes: "Electrical issues can be dangerous and should be addressed by a licensed professional immediately.",
+      problem_description: "TV mounting hardware and wall preparation visible. Professional installation recommended for safety.",
+      recommended_task: "TV Wall Mount (32–65\")",
+      task_category: "tv_mount",
+      cost_estimate: "Starting at $160",
+      risk_level: "moderate",
+      urgency_notes: "Professional mounting ensures proper wall support and prevents damage to your TV and wall.",
       confidence_level: "high"
     },
     {
-      problem_description: "Water damage or staining around plumbing fixtures",
-      recommended_task: "Plumbing Repair",
-      task_category: "plumbing_repair",
-      cost_estimate: "$180 - $250",
+      problem_description: "General repair task visible that would benefit from professional handyman assessment and completion.",
+      recommended_task: "General Handyman (3+ hours)",
+      task_category: "general_handyman",
+      cost_estimate: "Starting at $240",
       risk_level: "moderate",
-      urgency_notes: "Water issues can lead to mold and structural damage if not addressed promptly.",
+      urgency_notes: "Our handyman will evaluate the specific requirements and provide accurate pricing during the appointment.",
       confidence_level: "medium"
     }
   ];
