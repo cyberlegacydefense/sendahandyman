@@ -868,6 +868,7 @@
 
         // Pricing calculation function (matching original site logic)
         function calculatePricing(hours, window = 'tomorrow_am', rush = false, addons = 0, selectedDate = null) {
+            console.log('💰 calculatePricing called:', { hours, window, rush, addons, selectedDate });
             const base = hours * RATE;
             let premiums = [];
             let total = base + addons;
@@ -918,6 +919,13 @@
                 }
             }
 
+            console.log('💰 Pricing result:', {
+                base: base,
+                total: Math.round(total),
+                premiums: premiums,
+                finalCalculation: `${base} base + premiums = ${Math.round(total)}`
+            });
+
             return {
                 base: base,
                 total: Math.round(total),
@@ -956,8 +964,7 @@
         function updateAvailabilityText() {
             console.log('📅 updateAvailabilityText called');
             const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            const today = now.getDay(); // 0=Sunday, 6=Saturday
 
             const availabilityElement = document.getElementById('availabilityText');
             const scheduleElement = document.getElementById('scheduleEarliestDay');
@@ -965,12 +972,21 @@
             console.log('📅 Elements found:', {
                 availability: !!availabilityElement,
                 schedule: !!scheduleElement,
-                isTomorrowSunday: isSunday(tomorrow)
+                todayIs: today === 0 ? 'Sunday' : today === 6 ? 'Saturday' : 'Weekday'
             });
 
-            if (isSunday(tomorrow)) {
-                // If tomorrow is Sunday, show Monday
-                console.log('📅 Tomorrow is Sunday, updating to Monday');
+            if (today === 0) {
+                // If today is Sunday, earliest available is Tuesday (skip Monday business day rule)
+                console.log('📅 Today is Sunday, earliest available is Tuesday');
+                if (availabilityElement) {
+                    availabilityElement.textContent = 'Available Tuesday onwards';
+                }
+                if (scheduleElement) {
+                    scheduleElement.textContent = 'Tuesday';
+                }
+            } else if (today === 6) {
+                // If today is Saturday, earliest available is Monday (skip Sunday)
+                console.log('📅 Today is Saturday, earliest available is Monday');
                 if (availabilityElement) {
                     availabilityElement.textContent = 'Available Monday onwards';
                 }
@@ -978,13 +994,26 @@
                     scheduleElement.textContent = 'Monday';
                 }
             } else {
-                // Normal case
-                console.log('📅 Tomorrow is not Sunday, keeping Tomorrow');
-                if (availabilityElement) {
-                    availabilityElement.textContent = 'Available tomorrow onwards';
-                }
-                if (scheduleElement) {
-                    scheduleElement.textContent = 'Tomorrow';
+                // Normal weekday case
+                const tomorrow = new Date(now);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+
+                if (isSunday(tomorrow)) {
+                    console.log('📅 Tomorrow is Sunday, earliest available is Monday');
+                    if (availabilityElement) {
+                        availabilityElement.textContent = 'Available Monday onwards';
+                    }
+                    if (scheduleElement) {
+                        scheduleElement.textContent = 'Monday';
+                    }
+                } else {
+                    console.log('📅 Normal case, earliest available is tomorrow');
+                    if (availabilityElement) {
+                        availabilityElement.textContent = 'Available tomorrow onwards';
+                    }
+                    if (scheduleElement) {
+                        scheduleElement.textContent = 'Tomorrow';
+                    }
                 }
             }
         }
@@ -1569,10 +1598,26 @@
                 return nextDate;
             }
 
-            // For Saturday (today), earliest should be Tuesday (skip Sunday Monday)
-            // For other days, earliest should be tomorrow (if not Sunday)
-            const firstAvailableDay = getNextBusinessDay(now, 1);
-            const secondAvailableDay = getNextBusinessDay(firstAvailableDay, 1);
+            // Business day rules:
+            // Sunday → Tuesday (skip Monday, need 1 business day gap)
+            // Saturday → Monday (skip Sunday)
+            // Weekdays → Tomorrow (unless Sunday, then Monday)
+            const today = now.getDay();
+            let firstAvailableDay, secondAvailableDay;
+
+            if (today === 0) {
+                // Sunday: earliest is Tuesday
+                firstAvailableDay = getNextBusinessDay(now, 2); // Skip Monday
+                secondAvailableDay = getNextBusinessDay(firstAvailableDay, 1);
+            } else if (today === 6) {
+                // Saturday: earliest is Monday (skip Sunday)
+                firstAvailableDay = getNextBusinessDay(now, 2); // Skip Sunday, land on Monday
+                secondAvailableDay = getNextBusinessDay(firstAvailableDay, 1);
+            } else {
+                // Weekday: earliest is tomorrow (unless tomorrow is Sunday)
+                firstAvailableDay = getNextBusinessDay(now, 1);
+                secondAvailableDay = getNextBusinessDay(firstAvailableDay, 1);
+            }
 
             console.log('🕒 Available days:', {
                 today: now.toDateString(),
@@ -1584,6 +1629,7 @@
             // Add first available day slots (no future discount)
             timeBlocks.forEach(block => {
                 const window = `day1_${block.key}`;
+                // Use tomorrow_ window for next-day premium, but no selectedDate to avoid future discount
                 const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, 0, null);
                 const dayName = firstAvailableDay.toLocaleDateString('en-US', { weekday: 'long' });
 
@@ -1600,6 +1646,7 @@
             // Add second available day slots (no future discount)
             timeBlocks.forEach(block => {
                 const window = `day2_${block.key}`;
+                // Use tomorrow_ window for next-day premium, but no selectedDate to avoid future discount
                 const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, 0, null);
                 const dayName = secondAvailableDay.toLocaleDateString('en-US', { weekday: 'long' });
 
