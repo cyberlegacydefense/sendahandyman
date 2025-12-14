@@ -426,38 +426,14 @@ function validateAndEnhanceAnalysis(analysis) {
 }
 
 function createMockAnalysis() {
-  // Realistic mock analysis based on actual service categories
-  const mockAnalyses = [
-    {
-      problem_description: "Image shows a ceiling fan installation or replacement need. The existing fixture requires professional handyman assessment.",
-      recommended_task: "Ceiling Fan Install/Replace",
-      task_category: "ceiling_fan",
-      cost_estimate: "Starting at $160",
-      risk_level: "moderate",
-      urgency_notes: "This installation should be completed by a licensed professional for safety and proper electrical connection.",
-      confidence_level: "high"
-    },
-    {
-      problem_description: "TV mounting hardware and wall preparation visible. Professional installation recommended for safety.",
-      recommended_task: "TV Wall Mount (32–65\")",
-      task_category: "tv_mount",
-      cost_estimate: "Starting at $160",
-      risk_level: "moderate",
-      urgency_notes: "Professional mounting ensures proper wall support and prevents damage to your TV and wall.",
-      confidence_level: "high"
-    },
-    {
-      problem_description: "General repair task visible that would benefit from professional handyman assessment and completion.",
-      recommended_task: "General Handyman (3+ hours)",
-      task_category: "general_handyman",
-      cost_estimate: "Starting at $240",
-      risk_level: "moderate",
-      urgency_notes: "Our handyman will evaluate the specific requirements and provide accurate pricing during the appointment.",
-      confidence_level: "medium"
-    }
-  ];
-
-  // Return a random mock analysis
-  const randomIndex = Math.floor(Math.random() * mockAnalyses.length);
-  return mockAnalyses[randomIndex];
+  // For testing ceiling fan specifically, return ceiling fan analysis
+  return {
+    problem_description: "Image shows a ceiling fan installation or replacement need. The existing fixture appears ready for professional handyman service.",
+    recommended_task: "Ceiling Fan Install/Replace",
+    task_category: "ceiling_fan",
+    cost_estimate: "Starting at $160",
+    risk_level: "moderate",
+    urgency_notes: "This installation should be completed by a licensed professional for safety and proper electrical connection.",
+    confidence_level: "high"
+  };
 }

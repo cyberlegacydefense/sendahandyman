@@ -2136,36 +2136,63 @@
                 // Enhanced mapping logic for AI recommended task to service categories
                 let mappedCategory = 'repair'; // default
                 const task = result.recommended_task.toLowerCase();
+                const taskCategory = result.task_category; // Direct category from AI
 
-                console.log('📋 Mapping AI task:', task);
+                console.log('📋 AI Analysis Result:', {
+                    task: result.recommended_task,
+                    task_category: result.task_category,
+                    cost_estimate: result.cost_estimate
+                });
 
-                // More comprehensive task detection
-                if (task.includes('ceiling') && (task.includes('fan') || task.includes('install') || task.includes('replace'))) {
+                // First check if AI provided a direct task_category mapping
+                if (taskCategory === 'ceiling_fan') {
                     mappedCategory = 'ceiling-fan';
-                    console.log('✅ Mapped to ceiling-fan');
-                } else if (task.includes('fan') && (task.includes('install') || task.includes('replace') || task.includes('ceiling'))) {
-                    mappedCategory = 'ceiling-fan';
-                    console.log('✅ Mapped to ceiling-fan (fan detected)');
-                } else if (task.includes('tv') || task.includes('mount') || task.includes('mounting')) {
+                    console.log('✅ Direct mapping: ceiling_fan → ceiling-fan');
+                } else if (taskCategory === 'tv_mount') {
                     mappedCategory = 'tv-mounting';
-                } else if (task.includes('plumb') || task.includes('faucet') || task.includes('toilet') || task.includes('leak')) {
-                    mappedCategory = 'plumbing';
-                } else if (task.includes('electric') || task.includes('outlet') || task.includes('switch') || task.includes('wire')) {
+                    console.log('✅ Direct mapping: tv_mount → tv-mounting');
+                } else if (taskCategory === 'light_fixture') {
                     mappedCategory = 'electrical';
-                } else if (task.includes('paint') || task.includes('wall') || task.includes('color')) {
-                    mappedCategory = 'painting';
-                } else if (task.includes('furniture') || task.includes('assembly') || task.includes('ikea')) {
+                    console.log('✅ Direct mapping: light_fixture → electrical');
+                } else if (taskCategory === 'faucet_showerhead') {
+                    mappedCategory = 'plumbing';
+                    console.log('✅ Direct mapping: faucet_showerhead → plumbing');
+                } else if (taskCategory === 'furniture_assembly') {
                     mappedCategory = 'furniture-assembly';
-                } else if (task.includes('curtain') || task.includes('blind') || task.includes('window')) {
+                    console.log('✅ Direct mapping: furniture_assembly → furniture-assembly');
+                } else if (taskCategory === 'curtains_blinds') {
                     mappedCategory = 'curtains-blinds';
-                } else if (task.includes('general') && task.includes('handyman')) {
-                    // If AI says "General Handyman" but we expect a specific task,
-                    // check the cost estimate to help determine the correct category
-                    const cost = result.cost_estimate;
-                    if (cost && cost.includes('160')) {
-                        // $160 is ceiling fan base price
+                    console.log('✅ Direct mapping: curtains_blinds → curtains-blinds');
+                } else {
+                    // Fallback to text-based mapping
+                    console.log('🔄 Using text-based mapping for:', task);
+
+                    if (task.includes('ceiling') && (task.includes('fan') || task.includes('install') || task.includes('replace'))) {
                         mappedCategory = 'ceiling-fan';
-                        console.log('✅ Mapped General Handyman to ceiling-fan based on $160 cost');
+                        console.log('✅ Text mapped to ceiling-fan');
+                    } else if (task.includes('fan') && (task.includes('install') || task.includes('replace') || task.includes('ceiling'))) {
+                        mappedCategory = 'ceiling-fan';
+                        console.log('✅ Text mapped to ceiling-fan (fan detected)');
+                    } else if (task.includes('tv') || task.includes('mount') || task.includes('mounting')) {
+                        mappedCategory = 'tv-mounting';
+                    } else if (task.includes('plumb') || task.includes('faucet') || task.includes('toilet') || task.includes('leak')) {
+                        mappedCategory = 'plumbing';
+                    } else if (task.includes('electric') || task.includes('outlet') || task.includes('switch') || task.includes('wire')) {
+                        mappedCategory = 'electrical';
+                    } else if (task.includes('paint') || task.includes('wall') || task.includes('color')) {
+                        mappedCategory = 'painting';
+                    } else if (task.includes('furniture') || task.includes('assembly') || task.includes('ikea')) {
+                        mappedCategory = 'furniture-assembly';
+                    } else if (task.includes('curtain') || task.includes('blind') || task.includes('window')) {
+                        mappedCategory = 'curtains-blinds';
+                    } else if (task.includes('general') && task.includes('handyman')) {
+                        // If AI says "General Handyman" but cost suggests specific task
+                        const cost = result.cost_estimate;
+                        if (cost && cost.includes('160')) {
+                            // $160 suggests ceiling fan or TV mount
+                            mappedCategory = 'ceiling-fan'; // Default to ceiling-fan for $160
+                            console.log('✅ Mapped General Handyman to ceiling-fan based on $160 cost');
+                        }
                     }
                 }
 
