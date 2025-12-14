@@ -1460,10 +1460,13 @@
                 // Hide sticky bar
                 hideStickyBottomBar();
 
-                // Redirect after a brief delay
+                // Complete the booking flow
                 setTimeout(() => {
+                    // Store the service data for the original site
                     sessionStorage.setItem('prefilledService', JSON.stringify(serviceData));
-                    window.location.href = '#tasks';
+
+                    // Redirect to the original booking interface
+                    window.location.href = 'index-original.html';
                 }, 1500);
             }, 2000);
         }
@@ -2120,6 +2123,50 @@
         }
 
         function useAnalysisResults() {
+            const result = window.lastAnalysisResult;
+            console.log('🔍 useAnalysisResults called with result:', result);
+
+            if (result && result.recommended_task) {
+                // Enhanced mapping logic for AI recommended task to service categories
+                let mappedCategory = 'repair'; // default
+                const task = result.recommended_task.toLowerCase();
+
+                console.log('📋 Mapping AI task:', task);
+
+                // More comprehensive task detection
+                if (task.includes('ceiling') && (task.includes('fan') || task.includes('install') || task.includes('replace'))) {
+                    mappedCategory = 'ceiling-fan';
+                    console.log('✅ Mapped to ceiling-fan');
+                } else if (task.includes('fan') && (task.includes('install') || task.includes('replace') || task.includes('ceiling'))) {
+                    mappedCategory = 'ceiling-fan';
+                    console.log('✅ Mapped to ceiling-fan (fan detected)');
+                } else if (task.includes('tv') || task.includes('mount') || task.includes('mounting')) {
+                    mappedCategory = 'tv-mounting';
+                } else if (task.includes('plumb') || task.includes('faucet') || task.includes('toilet') || task.includes('leak')) {
+                    mappedCategory = 'plumbing';
+                } else if (task.includes('electric') || task.includes('outlet') || task.includes('switch') || task.includes('wire')) {
+                    mappedCategory = 'electrical';
+                } else if (task.includes('paint') || task.includes('wall') || task.includes('color')) {
+                    mappedCategory = 'painting';
+                } else if (task.includes('furniture') || task.includes('assembly') || task.includes('ikea')) {
+                    mappedCategory = 'furniture-assembly';
+                } else if (task.includes('curtain') || task.includes('blind') || task.includes('window')) {
+                    mappedCategory = 'curtains-blinds';
+                } else if (task.includes('general') && task.includes('handyman')) {
+                    // If AI says "General Handyman" but we expect a specific task,
+                    // check the cost estimate to help determine the correct category
+                    const cost = result.cost_estimate;
+                    if (cost && cost.includes('160')) {
+                        // $160 is ceiling fan base price
+                        mappedCategory = 'ceiling-fan';
+                        console.log('✅ Mapped General Handyman to ceiling-fan based on $160 cost');
+                    }
+                }
+
+                console.log('📍 Final mapped category:', mappedCategory);
+                selectService(mappedCategory);
+            }
+
             // Update service data with AI results
             serviceData.aiAnalysis = true;
             closePhotoModal();
