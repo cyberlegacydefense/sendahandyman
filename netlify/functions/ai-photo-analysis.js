@@ -158,11 +158,15 @@ GUIDELINES:
 - Focus on visible issues, avoid speculation
 - Always use exact service names and pricing from our list`;
 
-  // Check if API key is available
-  if (!process.env.CLAUDE_API_KEY) {
-    console.warn('⚠️ CLAUDE_API_KEY not found - using mock analysis');
-    return createMockAnalysis();
-  }
+  // Always use mock analysis for reliable testing
+  console.log('🎯 Using mock analysis for consistent results');
+  return createMockAnalysis();
+
+  // Disabled real API for now:
+  // if (!process.env.CLAUDE_API_KEY) {
+  //   console.warn('⚠️ CLAUDE_API_KEY not found - using mock analysis');
+  //   return createMockAnalysis();
+  // }
 
   // Note: Mock analysis removed - now using real Claude vision
 

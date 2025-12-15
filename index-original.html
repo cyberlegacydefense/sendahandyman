@@ -4343,6 +4343,72 @@
     document.addEventListener('DOMContentLoaded', () => {
         console.log('🚀 DOM Content Loaded - Initializing app...');
         console.log('📊 App Version:', APP_VERSION);
+
+        // Check for booking data from Uber-style interface
+        checkForUberBookingData();
+
+        function checkForUberBookingData() {
+            console.log('🔍 Checking for Uber booking data...');
+
+            const keys = ['uberBookingData', 'prefilledService', 'sendahandyman_booking'];
+            let bookingData = null;
+
+            for (const key of keys) {
+                const stored = sessionStorage.getItem(key);
+                if (stored) {
+                    try {
+                        bookingData = JSON.parse(stored);
+                        console.log(`✅ Found booking data in ${key}:`, bookingData);
+                        break;
+                    } catch (e) {
+                        console.warn(`⚠️ Invalid JSON in ${key}:`, e);
+                    }
+                }
+            }
+
+            if (bookingData && bookingData.fromUberInterface) {
+                console.log('🎯 Processing Uber interface booking data...');
+                processUberBookingData(bookingData);
+            } else {
+                console.log('ℹ️ No Uber booking data found, proceeding normally');
+            }
+        }
+
+        function processUberBookingData(data) {
+            console.log('🔄 Processing booking data:', data);
+
+            // Auto-populate form fields if available
+            if (data.description) {
+                const descField = document.getElementById('taskDescription');
+                if (descField) {
+                    descField.value = data.description;
+                    console.log('📝 Pre-filled description');
+                }
+            }
+
+            if (data.location) {
+                const locationField = document.getElementById('taskLocation');
+                if (locationField) {
+                    locationField.value = data.location;
+                    console.log('📍 Pre-filled location');
+                }
+            }
+
+            // Show a notification that we received booking data
+            setTimeout(() => {
+                if (typeof showToast === 'function') {
+                    showToast('Booking details transferred from selection interface', 'success', 3000);
+                }
+            }, 1000);
+
+            // Clear the session data to prevent reuse
+            setTimeout(() => {
+                sessionStorage.removeItem('uberBookingData');
+                sessionStorage.removeItem('prefilledService');
+                sessionStorage.removeItem('sendahandyman_booking');
+                console.log('🧹 Cleared session storage');
+            }, 5000);
+        }
         function populateTimeWindows() {
             const select = document.getElementById('taskWindow');
             if (!select) {

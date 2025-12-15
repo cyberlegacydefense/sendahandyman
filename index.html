@@ -1462,17 +1462,31 @@
 
                 // Complete the booking flow
                 setTimeout(() => {
-                    // Store the service data for the original site
-                    const bookingData = {
-                        ...serviceData,
-                        selectedTimeSlot: serviceData.selectedTimeSlot,
-                        pricing: serviceData.pricing,
-                        timestamp: new Date().toISOString()
-                    };
-                    sessionStorage.setItem('prefilledService', JSON.stringify(bookingData));
+                    console.log('📳 Preparing booking data for original site...');
 
-                    // Redirect to the original booking interface with pricing step
-                    window.location.href = 'index-original.html#booking-step-pricing';
+                    // Store the service data with all necessary fields for original site
+                    const bookingData = {
+                        category: serviceData.category,
+                        categoryDisplay: serviceData.categoryDisplay,
+                        description: serviceData.detailedDescription,
+                        location: serviceData.location,
+                        timeSlot: serviceData.selectedTimeSlot,
+                        pricing: serviceData.pricing,
+                        aiAnalysis: serviceData.aiAnalysis,
+                        timestamp: new Date().toISOString(),
+                        fromUberInterface: true
+                    };
+
+                    // Store in multiple keys to ensure compatibility
+                    sessionStorage.setItem('uberBookingData', JSON.stringify(bookingData));
+                    sessionStorage.setItem('prefilledService', JSON.stringify(bookingData));
+                    sessionStorage.setItem('sendahandyman_booking', JSON.stringify(bookingData));
+
+                    console.log('💾 Stored booking data:', bookingData);
+                    console.log('🚀 Redirecting to classic interface...');
+
+                    // Redirect to original site which should auto-populate form
+                    window.location.href = 'index-original.html';
                 }, 1500);
             }, 2000);
         }
