@@ -1363,6 +1363,7 @@
 
             serviceData.selectedWindow = selectedSlot.window;
             serviceData.selectedWindowLabel = selectedSlot.windowLabel;
+            serviceData.selectedTimeSlot = selectedSlot; // Store the full slot object
             serviceData.pricing = selectedSlot.pricing;
 
             // Show success toast
@@ -1450,8 +1451,22 @@
             console.log('🎯 Service data:', serviceData);
 
             // Validate required booking data
-            if (!serviceData.category || !serviceData.selectedTimeSlot || !serviceData.pricing) {
-                showToast('Booking data incomplete. Please restart the booking process.', 'error');
+            console.log('🔍 Validating serviceData:', {
+                category: serviceData.category,
+                selectedTimeSlot: serviceData.selectedTimeSlot,
+                pricing: serviceData.pricing,
+                location: serviceData.location
+            });
+
+            const missingFields = [];
+            if (!serviceData.category) missingFields.push('service category');
+            if (!serviceData.selectedTimeSlot) missingFields.push('time slot');
+            if (!serviceData.pricing) missingFields.push('pricing');
+
+            if (missingFields.length > 0) {
+                const message = `Missing required data: ${missingFields.join(', ')}. Please restart the booking process.`;
+                console.error('❌ Booking validation failed:', message);
+                showToast(message, 'error');
                 return;
             }
 
@@ -2031,6 +2046,10 @@
             // Reset analysis flag on success
             isAnalyzing = false;
             document.getElementById('analysisLoading').classList.add('hide');
+
+            // Store the result for later use
+            window.lastAnalysisResult = result;
+            console.log('📊 Stored analysis result:', result);
 
             const resultsDiv = document.getElementById('analysisResults');
 
