@@ -1485,8 +1485,32 @@
                     console.log('💾 Stored booking data:', bookingData);
                     console.log('🚀 Redirecting to classic interface...');
 
-                    // Redirect to original site which should auto-populate form
-                    window.location.href = 'index-original.html';
+                    // Build redirect URL based on current environment
+                    const currentUrl = window.location.href;
+                    const isLocalFile = currentUrl.startsWith('file://');
+                    const isLocalhost = currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1');
+                    const isProduction = currentUrl.includes('sendahandyman.com');
+
+                    let redirectUrl;
+                    if (isLocalFile) {
+                        // File:// protocol - stay in same directory
+                        redirectUrl = currentUrl.replace('index.html', 'index-original.html');
+                    } else if (isLocalhost) {
+                        // Local development server - use relative path
+                        redirectUrl = 'index-original.html';
+                    } else if (isProduction) {
+                        // Production - use relative path
+                        redirectUrl = 'index-original.html';
+                    } else {
+                        // Fallback - relative path
+                        redirectUrl = 'index-original.html';
+                    }
+
+                    console.log('🌐 Current URL:', currentUrl);
+                    console.log('🌐 Environment detected:', { isLocalFile, isLocalhost, isProduction });
+                    console.log('🌐 Redirect URL:', redirectUrl);
+
+                    window.location.href = redirectUrl;
                 }, 1500);
             }, 2000);
         }
