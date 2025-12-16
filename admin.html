@@ -4388,6 +4388,12 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       console.log('User session verified, calling Edge Function...');
 
       // Call the Edge Function (EXACT PostMyStyle approach)
+      console.log('🚀 CALLING EDGE FUNCTION with payload:', {
+        name: fullName,
+        email: email,
+        phone: phone || null
+      });
+
       const { data, error } = await supabase.functions.invoke('create-handyman', {
         body: {
           name: fullName,
@@ -4398,6 +4404,10 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
           Authorization: `Bearer ${session.access_token}`,
         },
       });
+
+      console.log('📥 EDGE FUNCTION RESPONSE DATA:', data);
+      console.log('📥 EDGE FUNCTION RESPONSE ERROR:', error);
+      console.log('📥 EDGE FUNCTION FULL RESPONSE:', { data, error });
 
       if (error) {
         console.error('Edge Function error details:', error);
@@ -4418,6 +4428,15 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       }
 
       console.log('✅ Handyman created successfully:', data.handyman);
+      console.log('🔑 PASSWORD FORMAT CHECK:', {
+        password: data.credentials.password,
+        length: data.credentials.password?.length,
+        type: typeof data.credentials.password,
+        hasSpecialChar: /[!@#$]/.test(data.credentials.password || ''),
+        hasNumbers: /\d/.test(data.credentials.password || ''),
+        hasUppercase: /[A-Z]/.test(data.credentials.password || ''),
+        hasLowercase: /[a-z]/.test(data.credentials.password || '')
+      });
 
       // SUCCESS - Show password and close modal
       const handyman = data.handyman;
@@ -4429,6 +4448,8 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
 Name: ${handyman.full_name || handyman.name}
 Email: ${handyman.email}
 Password: ${credentials.password}
+Length: ${credentials.password?.length} characters
+Format Check: ${/^[A-Z][a-z]+[A-Z][a-z]+\d{4}[!@#$]$/.test(credentials.password || '') ? '✅ NEW FORMAT' : '❌ OLD FORMAT'}
 
 The handyman can now log in with these credentials.`);
 
