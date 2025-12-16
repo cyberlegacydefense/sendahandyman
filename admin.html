@@ -4824,17 +4824,79 @@ function showHandymanCreatedModal(fullName, email, password, authUserId, handyma
 
 // Copy functions for the success modal
 function copyToClipboard(text) {
-  navigator.clipboard.writeText(text).then(() => {
-    // Show brief success feedback
-    const event = new CustomEvent('showToast', {
-      detail: { message: 'Copied to clipboard!', type: 'success' }
+  console.log('📋 Attempting to copy:', text);
+
+  // Modern clipboard API (requires HTTPS)
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('✅ Successfully copied to clipboard');
+      showCopyFeedback('Copied to clipboard!');
+    }).catch(err => {
+      console.error('❌ Clipboard API failed:', err);
+      fallbackCopy(text);
     });
-    window.dispatchEvent(event);
-  }).catch(err => {
-    console.error('Failed to copy: ', err);
-    // Fallback - show alert
-    alert('Copied: ' + text);
-  });
+  } else {
+    console.warn('⚠️ Clipboard API not available, using fallback');
+    fallbackCopy(text);
+  }
+}
+
+// Fallback copy method for non-HTTPS or unsupported browsers
+function fallbackCopy(text) {
+  try {
+    // Create temporary textarea element
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.left = '-999999px';
+    textarea.style.top = '-999999px';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    // Use document.execCommand as fallback
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+    if (successful) {
+      console.log('✅ Fallback copy successful');
+      showCopyFeedback('Copied to clipboard!');
+    } else {
+      console.error('❌ Fallback copy failed');
+      showCopyFeedback('Copy failed - please select and copy manually', 'error');
+    }
+  } catch (err) {
+    console.error('❌ All copy methods failed:', err);
+    // Final fallback - show the text for manual copying
+    prompt('Copy this text manually (Ctrl+C):', text);
+  }
+}
+
+// Show copy feedback to user
+function showCopyFeedback(message, type = 'success') {
+  // Create temporary visual feedback
+  const feedback = document.createElement('div');
+  feedback.textContent = message;
+  feedback.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : '#ef4444'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    z-index: 9999;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  `;
+  document.body.appendChild(feedback);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    if (feedback.parentNode) {
+      feedback.parentNode.removeChild(feedback);
+    }
+  }, 3000);
 }
 
 function copyAllCredentials(email, password) {
@@ -4845,15 +4907,10 @@ Dashboard: sendahandyman.com/dashboard
 
 Please complete your onboarding process after logging in.`;
 
-  navigator.clipboard.writeText(credentials).then(() => {
-    const event = new CustomEvent('showToast', {
-      detail: { message: 'All credentials copied to clipboard!', type: 'success' }
-    });
-    window.dispatchEvent(event);
-  }).catch(err => {
-    console.error('Failed to copy: ', err);
-    alert('Credentials copied!');
-  });
+  console.log('📋 Attempting to copy all credentials');
+
+  // Use the same robust copy function
+  copyToClipboard(credentials);
 }
 
 function closeHandymanCreatedModal() {
