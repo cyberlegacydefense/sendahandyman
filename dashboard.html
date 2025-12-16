@@ -3340,13 +3340,23 @@
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
-        // First try to find by auth UUID
-        const { data: adminUser, error } = await supabase
+        // First try to find by auth UUID - handle potential duplicates
+        const { data: adminUsers, error: adminError } = await supabase
           .from('admin_users')
           .select('id, email, full_name, role, is_active')
           .eq('id', user.id)
-          .eq('is_active', true)
-          .single();
+          .eq('is_active', true);
+
+        let adminUser = null;
+        let error = adminError;
+
+        if (adminUsers && adminUsers.length > 0) {
+          adminUser = adminUsers[0]; // Use first match if multiple exist
+          error = null;
+          if (adminUsers.length > 1) {
+            console.warn(`🚨 Multiple admin records found for user ${user.id}, using first one`);
+          }
+        }
 
         if (error) {
           console.log('🔍 Admin table query error (UUID):', error.code, error.message);
@@ -3370,13 +3380,23 @@
         }
       }
 
-      // Fallback: check by email for existing records
-      const { data: adminUser, error } = await supabase
+      // Fallback: check by email for existing records - handle potential duplicates
+      const { data: adminUsersByEmail, error: emailError } = await supabase
         .from('admin_users')
         .select('id, email, full_name, role, is_active')
         .eq('email', email.toLowerCase())
-        .eq('is_active', true)
-        .single();
+        .eq('is_active', true);
+
+      let adminUser = null;
+      let error = emailError;
+
+      if (adminUsersByEmail && adminUsersByEmail.length > 0) {
+        adminUser = adminUsersByEmail[0]; // Use first match if multiple exist
+        error = null;
+        if (adminUsersByEmail.length > 1) {
+          console.warn(`🚨 Multiple admin records found for email ${email}, using first one`);
+        }
+      }
 
       if (error) {
         console.log('🔍 Admin table query error (email):', error.code, error.message);
