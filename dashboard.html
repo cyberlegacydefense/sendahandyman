@@ -1309,11 +1309,33 @@
   async function loadHandymanData(userId) {
     console.log('🔍 Loading handyman data for user_id:', userId);
 
-    const { data: handyman, error } = await supabase
+    // Handle potential duplicate records - get the one with a name (correct one)
+    const { data: handymenList, error: listError } = await supabase
       .from('handymen')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .order('created_at', { ascending: false });
+
+    if (listError) {
+      console.error('🚨 Error loading handyman records:', listError);
+      throw new Error(`No handyman record found for user ${userId}: ${listError.message}`);
+    }
+
+    if (!handymenList || handymenList.length === 0) {
+      throw new Error(`No handyman record found for user ${userId}`);
+    }
+
+    // If multiple records exist, prefer the one with full_name
+    let handyman;
+    if (handymenList.length > 1) {
+      console.warn(`🚨 Found ${handymenList.length} handyman records for user ${userId}, selecting the one with full_name`);
+      handyman = handymenList.find(h => h.full_name) || handymenList[0];
+      console.log('📝 Selected handyman record:', handyman);
+    } else {
+      handyman = handymenList[0];
+    }
+
+    const error = null; // Reset error since we handled the multiple records
 
     if (error) {
       console.error('🚨 Error loading handyman record:', error);

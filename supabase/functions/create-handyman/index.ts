@@ -194,30 +194,81 @@ serve(async (req) => {
 
     console.log("Creating handyman record...");
 
-    const handymanInsertData = {
-      user_id: authData.user.id,
-      email: email.toLowerCase(),
-      full_name: name,
-      phone: phone || null,
-      hourly_rate: 64.00,
-      onboarding_completed: false,
-      is_active: true
-    };
-
-    console.log("Inserting handyman data:", handymanInsertData);
-    console.log("Full name field specifically:", {
-      name: name,
-      full_name: handymanInsertData.full_name,
-      name_type: typeof name,
-      name_length: name?.length
-    });
-
-    console.log(`💾 REQUEST ${requestId}: Inserting handyman record for ${email}...`);
-    const { data: handymanData, error: handymanError } = await supabaseAdmin
+    // Check if a handyman record already exists for this user_id (from trigger/webhook)
+    console.log(`🔍 REQUEST ${requestId}: Checking for existing handyman record with user_id ${authData.user.id}...`);
+    const { data: existingHandyman, error: existingError } = await supabaseAdmin
       .from("handymen")
-      .insert(handymanInsertData)
-      .select()
-      .single();
+      .select("*")
+      .eq("user_id", authData.user.id)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error("🚨 Error checking for existing handyman by user_id:", existingError);
+    }
+
+    let handymanData;
+    let handymanError = null;
+
+    if (existingHandyman) {
+      console.log(`🔄 REQUEST ${requestId}: Found existing handyman record, updating with full details...`);
+      console.log("📋 Existing record:", existingHandyman);
+
+      // Update the existing record with complete information
+      const updateData = {
+        email: email.toLowerCase(),
+        full_name: name,
+        phone: phone || null,
+        hourly_rate: 64.00,
+        onboarding_completed: false,
+        is_active: true
+      };
+
+      console.log("📝 Updating with data:", updateData);
+      const { data: updatedData, error: updateError } = await supabaseAdmin
+        .from("handymen")
+        .update(updateData)
+        .eq("id", existingHandyman.id)
+        .select()
+        .single();
+
+      handymanData = updatedData;
+      handymanError = updateError;
+
+      if (updateError) {
+        console.error("🚨 Failed to update existing handyman record:", updateError);
+      } else {
+        console.log("✅ Successfully updated existing handyman record");
+      }
+    } else {
+      console.log(`💾 REQUEST ${requestId}: No existing record found, creating new handyman record...`);
+
+      const handymanInsertData = {
+        user_id: authData.user.id,
+        email: email.toLowerCase(),
+        full_name: name,
+        phone: phone || null,
+        hourly_rate: 64.00,
+        onboarding_completed: false,
+        is_active: true
+      };
+
+      console.log("Inserting handyman data:", handymanInsertData);
+      console.log("Full name field specifically:", {
+        name: name,
+        full_name: handymanInsertData.full_name,
+        name_type: typeof name,
+        name_length: name?.length
+      });
+
+      const { data: insertedData, error: insertError } = await supabaseAdmin
+        .from("handymen")
+        .insert(handymanInsertData)
+        .select()
+        .single();
+
+      handymanData = insertedData;
+      handymanError = insertError;
+    }
 
     if (handymanData) {
       console.log(`✅ REQUEST ${requestId}: Handyman record created successfully:`, handymanData);
