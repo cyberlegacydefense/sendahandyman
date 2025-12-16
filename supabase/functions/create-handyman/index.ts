@@ -106,18 +106,27 @@ serve(async (req) => {
       error: similarError?.message
     });
 
+    // Generate a more robust password that meets typical requirements
     const adjectives = ["Quick", "Smart", "Brave", "Swift", "Bright"];
     const nouns = ["Tiger", "Eagle", "Wolf", "Lion", "Bear"];
-    const numbers = Math.floor(100 + Math.random() * 900);
+    const numbers = Math.floor(1000 + Math.random() * 9000); // 4 digits
+    const specialChars = ["!", "@", "#", "$"];
+    const specialChar = specialChars[Math.floor(Math.random() * specialChars.length)];
+
     const tempPassword = adjectives[Math.floor(Math.random() * adjectives.length)] +
                         nouns[Math.floor(Math.random() * nouns.length)] +
-                        numbers;
+                        numbers +
+                        specialChar;
+
+    console.log("Generated password length:", tempPassword.length, "characters");
 
     console.log("Creating auth user with email:", email.toLowerCase());
+    console.log("Generated password for testing:", tempPassword);
+
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: email.toLowerCase(),
       password: tempPassword,
-      email_confirm: true, // Skip email confirmation to avoid rate limits
+      email_confirm: true, // Confirm email immediately
       user_metadata: {
         full_name: name,
         user_type: "handyman"
@@ -148,12 +157,13 @@ serve(async (req) => {
 
     console.log("Auth user created successfully, forcing email confirmation...");
 
-    // Force email confirmation using admin API
+    // Ensure email is confirmed using admin API
     console.log("Manually confirming email for user:", authData.user.id);
     const { data: updatedUser, error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
       authData.user.id,
       {
         email_confirm: true,
+        email_confirmed_at: new Date().toISOString(),
         user_metadata: {
           ...authData.user.user_metadata,
           full_name: name,
@@ -164,10 +174,11 @@ serve(async (req) => {
 
     if (confirmError) {
       console.error("Email confirmation failed:", confirmError);
+      console.error("Confirmation error details:", JSON.stringify(confirmError, null, 2));
       throw new Error(`Failed to confirm email: ${confirmError.message}`);
     } else {
       console.log("Email manually confirmed successfully");
-      console.log("Updated user data:", updatedUser);
+      console.log("Updated user confirmed_at:", updatedUser?.user?.email_confirmed_at);
     }
 
     console.log("Creating handyman record...");
