@@ -81,7 +81,7 @@
     <div class="text-center mb-6">
       <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 mb-4">
         <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 0 1 2 2m4 0a6 6 0 0 1-7.743 5.743L11 17H9v2H7v2H4a1 1 0 0 1-1-1v-2.586a1 1 0 0 1 .293-.707l5.964-5.964A6 6 0 0 1 17 21z"></path>
         </svg>
       </div>
       <h3 class="text-xl font-bold text-gray-900 mb-2">Reset Password</h3>
@@ -143,7 +143,7 @@
         <div class="relative">
           <input
             type="password"
-            id="newPassword"
+            id="resetNewPassword"
             required
             placeholder="Enter new password"
             class="w-full rounded-lg border border-slate-200 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -161,7 +161,7 @@
         <label class="block text-sm font-semibold mb-2">Confirm New Password</label>
         <input
           type="password"
-          id="confirmPassword"
+          id="resetConfirmPassword"
           required
           placeholder="Confirm new password"
           class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -1516,12 +1516,12 @@
       document.getElementById('updateError').classList.remove('hidden');
     }
 
-    document.getElementById('newPassword').focus();
+    document.getElementById('resetNewPassword').focus();
   }
 
   // Toggle new password visibility
   document.getElementById('toggleNewPassword').addEventListener('click', () => {
-    const passwordInput = document.getElementById('newPassword');
+    const passwordInput = document.getElementById('resetNewPassword');
     const icon = document.getElementById('toggleNewPassword');
 
     if (passwordInput.type === 'password') {
@@ -1542,8 +1542,8 @@
   document.getElementById('passwordUpdateForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
+    const newPassword = document.getElementById('resetNewPassword').value;
+    const confirmPassword = document.getElementById('resetConfirmPassword').value;
     const submitBtn = document.getElementById('submitUpdateBtn');
     const btnText = document.getElementById('updateBtnText');
     const btnLoading = document.getElementById('updateBtnLoading');
