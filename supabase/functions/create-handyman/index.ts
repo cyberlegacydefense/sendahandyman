@@ -8,6 +8,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  const requestId = Math.random().toString(36).substr(2, 9);
+  console.log(`🚀 REQUEST ${requestId}: create-handyman function started at ${new Date().toISOString()}`);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", {
       headers: corsHeaders
@@ -44,9 +47,10 @@ serve(async (req) => {
     }
 
     const requestBody = await req.json();
-    console.log("Request body received:", requestBody);
+    console.log(`📨 REQUEST ${requestId}: Request body received:`, requestBody);
 
     const { name, email, phone } = requestBody;
+    console.log(`🎯 REQUEST ${requestId}: Processing handyman creation for ${email}`);
 
     // Prevent duplicate submissions with same email within 10 seconds
     const submissionKey = `${email.toLowerCase()}_${name}`;
@@ -54,7 +58,7 @@ serve(async (req) => {
     const recentSubmission = global.recentSubmissions?.get(submissionKey);
 
     if (recentSubmission && (now - recentSubmission) < 10000) {
-      console.warn(`🚫 Duplicate submission prevented for ${email} within 10 seconds`);
+      console.warn(`🚫 REQUEST ${requestId}: Duplicate submission prevented for ${email} within 10 seconds`);
       throw new Error("Duplicate submission detected. Please wait before trying again.");
     }
 
@@ -224,6 +228,7 @@ serve(async (req) => {
       name_length: name?.length
     });
 
+    console.log(`💾 REQUEST ${requestId}: Inserting handyman record for ${email}...`);
     const { data: handymanData, error: handymanError } = await supabaseAdmin
       .from("handymen")
       .insert(handymanInsertData)
@@ -231,7 +236,7 @@ serve(async (req) => {
       .single();
 
     if (handymanData) {
-      console.log("✅ Handyman record created successfully:", handymanData);
+      console.log(`✅ REQUEST ${requestId}: Handyman record created successfully:`, handymanData);
       console.log("Checking full_name in returned data:", {
         returned_full_name: handymanData.full_name,
         all_fields: Object.keys(handymanData)
