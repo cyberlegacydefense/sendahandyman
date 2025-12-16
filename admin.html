@@ -4443,13 +4443,34 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       const credentials = data.credentials;
 
       // Show success modal with copy buttons instead of basic alert
-      showHandymanCreatedModal(
-        handyman.full_name || handyman.name,
-        handyman.email,
-        credentials.password,
-        data.auth_user_id || handyman.auth_user_id,
-        handyman.id
-      );
+      console.log('🎯 CALLING showHandymanCreatedModal with:', {
+        name: handyman.full_name || handyman.name,
+        email: handyman.email,
+        password: credentials.password,
+        authId: data.auth_user_id || handyman.auth_user_id,
+        handymanId: handyman.id
+      });
+
+      try {
+        showHandymanCreatedModal(
+          handyman.full_name || handyman.name,
+          handyman.email,
+          credentials.password,
+          data.auth_user_id || handyman.auth_user_id,
+          handyman.id
+        );
+        console.log('✅ Modal function called successfully');
+      } catch (modalError) {
+        console.error('❌ Error calling modal function:', modalError);
+        // Fallback to basic alert if modal fails
+        alert(`✅ Handyman Created Successfully!
+
+Name: ${handyman.full_name || handyman.name}
+Email: ${handyman.email}
+Password: ${credentials.password}
+
+Copy these credentials manually.`);
+      }
 
       // Reset form and close modal
       const form = document.getElementById('addHandymanForm');
@@ -4728,6 +4749,10 @@ function highlightExistingHandyman(email) {
 
 // PostMyStyle-style success modal for handyman creation
 function showHandymanCreatedModal(fullName, email, password, authUserId, handymanId) {
+  console.log('🎯 showHandymanCreatedModal function called with:', {
+    fullName, email, password, authUserId, handymanId
+  });
+
   // Create modal HTML dynamically
   const modalHtml = `
     <div id="handymanCreatedModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -4846,7 +4871,19 @@ function showHandymanCreatedModal(fullName, email, password, authUserId, handyma
   }
 
   // Add modal to DOM
+  console.log('📝 Adding modal to DOM...');
   document.body.insertAdjacentHTML('beforeend', modalHtml);
+  console.log('✅ Modal added to DOM successfully');
+
+  // Force browser to refresh/reflow
+  setTimeout(() => {
+    const modal = document.getElementById('handymanCreatedModal');
+    if (modal) {
+      console.log('✅ Modal element found in DOM:', modal);
+    } else {
+      console.error('❌ Modal element not found in DOM after insertion');
+    }
+  }, 100);
 }
 
 // Copy functions for the success modal
