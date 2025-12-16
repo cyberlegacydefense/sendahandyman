@@ -48,6 +48,29 @@ serve(async (req) => {
 
     const { name, email, phone } = requestBody;
 
+    // Prevent duplicate submissions with same email within 10 seconds
+    const submissionKey = `${email.toLowerCase()}_${name}`;
+    const now = Date.now();
+    const recentSubmission = global.recentSubmissions?.get(submissionKey);
+
+    if (recentSubmission && (now - recentSubmission) < 10000) {
+      console.warn(`🚫 Duplicate submission prevented for ${email} within 10 seconds`);
+      throw new Error("Duplicate submission detected. Please wait before trying again.");
+    }
+
+    // Initialize global submissions tracker if needed
+    if (!global.recentSubmissions) {
+      global.recentSubmissions = new Map();
+    }
+    global.recentSubmissions.set(submissionKey, now);
+
+    // Clean up old submissions (older than 1 minute)
+    for (const [key, timestamp] of global.recentSubmissions.entries()) {
+      if (now - timestamp > 60000) {
+        global.recentSubmissions.delete(key);
+      }
+    }
+
     if (!name || !email) {
       console.error("Missing required fields:", { name: !!name, email: !!email });
       throw new Error("Name and email required");
@@ -208,11 +231,14 @@ serve(async (req) => {
       .single();
 
     if (handymanData) {
-      console.log("Handyman record created successfully:", handymanData);
+      console.log("✅ Handyman record created successfully:", handymanData);
       console.log("Checking full_name in returned data:", {
         returned_full_name: handymanData.full_name,
         all_fields: Object.keys(handymanData)
       });
+
+      // Mark this email as successfully processed
+      global.recentSubmissions.set(`success_${email.toLowerCase()}`, now);
     }
 
     if (handymanError) {
@@ -273,34 +299,14 @@ serve(async (req) => {
         const existingHandyman = exactMatch || (ilikeMatch && ilikeMatch[0]);
 
         if (existingHandyman && !exactError && !ilikeError) {
-          console.log("Found existing handyman record:", existingHandyman);
+          console.log("🔍 Found existing handyman record:", existingHandyman);
 
-          // If full_name is null, update it
-          if (!existingHandyman.full_name) {
-            console.log("Updating null full_name for existing record...");
-            const { error: updateError } = await supabaseAdmin
-              .from("handymen")
-              .update({ full_name: name })
-              .eq("id", existingHandyman.id);
+          // This is a real duplicate - do NOT create another one
+          // Clean up the auth user we just created since we have an existing handyman
+          await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+          console.log("🧹 Cleaned up duplicate auth user");
 
-            if (updateError) {
-              console.error("Failed to update full_name:", updateError);
-            } else {
-              console.log("Successfully updated full_name");
-              existingHandyman.full_name = name;
-            }
-          }
-
-          return {
-            success: true,
-            handyman: {
-              id: existingHandyman.id,
-              name: existingHandyman.full_name || name,
-              email: existingHandyman.email,
-              auth_user_id: existingHandyman.user_id
-            },
-            message: "Handyman already exists, updated missing information"
-          };
+          throw new Error(`Email ${email.toLowerCase()} already exists. A handyman with this email is already registered.`);
         }
 
         console.log("🚨 PHANTOM CONSTRAINT VIOLATION - This is the core issue:");
