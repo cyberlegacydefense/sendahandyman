@@ -168,7 +168,7 @@ serve(async (req) => {
 
     console.log("Auth user created successfully, forcing email confirmation...");
 
-    // Ensure email is confirmed using admin API
+    // Ensure email is confirmed using admin API - force confirmation despite global setting
     console.log("Manually confirming email for user:", authData.user.id);
     const { data: updatedUser, error: confirmError } = await supabaseAdmin.auth.admin.updateUserById(
       authData.user.id,
@@ -179,6 +179,12 @@ serve(async (req) => {
           ...authData.user.user_metadata,
           full_name: name,
           user_type: "handyman"
+        },
+        app_metadata: {
+          ...authData.user.app_metadata,
+          user_type: "handyman",
+          created_by_admin: true,
+          email_confirmed_by_admin: true
         }
       }
     );
@@ -186,7 +192,28 @@ serve(async (req) => {
     if (confirmError) {
       console.error("Email confirmation failed:", confirmError);
       console.error("Confirmation error details:", JSON.stringify(confirmError, null, 2));
-      throw new Error(`Failed to confirm email: ${confirmError.message}`);
+
+      // Try alternative confirmation method
+      console.log("Attempting alternative email confirmation method...");
+      try {
+        const { error: altConfirmError } = await supabaseAdmin
+          .from('auth.users')
+          .update({
+            email_confirmed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', authData.user.id);
+
+        if (altConfirmError) {
+          console.error("Alternative confirmation failed:", altConfirmError);
+          throw new Error(`Failed to confirm email: ${confirmError.message}`);
+        } else {
+          console.log("Email confirmed using alternative method");
+        }
+      } catch (altError) {
+        console.error("Alternative confirmation method failed:", altError);
+        throw new Error(`Failed to confirm email: ${confirmError.message}`);
+      }
     } else {
       console.log("Email manually confirmed successfully");
       console.log("Updated user confirmed_at:", updatedUser?.user?.email_confirmed_at);
