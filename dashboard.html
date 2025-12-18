@@ -1338,17 +1338,17 @@
 
 <script>
   // Configuration
-  const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
+  const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabaseClient.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
 
-  let supabase;
+  let supabaseClientClient;
   let currentHandyman = null;
   let currentStep = 1;
   let scheduleData = {};
 
   // Initialize Supabase
   async function initializeSupabase() {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Handle password reset URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -1360,7 +1360,7 @@
       console.log('🔄 Handling password recovery from email link');
 
       // Set the session from URL parameters
-      const { error } = await supabase.auth.setSession({
+      const { error } = await supabaseClient.auth.setSession({
         access_token: accessToken,
         refresh_token: refreshToken
       });
@@ -1405,7 +1405,7 @@
 
     console.log('🔐 Attempting login for:', email);
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
     if (error) {
       console.error('🚨 Authentication failed:', error);
@@ -1466,7 +1466,7 @@
     try {
       console.log('🔄 Sending password reset email to:', email);
 
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: window.location.origin + '/dashboard.html'
       });
 
@@ -1576,7 +1576,7 @@
     try {
       console.log('🔄 Updating password...');
 
-      const { error } = await supabase.auth.updateUser({
+      const { error } = await supabaseClient.auth.updateUser({
         password: newPassword
       });
 
@@ -1617,7 +1617,7 @@
 
   // Logout
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     location.reload();
   });
 
@@ -1628,7 +1628,7 @@
 
   // Check authentication
   async function checkAuth() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
 
     if (user) {
       await loadHandymanData(user.id);
@@ -1642,7 +1642,7 @@
     console.log('🔍 Loading handyman data for user_id:', userId);
 
     // Handle potential duplicate records - get the one with a name (correct one)
-    const { data: handymenList, error: listError } = await supabase
+    const { data: handymenList, error: listError } = await supabaseClient
       .from('handymen')
       .select('*')
       .eq('user_id', userId)
@@ -1711,7 +1711,7 @@
     await checkAdminAccess(handyman.email);
 
     // Also check using current auth user email as backup
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseClient.auth.getUser();
     if (user && user.email && user.email !== handyman.email) {
       console.log('🔍 Also checking admin access with auth user email:', user.email);
       await checkAdminAccess(user.email);
@@ -1732,7 +1732,7 @@
     if (!currentHandyman) return;
 
     console.log('Refreshing handyman data from database');
-    const { data: handyman, error } = await supabase
+    const { data: handyman, error } = await supabaseClient
       .from('handymen')
       .select('*')
       .eq('id', currentHandyman.id)
@@ -1790,7 +1790,7 @@
     try {
       console.log(`Uploading ${file.name} to ${bucketName}/${filePath}`);
 
-      const { data, error } = await supabase.storage
+      const { data, error } = await supabaseClient.storage
         .from(bucketName)
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -1882,7 +1882,7 @@
   // Recommended structure: /handyman-documents/{handyman-documents}/{file_type}/{filename}
   // Example implementation:
   // const file = document.getElementById('govId').files[0];
-  // const { data, error } = await supabase.storage
+  // const { data, error } = await supabaseClient.storage
   //   .from('handyman-documents')
   //   .upload(`${currentHandyman.id}/gov-id/${file.name}`, file);
   // Then store the file path in the database column (e.g., gov_id_url)
@@ -1893,7 +1893,7 @@
     const taxIdType = document.querySelector('input[name="taxIdType"]:checked').value;
 
     // Get user info for folder naming - use just user ID to match RLS policies
-    const user = (await supabase.auth.getUser()).data.user;
+    const user = (await supabaseClient.auth.getUser()).data.user;
     const folderName = user.id;
     console.log('Step 1 - User ID:', user.id);
     console.log('Step 1 - Folder name:', folderName);
@@ -1912,7 +1912,7 @@
         `${folderName}/gov-id/${Date.now()}-${govIdFile.name}`
       );
       if (govIdPath) {
-        govIdUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${govIdPath}`;
+        govIdUrl = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${govIdPath}`;
       }
     }
 
@@ -1923,7 +1923,7 @@
         `${folderName}/profile/${Date.now()}-${profilePhotoFile.name}`
       );
       if (profilePhotoPath) {
-        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
+        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
       }
     }
 
@@ -1939,7 +1939,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -1985,7 +1985,7 @@
     console.log('Insurance provider:', insuranceProvider);
 
     // Get user info for folder naming - use just user ID to match RLS policies
-    const user = (await supabase.auth.getUser()).data.user;
+    const user = (await supabaseClient.auth.getUser()).data.user;
     const folderName = user.id;
 
     // Upload insurance proof if provided
@@ -1999,7 +1999,7 @@
         `${folderName}/insurance/${Date.now()}-${insuranceProofFile.name}`
       );
       if (insuranceProofPath) {
-        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${insuranceProofPath}`;
+        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${insuranceProofPath}`;
       }
     }
 
@@ -2014,7 +2014,7 @@
           `${folderName}/licenses/${Date.now()}-${index}-${licenseFile.name}`
         );
         if (licenseFilePath) {
-          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${licenseFilePath}`);
+          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${licenseFilePath}`);
         }
       }
     });
@@ -2034,7 +2034,7 @@
     console.log('About to save to database...');
     console.log('Current handyman ID:', currentHandyman?.id);
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2067,7 +2067,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2092,7 +2092,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2118,7 +2118,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2145,7 +2145,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2171,7 +2171,7 @@
     }
 
     // Get user info for folder naming - use just user ID to match RLS policies
-    const user = (await supabase.auth.getUser()).data.user;
+    const user = (await supabaseClient.auth.getUser()).data.user;
     const folderName = user.id;
 
     // Upload W-9 file
@@ -2185,7 +2185,7 @@
         `${folderName}/tax/${Date.now()}-${w9File.name}`
       );
       if (w9Path) {
-        w9Url = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${w9Path}`;
+        w9Url = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${w9Path}`;
       }
     }
 
@@ -2201,7 +2201,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2225,7 +2225,7 @@
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2257,7 +2257,7 @@
     console.log('Step 9 form data being saved:', formData);
 
     // Mark onboarding as complete
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update(formData)
       .eq('id', currentHandyman.id);
@@ -2269,7 +2269,7 @@
     }
 
     if (!error) {
-      await loadHandymanData((await supabase.auth.getUser()).data.user.id);
+      await loadHandymanData((await supabaseClient.auth.getUser()).data.user.id);
     }
   });
 
@@ -2337,7 +2337,7 @@
       schedule[day].push(hour);
     });
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update({
         schedule: schedule,
@@ -2363,7 +2363,7 @@
 
     try {
       // Get all completed tasks for this handyman
-      const { data: completedTasks, error } = await supabase
+      const { data: completedTasks, error } = await supabaseClient
         .from('tasks')
         .select('completed_at, task_category')
         .eq('handyman_id', currentHandyman.id)
@@ -2596,7 +2596,7 @@
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const { data: tasks } = await supabase
+    const { data: tasks } = await supabaseClient
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id);
@@ -2640,7 +2640,7 @@
 
   // Load current tasks
   async function loadCurrentTasks() {
-    const { data: tasks } = await supabase
+    const { data: tasks } = await supabaseClient
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
@@ -2775,7 +2775,7 @@
 
   // Load task history
   async function loadTaskHistory() {
-    const { data: tasks } = await supabase
+    const { data: tasks } = await supabaseClient
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
@@ -2826,7 +2826,7 @@
 
   // Load earnings
   async function loadEarnings() {
-    const { data: tasks } = await supabase
+    const { data: tasks } = await supabaseClient
       .from('tasks')
       .select('*')
       .eq('handyman_id', currentHandyman.id)
@@ -2902,7 +2902,7 @@
             const filePath = urlParts.split('?token=')[0];
             console.log('Regenerating signed URL for path:', filePath);
 
-            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+            const { data: signedUrlData, error: signedUrlError } = await supabaseClient.storage
               .from('handyman-documents')
               .createSignedUrl(filePath, 3600);
 
@@ -2931,7 +2931,7 @@
       }
 
       // If it's a Supabase storage URL, try to get proper access
-      if (imageUrl.includes('supabase.co/storage')) {
+      if (imageUrl.includes('supabaseClient.co/storage')) {
         try {
           // Extract the file path from the URL
           const urlParts = imageUrl.split('/object/public/handyman-documents/');
@@ -2940,7 +2940,7 @@
             console.log('File path extracted:', filePath);
 
             // Try to get a fresh public URL
-            const { data: publicUrlData } = supabase.storage
+            const { data: publicUrlData } = supabaseClient.storage
               .from('handyman-documents')
               .getPublicUrl(filePath);
 
@@ -2950,7 +2950,7 @@
             }
 
             // Also try signed URL as backup
-            const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+            const { data: signedUrlData, error: signedUrlError } = await supabaseClient.storage
               .from('handyman-documents')
               .createSignedUrl(filePath, 3600);
 
@@ -3093,7 +3093,7 @@
     reader.readAsDataURL(file);
 
     // Upload to storage
-    const user = (await supabase.auth.getUser()).data.user;
+    const user = (await supabaseClient.auth.getUser()).data.user;
     console.log('Uploading profile photo for user:', user.id);
 
     const filePath = await uploadFile(
@@ -3109,14 +3109,14 @@
       console.log('Profile photo uploaded, path:', profilePhotoPath);
 
       // Get a fresh signed URL for immediate use
-      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+      const { data: signedUrlData, error: signedUrlError } = await supabaseClient.storage
         .from('handyman-documents')
         .createSignedUrl(profilePhotoPath, 3600);
 
-      const profilePhotoUrl = signedUrlData?.signedUrl || `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
+      const profilePhotoUrl = signedUrlData?.signedUrl || `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
 
       // Update database
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('handymen')
         .update({ profile_photo_url: profilePhotoUrl })
         .eq('id', currentHandyman.id);
@@ -3202,7 +3202,7 @@
   document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update({
         full_name: document.getElementById('profileName').value,
@@ -3220,7 +3220,7 @@
       setTimeout(() => {
         document.getElementById('profileSuccess').classList.add('hidden');
       }, 3000);
-      await loadHandymanData((await supabase.auth.getUser()).data.user.id);
+      await loadHandymanData((await supabaseClient.auth.getUser()).data.user.id);
     }
   });
 
@@ -3231,7 +3231,7 @@
     const skills = Array.from(document.querySelectorAll('.skill-checkbox:checked')).map(cb => cb.value);
     const serviceAreas = Array.from(document.querySelectorAll('.city-checkbox:checked')).map(cb => cb.value);
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update({
         skills: skills,
@@ -3252,7 +3252,7 @@
   document.getElementById('insuranceForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('handymen')
       .update({
         insurance_status: document.getElementById('editInsuranceStatus').value,
@@ -3282,7 +3282,7 @@
       return;
     }
 
-    const { error } = await supabase.auth.updateUser({ password: newPass });
+    const { error } = await supabaseClient.auth.updateUser({ password: newPass });
 
     if (error) {
       document.getElementById('passwordError').textContent = error.message;
@@ -3342,7 +3342,7 @@
         const urlParts = currentHandyman.profile_photo_url.split('/object/public/handyman-documents/');
         if (urlParts.length === 2) {
           const filePath = urlParts[1];
-          const { data: signedUrlData, error } = await supabase.storage
+          const { data: signedUrlData, error } = await supabaseClient.storage
             .from('handyman-documents')
             .createSignedUrl(filePath, 60);
 
@@ -3413,7 +3413,7 @@
   // Mark task as in progress
   async function markTaskInProgress(taskId) {
     try {
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('tasks')
         .update({
           status: 'in_progress',
@@ -3454,7 +3454,7 @@
       button.textContent = 'Processing...';
 
       // Upload completion photos
-      const user = (await supabase.auth.getUser()).data.user;
+      const user = (await supabaseClient.auth.getUser()).data.user;
       const photoUrls = [];
 
       for (let i = 0; i < fileInput.files.length; i++) {
@@ -3470,7 +3470,7 @@
 
         if (filePath) {
           // Get signed URL for the uploaded image
-          const { data: signedUrlData } = await supabase.storage
+          const { data: signedUrlData } = await supabaseClient.storage
             .from('handyman-documents')
             .createSignedUrl(filePath, 31536000); // 1 year expiry for completion photos
 
@@ -3487,7 +3487,7 @@
       console.log('📸 Uploaded completion photos:', photoUrls.length);
 
       // Update task status and add completion data
-      const { error: taskError } = await supabase
+      const { error: taskError } = await supabaseClient
         .from('tasks')
         .update({
           status: 'completed',
@@ -3573,7 +3573,7 @@
 
   // Upload materials receipts
   async function uploadMaterialsReceipts(taskId, files) {
-    const user = (await supabase.auth.getUser()).data.user;
+    const user = (await supabaseClient.auth.getUser()).data.user;
     const receiptUrls = [];
 
     for (let i = 0; i < files.length; i++) {
@@ -3588,7 +3588,7 @@
       );
 
       if (filePath) {
-        const { data: signedUrlData } = await supabase.storage
+        const { data: signedUrlData } = await supabaseClient.storage
           .from('handyman-documents')
           .createSignedUrl(filePath, 31536000); // 1 year expiry
 
@@ -3669,11 +3669,11 @@
       console.log('🔐 Checking admin access for:', email);
 
       // Get current auth user to use their UUID
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabaseClient.auth.getUser();
 
       if (user) {
         // First try to find by auth UUID - handle potential duplicates
-        const { data: adminUsers, error: adminError } = await supabase
+        const { data: adminUsers, error: adminError } = await supabaseClient
           .from('admin_users')
           .select('id, email, full_name, role, is_active')
           .eq('id', user.id)
@@ -3701,7 +3701,7 @@
 
           // Update last login time
           try {
-            await supabase
+            await supabaseClient
               .from('admin_users')
               .update({ last_login_at: new Date().toISOString() })
               .eq('id', adminUser.id);
@@ -3713,7 +3713,7 @@
       }
 
       // Fallback: check by email for existing records - handle potential duplicates
-      const { data: adminUsersByEmail, error: emailError } = await supabase
+      const { data: adminUsersByEmail, error: emailError } = await supabaseClient
         .from('admin_users')
         .select('id, email, full_name, role, is_active')
         .eq('email', email.toLowerCase())
@@ -3742,7 +3742,7 @@
 
         // Update last login time
         try {
-          await supabase
+          await supabaseClient
             .from('admin_users')
             .update({ last_login_at: new Date().toISOString() })
             .eq('id', adminUser.id);
