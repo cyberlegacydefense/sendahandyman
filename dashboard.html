@@ -1338,10 +1338,10 @@
 
 <script>
   // Configuration
-  const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabaseClient.co';
+  const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
 
-  let supabaseClientClient;
+  let supabaseClient;
   let currentHandyman = null;
   let currentStep = 1;
   let scheduleData = {};
@@ -1912,7 +1912,7 @@
         `${folderName}/gov-id/${Date.now()}-${govIdFile.name}`
       );
       if (govIdPath) {
-        govIdUrl = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${govIdPath}`;
+        govIdUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${govIdPath}`;
       }
     }
 
@@ -1923,7 +1923,7 @@
         `${folderName}/profile/${Date.now()}-${profilePhotoFile.name}`
       );
       if (profilePhotoPath) {
-        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
+        profilePhotoUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
       }
     }
 
@@ -1999,7 +1999,7 @@
         `${folderName}/insurance/${Date.now()}-${insuranceProofFile.name}`
       );
       if (insuranceProofPath) {
-        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${insuranceProofPath}`;
+        insuranceProofUrl = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${insuranceProofPath}`;
       }
     }
 
@@ -2014,7 +2014,7 @@
           `${folderName}/licenses/${Date.now()}-${index}-${licenseFile.name}`
         );
         if (licenseFilePath) {
-          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${licenseFilePath}`);
+          licenseFiles.push(`https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${licenseFilePath}`);
         }
       }
     });
@@ -2185,7 +2185,7 @@
         `${folderName}/tax/${Date.now()}-${w9File.name}`
       );
       if (w9Path) {
-        w9Url = `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${w9Path}`;
+        w9Url = `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${w9Path}`;
       }
     }
 
@@ -2931,7 +2931,7 @@
       }
 
       // If it's a Supabase storage URL, try to get proper access
-      if (imageUrl.includes('supabaseClient.co/storage')) {
+      if (imageUrl.includes('supabase.co/storage')) {
         try {
           // Extract the file path from the URL
           const urlParts = imageUrl.split('/object/public/handyman-documents/');
@@ -3113,7 +3113,7 @@
         .from('handyman-documents')
         .createSignedUrl(profilePhotoPath, 3600);
 
-      const profilePhotoUrl = signedUrlData?.signedUrl || `https://ynbhskdiplwabsksamxa.supabaseClient.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
+      const profilePhotoUrl = signedUrlData?.signedUrl || `https://ynbhskdiplwabsksamxa.supabase.co/storage/v1/object/public/handyman-documents/${profilePhotoPath}`;
 
       // Update database
       const { error } = await supabaseClient
