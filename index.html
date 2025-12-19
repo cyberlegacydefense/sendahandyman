@@ -394,6 +394,37 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Custom Task Icon Optimization */
+        .service-card img {
+            object-fit: contain;
+            image-rendering: auto;
+            image-rendering: crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        /* Responsive icon sizing */
+        @media (max-width: 640px) {
+            .service-card .w-12 {
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+            }
+            .service-card .w-6 {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+            }
+        }
+
+        /* Smooth hover effects for icons */
+        .service-card:hover img {
+            transform: scale(1.05);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        /* Ensure icons maintain aspect ratio */
+        .service-card img {
+            transition: transform 0.2s ease-in-out;
+        }
     </style>
 </head>
 
@@ -467,31 +498,45 @@
                 <div class="max-w-5xl mx-auto mb-8">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                         <div class="service-card p-6 text-center" onclick="selectService('light-plumbing')">
-                            <div class="text-4xl mb-3">🚿</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/faucet.png" alt="Light Plumbing" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">Light Plumbing</div>
                         </div>
                         <div class="service-card p-6 text-center" onclick="selectService('electrical')">
-                            <div class="text-4xl mb-3">⚡</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/ceiling_mounted_light_fixture.png" alt="Electrical" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">Electrical</div>
                         </div>
                         <div class="service-card p-6 text-center" onclick="selectService('mounting')">
-                            <div class="text-4xl mb-3">📺</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/tv.png" alt="TV Mounting" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">TV Mounting</div>
                         </div>
                         <div class="service-card p-6 text-center" onclick="selectService('furniture')">
-                            <div class="text-4xl mb-3">🪑</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/furniture.png" alt="Furniture Assembly" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">Furniture</div>
                         </div>
                         <div class="service-card p-6 text-center" onclick="selectService('painting')">
-                            <div class="text-4xl mb-3">🎨</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/painting.png" alt="Painting" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">Painting</div>
                         </div>
                         <div class="service-card p-6 text-center" onclick="selectService('appliances')">
-                            <div class="text-4xl mb-3">🔌</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/appliance.png" alt="Appliances" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">Appliances</div>
                         </div>
                         <div class="service-card p-6 text-center" onclick="selectService('repair')">
-                            <div class="text-4xl mb-3">🔨</div>
+                            <div class="flex justify-center mb-3">
+                                <img src="/images/small_hole_wall.png" alt="General Repair" class="w-12 h-12">
+                            </div>
                             <div class="font-semibold text-base">General Repair</div>
                         </div>
                         <div class="service-card p-6 text-center"
@@ -1051,18 +1096,18 @@
 
         function getCategoryDisplay(category) {
             const categories = {
-                'light-plumbing': '🚿 Light Plumbing',
-                'electrical': '⚡ Electrical',
-                'mounting': '📺 TV Mounting',
-                'furniture': '🪑 Furniture Assembly',
-                'painting': '🎨 Painting',
-                'appliances': '🔌 Appliances',
-                'repair': '🔨 General Repair',
-                'ceiling-fan': '<img src="/images/fan.png" alt="Ceiling Fan" class="inline w-6 h-6"> Ceiling Fan',
-                'curtains-blinds': '🪟 Curtain Rods / Blinds',
-                'installation': '🛠️ Installations',
-                'outdoor': '🏡 Outdoor',
-                'other': '❓ Other'
+                'light-plumbing': '<img src="/images/faucet.png" alt="Light Plumbing" class="inline w-6 h-6"> Light Plumbing',
+                'electrical': '<img src="/images/ceiling_mounted_light_fixture.png" alt="Electrical" class="inline w-6 h-6"> Electrical',
+                'mounting': '<img src="/images/tv.png" alt="TV Mounting" class="inline w-6 h-6"> TV Mounting',
+                'furniture': '<img src="/images/furniture.png" alt="Furniture Assembly" class="inline w-6 h-6"> Furniture Assembly',
+                'painting': '<img src="/images/painting.png" alt="Painting" class="inline w-6 h-6"> Painting',
+                'appliances': '<img src="/images/appliance.png" alt="Appliances" class="inline w-6 h-6"> Appliances',
+                'repair': '<img src="/images/small_hole_wall.png" alt="General Repair" class="inline w-6 h-6"> General Repair',
+                'ceiling-fan': '<img src="/images/ceiling_fan.png" alt="Ceiling Fan" class="inline w-6 h-6"> Ceiling Fan',
+                'curtains-blinds': '<img src="/images/window_blinds.png" alt="Curtain Rods / Blinds" class="inline w-6 h-6"> Curtain Rods / Blinds',
+                'installation': '<img src="/images/wall_shelf.png" alt="Installations" class="inline w-6 h-6"> Installations',
+                'outdoor': '<img src="/images/outdoor.png" alt="Outdoor" class="inline w-6 h-6"> Outdoor',
+                'other': '<img src="/images/question_mark.png" alt="Other" class="inline w-6 h-6"> Other'
             };
             return categories[category] || category;
         }
@@ -2602,7 +2647,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                         <div class="service-card p-4" onclick="selectService('light-plumbing')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🚿</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/faucet.png" alt="Light Plumbing" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Light Plumbing</div>
                                     <div class="text-sm text-gray-600">Faucets, toilets, minor leaks</div>
@@ -2612,7 +2659,9 @@
 
                         <div class="service-card p-4" onclick="selectService('electrical')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">⚡</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/ceiling_mounted_light_fixture.png" alt="Electrical" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Electrical</div>
                                     <div class="text-sm text-gray-600">Outlets, switches, light fixtures</div>
@@ -2622,7 +2671,9 @@
 
                         <div class="service-card p-4" onclick="selectService('mounting')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">📺</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/tv.png" alt="TV Mounting" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">TV Mounting</div>
                                     <div class="text-sm text-gray-600">Wall mounting, cable management</div>
@@ -2632,7 +2683,9 @@
 
                         <div class="service-card p-4" onclick="selectService('furniture')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🪑</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/furniture.png" alt="Furniture Assembly" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Furniture Assembly</div>
                                     <div class="text-sm text-gray-600">IKEA, office furniture, beds</div>
@@ -2642,7 +2695,9 @@
 
                         <div class="service-card p-4" onclick="selectService('painting')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🎨</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/painting.png" alt="Painting" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Painting</div>
                                     <div class="text-sm text-gray-600">Touch-ups, small rooms, trim</div>
@@ -2652,7 +2707,9 @@
 
                         <div class="service-card p-4" onclick="selectService('appliances')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🔌</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/appliance.png" alt="Appliances" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Appliances</div>
                                     <div class="text-sm text-gray-600">Installation, basic repairs</div>
@@ -2662,7 +2719,9 @@
 
                         <div class="service-card p-4" onclick="selectService('repair')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🔨</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/small_hole_wall.png" alt="General Repair" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">General Repair</div>
                                     <div class="text-sm text-gray-600">Doors, windows, drywall</div>
@@ -2673,7 +2732,7 @@
                         <div class="service-card p-4" onclick="selectService('ceiling-fan')">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 flex items-center justify-center">
-                                    <img src="/images/fan.png" alt="Ceiling Fan" class="w-6 h-6">
+                                    <img src="/images/ceiling_fan.png" alt="Ceiling Fan" class="w-6 h-6">
                                 </div>
                                 <div>
                                     <div class="font-semibold">Ceiling Fan</div>
@@ -2684,7 +2743,9 @@
 
                         <div class="service-card p-4" onclick="selectService('curtains-blinds')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🪟</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/window_blinds.png" alt="Curtain Rods / Blinds" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Curtain Rods / Blinds</div>
                                     <div class="text-sm text-gray-600">Mount curtain rods, install blinds</div>
@@ -2694,7 +2755,9 @@
 
                         <div class="service-card p-4" onclick="selectService('installation')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🛠️</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/wall_shelf.png" alt="Installations" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Installations</div>
                                     <div class="text-sm text-gray-600">Shelves, hardware, fixtures</div>
@@ -2704,7 +2767,9 @@
 
                         <div class="service-card p-4" onclick="selectService('outdoor')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">🏡</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/outdoor.png" alt="Outdoor" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Outdoor</div>
                                     <div class="text-sm text-gray-600">Deck repairs, outdoor fixtures</div>
@@ -2714,7 +2779,9 @@
 
                         <div class="service-card p-4" onclick="selectService('other')">
                             <div class="flex items-center gap-3">
-                                <div class="text-2xl">❓</div>
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <img src="/images/question_mark.png" alt="Other" class="w-6 h-6">
+                                </div>
                                 <div>
                                     <div class="font-semibold">Other</div>
                                     <div class="text-sm text-gray-600">Describe your specific need</div>
