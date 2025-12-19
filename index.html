@@ -425,6 +425,163 @@
         .service-card img {
             transition: transform 0.2s ease-in-out;
         }
+
+        /* =================================== */
+        /* UBER-STYLE VISUAL IMPROVEMENTS v3.1 */
+        /* =================================== */
+
+        /* 1. Enhanced Service Cards */
+        .service-card {
+            border-radius: 12px !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border: 1px solid #e5e5e5;
+            padding: 16px !important;
+        }
+
+        .service-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+            border-color: #000;
+        }
+
+        /* 2. Typography Hierarchy */
+        h1 {
+            font-weight: 800 !important;
+            letter-spacing: -0.02em !important;
+        }
+
+        h2 {
+            font-weight: 700 !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        h3 {
+            font-weight: 600 !important;
+        }
+
+        button, .btn {
+            font-weight: 600 !important;
+            letter-spacing: 0.01em !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* 3. Color & Contrast Refinements */
+        .text-gray-900 {
+            color: #000 !important;
+        }
+
+        body {
+            background-color: #f7f7f7 !important;
+        }
+
+        .bg-blue-600 {
+            background-color: #276EF1 !important;
+        }
+
+        .bg-indigo-600 {
+            background-color: #276EF1 !important;
+        }
+
+        /* 4. Enhanced Buttons */
+        .btn-primary,
+        .bg-blue-600,
+        .bg-indigo-600,
+        button[class*="bg-blue"],
+        button[class*="bg-indigo"] {
+            min-height: 48px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            border-radius: 8px !important;
+        }
+
+        .btn-primary:hover,
+        .bg-blue-600:hover,
+        .bg-indigo-600:hover,
+        button[class*="bg-blue"]:hover,
+        button[class*="bg-indigo"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+        }
+
+        /* 5. Grid Improvements */
+        .grid {
+            gap: 12px !important;
+        }
+
+        .grid.gap-4 {
+            gap: 12px !important;
+        }
+
+        .grid.gap-6 {
+            gap: 16px !important;
+        }
+
+        /* 6. Loading States */
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+
+        .loading, .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200px 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        /* 7. Enhanced Available Status */
+        .text-green-700 {
+            color: #15803d !important;
+            font-weight: 600 !important;
+        }
+
+        /* 8. Improved Input Fields */
+        input, textarea, select {
+            border-radius: 8px !important;
+            border: 1px solid #d1d5db !important;
+            transition: all 0.2s ease !important;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #276EF1 !important;
+            box-shadow: 0 0 0 3px rgba(39, 110, 241, 0.1) !important;
+            outline: none !important;
+        }
+
+        /* 9. Modal Improvements */
+        .modal, [class*="modal"] {
+            border-radius: 12px !important;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        /* 10. Floating Header Enhancement */
+        .floating-header {
+            backdrop-filter: blur(10px) !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* 11. Mobile Optimizations */
+        @media (max-width: 640px) {
+            .service-card {
+                padding: 12px !important;
+            }
+
+            h1 {
+                font-size: 1.875rem !important;
+            }
+
+            .grid {
+                gap: 8px !important;
+            }
+        }
+
+        /* 12. Smooth Page Transitions */
+        * {
+            scroll-behavior: smooth;
+        }
+
+        .page-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
     </style>
 </head>
 
