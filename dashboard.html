@@ -1359,18 +1359,18 @@
     if (type === 'recovery' && accessToken) {
       console.log('🔄 Handling password recovery from email link');
 
-      // For password recovery, we handle the access token directly
-      // The access token from password reset emails is sufficient for password updates
-      const { error } = await supabaseClient.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken || '' // Use refresh token if available, otherwise empty
+      // For password recovery, we use verifyOtp to establish a proper session
+      const { data, error } = await supabaseClient.auth.verifyOtp({
+        token_hash: accessToken,
+        type: 'recovery'
       });
 
       if (error) {
-        console.error('❌ Error setting recovery session:', error);
+        console.error('❌ Error verifying recovery token:', error);
         showPasswordUpdateForm('Error: Invalid or expired reset link. Please request a new password reset.');
       } else {
         console.log('✅ Recovery session established, showing password update form');
+        console.log('Session data:', data);
         showPasswordUpdateForm();
       }
 
