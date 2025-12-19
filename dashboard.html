@@ -1356,13 +1356,14 @@
     const refreshToken = urlParams.get('refresh_token');
     const type = urlParams.get('type');
 
-    if (type === 'recovery' && accessToken && refreshToken) {
+    if (type === 'recovery' && accessToken) {
       console.log('🔄 Handling password recovery from email link');
 
-      // Set the session from URL parameters
+      // For password recovery, we handle the access token directly
+      // The access token from password reset emails is sufficient for password updates
       const { error } = await supabaseClient.auth.setSession({
         access_token: accessToken,
-        refresh_token: refreshToken
+        refresh_token: refreshToken || '' // Use refresh token if available, otherwise empty
       });
 
       if (error) {
