@@ -675,7 +675,7 @@
         <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2">
                 <img src="/images/favicon.png" alt="SendAHandyman Logo" class="h-8 w-auto">
-                <span>© <span id="year"></span> SendAHandyman v <span id="version">3.0.0</span></span>
+                <span>© <span id="year"></span> SendAHandyman v <span id="version">3.1.0</span></span>
             </div>
             <div class="flex items-center gap-4">
                 <a href="privacy.html" class="hover:text-gray-900">Privacy</a>
@@ -2875,19 +2875,16 @@
                 // Miami-Dade handymen
                 { id: "h1", city: "Miami", lat: 25.7617, lng: -80.1918, status: "available", rating: 4.8, experience: 5, specialties: ["Plumbing", "Electrical"] },
                 { id: "h2", city: "Coral Gables", lat: 25.7214, lng: -80.2683, status: "available", rating: 4.9, experience: 8, specialties: ["Painting", "General Repair"] },
-                { id: "h3", city: "Aventura", lat: 25.9565, lng: -80.1389, status: "busy", rating: 4.7, experience: 3, specialties: ["TV Mounting", "Furniture Assembly"] },
                 { id: "h4", city: "Homestead", lat: 25.4687, lng: -80.4776, status: "available", rating: 4.6, experience: 6, specialties: ["Ceiling Fan", "Electrical"] },
 
                 // Broward handymen
                 { id: "h5", city: "Fort Lauderdale", lat: 26.1224, lng: -80.1373, status: "available", rating: 4.8, experience: 7, specialties: ["Plumbing", "General Repair"] },
                 { id: "h6", city: "Hollywood", lat: 26.0112, lng: -80.1495, status: "available", rating: 4.5, experience: 4, specialties: ["Painting", "Appliances"] },
-                { id: "h7", city: "Coral Springs", lat: 26.2712, lng: -80.2706, status: "busy", rating: 4.7, experience: 5, specialties: ["Furniture Assembly", "Mounting"] },
                 { id: "h8", city: "Plantation", lat: 26.1267, lng: -80.2331, status: "available", rating: 4.9, experience: 9, specialties: ["Electrical", "Ceiling Fan"] },
 
                 // Palm Beach handymen
                 { id: "h9", city: "West Palm Beach", lat: 26.7153, lng: -80.0534, status: "available", rating: 4.8, experience: 6, specialties: ["General Repair", "Painting"] },
                 { id: "h10", city: "Boca Raton", lat: 26.3683, lng: -80.1289, status: "available", rating: 4.9, experience: 10, specialties: ["Plumbing", "Electrical"] },
-                { id: "h11", city: "Wellington", lat: 26.6584, lng: -80.2417, status: "busy", rating: 4.6, experience: 4, specialties: ["Furniture Assembly", "Mounting"] },
                 { id: "h12", city: "Jupiter", lat: 26.9342, lng: -80.0942, status: "available", rating: 4.7, experience: 7, specialties: ["Appliances", "General Repair"] }
             ];
 
@@ -3056,7 +3053,6 @@
                 .filter(h => h.status === 'available')
                 .sort((a, b) => a.distance - b.distance)
                 .slice(0, 3); // Show only closest 3 available handymen
-            const busyHandymen = handymenData.filter(h => h.status === 'busy');
 
             list.innerHTML = `
                 <div class="space-y-3">
@@ -3083,31 +3079,6 @@
                         `).join('')}
                     </div>
 
-                    ${busyHandymen.length > 0 ? `
-                        <!-- Busy Handymen -->
-                        <div>
-                            <div class="text-sm font-semibold text-gray-600 mb-2 flex items-center">
-                                <div class="w-2 h-2 bg-gray-500 rounded-full mr-2"></div>
-                                ${busyHandymen.length} Busy
-                            </div>
-                            ${busyHandymen.slice(0, 2).map(handyman => `
-                                <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg mb-2 cursor-pointer"
-                                     onclick="selectMainPageHandymanFromList('${handyman.id}')">
-                                    <div class="space-y-1">
-                                        <div class="font-medium text-sm text-gray-600">${handyman.city}</div>
-                                        <div class="text-xs text-gray-500">⭐ ${handyman.rating} • ${handyman.experience}y</div>
-                                        <div class="text-xs text-gray-500">~${Math.round(Math.random() * 5 + 1)} mi away</div>
-                                        <div class="text-xs text-orange-600 font-medium">Available later</div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                            ${busyHandymen.length > 2 ? `
-                                <div class="text-xs text-gray-400 text-center">
-                                    +${busyHandymen.length - 2} more later
-                                </div>
-                            ` : ''}
-                        </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -3324,19 +3295,16 @@
                 // Miami-Dade handymen
                 { id: "m1", city: "Miami", lat: 25.7617, lng: -80.1918, status: "available", rating: 4.8, experience: 5, specialties: ["Plumbing", "Electrical"] },
                 { id: "m2", city: "Coral Gables", lat: 25.7214, lng: -80.2683, status: "available", rating: 4.9, experience: 8, specialties: ["Painting", "General Repair"] },
-                { id: "m3", city: "Aventura", lat: 25.9565, lng: -80.1389, status: "busy", rating: 4.7, experience: 3, specialties: ["TV Mounting", "Furniture Assembly"] },
                 { id: "m4", city: "Homestead", lat: 25.4687, lng: -80.4776, status: "available", rating: 4.6, experience: 6, specialties: ["Ceiling Fan", "Electrical"] },
 
                 // Broward handymen
                 { id: "m5", city: "Fort Lauderdale", lat: 26.1224, lng: -80.1373, status: "available", rating: 4.8, experience: 7, specialties: ["Plumbing", "General Repair"] },
                 { id: "m6", city: "Hollywood", lat: 26.0112, lng: -80.1495, status: "available", rating: 4.5, experience: 4, specialties: ["Painting", "Appliances"] },
-                { id: "m7", city: "Coral Springs", lat: 26.2712, lng: -80.2706, status: "busy", rating: 4.7, experience: 5, specialties: ["Furniture Assembly", "Mounting"] },
                 { id: "m8", city: "Plantation", lat: 26.1267, lng: -80.2331, status: "available", rating: 4.9, experience: 9, specialties: ["Electrical", "Ceiling Fan"] },
 
                 // Palm Beach handymen
                 { id: "m9", city: "West Palm Beach", lat: 26.7153, lng: -80.0534, status: "available", rating: 4.8, experience: 6, specialties: ["General Repair", "Painting"] },
                 { id: "m10", city: "Boca Raton", lat: 26.3683, lng: -80.1289, status: "available", rating: 4.9, experience: 10, specialties: ["Plumbing", "Electrical"] },
-                { id: "m11", city: "Wellington", lat: 26.6584, lng: -80.2417, status: "busy", rating: 4.6, experience: 4, specialties: ["Furniture Assembly", "Mounting"] },
                 { id: "m12", city: "Jupiter", lat: 26.9342, lng: -80.0942, status: "available", rating: 4.7, experience: 7, specialties: ["Appliances", "General Repair"] }
             ];
 
@@ -3450,7 +3418,6 @@
         function updateHandymanList(handymenData) {
             const handymanList = document.getElementById('handymanList');
             const availableHandymen = handymenData.filter(h => h.status === 'available');
-            const busyHandymen = handymenData.filter(h => h.status === 'busy');
 
             handymanList.innerHTML = `
                 ${availableHandymen.length > 0 ? `
@@ -3460,12 +3427,6 @@
                     </div>
                 ` : ''}
 
-                ${busyHandymen.length > 0 ? `
-                    <div>
-                        <h5 class="text-sm font-medium text-gray-600 mb-2">🔒 Currently Busy (${busyHandymen.length})</h5>
-                        ${busyHandymen.map(handyman => createHandymanListItem(handyman)).join('')}
-                    </div>
-                ` : ''}
             `;
         }
 
