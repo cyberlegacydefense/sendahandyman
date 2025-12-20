@@ -1368,7 +1368,7 @@
                     </div>
                 </div>
             `;
-            updateProgress(50);
+            updateProgress(2); // Step 2: Details
 
             // Initialize textarea after DOM update
             setTimeout(() => {
@@ -1401,7 +1401,7 @@
         }
 
         function proceedToScheduling() {
-            updateProgress(75);
+            updateProgress(3); // Step 3: Time Selection
             const content = document.getElementById('serviceContent');
             content.innerHTML = `
                 <div class="slide-up">
@@ -1456,7 +1456,7 @@
         }
 
         function showEstimate() {
-            updateProgress(100);
+            updateProgress(4); // Step 4: Final Booking
             const content = document.getElementById('serviceContent');
             content.innerHTML = `
                 <div class="slide-up">
@@ -1952,9 +1952,7 @@
             }
         }
 
-        function updateProgress(percent) {
-            document.getElementById('progressFill').style.width = percent + '%';
-        }
+        // Legacy progress function removed - using step-based progress now
 
         // Photo Modal Functions
         function showPhotoModal() {
@@ -2845,6 +2843,7 @@
             document.getElementById('landingScreen').classList.add('hide');
             document.getElementById('serviceFlow').classList.remove('hide');
             currentStep = 'services';
+            updateProgress(1); // Step 1: Service Selection
 
             content.innerHTML = `
                 <div class="slide-up">
@@ -2998,7 +2997,7 @@
                     </div>
                 </div>
             `;
-            updateProgress(25);
+            updateProgress(1); // Step 1: Service Selection
         }
 
         // Handle click outside modal to close
