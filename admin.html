@@ -1314,7 +1314,7 @@
 // Initialize Supabase
 const supabaseUrl = 'https://ynbhskdiplwabsksamxa.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseAdmin = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 let currentAdminUser = null;
 let handymenData = [];
@@ -1339,7 +1339,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
     console.log('🔐 Attempting admin login for:', email);
 
     // First authenticate with Supabase
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
       email: email,
       password: password
     });
@@ -1426,7 +1426,7 @@ async function checkExistingAuth() {
   try {
     console.log('🔍 Checking existing authentication...');
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseAdmin.auth.getUser();
 
     if (user) {
       console.log('✅ User already authenticated:', user.email);
@@ -2702,7 +2702,7 @@ async function saveHandymanEdits() {
     console.log('💾 Comprehensive update payload prepared:', updateData);
 
     // Check current user session
-    const { data: session } = await supabase.auth.getSession();
+    const { data: session } = await supabaseAdmin.auth.getSession();
     console.log('🔐 Current session:', {
       user: session.session?.user?.id,
       email: session.session?.user?.email
@@ -2729,7 +2729,7 @@ async function saveHandymanEdits() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+        'Authorization': `Bearer ${(await supabaseAdmin.auth.getSession()).data.session?.access_token}`
       },
       body: JSON.stringify({
         handyman_id: handymanId,
@@ -2867,7 +2867,7 @@ async function viewHandymanDetails(handymanId) {
 
     // First, let's discover what buckets exist
     try {
-      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets();
       console.log('📦 Available storage buckets:', buckets?.map(b => b.name) || 'None found');
     } catch (e) {
       console.log('❌ Could not list buckets:', e.message);
@@ -2901,7 +2901,7 @@ async function viewHandymanDetails(handymanId) {
     for (const { bucket, path } of possiblePaths) {
       try {
         console.log(`🔍 Trying bucket: ${bucket}, path: ${path}`);
-        const { data: storageFiles, error: storageError } = await supabase.storage
+        const { data: storageFiles, error: storageError } = await supabaseAdmin.storage
           .from(bucket)
           .list(path, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
 
@@ -3134,7 +3134,7 @@ async function downloadFile(bucket, filePath) {
     // First, let's verify the file actually exists and get its info
     console.log('🔍 Verifying file exists...');
     try {
-      const { data: fileList, error: listError } = await supabase.storage
+      const { data: fileList, error: listError } = await supabaseAdmin.storage
         .from(bucket)
         .list('', { search: filePath });
 
@@ -3160,7 +3160,7 @@ async function downloadFile(bucket, filePath) {
 
     // Try direct download first
     console.log('🔗 Attempting direct download...');
-    let { data, error } = await supabase.storage
+    let { data, error } = await supabaseAdmin.storage
       .from(bucket)
       .download(cleanPath);
 
@@ -3172,7 +3172,7 @@ async function downloadFile(bucket, filePath) {
       // Try getting public URL instead
       try {
         console.log('🔗 Trying to get public URL...');
-        const { data: urlData } = supabase.storage
+        const { data: urlData } = supabaseAdmin.storage
           .from(bucket)
           .getPublicUrl(cleanPath);
 
@@ -3205,7 +3205,7 @@ async function downloadFile(bucket, filePath) {
       // Try creating signed URL
       try {
         console.log('🔗 Trying to create signed URL...');
-        const { data: signedUrlData, error: signedError } = await supabase.storage
+        const { data: signedUrlData, error: signedError } = await supabaseAdmin.storage
           .from(bucket)
           .createSignedUrl(cleanPath, 60); // 60 seconds expiry
 
@@ -3520,7 +3520,7 @@ async function previewFile(bucket, filePath, fileName, fileType) {
     }
 
     // Get signed URL for preview
-    const { data: signedUrlData, error: signedError } = await supabase.storage
+    const { data: signedUrlData, error: signedError } = await supabaseAdmin.storage
       .from(bucket)
       .createSignedUrl(cleanPath, 60); // 60 seconds expiry
 
@@ -4358,7 +4358,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
     console.log('🔐 Creating handyman via Supabase Edge Function...');
 
     // Get current user session for authentication
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabaseAdmin.auth.getSession();
 
     if (sessionError || !session) {
       throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
@@ -4379,7 +4379,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       console.log('Creating new handyman via Edge Function:', { name: fullName, email });
 
       // Get current user session for authentication (exact PostMyStyle method)
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabaseAdmin.auth.getSession();
 
       if (sessionError || !session) {
         throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
@@ -4394,7 +4394,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         phone: phone || null
       });
 
-      const { data, error } = await supabase.functions.invoke('create-handyman', {
+      const { data, error } = await supabaseAdmin.functions.invoke('create-handyman', {
         body: {
           name: fullName,
           email: email,
@@ -4493,7 +4493,7 @@ Copy these credentials manually.`);
         console.log('🔄 Creating auth user directly...');
 
         // Create auth user directly with email confirmation disabled for admin users
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
           email: email,
           password: tempPassword,
           options: {
