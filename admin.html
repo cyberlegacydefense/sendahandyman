@@ -1339,7 +1339,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
     console.log('🔐 Attempting admin login for:', email);
 
     // First authenticate with Supabase
-    const { data: authData, error: authError } = await supabaseAdmin.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabaseAdminAdmin.auth.signInWithPassword({
       email: email,
       password: password
     });
@@ -1353,7 +1353,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
     // Now check if user exists in admin_users table using the auth UUID
     const authUserId = authData.user.id;
 
-    let { data: adminUser, error } = await supabase
+    let { data: adminUser, error } = await supabaseAdmin
       .from('admin_users')
       .select('id, email, full_name, role, is_active')
       .eq('id', authUserId)  // Match by UUID instead of email
@@ -1362,7 +1362,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
 
     // If admin record doesn't exist but auth succeeded, check by email as fallback
     if (error && error.code === 'PGRST116') {
-      const { data: adminByEmail, error: emailError } = await supabase
+      const { data: adminByEmail, error: emailError } = await supabaseAdmin
         .from('admin_users')
         .select('id, email, full_name, role, is_active')
         .eq('email', email)
@@ -1371,7 +1371,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
 
       if (!emailError && adminByEmail) {
         // Update the admin record to use the correct auth UUID
-        const { data: updatedAdmin, error: updateError } = await supabase
+        const { data: updatedAdmin, error: updateError } = await supabaseAdmin
           .from('admin_users')
           .update({ id: authUserId })
           .eq('email', email)
@@ -1402,7 +1402,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (e) =
     console.log('✅ Admin login successful:', adminUser.role);
 
     // Update last login time
-    await supabase
+    await supabaseAdmin
       .from('admin_users')
       .update({ last_login_at: new Date().toISOString() })
       .eq('id', adminUser.id);
@@ -1426,13 +1426,13 @@ async function checkExistingAuth() {
   try {
     console.log('🔍 Checking existing authentication...');
 
-    const { data: { user } } = await supabaseAdmin.auth.getUser();
+    const { data: { user } } = await supabaseAdminAdmin.auth.getUser();
 
     if (user) {
       console.log('✅ User already authenticated:', user.email);
 
       // Check if user has admin access
-      const { data: adminUser, error } = await supabase
+      const { data: adminUser, error } = await supabaseAdmin
         .from('admin_users')
         .select('id, email, full_name, role, is_active')
         .eq('id', user.id)
@@ -1447,7 +1447,7 @@ async function checkExistingAuth() {
 
       // Fallback: check by email for existing records
       console.log('🔄 Trying email-based lookup as fallback...');
-      const { data: adminUserByEmail, error: emailError } = await supabase
+      const { data: adminUserByEmail, error: emailError } = await supabaseAdmin
         .from('admin_users')
         .select('id, email, full_name, role, is_active')
         .eq('email', user.email.toLowerCase())
@@ -1486,7 +1486,7 @@ async function setupAdminUser(adminUser) {
   };
 
   // Update last login time
-  await supabase
+  await supabaseAdmin
     .from('admin_users')
     .update({ last_login_at: new Date().toISOString() })
     .eq('id', adminUser.id);
@@ -1587,7 +1587,7 @@ async function loadDashboardData() {
 async function loadMetrics() {
   try {
     // Count active handymen based on onboarding and skills
-    const { data: handymen, error: handymenError } = await supabase
+    const { data: handymen, error: handymenError } = await supabaseAdmin
       .from('handymen')
       .select('id, onboarding_completed, skills');
 
@@ -1597,7 +1597,7 @@ async function loadMetrics() {
     }
 
     // Count active tasks
-    const { data: tasks, error: tasksError } = await supabase
+    const { data: tasks, error: tasksError } = await supabaseAdmin
       .from('tasks')
       .select('id, status')
       .in('status', ['pending', 'in_progress']);
@@ -1607,7 +1607,7 @@ async function loadMetrics() {
     }
 
     // Count pending quotes from quotes table
-    const { data: quotes, error: quotesError } = await supabase
+    const { data: quotes, error: quotesError } = await supabaseAdmin
       .from('quotes')
       .select('id, status')
       .eq('status', 'pending');
@@ -1625,7 +1625,7 @@ async function loadMetrics() {
     const todayEnd = new Date(todayStart);
     todayEnd.setDate(todayEnd.getDate() + 1);
 
-    const { data: completedTasks, error: revenueError } = await supabase
+    const { data: completedTasks, error: revenueError } = await supabaseAdmin
       .from('tasks')
       .select('total_amount')
       .eq('status', 'completed')
@@ -1654,7 +1654,7 @@ async function loadRecentActivity() {
     // Get recent completed tasks (with error handling)
     let recentTasks = [];
     try {
-      const { data: tasks, error: tasksError } = await supabase
+      const { data: tasks, error: tasksError } = await supabaseAdmin
         .from('tasks')
         .select('id, task_category, status, total_amount, updated_at, handyman_id')
         .eq('status', 'completed')
@@ -1667,7 +1667,7 @@ async function loadRecentActivity() {
         let handymenMap = {};
 
         if (handymanIds.length > 0) {
-          const { data: handymen } = await supabase
+          const { data: handymen } = await supabaseAdmin
             .from('handymen')
             .select('id, full_name')
             .in('id', handymanIds);
@@ -1685,7 +1685,7 @@ async function loadRecentActivity() {
       } else {
         console.warn('Tasks query failed, trying fallback:', tasksError);
         // Fallback: get tasks with minimal columns (no service_type)
-        const { data: simpleTasks, error: simpleError } = await supabase
+        const { data: simpleTasks, error: simpleError } = await supabaseAdmin
           .from('tasks')
           .select('id, status, total_amount, updated_at')
           .eq('status', 'completed')
@@ -1718,7 +1718,7 @@ async function loadRecentActivity() {
     }
 
     // Get recent quotes
-    const { data: recentQuotes, error: quotesError } = await supabase
+    const { data: recentQuotes, error: quotesError } = await supabaseAdmin
       .from('quotes')
       .select('quote_id, service_type, custom_amount, created_at')
       .order('created_at', { ascending: false })
@@ -1736,7 +1736,7 @@ async function loadRecentActivity() {
     }
 
     // Get recent handymen who joined
-    const { data: recentHandymen, error: handymenError } = await supabase
+    const { data: recentHandymen, error: handymenError } = await supabaseAdmin
       .from('handymen')
       .select('full_name, created_at')
       .order('created_at', { ascending: false })
@@ -1836,14 +1836,14 @@ async function loadHandymenData() {
     console.log('🔍 Running handymen query...');
 
     // First, try to get a count to see if RLS is blocking
-    const { count, error: countError } = await supabase
+    const { count, error: countError } = await supabaseAdmin
       .from('handymen')
       .select('*', { count: 'exact', head: true });
 
     console.log('📊 Total handymen count (with RLS):', count);
     if (countError) console.error('Count error:', countError);
 
-    const { data: handymen, error } = await supabase
+    const { data: handymen, error } = await supabaseAdmin
       .from('handymen')
       .select('*')
       .order('created_at', { ascending: false });
@@ -1931,7 +1931,7 @@ async function loadQuotesData() {
 
   try {
     // Load actual quotes from database
-    const { data: quotes, error: quotesError } = await supabase
+    const { data: quotes, error: quotesError } = await supabaseAdmin
       .from('quotes')
       .select('*')
       .order('created_at', { ascending: false });
@@ -2018,7 +2018,7 @@ async function loadAnalyticsData() {
       conversionChart = null;
     }
     // Get real revenue data from completed tasks
-    const { data: completedTasks, error } = await supabase
+    const { data: completedTasks, error } = await supabaseAdmin
       .from('tasks')
       .select('total_amount, completed_at, created_at')
       .eq('status', 'completed')
@@ -2349,7 +2349,7 @@ async function editHandyman(handymanId) {
     console.log('🔧 Function triggered successfully');
 
     // Load handyman data
-    const { data: handyman, error } = await supabase
+    const { data: handyman, error } = await supabaseAdmin
       .from('handymen')
       .select('*')
       .eq('id', handymanId)
@@ -2702,14 +2702,14 @@ async function saveHandymanEdits() {
     console.log('💾 Comprehensive update payload prepared:', updateData);
 
     // Check current user session
-    const { data: session } = await supabaseAdmin.auth.getSession();
+    const { data: session } = await supabaseAdminAdmin.auth.getSession();
     console.log('🔐 Current session:', {
       user: session.session?.user?.id,
       email: session.session?.user?.email
     });
 
     // Verify existing record
-    const { data: existingRecord, error: readError } = await supabase
+    const { data: existingRecord, error: readError } = await supabaseAdmin
       .from('handymen')
       .select('*')
       .eq('id', handymanId);
@@ -2729,7 +2729,7 @@ async function saveHandymanEdits() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(await supabaseAdmin.auth.getSession()).data.session?.access_token}`
+        'Authorization': `Bearer ${(await supabaseAdminAdmin.auth.getSession()).data.session?.access_token}`
       },
       body: JSON.stringify({
         handyman_id: handymanId,
@@ -2779,7 +2779,7 @@ async function viewHandymanDetails(handymanId) {
     document.getElementById('handymanDetailsContent').classList.add('hidden');
 
     // Fetch comprehensive handyman data
-    const { data: handyman, error: handymanError } = await supabase
+    const { data: handyman, error: handymanError } = await supabaseAdmin
       .from('handymen')
       .select('*')
       .eq('id', handymanId)
@@ -2794,7 +2794,7 @@ async function viewHandymanDetails(handymanId) {
 
     // First discover what columns actually exist in tasks table
     console.log('🔍 Discovering tasks table structure...');
-    let { data: sampleTasks, error: sampleError } = await supabase
+    let { data: sampleTasks, error: sampleError } = await supabaseAdmin
       .from('tasks')
       .select('*')
       .limit(1);
@@ -2802,7 +2802,7 @@ async function viewHandymanDetails(handymanId) {
     console.log('📊 Tasks table columns available:', sampleTasks?.[0] ? Object.keys(sampleTasks[0]) : 'No tasks found');
 
     // Try basic columns that should exist
-    let { data: tasks, error: tasksError } = await supabase
+    let { data: tasks, error: tasksError } = await supabaseAdmin
       .from('tasks')
       .select('*')
       .eq('handyman_id', handymanId)
@@ -2814,7 +2814,7 @@ async function viewHandymanDetails(handymanId) {
     // If no tasks found or error, try assigned_handyman_id
     if ((!tasks || tasks.length === 0) && !tasksError) {
       console.log('🔍 Trying assigned_handyman_id column...');
-      const { data: tasks2, error: tasksError2 } = await supabase
+      const { data: tasks2, error: tasksError2 } = await supabaseAdmin
         .from('tasks')
         .select('*')
         .eq('assigned_handyman_id', handymanId)
@@ -2833,7 +2833,7 @@ async function viewHandymanDetails(handymanId) {
       console.log('🔍 Trying other possible column names...');
       for (const columnName of ['handyman', 'worker_id', 'assigned_to', 'technician_id']) {
         try {
-          const { data: tasks3, error: tasksError3 } = await supabase
+          const { data: tasks3, error: tasksError3 } = await supabaseAdmin
             .from('tasks')
             .select('*')
             .eq(columnName, handymanId)
@@ -2867,7 +2867,7 @@ async function viewHandymanDetails(handymanId) {
 
     // First, let's discover what buckets exist
     try {
-      const { data: buckets, error: bucketsError } = await supabaseAdmin.storage.listBuckets();
+      const { data: buckets, error: bucketsError } = await supabaseAdminAdmin.storage.listBuckets();
       console.log('📦 Available storage buckets:', buckets?.map(b => b.name) || 'None found');
     } catch (e) {
       console.log('❌ Could not list buckets:', e.message);
@@ -2901,7 +2901,7 @@ async function viewHandymanDetails(handymanId) {
     for (const { bucket, path } of possiblePaths) {
       try {
         console.log(`🔍 Trying bucket: ${bucket}, path: ${path}`);
-        const { data: storageFiles, error: storageError } = await supabaseAdmin.storage
+        const { data: storageFiles, error: storageError } = await supabaseAdminAdmin.storage
           .from(bucket)
           .list(path, { limit: 100, sortBy: { column: 'name', order: 'asc' } });
 
@@ -3134,7 +3134,7 @@ async function downloadFile(bucket, filePath) {
     // First, let's verify the file actually exists and get its info
     console.log('🔍 Verifying file exists...');
     try {
-      const { data: fileList, error: listError } = await supabaseAdmin.storage
+      const { data: fileList, error: listError } = await supabaseAdminAdmin.storage
         .from(bucket)
         .list('', { search: filePath });
 
@@ -3160,7 +3160,7 @@ async function downloadFile(bucket, filePath) {
 
     // Try direct download first
     console.log('🔗 Attempting direct download...');
-    let { data, error } = await supabaseAdmin.storage
+    let { data, error } = await supabaseAdminAdmin.storage
       .from(bucket)
       .download(cleanPath);
 
@@ -3205,7 +3205,7 @@ async function downloadFile(bucket, filePath) {
       // Try creating signed URL
       try {
         console.log('🔗 Trying to create signed URL...');
-        const { data: signedUrlData, error: signedError } = await supabaseAdmin.storage
+        const { data: signedUrlData, error: signedError } = await supabaseAdminAdmin.storage
           .from(bucket)
           .createSignedUrl(cleanPath, 60); // 60 seconds expiry
 
@@ -3520,7 +3520,7 @@ async function previewFile(bucket, filePath, fileName, fileType) {
     }
 
     // Get signed URL for preview
-    const { data: signedUrlData, error: signedError } = await supabaseAdmin.storage
+    const { data: signedUrlData, error: signedError } = await supabaseAdminAdmin.storage
       .from(bucket)
       .createSignedUrl(cleanPath, 60); // 60 seconds expiry
 
@@ -3666,7 +3666,7 @@ function closeFileInfoModal() {
 async function toggleHandymanStatus(handymanId) {
   try {
     // Get current handyman data
-    const { data: handyman, error: fetchError } = await supabase
+    const { data: handyman, error: fetchError } = await supabaseAdmin
       .from('handymen')
       .select('full_name, is_active')
       .eq('id', handymanId)
@@ -3694,7 +3694,7 @@ async function toggleHandymanStatus(handymanId) {
     }
 
     // Update the status
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('handymen')
       .update({ is_active: newStatus })
       .eq('id', handymanId);
@@ -3720,7 +3720,7 @@ async function loadTasksData() {
   console.log('📋 Loading tasks data...');
 
   try {
-    const { data: tasks, error } = await supabase
+    const { data: tasks, error } = await supabaseAdmin
       .from('tasks')
       .select('*')
       .order('created_at', { ascending: false });
@@ -3732,7 +3732,7 @@ async function loadTasksData() {
     let handymenMap = {};
 
     if (handymanIds.length > 0) {
-      const { data: handymen } = await supabase
+      const { data: handymen } = await supabaseAdmin
         .from('handymen')
         .select('id, full_name')
         .in('id', handymanIds);
@@ -3866,7 +3866,7 @@ function filterTasks() {
 async function openAssignModal(taskId = null) {
   try {
     // Load available handymen
-    const { data: handymen, error } = await supabase
+    const { data: handymen, error } = await supabaseAdmin
       .from('handymen')
       .select('id, full_name, email, skills')
       .eq('is_active', true)
@@ -3950,7 +3950,7 @@ async function handleTaskAssignment() {
 
     // Update tasks with assignment
     for (const taskId of taskIds) {
-      const { error } = await supabase
+      const { error } = await supabaseAdmin
         .from('tasks')
         .update({
           handyman_id: handymanId,
@@ -4000,7 +4000,7 @@ async function reassignTask(taskId) {
 // View task details
 async function viewTaskDetails(taskId) {
   try {
-    const { data: task, error } = await supabase
+    const { data: task, error } = await supabaseAdmin
       .from('tasks')
       .select('*')
       .eq('id', taskId)
@@ -4011,7 +4011,7 @@ async function viewTaskDetails(taskId) {
     // Get handyman details separately if assigned
     let handyman = null;
     if (task.handyman_id) {
-      const { data: handymanData, error: handymanError } = await supabase
+      const { data: handymanData, error: handymanError } = await supabaseAdmin
         .from('handymen')
         .select('id, full_name, email, phone')
         .eq('id', task.handyman_id)
@@ -4326,7 +4326,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
   // ADDITIONAL DEBUG: Check database directly for this specific email
   console.log('🔍 Checking database directly for email conflicts...');
   try {
-    const { data: directCheck, error: directError } = await supabase
+    const { data: directCheck, error: directError } = await supabaseAdmin
       .from('handymen')
       .select('id, email, full_name, is_active, created_at')
       .ilike('email', email);
@@ -4358,7 +4358,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
     console.log('🔐 Creating handyman via Supabase Edge Function...');
 
     // Get current user session for authentication
-    const { data: { session }, error: sessionError } = await supabaseAdmin.auth.getSession();
+    const { data: { session }, error: sessionError } = await supabaseAdminAdmin.auth.getSession();
 
     if (sessionError || !session) {
       throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
@@ -4379,7 +4379,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
       console.log('Creating new handyman via Edge Function:', { name: fullName, email });
 
       // Get current user session for authentication (exact PostMyStyle method)
-      const { data: { session }, error: sessionError } = await supabaseAdmin.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabaseAdminAdmin.auth.getSession();
 
       if (sessionError || !session) {
         throw new Error('You must be logged in to create handymen. Please refresh and log in again.');
@@ -4394,7 +4394,7 @@ document.getElementById('addHandymanForm').addEventListener('submit', async (e) 
         phone: phone || null
       });
 
-      const { data, error } = await supabaseAdmin.functions.invoke('create-handyman', {
+      const { data, error } = await supabaseAdminAdmin.functions.invoke('create-handyman', {
         body: {
           name: fullName,
           email: email,
@@ -4493,7 +4493,7 @@ Copy these credentials manually.`);
         console.log('🔄 Creating auth user directly...');
 
         // Create auth user directly with email confirmation disabled for admin users
-        const { data: authData, error: authError } = await supabaseAdmin.auth.signUp({
+        const { data: authData, error: authError } = await supabaseAdminAdmin.auth.signUp({
           email: email,
           password: tempPassword,
           options: {
@@ -4545,7 +4545,7 @@ Copy these credentials manually.`);
           is_active: true
         });
 
-        const { data: handyman, error: handymanError } = await supabase
+        const { data: handyman, error: handymanError } = await supabaseAdmin
           .from('handymen')
           .insert({
             user_id: authData.user?.id,
@@ -4565,7 +4565,7 @@ Copy these credentials manually.`);
           // Check if the error is due to the record already existing
           if (handymanError.message?.includes('duplicate key value violates unique constraint')) {
             console.log('🔍 Checking if handyman was created despite error...');
-            const { data: existingRecord, error: checkError } = await supabase
+            const { data: existingRecord, error: checkError } = await supabaseAdmin
               .from('handymen')
               .select('*')
               .eq('email', email.toLowerCase())
@@ -4583,7 +4583,7 @@ Copy these credentials manually.`);
                   length: fullName?.length,
                   existingRecordId: existingRecord.id
                 });
-                const { error: updateError } = await supabase
+                const { error: updateError } = await supabaseAdmin
                   .from('handymen')
                   .update({ full_name: fullName })
                   .eq('id', existingRecord.id);
