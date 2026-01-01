@@ -3919,12 +3919,19 @@
                 // Send booking data to backend
                 console.log('📤 Dispatching booking:', bookingData);
 
-                // Note: You'll need to implement the dispatch function
-                // await fetch('/.netlify/functions/dispatch-handyman', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify(bookingData)
-                // });
+                // TODO: Implement dispatch-handyman function for automated task creation
+                // For now, tasks will be created manually based on console logs
+                try {
+                    await fetch('/.netlify/functions/dispatch-handyman', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(bookingData)
+                    });
+                    console.log('✅ Booking dispatched successfully');
+                } catch (dispatchError) {
+                    console.warn('⚠️ Dispatch function not implemented yet - handle manually:', dispatchError.message);
+                    console.log('📋 MANUAL TASK CREATION NEEDED:', bookingData);
+                }
 
                 // Show success modal
                 closePaymentModal();
