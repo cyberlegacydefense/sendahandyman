@@ -158,15 +158,11 @@ GUIDELINES:
 - Focus on visible issues, avoid speculation
 - Always use exact service names and pricing from our list`;
 
-  // Always use mock analysis for reliable testing
-  console.log('🎯 Using mock analysis for consistent results');
-  return createMockAnalysis();
-
-  // Disabled real API for now:
-  // if (!process.env.CLAUDE_API_KEY) {
-  //   console.warn('⚠️ CLAUDE_API_KEY not found - using mock analysis');
-  //   return createMockAnalysis();
-  // }
+  // Check if API key is available for real analysis
+  if (!process.env.CLAUDE_API_KEY) {
+    console.warn('⚠️ CLAUDE_API_KEY not found - using fallback analysis');
+    return createFallbackAnalysis('Professional handyman assessment needed based on uploaded photo.');
+  }
 
   // Note: Mock analysis removed - now using real Claude vision
 
@@ -361,7 +357,7 @@ function createFallbackAnalysis(responseText) {
     taskCategory = 'floating_shelf';
   } else if (lowerText.includes('appliance') || lowerText.includes('washer') || lowerText.includes('dryer')) {
     taskCategory = 'appliance_hookup';
-  } else if (lowerText.includes('furniture') || lowerText.includes('assembly') || lowerText.includes('ikea')) {
+  } else if (lowerText.includes('furniture') || lowerText.includes('assembly') || lowerText.includes('ikea') || lowerText.includes('desk') || lowerText.includes('disassemble') || lowerText.includes('dissamble')) {
     taskCategory = 'furniture_assembly';
   } else if (lowerText.includes('closet') || lowerText.includes('organizer')) {
     taskCategory = 'closet_organizer';
