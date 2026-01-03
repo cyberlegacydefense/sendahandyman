@@ -1009,7 +1009,7 @@
         console.log('🔧 System Configuration:');
         console.log('📍 Database:', SUPABASE_URL.includes('ynbhskdiplwabsksamxa') ? '✅ Correct (Admin DB)' : '❌ Wrong Database');
         console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY ? '✅ Present' : '❌ Missing');
-        console.log('💳 Stripe Key:', typeof STRIPE_PUBLISHABLE_KEY !== 'undefined' ? '✅ Present' : '❌ Missing');
+        console.log('💳 Stripe Key: Will be validated when payment modal loads');
 
         // Pricing constants (from original site)
         const RATE = 80;
@@ -3784,6 +3784,7 @@
 
         // Initialize Stripe
         function initializeStripe() {
+            console.log('💳 Stripe Configuration:', STRIPE_PUBLISHABLE_KEY ? '✅ Key Present' : '❌ Key Missing');
             if (typeof Stripe !== 'undefined') {
                 try {
                     stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
