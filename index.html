@@ -1000,10 +1000,16 @@
         let supabaseClient = null;
         let isAnalyzing = false; // Prevent concurrent analysis attempts
 
-        // Initialize Supabase
-        const SUPABASE_URL = 'https://bhjcryqcegrlglbfmxvx.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoamNyeXFjZWdybGdsYmZteHZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzEwNTU2ODcsImV4cCI6MjA0NjYzMTY4N30.BKfSkI98W7TmMgF88J5vCy8CHg4XvH3CGc2DGC8XGVw';
+        // Initialize Supabase - Updated to match admin/handyman database
+        const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Environment validation
+        console.log('🔧 System Configuration:');
+        console.log('📍 Database:', SUPABASE_URL.includes('ynbhskdiplwabsksamxa') ? '✅ Correct (Admin DB)' : '❌ Wrong Database');
+        console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY ? '✅ Present' : '❌ Missing');
+        console.log('💳 Stripe Key:', typeof STRIPE_PUBLISHABLE_KEY !== 'undefined' ? '✅ Present' : '❌ Missing');
 
         // Pricing constants (from original site)
         const RATE = 80;
@@ -3931,6 +3937,21 @@
                 } catch (dispatchError) {
                     console.warn('⚠️ Dispatch function not implemented yet - handle manually:', dispatchError.message);
                     console.log('📋 MANUAL TASK CREATION NEEDED:', bookingData);
+                    console.log('🔥 =================================');
+                    console.log('🔥 URGENT: MANUAL TASK REQUIRED');
+                    console.log('🔥 Task ID:', bookingData.task_id);
+                    console.log('🔥 Service:', bookingData.service_display);
+                    console.log('🔥 Description:', bookingData.description);
+                    console.log('🔥 Location:', bookingData.location);
+                    console.log('🔥 Time Slot:', bookingData.time_slot);
+                    console.log('🔥 Amount:', `$${bookingData.total_amount}`);
+                    console.log('🔥 Payment ID:', bookingData.payment_intent_id);
+                    console.log('🔥 =================================');
+
+                    // Also show an admin notification if possible
+                    if (typeof showToast === 'function') {
+                        showToast(`Task ${bookingData.task_id} needs manual creation - Check console for details`, 'warning', 10000);
+                    }
                 }
 
                 // Show success modal
