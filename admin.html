@@ -1619,25 +1619,67 @@ async function loadMetrics() {
       document.getElementById('pendingQuotesCount').textContent = '0';
     }
 
-    // Calculate today's revenue from completed tasks
+    // Calculate today's revenue from multiple sources
     const today = new Date();
     const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const todayEnd = new Date(todayStart);
     todayEnd.setDate(todayEnd.getDate() + 1);
 
+    let todayRevenue = 0;
+
+    // Method 1: Check completed tasks
     const { data: completedTasks, error: revenueError } = await supabaseAdmin
       .from('tasks')
-      .select('total_amount')
+      .select('total_amount, amount, price, final_amount')
       .eq('status', 'completed')
       .gte('updated_at', todayStart.toISOString())
       .lt('updated_at', todayEnd.toISOString());
 
     if (!revenueError && completedTasks) {
-      const todayRevenue = completedTasks.reduce((sum, task) => sum + (task.total_amount || 0), 0);
-      document.getElementById('todayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
-    } else {
-      document.getElementById('todayRevenue').textContent = '$0.00';
+      todayRevenue += completedTasks.reduce((sum, task) => {
+        const amount = task.total_amount || task.amount || task.price || task.final_amount || 0;
+        return sum + parseFloat(amount);
+      }, 0);
     }
+
+    // Method 2: Check paid quotes as backup revenue source
+    try {
+      const { data: paidQuotes, error: quotesError } = await supabaseAdmin
+        .from('quotes')
+        .select('custom_amount')
+        .eq('status', 'paid')
+        .gte('updated_at', todayStart.toISOString())
+        .lt('updated_at', todayEnd.toISOString());
+
+      if (!quotesError && paidQuotes) {
+        todayRevenue += paidQuotes.reduce((sum, quote) => sum + (parseFloat(quote.custom_amount) || 0), 0);
+      }
+    } catch (quotesErr) {
+      console.warn('Quotes table not accessible for revenue calculation');
+    }
+
+    // Method 3: Check any tasks with payment_intent_id (indicating payment was made)
+    const { data: paidTasks, error: paidError } = await supabaseAdmin
+      .from('tasks')
+      .select('total_amount, amount, price')
+      .not('payment_intent_id', 'is', null)
+      .gte('created_at', todayStart.toISOString())
+      .lt('created_at', todayEnd.toISOString());
+
+    if (!paidError && paidTasks) {
+      const paidTasksRevenue = paidTasks.reduce((sum, task) => {
+        const amount = task.total_amount || task.amount || task.price || 0;
+        return sum + parseFloat(amount);
+      }, 0);
+
+      // Only add if we haven't already counted these tasks
+      if (completedTasks?.length === 0) {
+        todayRevenue += paidTasksRevenue;
+      }
+    }
+
+    document.getElementById('todayRevenue').textContent = `$${todayRevenue.toFixed(2)}`;
+    console.log(`📊 Today's Revenue: $${todayRevenue.toFixed(2)} from ${completedTasks?.length || 0} completed tasks and ${paidQuotes?.length || 0} paid quotes`);
 
   } catch (error) {
     console.error('Error loading metrics:', error);
@@ -1993,6 +2035,11 @@ function renderQuotesTable() {
       <td class="py-3 px-4">
         <div class="flex gap-2">
           <button onclick="resendQuote('${quote.id}')" class="text-green-600 hover:text-green-800 text-sm">Resend</button>
+          ${quote.status === 'pending' ?
+            `<button onclick="changeQuoteStatus('${quote.id}', 'closed')" class="text-red-600 hover:text-red-800 text-sm font-medium">Mark Closed</button>
+             <button onclick="changeQuoteStatus('${quote.id}', 'expired')" class="text-orange-600 hover:text-orange-800 text-sm">Mark Expired</button>` :
+            ''
+          }
         </div>
       </td>
     </tr>
@@ -2017,13 +2064,65 @@ async function loadAnalyticsData() {
       conversionChart.destroy();
       conversionChart = null;
     }
-    // Get real revenue data from completed tasks
-    const { data: completedTasks, error } = await supabaseAdmin
+    // Get real revenue data from multiple sources
+    let allRevenueTasks = [];
+
+    // Method 1: Completed tasks
+    const { data: completedTasks, error: completedError } = await supabaseAdmin
       .from('tasks')
-      .select('total_amount, completed_at, created_at')
+      .select('total_amount, amount, price, completed_at, created_at, updated_at')
       .eq('status', 'completed')
-      .not('total_amount', 'is', null)
-      .order('completed_at', { ascending: false });
+      .order('updated_at', { ascending: false });
+
+    if (!completedError && completedTasks) {
+      allRevenueTasks = allRevenueTasks.concat(
+        completedTasks.map(task => ({
+          amount: task.total_amount || task.amount || task.price || 0,
+          date: task.completed_at || task.updated_at || task.created_at
+        })).filter(task => task.amount > 0)
+      );
+    }
+
+    // Method 2: Paid quotes
+    try {
+      const { data: paidQuotes, error: quotesError } = await supabaseAdmin
+        .from('quotes')
+        .select('custom_amount, updated_at, created_at')
+        .eq('status', 'paid')
+        .order('updated_at', { ascending: false });
+
+      if (!quotesError && paidQuotes) {
+        allRevenueTasks = allRevenueTasks.concat(
+          paidQuotes.map(quote => ({
+            amount: parseFloat(quote.custom_amount) || 0,
+            date: quote.updated_at || quote.created_at
+          })).filter(quote => quote.amount > 0)
+        );
+      }
+    } catch (quotesErr) {
+      console.warn('Quotes not accessible for analytics');
+    }
+
+    // Method 3: Tasks with payment data
+    const { data: paidTasks, error: paidError } = await supabaseAdmin
+      .from('tasks')
+      .select('total_amount, amount, price, created_at, updated_at')
+      .not('payment_intent_id', 'is', null)
+      .order('created_at', { ascending: false });
+
+    if (!paidError && paidTasks) {
+      // Only add if we don't already have completed task data
+      if (completedTasks?.length === 0) {
+        allRevenueTasks = allRevenueTasks.concat(
+          paidTasks.map(task => ({
+            amount: task.total_amount || task.amount || task.price || 0,
+            date: task.updated_at || task.created_at
+          })).filter(task => task.amount > 0)
+        );
+      }
+    }
+
+    const error = completedError;
 
     if (error) {
       console.error('Error loading analytics data:', error);
@@ -2033,7 +2132,8 @@ async function loadAnalyticsData() {
     }
 
     // Process real data for charts
-    createChartsWithData(completedTasks || []);
+    console.log(`📊 Analytics found ${allRevenueTasks.length} revenue transactions`);
+    createChartsWithData(allRevenueTasks || []);
 
   } catch (error) {
     console.error('Error in loadAnalyticsData:', error);
@@ -2043,14 +2143,13 @@ async function loadAnalyticsData() {
 }
 
 // Create charts with provided data
-function createChartsWithData(completedTasks) {
+function createChartsWithData(revenueTransactions) {
   // Process revenue data by week
   const weeks = [];
   const revenueData = [];
 
-  if (completedTasks.length > 0) {
+  if (revenueTransactions.length > 0) {
     // Group by week and calculate revenue
-    const weeklyRevenue = {};
     const now = new Date();
 
     for (let i = 3; i >= 0; i--) {
@@ -2062,14 +2161,18 @@ function createChartsWithData(completedTasks) {
       const weekLabel = `Week ${4 - i}`;
       weeks.push(weekLabel);
 
-      const weekRevenue = completedTasks
-        .filter(task => {
-          const completedDate = new Date(task.completed_at);
-          return completedDate >= weekStart && completedDate < weekEnd;
+      const weekRevenue = revenueTransactions
+        .filter(transaction => {
+          const transactionDate = new Date(transaction.date);
+          return transactionDate >= weekStart && transactionDate < weekEnd;
         })
-        .reduce((sum, task) => sum + (parseFloat(task.total_amount) || 0), 0);
+        .reduce((sum, transaction) => sum + (parseFloat(transaction.amount) || 0), 0);
 
       revenueData.push(weekRevenue);
+      console.log(`📅 ${weekLabel}: $${weekRevenue.toFixed(2)} from ${revenueTransactions.filter(t => {
+        const d = new Date(t.date);
+        return d >= weekStart && d < weekEnd;
+      }).length} transactions`);
     }
   } else {
     // No data available - show empty chart
@@ -2341,6 +2444,51 @@ function copyQuoteLink(quoteToken) {
 
 function resendQuote(quoteId) {
   alert('Resend functionality would be implemented here');
+}
+
+// Change quote status (mark as closed, expired, etc.)
+async function changeQuoteStatus(quoteId, newStatus) {
+  try {
+    // Confirm with user before changing status
+    const statusText = newStatus === 'closed' ? 'closed (client declined)' : newStatus;
+    if (!confirm(`Are you sure you want to mark this quote as ${statusText}? This action cannot be undone.`)) {
+      return;
+    }
+
+    console.log(`💰 Changing quote ${quoteId} status to ${newStatus}...`);
+
+    // Update quote status in database
+    const { data, error } = await supabaseAdmin
+      .from('quotes')
+      .update({
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', quoteId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error changing quote status:', error);
+      alert(`Failed to change quote status: ${error.message}`);
+      return;
+    }
+
+    console.log('✅ Quote status changed successfully:', data);
+
+    // Show success message
+    const successMessage = newStatus === 'closed'
+      ? 'Quote has been marked as closed (client declined)'
+      : `Quote has been marked as ${newStatus}`;
+    alert(`${successMessage} successfully!`);
+
+    // Refresh the quotes table to reflect the change
+    await loadQuotesData();
+
+  } catch (error) {
+    console.error('Error changing quote status:', error);
+    alert('An unexpected error occurred while changing the quote status. Please try again.');
+  }
 }
 
 async function editHandyman(handymanId) {
@@ -3795,6 +3943,10 @@ function renderTasksTable() {
             `<button onclick="reassignTask('${task.id}')" class="text-orange-600 hover:text-orange-800 text-sm">Reassign</button>`
           }
           <button onclick="viewTaskDetails('${task.id}')" class="text-slate-600 hover:text-slate-800 text-sm">View</button>
+          ${task.status !== 'completed' && task.status !== 'cancelled' ?
+            `<button onclick="closeTask('${task.id}')" class="text-green-600 hover:text-green-800 text-sm font-medium">Close</button>` :
+            ''
+          }
         </div>
       </td>
     </tr>
@@ -3995,6 +4147,48 @@ function quickAssignSelected() {
 // Reassign task
 async function reassignTask(taskId) {
   openAssignModal(taskId);
+}
+
+// Close task manually (mark as completed)
+async function closeTask(taskId) {
+  try {
+    // Confirm with user before closing
+    if (!confirm('Are you sure you want to mark this task as completed? This action cannot be undone.')) {
+      return;
+    }
+
+    console.log(`🔒 Attempting to close task ${taskId}...`);
+
+    // Update task status to completed
+    const { data, error } = await supabaseAdmin
+      .from('tasks')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', taskId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error closing task:', error);
+      alert(`Failed to close task: ${error.message}`);
+      return;
+    }
+
+    console.log('✅ Task closed successfully:', data);
+
+    // Show success message
+    alert('Task has been marked as completed successfully!');
+
+    // Refresh the tasks table to reflect the change
+    await loadTasksData();
+
+  } catch (error) {
+    console.error('Error closing task:', error);
+    alert('An unexpected error occurred while closing the task. Please try again.');
+  }
 }
 
 // View task details
