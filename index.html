@@ -15,17 +15,185 @@
     <link rel="apple-touch-icon" href="/images/favicon.png">
 
     <!-- Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17598022946"></script>
+    <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-PW9HC7HL');</script>
+
+    <!-- Google Analytics 4 + Google Ads -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
+
+        // Google Analytics 4 (replace G-XXXXXXXXXX with your actual GA4 measurement ID)
+        gtag('config', 'G-XXXXXXXXXX', {
+            page_title: 'SendAHandyman - Book Handyman Services',
+            page_location: window.location.href
+        });
+
+        // Google Ads Conversion Tracking
         gtag('config', 'AW-17598022946');
+    </script>
+
+    <!-- Custom Analytics System -->
+    <script>
+        // Enhanced Analytics System for SendAHandyman
+        const HandymanAnalytics = {
+            sessionId: null,
+
+            init() {
+                this.sessionId = this.getOrCreateSessionId();
+                this.trackPageView();
+                console.log('📊 Analytics initialized for session:', this.sessionId);
+            },
+
+            getOrCreateSessionId() {
+                let sessionId = sessionStorage.getItem('handyman_session_id');
+                if (!sessionId) {
+                    sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    sessionStorage.setItem('handyman_session_id', sessionId);
+                }
+                return sessionId;
+            },
+
+            trackPageView() {
+                this.trackEvent('page_view', {
+                    page_title: document.title,
+                    page_url: window.location.href,
+                    referrer: document.referrer,
+                    user_agent: navigator.userAgent,
+                    screen_resolution: `${screen.width}x${screen.height}`,
+                    is_mobile: window.innerWidth <= 768
+                });
+            },
+
+            trackEvent(eventName, eventData = {}) {
+                const eventPayload = {
+                    event_name: eventName,
+                    session_id: this.sessionId,
+                    timestamp: new Date().toISOString(),
+                    page_url: window.location.href,
+                    ...eventData
+                };
+
+                // Send to custom analytics (Supabase)
+                this.sendToCustomAnalytics(eventPayload);
+
+                // Send to Google Analytics if available
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', eventName, eventData);
+                }
+
+                console.log('📊 Event tracked:', eventName, eventData);
+            },
+
+            async sendToCustomAnalytics(payload) {
+                try {
+                    // Store analytics in Supabase for detailed analysis
+                    if (typeof supabase !== 'undefined') {
+                        await supabase
+                            .from('analytics_events')
+                            .insert(payload);
+                    }
+                } catch (error) {
+                    console.error('Analytics storage error:', error);
+                }
+            },
+
+            // Booking funnel tracking methods
+            trackSearchStarted(query) {
+                this.trackEvent('search_started', {
+                    search_query: query,
+                    funnel_step: 1
+                });
+            },
+
+            trackServiceSelected(service) {
+                this.trackEvent('service_selected', {
+                    service_type: service,
+                    service_display: serviceData.categoryDisplay,
+                    funnel_step: 2
+                });
+            },
+
+            trackDetailsEntered(hasDescription, hasPhotos, hasLocation) {
+                this.trackEvent('details_entered', {
+                    has_description: hasDescription,
+                    has_photos: hasPhotos,
+                    has_location: hasLocation,
+                    description_length: hasDescription ? serviceData.detailedDescription.length : 0,
+                    funnel_step: 3
+                });
+            },
+
+            trackPhotoUploaded(analysisResult) {
+                this.trackEvent('photo_uploaded', {
+                    ai_analysis_success: !!analysisResult,
+                    analysis_category: analysisResult?.category,
+                    analysis_confidence: analysisResult?.confidence
+                });
+            },
+
+            trackSchedulingViewed(timeSlots) {
+                this.trackEvent('scheduling_viewed', {
+                    available_slots: timeSlots.length,
+                    funnel_step: 4
+                });
+            },
+
+            trackTimeSlotSelected(timeSlot) {
+                this.trackEvent('time_slot_selected', {
+                    selected_time: timeSlot.windowLabel,
+                    pricing: serviceData.pricing?.total,
+                    funnel_step: 5
+                });
+            },
+
+            trackPaymentStarted(amount) {
+                this.trackEvent('payment_started', {
+                    amount: amount,
+                    service: serviceData.categoryDisplay,
+                    funnel_step: 6
+                });
+            },
+
+            trackBookingCompleted(bookingData) {
+                this.trackEvent('booking_completed', {
+                    amount: bookingData.total_amount,
+                    service: bookingData.service_category,
+                    payment_intent: bookingData.payment_intent_id,
+                    time_slot: bookingData.time_slot,
+                    funnel_step: 7,
+                    conversion: true
+                });
+
+                // Also track as conversion for Google Ads
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'conversion', {
+                        'send_to': 'AW-17598022946/booking_conversion',
+                        'value': bookingData.total_amount,
+                        'currency': 'USD'
+                    });
+                }
+            },
+
+            trackError(errorType, errorMessage) {
+                this.trackEvent('error_occurred', {
+                    error_type: errorType,
+                    error_message: errorMessage,
+                    page_url: window.location.href
+                });
+            }
+        };
+
+        // Initialize analytics when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            HandymanAnalytics.init();
+        });
     </script>
 
     <!-- Styles -->
@@ -1304,6 +1472,10 @@
             const searchInput = document.getElementById('mainSearchInput').value;
             if (searchInput.trim()) {
                 serviceData.description = searchInput.trim();
+
+                // Track search started
+                HandymanAnalytics.trackSearchStarted(searchInput.trim());
+
                 showServiceDetails();
             }
         }
@@ -1311,6 +1483,9 @@
         function selectService(category) {
             serviceData.category = category;
             serviceData.categoryDisplay = getCategoryDisplay(category);
+
+            // Track service selection
+            HandymanAnalytics.trackServiceSelected(category);
 
             // Update pricing displays based on selected service
             updatePricingDisplay(category);
@@ -1451,6 +1626,13 @@
         }
 
         function proceedToScheduling() {
+            // Track details entry
+            HandymanAnalytics.trackDetailsEntered(
+                !!serviceData.detailedDescription,
+                !!serviceData.uploadedPhotos?.length,
+                !!serviceData.location
+            );
+
             updateProgress(3); // Step 3: Time Selection
             const content = document.getElementById('serviceContent');
             content.innerHTML = `
@@ -1502,6 +1684,13 @@
 
         function selectSchedule(schedule) {
             serviceData.schedule = schedule;
+
+            // Track time slot selection
+            HandymanAnalytics.trackTimeSlotSelected({
+                windowLabel: schedule,
+                pricing: serviceData.pricing
+            });
+
             showEstimate();
         }
 
@@ -3855,6 +4044,9 @@
 
             const finalAmount = serviceData.pricing.total;
 
+            // Track payment started
+            HandymanAnalytics.trackPaymentStarted(finalAmount);
+
             document.getElementById('paymentAmount').textContent = '$' + finalAmount.toFixed(0);
             document.getElementById('paymentTiming').textContent = serviceData.selectedTimeSlot.windowLabel;
             document.getElementById('paymentModal').classList.remove('hidden');
@@ -3966,6 +4158,9 @@
                     customer_contact: 'TBD', // Will be collected in classic interface
                     timestamp: new Date().toISOString()
                 };
+
+                // Track successful booking completion
+                HandymanAnalytics.trackBookingCompleted(bookingData);
 
                 // Send booking data to backend
                 console.log('📤 Dispatching booking:', bookingData);

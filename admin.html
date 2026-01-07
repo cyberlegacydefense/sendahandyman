@@ -8,6 +8,102 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="images/favicon.png">
 
+  <!-- Analytics -->
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    // Google Analytics 4 (replace with your actual GA4 measurement ID)
+    gtag('config', 'G-XXXXXXXXXX', {
+      page_title: 'Admin Dashboard - SendAHandyman',
+      page_location: window.location.href
+    });
+  </script>
+
+  <!-- Admin Analytics System -->
+  <script>
+    const AdminAnalytics = {
+      sessionId: null,
+
+      init() {
+        this.sessionId = this.getOrCreateSessionId();
+        this.trackPageView();
+        console.log('📊 Admin Analytics initialized for session:', this.sessionId);
+      },
+
+      getOrCreateSessionId() {
+        let sessionId = sessionStorage.getItem('admin_session_id');
+        if (!sessionId) {
+          sessionId = 'admin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          sessionStorage.setItem('admin_session_id', sessionId);
+        }
+        return sessionId;
+      },
+
+      trackPageView() {
+        this.trackEvent('admin_page_view', {
+          page_title: document.title,
+          page_url: window.location.href,
+          user_agent: navigator.userAgent
+        });
+      },
+
+      trackEvent(eventName, eventData = {}) {
+        const eventPayload = {
+          event_name: eventName,
+          session_id: this.sessionId,
+          timestamp: new Date().toISOString(),
+          page_url: window.location.href,
+          user_type: 'admin',
+          ...eventData
+        };
+
+        // Send to Google Analytics if available
+        if (typeof gtag !== 'undefined') {
+          gtag('event', eventName, eventData);
+        }
+
+        console.log('📊 Admin Event:', eventName, eventData);
+      },
+
+      // Admin-specific tracking methods
+      trackSectionView(sectionName) {
+        this.trackEvent('admin_section_viewed', {
+          section: sectionName
+        });
+      },
+
+      trackTaskAction(action, taskId) {
+        this.trackEvent('admin_task_action', {
+          action: action,
+          task_id: taskId
+        });
+      },
+
+      trackQuoteAction(action, quoteId) {
+        this.trackEvent('admin_quote_action', {
+          action: action,
+          quote_id: quoteId
+        });
+      },
+
+      trackHandymanAction(action, handymanId) {
+        this.trackEvent('admin_handyman_action', {
+          action: action,
+          handyman_id: handymanId
+        });
+      }
+    };
+
+    // Initialize admin analytics when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      AdminAnalytics.init();
+    });
+  </script>
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1561,6 +1657,9 @@ document.querySelectorAll('.admin-nav-btn').forEach(btn => {
     document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
 
+    // Track section view
+    AdminAnalytics.trackSectionView(sectionId.replace('section-', ''));
+
     // Load section-specific data
     loadSectionData(sectionId);
   });
@@ -2475,6 +2574,9 @@ async function changeQuoteStatus(quoteId, newStatus) {
     }
 
     console.log('✅ Quote status changed successfully:', data);
+
+    // Track admin action
+    AdminAnalytics.trackQuoteAction(`mark_${newStatus}`, quoteId);
 
     // Show success message
     const successMessage = newStatus === 'closed'
@@ -4178,6 +4280,9 @@ async function closeTask(taskId) {
     }
 
     console.log('✅ Task closed successfully:', data);
+
+    // Track admin action
+    AdminAnalytics.trackTaskAction('close', taskId);
 
     // Show success message
     alert('Task has been marked as completed successfully!');
