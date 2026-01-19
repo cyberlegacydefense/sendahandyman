@@ -760,10 +760,16 @@
 
             /* Detail description textarea optimization */
             #detailDescription {
-                min-height: 140px !important;
+                min-height: 180px !important; /* Increased for 144+ characters visibility */
                 font-size: 16px !important; /* Prevents zoom on iOS */
                 padding: 16px !important;
                 line-height: 1.5 !important; /* Better readability */
+                width: 100% !important;
+                max-height: 320px !important; /* Allow more expansion */
+                overflow-y: auto !important;
+                resize: vertical !important; /* Allow manual resizing */
+                word-wrap: break-word !important;
+                white-space: pre-wrap !important; /* Preserve line breaks */
             }
 
             /* All text inputs optimization */
@@ -1590,14 +1596,19 @@
                     <div class="space-y-6">
                         <div>
                             <label class="block text-sm font-semibold mb-2">Describe the issue or project</label>
-                            <textarea
-                                id="detailDescription"
-                                class="w-full border border-gray-300 rounded-lg p-3 h-32 sm:h-24 md:h-32 lg:h-36 resize-none"
-                                placeholder="${getDescriptionPlaceholder(serviceData.category)}"
-                                onchange="updateServiceData('detailedDescription', this.value)"
-                                oninput="autoResizeTextarea(); updateServiceData('detailedDescription', this.value)"
-                                style="min-height: 120px; max-height: 250px; overflow-y: auto;"
-                            >${serviceData.description || ''}</textarea>
+                            <div class="relative">
+                                <textarea
+                                    id="detailDescription"
+                                    class="w-full border border-gray-300 rounded-lg p-3 resize-none"
+                                    placeholder="${getDescriptionPlaceholder(serviceData.category)}"
+                                    onchange="updateServiceData('detailedDescription', this.value)"
+                                    oninput="autoResizeTextarea(); updateServiceData('detailedDescription', this.value); updateCharacterCount()"
+                                    style="min-height: 180px; max-height: 320px; overflow-y: auto; word-wrap: break-word; white-space: pre-wrap;"
+                                >${serviceData.description || ''}</textarea>
+                                <div id="characterCount" class="absolute bottom-2 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded hidden md:block">
+                                    <span id="charCount">0</span> characters
+                                </div>
+                            </div>
                         </div>
 
                         <div>
@@ -1636,6 +1647,7 @@
             // Initialize textarea after DOM update
             setTimeout(() => {
                 autoResizeTextarea();
+                updateCharacterCount(); // Initialize character count
                 // Focus on textarea for better mobile UX
                 const textarea = document.getElementById('detailDescription');
                 if (textarea && window.innerWidth > 640) {
@@ -1657,9 +1669,37 @@
             if (textarea) {
                 // Reset height to get accurate scrollHeight
                 textarea.style.height = 'auto';
-                // Set new height based on content, with min/max constraints
-                const newHeight = Math.min(Math.max(textarea.scrollHeight, 120), 250);
+                // Set new height based on content, with updated min/max constraints for better character visibility
+                const minHeight = window.innerWidth <= 640 ? 180 : 140; // Larger on mobile
+                const maxHeight = window.innerWidth <= 640 ? 320 : 280; // Allow more expansion on mobile
+                const newHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
                 textarea.style.height = newHeight + 'px';
+
+                // Ensure adequate padding for character visibility on mobile
+                if (window.innerWidth <= 640) {
+                    textarea.style.padding = '16px';
+                    textarea.style.lineHeight = '1.5';
+                }
+            }
+        }
+
+        function updateCharacterCount() {
+            const textarea = document.getElementById('detailDescription');
+            const charCountSpan = document.getElementById('charCount');
+            const charCountDiv = document.getElementById('characterCount');
+
+            if (textarea && charCountSpan) {
+                const count = textarea.value.length;
+                charCountSpan.textContent = count;
+
+                // Show helpful color coding for character count
+                if (count >= 144) {
+                    charCountSpan.parentElement.className = 'absolute bottom-2 right-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded hidden md:block';
+                } else if (count >= 100) {
+                    charCountSpan.parentElement.className = 'absolute bottom-2 right-2 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded hidden md:block';
+                } else {
+                    charCountSpan.parentElement.className = 'absolute bottom-2 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded hidden md:block';
+                }
             }
         }
 
