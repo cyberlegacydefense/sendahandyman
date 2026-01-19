@@ -193,7 +193,36 @@
         // Initialize analytics when page loads
         document.addEventListener('DOMContentLoaded', () => {
             HandymanAnalytics.init();
+
+            // Initialize mobile menu functionality
+            initializeMobileMenu();
         });
+
+        // Mobile menu initialization
+        function initializeMobileMenu() {
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (event) => {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const hamburgerButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+
+                if (!mobileMenu.classList.contains('hidden') &&
+                    !mobileMenu.contains(event.target) &&
+                    !hamburgerButton.contains(event.target)) {
+                    toggleMobileMenu();
+                }
+            });
+
+            // Close mobile menu when clicking on menu links
+            const mobileMenuLinks = document.querySelectorAll('#mobileMenu a, #mobileMenu button');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const mobileMenu = document.getElementById('mobileMenu');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        toggleMobileMenu();
+                    }
+                });
+            });
+        }
     </script>
 
     <!-- Styles -->
@@ -841,6 +870,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div class="px-4 py-2">
+                <a href="concierge.html" class="block py-3 text-gray-600 hover:text-black transition-colors border-b border-gray-100">Concierge</a>
+                <a href="join-team.html" class="block py-3 text-gray-600 hover:text-black transition-colors border-b border-gray-100">Join Our Team</a>
+                <button onclick="showLoginModal()" class="block w-full text-left py-3 text-gray-600 hover:text-black transition-colors">Sign In</button>
             </div>
         </div>
     </header>
@@ -3069,7 +3107,24 @@
 
         // Utility functions
         function toggleMobileMenu() {
-            // Mobile menu toggle logic
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburgerIcon = document.querySelector('button[onclick="toggleMobileMenu()"] svg');
+
+            if (mobileMenu.classList.contains('hidden')) {
+                // Show mobile menu
+                mobileMenu.classList.remove('hidden');
+                // Transform hamburger to X
+                if (hamburgerIcon) {
+                    hamburgerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                }
+            } else {
+                // Hide mobile menu
+                mobileMenu.classList.add('hidden');
+                // Transform X back to hamburger
+                if (hamburgerIcon) {
+                    hamburgerIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+                }
+            }
         }
 
         function showLoginModal() {
