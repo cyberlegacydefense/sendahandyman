@@ -227,6 +227,49 @@
 
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style id="tailwind-textarea-override">
+        /* IMMEDIATE TAILWIND TEXTAREA OVERRIDE - LOADED AFTER TAILWIND */
+        textarea#detailDescription,
+        #detailDescription,
+        .mobile-textarea-force {
+            min-height: 400px !important;
+            height: 400px !important;
+            font-size: 20px !important;
+            padding: 35px !important;
+            line-height: 2.0 !important;
+            border: 8px solid #059669 !important; /* Green override border */
+            background: #ecfdf5 !important;
+            width: calc(100% - 16px) !important;
+            box-sizing: border-box !important;
+            resize: vertical !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            max-height: none !important;
+        }
+
+        /* MOBILE/PORTRAIT SPECIFIC OVERRIDES */
+        @media screen and (max-width: 768px) {
+            textarea#detailDescription {
+                min-height: 450px !important;
+                height: 450px !important;
+                font-size: 24px !important;
+                padding: 40px !important;
+                border: 10px solid #dc2626 !important; /* Red for mobile */
+                background: linear-gradient(45deg, #fef2f2, #fee2e2) !important;
+            }
+        }
+
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            textarea#detailDescription {
+                min-height: 500px !important;
+                height: 500px !important;
+                font-size: 26px !important;
+                padding: 45px !important;
+                border: 12px solid #991b1b !important; /* Dark red for portrait */
+                box-shadow: 0 0 25px rgba(220, 38, 38, 0.6) !important;
+            }
+        }
+    </style>
 
     <!-- Leaflet CSS and JS for interactive maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -1836,15 +1879,24 @@
 
                         console.log('  ✅ Force-applied mobile styles with !important');
 
-                        // ADDITIONAL PORTRAIT NUCLEAR OPTION
+                        // ADDITIONAL PORTRAIT NUCLEAR OPTION + TAILWIND OVERRIDE
                         if (isPortrait) {
                             console.log('🚨 PORTRAIT NUCLEAR MODE ACTIVATED');
 
-                            // Create and inject ultra-specific CSS
+                            // TAILWIND CSS OVERRIDE - Remove ALL Tailwind classes
+                            console.log('🎨 NEUTRALIZING TAILWIND CSS...');
+                            textarea.className = '';
+                            textarea.removeAttribute('class');
+
+                            // Create and inject ultra-specific CSS that beats TailwindCSS
                             const portraitCSS = document.createElement('style');
                             portraitCSS.id = 'portrait-nuclear-css';
                             portraitCSS.innerHTML = `
-                                html body div textarea#detailDescription[id="detailDescription"] {
+                                /* TAILWIND CSS OVERRIDE WITH MAXIMUM SPECIFICITY */
+                                html body div textarea#detailDescription[id="detailDescription"].mobile-textarea-force,
+                                html body div textarea#detailDescription[id="detailDescription"],
+                                html body textarea#detailDescription,
+                                #detailDescription {
                                     min-height: 520px !important;
                                     height: 520px !important;
                                     font-size: 28px !important;
@@ -1852,13 +1904,37 @@
                                     border: 15px solid #991b1b !important;
                                     background: linear-gradient(45deg, #fee2e2, #fca5a5) !important;
                                     line-height: 2.5 !important;
-                                    width: calc(100% - 0px) !important;
+                                    width: calc(100% - 30px) !important;
                                     max-height: none !important;
                                     box-shadow: 0 0 30px rgba(220, 38, 38, 0.7) !important;
+                                    border-radius: 8px !important;
+                                    outline: none !important;
+                                    resize: vertical !important;
+                                    box-sizing: border-box !important;
+                                }
+
+                                /* OVERRIDE TAILWIND UTILITIES */
+                                textarea#detailDescription {
+                                    --tw-ring-shadow: none !important;
+                                    --tw-shadow: none !important;
                                 }
                             `;
                             document.head.appendChild(portraitCSS);
-                            console.log('💥 NUCLEAR CSS INJECTED');
+                            console.log('💥 TAILWIND-BEATING CSS INJECTED');
+
+                            // CONTINUOUS STYLE MONITORING TO FIGHT TAILWIND
+                            const styleMonitor = setInterval(() => {
+                                const currentHeight = parseInt(window.getComputedStyle(textarea).height);
+                                if (currentHeight < 400) {
+                                    console.log('🚨 TAILWIND OVERRIDE DETECTED - REAPPLYING STYLES');
+                                    Object.entries(forceStyles).forEach(([prop, value]) => {
+                                        textarea.style.setProperty(prop, value, 'important');
+                                    });
+                                }
+                            }, 500);
+
+                            // Clean up monitor after 30 seconds
+                            setTimeout(() => clearInterval(styleMonitor), 30000);
                         }
 
                         // Triple-check after applying
