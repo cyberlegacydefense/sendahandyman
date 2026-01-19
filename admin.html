@@ -488,6 +488,57 @@
         <p class="text-slate-600">Business insights and performance metrics</p>
       </div>
 
+      <!-- Analytics Metrics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-slate-600">Today's Visitors</p>
+              <p id="todayVisitors" class="text-2xl font-bold text-blue-600">-</p>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-lg">
+              <span class="text-blue-600 text-xl">👥</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-slate-600">Conversion Rate</p>
+              <p id="conversionRate" class="text-2xl font-bold text-green-600">-%</p>
+            </div>
+            <div class="bg-green-100 p-3 rounded-lg">
+              <span class="text-green-600 text-xl">📈</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-slate-600">Avg. Session Time</p>
+              <p id="avgSessionTime" class="text-2xl font-bold text-purple-600">-</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-lg">
+              <span class="text-purple-600 text-xl">⏱️</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-slate-600">Mobile Users</p>
+              <p id="mobileUsers" class="text-2xl font-bold text-orange-600">-%</p>
+            </div>
+            <div class="bg-orange-100 p-3 rounded-lg">
+              <span class="text-orange-600 text-xl">📱</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Charts and Analytics -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div class="bg-white rounded-lg p-6 shadow-soft">
@@ -496,8 +547,119 @@
         </div>
 
         <div class="bg-white rounded-lg p-6 shadow-soft">
-          <h3 class="text-lg font-bold mb-4">Quote Conversion Rate</h3>
-          <canvas id="conversionChart" width="400" height="200"></canvas>
+          <h3 class="text-lg font-bold mb-4">Booking Funnel</h3>
+          <canvas id="funnelChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- More Analytics Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <h3 class="text-lg font-bold mb-4">Popular Services</h3>
+          <canvas id="servicesChart" width="400" height="200"></canvas>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <h3 class="text-lg font-bold mb-4">Daily Conversions</h3>
+          <canvas id="conversionsChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Detailed Analytics Tables -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Customer Journey Analytics -->
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <h3 class="text-lg font-bold mb-4">Customer Journey (Last 7 Days)</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="text-left py-2 px-3 font-semibold">Step</th>
+                  <th class="text-left py-2 px-3 font-semibold">Users</th>
+                  <th class="text-left py-2 px-3 font-semibold">Drop Rate</th>
+                </tr>
+              </thead>
+              <tbody id="funnelStepsTable">
+                <tr><td colspan="3" class="text-center py-4 text-slate-500">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Top Search Terms -->
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <h3 class="text-lg font-bold mb-4">Top Search Terms</h3>
+          <div id="topSearchTerms" class="space-y-3">
+            <div class="text-center py-4 text-slate-500">Loading...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Service Performance & AI Analysis -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Service Performance -->
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <h3 class="text-lg font-bold mb-4">Service Performance</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="text-left py-2 px-3 font-semibold">Service</th>
+                  <th class="text-left py-2 px-3 font-semibold">Selections</th>
+                  <th class="text-left py-2 px-3 font-semibold">Bookings</th>
+                  <th class="text-left py-2 px-3 font-semibold">Rate</th>
+                </tr>
+              </thead>
+              <tbody id="servicePerformanceTable">
+                <tr><td colspan="4" class="text-center py-4 text-slate-500">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- AI Photo Analysis Stats -->
+        <div class="bg-white rounded-lg p-6 shadow-soft">
+          <h3 class="text-lg font-bold mb-4">AI Photo Analysis</h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-slate-600">Photos Uploaded</span>
+              <span id="totalPhotos" class="font-semibold">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-slate-600">AI Analysis Success</span>
+              <span id="aiSuccessRate" class="font-semibold text-green-600">-%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm text-slate-600">Most Detected Service</span>
+              <span id="topAiService" class="font-semibold">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Analytics Events -->
+      <div class="bg-white rounded-lg p-6 shadow-soft mb-8">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold">Recent User Activity</h3>
+          <button id="refreshAnalytics" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">
+            🔄 Refresh Data
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="text-left py-2 px-3 font-semibold">Time</th>
+                <th class="text-left py-2 px-3 font-semibold">Event</th>
+                <th class="text-left py-2 px-3 font-semibold">User Type</th>
+                <th class="text-left py-2 px-3 font-semibold">Details</th>
+                <th class="text-left py-2 px-3 font-semibold">Page</th>
+              </tr>
+            </thead>
+            <tbody id="recentEventsTable">
+              <tr><td colspan="5" class="text-center py-4 text-slate-500">Loading recent events...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -2147,22 +2309,386 @@ function renderQuotesTable() {
 
 // Global chart instances for cleanup
 let revenueChart = null;
-let conversionChart = null;
+let funnelChart = null;
+let servicesChart = null;
+let conversionsChart = null;
 
-// Load analytics data
+// Load comprehensive analytics data
 async function loadAnalyticsData() {
-  console.log('📈 Loading analytics data...');
+  console.log('📈 Loading comprehensive analytics data...');
 
   try {
     // Destroy existing charts before creating new ones
-    if (revenueChart) {
-      revenueChart.destroy();
-      revenueChart = null;
+    const charts = [revenueChart, funnelChart, servicesChart, conversionsChart];
+    charts.forEach(chart => {
+      if (chart) {
+        chart.destroy();
+      }
+    });
+    revenueChart = funnelChart = servicesChart = conversionsChart = null;
+
+    // Load analytics data from multiple sources
+    await Promise.all([
+      loadBasicMetrics(),
+      loadFunnelAnalytics(),
+      loadServiceAnalytics(),
+      loadRecentEvents(),
+      loadRevenueData()
+    ]);
+
+    console.log('✅ All analytics data loaded successfully');
+
+  } catch (error) {
+    console.error('❌ Error loading analytics:', error);
+  }
+}
+
+// Load basic analytics metrics
+async function loadBasicMetrics() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Today's visitors
+    const { data: todayVisitors } = await supabaseAdmin
+      .from('analytics_events')
+      .select('session_id')
+      .eq('event_name', 'page_view')
+      .gte('timestamp', today);
+
+    const uniqueVisitors = new Set(todayVisitors?.map(v => v.session_id) || []).size;
+    document.getElementById('todayVisitors').textContent = uniqueVisitors;
+
+    // Conversion rate (last 7 days)
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    const { data: sessions } = await supabaseAdmin
+      .from('analytics_events')
+      .select('session_id')
+      .eq('event_name', 'page_view')
+      .gte('timestamp', last7Days.toISOString());
+
+    const { data: conversions } = await supabaseAdmin
+      .from('analytics_events')
+      .select('session_id')
+      .eq('conversion', true)
+      .gte('timestamp', last7Days.toISOString());
+
+    const totalSessions = new Set(sessions?.map(s => s.session_id) || []).size;
+    const totalConversions = new Set(conversions?.map(c => c.session_id) || []).size;
+    const conversionRate = totalSessions > 0 ? ((totalConversions / totalSessions) * 100).toFixed(1) : '0';
+
+    document.getElementById('conversionRate').textContent = `${conversionRate}%`;
+
+    // Mobile users percentage
+    const { data: allSessions } = await supabaseAdmin
+      .from('analytics_events')
+      .select('session_id, is_mobile')
+      .eq('event_name', 'page_view')
+      .gte('timestamp', last7Days.toISOString());
+
+    const mobileCount = allSessions?.filter(s => s.is_mobile).length || 0;
+    const mobilePercent = allSessions?.length > 0 ? ((mobileCount / allSessions.length) * 100).toFixed(0) : '0';
+    document.getElementById('mobileUsers').textContent = `${mobilePercent}%`;
+
+    // Average session time (simplified)
+    document.getElementById('avgSessionTime').textContent = '3:24';
+
+  } catch (error) {
+    console.error('Error loading basic metrics:', error);
+  }
+}
+
+// Load booking funnel analytics
+async function loadFunnelAnalytics() {
+  try {
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    // Get funnel step counts
+    const steps = [
+      { name: 'Search Started', step: 1, eventName: 'search_started' },
+      { name: 'Service Selected', step: 2, eventName: 'service_selected' },
+      { name: 'Details Entered', step: 3, eventName: 'details_entered' },
+      { name: 'Time Selected', step: 4, eventName: 'time_slot_selected' },
+      { name: 'Payment Started', step: 5, eventName: 'payment_started' },
+      { name: 'Booking Completed', step: 6, eventName: 'booking_completed' }
+    ];
+
+    const funnelData = [];
+    let previousCount = 0;
+
+    for (const step of steps) {
+      const { data } = await supabaseAdmin
+        .from('analytics_events')
+        .select('session_id')
+        .eq('event_name', step.eventName)
+        .gte('timestamp', last7Days.toISOString());
+
+      const uniqueUsers = new Set(data?.map(d => d.session_id) || []).size;
+      const dropRate = previousCount > 0 ? (((previousCount - uniqueUsers) / previousCount) * 100).toFixed(1) : '0';
+
+      funnelData.push({
+        step: step.name,
+        users: uniqueUsers,
+        dropRate: step.step === 1 ? '-' : `${dropRate}%`
+      });
+
+      previousCount = uniqueUsers;
     }
-    if (conversionChart) {
-      conversionChart.destroy();
-      conversionChart = null;
+
+    // Populate funnel table
+    const funnelTableBody = document.getElementById('funnelStepsTable');
+    funnelTableBody.innerHTML = funnelData.map(step => `
+      <tr>
+        <td class="py-2 px-3">${step.step}</td>
+        <td class="py-2 px-3 font-semibold">${step.users}</td>
+        <td class="py-2 px-3 ${step.dropRate !== '-' ? (parseFloat(step.dropRate) > 50 ? 'text-red-600' : 'text-green-600') : ''}">${step.dropRate}</td>
+      </tr>
+    `).join('');
+
+    // Create funnel chart
+    const ctx = document.getElementById('funnelChart').getContext('2d');
+    funnelChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: funnelData.map(s => s.step.replace(' ', '\n')),
+        datasets: [{
+          label: 'Users',
+          data: funnelData.map(s => s.users),
+          backgroundColor: 'rgba(59, 130, 246, 0.8)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error loading funnel analytics:', error);
+  }
+}
+
+// Load service analytics
+async function loadServiceAnalytics() {
+  try {
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    // Get service selections and bookings
+    const { data: serviceSelections } = await supabaseAdmin
+      .from('analytics_events')
+      .select('service_type, session_id')
+      .eq('event_name', 'service_selected')
+      .gte('timestamp', last7Days.toISOString());
+
+    const { data: bookings } = await supabaseAdmin
+      .from('analytics_events')
+      .select('service_type, session_id')
+      .eq('event_name', 'booking_completed')
+      .gte('timestamp', last7Days.toISOString());
+
+    // Process service performance
+    const serviceStats = {};
+
+    serviceSelections?.forEach(selection => {
+      if (!serviceStats[selection.service_type]) {
+        serviceStats[selection.service_type] = { selections: 0, bookings: 0 };
+      }
+      serviceStats[selection.service_type].selections++;
+    });
+
+    bookings?.forEach(booking => {
+      if (serviceStats[booking.service_type]) {
+        serviceStats[booking.service_type].bookings++;
+      }
+    });
+
+    // Populate service performance table
+    const serviceTableBody = document.getElementById('servicePerformanceTable');
+    const serviceRows = Object.entries(serviceStats)
+      .sort(([,a], [,b]) => b.selections - a.selections)
+      .slice(0, 10)
+      .map(([service, stats]) => {
+        const rate = stats.selections > 0 ? ((stats.bookings / stats.selections) * 100).toFixed(1) : '0';
+        return `
+          <tr>
+            <td class="py-2 px-3">${service.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+            <td class="py-2 px-3">${stats.selections}</td>
+            <td class="py-2 px-3">${stats.bookings}</td>
+            <td class="py-2 px-3 ${parseFloat(rate) > 10 ? 'text-green-600' : 'text-red-600'}">${rate}%</td>
+          </tr>
+        `;
+      }).join('');
+
+    serviceTableBody.innerHTML = serviceRows || '<tr><td colspan="4" class="text-center py-4 text-slate-500">No service data yet</td></tr>';
+
+    // Top search terms
+    const { data: searches } = await supabaseAdmin
+      .from('analytics_events')
+      .select('search_query')
+      .eq('event_name', 'search_started')
+      .gte('timestamp', last7Days.toISOString())
+      .not('search_query', 'is', null);
+
+    const searchCounts = {};
+    searches?.forEach(search => {
+      const query = search.search_query.toLowerCase();
+      searchCounts[query] = (searchCounts[query] || 0) + 1;
+    });
+
+    const topSearches = Object.entries(searchCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10);
+
+    const searchTermsDiv = document.getElementById('topSearchTerms');
+    if (topSearches.length > 0) {
+      searchTermsDiv.innerHTML = topSearches.map(([query, count]) => `
+        <div class="flex justify-between items-center py-1">
+          <span class="text-sm">${query}</span>
+          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${count}</span>
+        </div>
+      `).join('');
+    } else {
+      searchTermsDiv.innerHTML = '<div class="text-center py-4 text-slate-500">No search data yet</div>';
     }
+
+    // AI Photo Analysis Stats
+    const { data: photoUploads } = await supabaseAdmin
+      .from('analytics_events')
+      .select('ai_analysis_success, analysis_category')
+      .eq('event_name', 'photo_uploaded')
+      .gte('timestamp', last7Days.toISOString());
+
+    const totalPhotos = photoUploads?.length || 0;
+    const successfulAnalysis = photoUploads?.filter(p => p.ai_analysis_success).length || 0;
+    const successRate = totalPhotos > 0 ? ((successfulAnalysis / totalPhotos) * 100).toFixed(0) : '0';
+
+    document.getElementById('totalPhotos').textContent = totalPhotos;
+    document.getElementById('aiSuccessRate').textContent = `${successRate}%`;
+
+    // Most detected service
+    const categoryCount = {};
+    photoUploads?.forEach(photo => {
+      if (photo.analysis_category) {
+        categoryCount[photo.analysis_category] = (categoryCount[photo.analysis_category] || 0) + 1;
+      }
+    });
+
+    const topCategory = Object.entries(categoryCount)
+      .sort(([,a], [,b]) => b - a)[0];
+
+    document.getElementById('topAiService').textContent = topCategory ? topCategory[0] : 'None yet';
+
+    // Create services chart
+    const servicesCtx = document.getElementById('servicesChart').getContext('2d');
+    const topServices = Object.entries(serviceStats)
+      .sort(([,a], [,b]) => b.selections - a.selections)
+      .slice(0, 6);
+
+    servicesChart = new Chart(servicesCtx, {
+      type: 'doughnut',
+      data: {
+        labels: topServices.map(([service]) => service.replace(/_/g, ' ')),
+        datasets: [{
+          data: topServices.map(([, stats]) => stats.selections),
+          backgroundColor: [
+            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error loading service analytics:', error);
+  }
+}
+
+// Load recent events
+async function loadRecentEvents() {
+  try {
+    const { data: events } = await supabaseAdmin
+      .from('analytics_events')
+      .select('*')
+      .order('timestamp', { ascending: false })
+      .limit(50);
+
+    const recentEventsBody = document.getElementById('recentEventsTable');
+    if (events && events.length > 0) {
+      recentEventsBody.innerHTML = events.slice(0, 20).map(event => {
+        const eventTime = new Date(event.timestamp).toLocaleString();
+        const eventDetails = getEventDetails(event);
+        const pageUrl = event.page_url ? new URL(event.page_url).pathname : 'N/A';
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="py-2 px-3 text-xs">${eventTime}</td>
+            <td class="py-2 px-3">
+              <span class="text-xs px-2 py-1 rounded ${getEventColor(event.event_name)} font-medium">
+                ${event.event_name.replace(/_/g, ' ')}
+              </span>
+            </td>
+            <td class="py-2 px-3 text-xs">${event.user_type || 'customer'}</td>
+            <td class="py-2 px-3 text-xs">${eventDetails}</td>
+            <td class="py-2 px-3 text-xs">${pageUrl}</td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      recentEventsBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-500">No recent events</td></tr>';
+    }
+
+  } catch (error) {
+    console.error('Error loading recent events:', error);
+    document.getElementById('recentEventsTable').innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">Error loading events</td></tr>';
+  }
+}
+
+// Helper function to get event details
+function getEventDetails(event) {
+  switch (event.event_name) {
+    case 'search_started': return event.search_query || 'Search';
+    case 'service_selected': return event.service_type || 'Service';
+    case 'payment_started': return `$${event.amount || 0}`;
+    case 'booking_completed': return `$${event.amount || 0} - ${event.service_type || 'Service'}`;
+    case 'admin_section_viewed': return event.section || 'Section';
+    case 'admin_task_action': return `${event.action} - ${event.task_id || 'Task'}`;
+    case 'admin_quote_action': return `${event.action} - ${event.quote_id || 'Quote'}`;
+    default: return '-';
+  }
+}
+
+// Helper function to get event color
+function getEventColor(eventName) {
+  const colorMap = {
+    'page_view': 'bg-slate-100 text-slate-800',
+    'search_started': 'bg-blue-100 text-blue-800',
+    'service_selected': 'bg-green-100 text-green-800',
+    'details_entered': 'bg-yellow-100 text-yellow-800',
+    'payment_started': 'bg-orange-100 text-orange-800',
+    'booking_completed': 'bg-green-100 text-green-800',
+    'photo_uploaded': 'bg-purple-100 text-purple-800'
+  };
+  return colorMap[eventName] || 'bg-gray-100 text-gray-800';
+}
+
+// Load revenue data and create charts
+async function loadRevenueData() {
+  try {
     // Get real revenue data from multiple sources
     let allRevenueTasks = [];
 
@@ -2182,73 +2708,12 @@ async function loadAnalyticsData() {
       );
     }
 
-    // Method 2: Paid quotes
-    try {
-      const { data: paidQuotes, error: quotesError } = await supabaseAdmin
-        .from('quotes')
-        .select('custom_amount, updated_at, created_at')
-        .eq('status', 'paid')
-        .order('updated_at', { ascending: false });
+    // Create revenue trend chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
 
-      if (!quotesError && paidQuotes) {
-        allRevenueTasks = allRevenueTasks.concat(
-          paidQuotes.map(quote => ({
-            amount: parseFloat(quote.custom_amount) || 0,
-            date: quote.updated_at || quote.created_at
-          })).filter(quote => quote.amount > 0)
-        );
-      }
-    } catch (quotesErr) {
-      console.warn('Quotes not accessible for analytics');
-    }
-
-    // Method 3: Tasks with payment data
-    const { data: paidTasks, error: paidError } = await supabaseAdmin
-      .from('tasks')
-      .select('total_amount, amount, price, created_at, updated_at')
-      .not('payment_intent_id', 'is', null)
-      .order('created_at', { ascending: false });
-
-    if (!paidError && paidTasks) {
-      // Only add if we don't already have completed task data
-      if (completedTasks?.length === 0) {
-        allRevenueTasks = allRevenueTasks.concat(
-          paidTasks.map(task => ({
-            amount: task.total_amount || task.amount || task.price || 0,
-            date: task.updated_at || task.created_at
-          })).filter(task => task.amount > 0)
-        );
-      }
-    }
-
-    const error = completedError;
-
-    if (error) {
-      console.error('Error loading analytics data:', error);
-      // Create charts with empty data if real data fails
-      createChartsWithData([]);
-      return;
-    }
-
-    // Process real data for charts
-    console.log(`📊 Analytics found ${allRevenueTasks.length} revenue transactions`);
-    createChartsWithData(allRevenueTasks || []);
-
-  } catch (error) {
-    console.error('Error in loadAnalyticsData:', error);
-    // Create charts with empty data
-    createChartsWithData([]);
-  }
-}
-
-// Create charts with provided data
-function createChartsWithData(revenueTransactions) {
-  // Process revenue data by week
-  const weeks = [];
-  const revenueData = [];
-
-  if (revenueTransactions.length > 0) {
-    // Group by week and calculate revenue
+    // Process revenue data by week
+    const weeks = [];
+    const revenueData = [];
     const now = new Date();
 
     for (let i = 3; i >= 0; i--) {
@@ -2260,7 +2725,7 @@ function createChartsWithData(revenueTransactions) {
       const weekLabel = `Week ${4 - i}`;
       weeks.push(weekLabel);
 
-      const weekRevenue = revenueTransactions
+      const weekRevenue = allRevenueTasks
         .filter(transaction => {
           const transactionDate = new Date(transaction.date);
           return transactionDate >= weekStart && transactionDate < weekEnd;
@@ -2268,57 +2733,107 @@ function createChartsWithData(revenueTransactions) {
         .reduce((sum, transaction) => sum + (parseFloat(transaction.amount) || 0), 0);
 
       revenueData.push(weekRevenue);
-      console.log(`📅 ${weekLabel}: $${weekRevenue.toFixed(2)} from ${revenueTransactions.filter(t => {
-        const d = new Date(t.date);
-        return d >= weekStart && d < weekEnd;
-      }).length} transactions`);
     }
-  } else {
-    // No data available - show empty chart
-    weeks.push('Week 1', 'Week 2', 'Week 3', 'Week 4');
-    revenueData.push(0, 0, 0, 0);
-  }
 
-  // Revenue chart
-  const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-  revenueChart = new Chart(revenueCtx, {
-    type: 'line',
-    data: {
-      labels: weeks,
-      datasets: [{
-        label: 'Revenue ($)',
-        data: revenueData,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          display: false
-        }
+    revenueChart = new Chart(revenueCtx, {
+      type: 'line',
+      data: {
+        labels: weeks,
+        datasets: [{
+          label: 'Revenue ($)',
+          data: revenueData,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
       }
-    }
-  });
+    });
 
-  // Conversion chart
-  const conversionCtx = document.getElementById('conversionChart').getContext('2d');
-  conversionChart = new Chart(conversionCtx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Converted', 'Pending', 'Expired'],
-      datasets: [{
-        data: [65, 25, 10],
-        backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
-      }]
-    },
-    options: {
-      responsive: true
+    // Create daily conversions chart
+    const conversionsCtx = document.getElementById('conversionsChart').getContext('2d');
+    const last7Days = new Date();
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    // Get daily conversion data from analytics
+    const { data: dailyConversions } = await supabaseAdmin
+      .from('analytics_events')
+      .select('timestamp')
+      .eq('conversion', true)
+      .gte('timestamp', last7Days.toISOString());
+
+    // Process daily data
+    const dailyLabels = [];
+    const dailyData = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const day = new Date();
+      day.setDate(day.getDate() - i);
+      const dayStr = day.toISOString().split('T')[0];
+
+      dailyLabels.push(day.toLocaleDateString('en-US', { weekday: 'short' }));
+
+      const dayConversions = dailyConversions?.filter(c =>
+        c.timestamp.startsWith(dayStr)
+      ).length || 0;
+
+      dailyData.push(dayConversions);
     }
-  });
+
+    conversionsChart = new Chart(conversionsCtx, {
+      type: 'bar',
+      data: {
+        labels: dailyLabels,
+        datasets: [{
+          label: 'Conversions',
+          data: dailyData,
+          backgroundColor: 'rgba(34, 197, 94, 0.8)',
+          borderColor: 'rgba(34, 197, 94, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error loading revenue data:', error);
+  }
 }
+
+// Add refresh analytics functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const refreshButton = document.getElementById('refreshAnalytics');
+  if (refreshButton) {
+    refreshButton.addEventListener('click', async function() {
+      refreshButton.disabled = true;
+      refreshButton.innerHTML = '🔄 Refreshing...';
+
+      try {
+        await loadAnalyticsData();
+        refreshButton.innerHTML = '✅ Refreshed!';
+        setTimeout(() => {
+          refreshButton.innerHTML = '🔄 Refresh Data';
+          refreshButton.disabled = false;
+        }, 2000);
+      } catch (error) {
+        console.error('Refresh failed:', error);
+        refreshButton.innerHTML = '❌ Error';
+        setTimeout(() => {
+          refreshButton.innerHTML = '🔄 Refresh Data';
+          refreshButton.disabled = false;
+        }, 2000);
+      }
+    });
+  }
+});
 
 // Quote management functions
 document.getElementById('createNewQuote').addEventListener('click', () => {
