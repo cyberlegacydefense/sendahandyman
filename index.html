@@ -859,6 +859,35 @@
                 }
             }
 
+            /* PORTRAIT SPECIFIC TARGETING */
+            @media screen and (orientation: portrait) and (max-width: 768px) {
+                textarea#detailDescription,
+                .mobile-textarea-force {
+                    min-height: 450px !important;
+                    height: 450px !important;
+                    font-size: 24px !important;
+                    padding: 40px !important;
+                    line-height: 2.2 !important;
+                    border: 10px solid #dc2626 !important; /* Thick red border for portrait */
+                    background: linear-gradient(135deg, #fee2e2, #fecaca) !important;
+                    width: calc(100% - 0px) !important;
+                    max-height: none !important;
+                    box-shadow: 0 0 20px rgba(220, 38, 38, 0.5) !important;
+                }
+            }
+
+            /* NUCLEAR PORTRAIT FALLBACK */
+            @media only screen and (max-width: 500px) and (orientation: portrait) {
+                textarea[id="detailDescription"] {
+                    min-height: 500px !important;
+                    height: 500px !important;
+                    font-size: 26px !important;
+                    padding: 45px !important;
+                    border: 12px solid #991b1b !important;
+                    background-color: #fee2e2 !important;
+                }
+            }
+
             /* All text inputs optimization */
             input[type="text"], input[type="email"], input[type="tel"] {
                 font-size: 16px !important; /* Prevents zoom on iOS */
@@ -1686,11 +1715,10 @@
                             <div class="relative">
                                 <textarea
                                     id="detailDescription"
-                                    class="w-full border border-gray-300 rounded-lg resize-none"
+                                    class="w-full border border-gray-300 rounded-lg resize-none mobile-textarea-force"
                                     placeholder="${getDescriptionPlaceholder(serviceData.category)}"
                                     onchange="updateServiceData('detailedDescription', this.value)"
                                     oninput="autoResizeTextarea(); updateServiceData('detailedDescription', this.value); updateCharacterCount()"
-                                    style="min-height: 250px; max-height: 400px; overflow-y: auto; word-wrap: break-word; white-space: pre-wrap; padding: 20px; line-height: 1.6; font-size: 16px;"
                                 >${serviceData.description || ''}</textarea>
                                 <div id="characterCount" class="absolute bottom-2 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded hidden md:block">
                                     <span id="charCount">0</span> characters
@@ -1750,39 +1778,118 @@
                 const textarea = document.getElementById('detailDescription');
                 if (textarea && window.innerWidth <= 768) {
                     console.log('🔧 APPLYING AGGRESSIVE MOBILE FIXES...');
+                    console.log('🔍 PORTRAIT MODE DEBUGGING:', {
+                        orientation: screen.orientation?.angle || 'unknown',
+                        orientationType: screen.orientation?.type || 'unknown',
+                        isPortrait: window.innerHeight > window.innerWidth,
+                        viewport: `${window.innerWidth}x${window.innerHeight}`,
+                        devicePixelRatio: window.devicePixelRatio,
+                        userAgent: navigator.userAgent.substring(0, 100)
+                    });
 
                     // Force minimum visible dimensions with JavaScript override
                     function forceMobileTextarea() {
-                        textarea.style.setProperty('width', '100%', 'important');
-                        textarea.style.setProperty('min-height', '350px', 'important');
-                        textarea.style.setProperty('height', '350px', 'important');
-                        textarea.style.setProperty('font-size', '18px', 'important');
-                        textarea.style.setProperty('padding', '28px', 'important');
-                        textarea.style.setProperty('line-height', '1.7', 'important');
-                        textarea.style.setProperty('border', '3px solid #ff6b35', 'important');
-                        textarea.style.setProperty('background-color', '#fff8f0', 'important');
-                        textarea.style.setProperty('box-sizing', 'border-box', 'important');
-                        textarea.style.setProperty('resize', 'vertical', 'important');
-                        textarea.style.setProperty('word-wrap', 'break-word', 'important');
-                        textarea.style.setProperty('overflow-wrap', 'break-word', 'important');
-                        textarea.style.setProperty('-webkit-appearance', 'none', 'important');
-                        textarea.style.setProperty('appearance', 'none', 'important');
+                        // EXTREMELY AGGRESSIVE PORTRAIT MODE FORCING
+                        const isPortrait = window.innerHeight > window.innerWidth;
+                        const minHeight = isPortrait ? '500px' : '350px';
+                        const fontSize = isPortrait ? '26px' : '18px';
+                        const padding = isPortrait ? '45px' : '28px';
+
+                        console.log('🎯 PORTRAIT MODE FORCE:', {
+                            isPortrait,
+                            applying: { minHeight, fontSize, padding },
+                            screenDimensions: `${window.innerWidth}x${window.innerHeight}`
+                        });
+
+                        // NUCLEAR APPROACH - Clear all existing styles first
+                        textarea.removeAttribute('style');
+                        textarea.style.cssText = '';
+
+                        // Apply with maximum force
+                        const forceStyles = {
+                            'width': '100%',
+                            'min-height': minHeight,
+                            'height': minHeight,
+                            'font-size': fontSize,
+                            'padding': padding,
+                            'line-height': isPortrait ? '2.2' : '1.8',
+                            'border': `${isPortrait ? '12px' : '5px'} solid ${isPortrait ? '#dc2626' : '#ff6b35'}`,
+                            'background-color': isPortrait ? '#fee2e2' : '#fff8f0',
+                            'box-sizing': 'border-box',
+                            'resize': 'vertical',
+                            'word-wrap': 'break-word',
+                            'overflow-wrap': 'break-word',
+                            '-webkit-appearance': 'none',
+                            'appearance': 'none',
+                            'transform': 'translateZ(0)',
+                            'position': 'relative',
+                            'z-index': '999',
+                            'display': 'block',
+                            'visibility': 'visible',
+                            'max-height': 'none',
+                            'overflow-y': 'auto'
+                        };
+
+                        Object.entries(forceStyles).forEach(([prop, value]) => {
+                            textarea.style.setProperty(prop, value, 'important');
+                        });
 
                         console.log('  ✅ Force-applied mobile styles with !important');
 
-                        // Double-check after applying
+                        // ADDITIONAL PORTRAIT NUCLEAR OPTION
+                        if (isPortrait) {
+                            console.log('🚨 PORTRAIT NUCLEAR MODE ACTIVATED');
+
+                            // Create and inject ultra-specific CSS
+                            const portraitCSS = document.createElement('style');
+                            portraitCSS.id = 'portrait-nuclear-css';
+                            portraitCSS.innerHTML = `
+                                html body div textarea#detailDescription[id="detailDescription"] {
+                                    min-height: 520px !important;
+                                    height: 520px !important;
+                                    font-size: 28px !important;
+                                    padding: 50px !important;
+                                    border: 15px solid #991b1b !important;
+                                    background: linear-gradient(45deg, #fee2e2, #fca5a5) !important;
+                                    line-height: 2.5 !important;
+                                    width: calc(100% - 0px) !important;
+                                    max-height: none !important;
+                                    box-shadow: 0 0 30px rgba(220, 38, 38, 0.7) !important;
+                                }
+                            `;
+                            document.head.appendChild(portraitCSS);
+                            console.log('💥 NUCLEAR CSS INJECTED');
+                        }
+
+                        // Triple-check after applying
                         setTimeout(() => {
                             const computed = window.getComputedStyle(textarea);
-                            console.log('  🔍 Post-force verification:', {
+                            console.log('  🔍 POST-NUCLEAR verification:', {
                                 width: computed.width,
                                 height: computed.height,
                                 minHeight: computed.minHeight,
                                 fontSize: computed.fontSize,
                                 padding: computed.padding,
-                                effectiveArea: `${textarea.clientWidth}x${textarea.clientHeight}`
+                                border: computed.border,
+                                effectiveArea: `${textarea.clientWidth}x${textarea.clientHeight}`,
+                                isPortrait: isPortrait
                             });
-                            console.log('  📝 Estimated character capacity:', Math.floor(textarea.clientWidth / 8));
-                        }, 100);
+                            console.log('  📝 Character capacity estimate:', Math.floor(textarea.clientWidth / 8));
+
+                            // EMERGENCY ERROR LOGGING if still tiny
+                            if (textarea.clientHeight < 400) {
+                                console.error('🚨🚨🚨 TEXTAREA STILL TOO SMALL!', {
+                                    clientHeight: textarea.clientHeight,
+                                    offsetHeight: textarea.offsetHeight,
+                                    scrollHeight: textarea.scrollHeight,
+                                    boundingRect: textarea.getBoundingClientRect(),
+                                    parentElement: textarea.parentElement.getBoundingClientRect(),
+                                    allComputedStyles: computed
+                                });
+                            } else {
+                                console.log('✅ TEXTAREA APPEARS PROPERLY SIZED');
+                            }
+                        }, 300);
                     }
 
                     // Apply immediately and on any resize
