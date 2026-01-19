@@ -2297,8 +2297,8 @@ function renderQuotesTable() {
         <div class="flex gap-2">
           <button onclick="resendQuote('${quote.id}')" class="text-green-600 hover:text-green-800 text-sm">Resend</button>
           ${quote.status === 'pending' ?
-            `<button onclick="changeQuoteStatus('${quote.id}', 'closed')" class="text-red-600 hover:text-red-800 text-sm font-medium">Mark Closed</button>
-             <button onclick="changeQuoteStatus('${quote.id}', 'expired')" class="text-orange-600 hover:text-orange-800 text-sm">Mark Expired</button>` :
+            `<button onclick="changeQuoteStatus('${quote.id}', 'expired')" class="text-red-600 hover:text-red-800 text-sm font-medium">Mark Declined</button>
+             <button onclick="changeQuoteStatus('${quote.id}', 'paid')" class="text-green-600 hover:text-green-800 text-sm">Mark Paid</button>` :
             ''
           }
         </div>
@@ -3064,7 +3064,13 @@ function resendQuote(quoteId) {
 async function changeQuoteStatus(quoteId, newStatus) {
   try {
     // Confirm with user before changing status
-    const statusText = newStatus === 'closed' ? 'closed (client declined)' : newStatus;
+    let statusText;
+    switch(newStatus) {
+      case 'expired': statusText = 'declined (client chose not to proceed)'; break;
+      case 'paid': statusText = 'paid (client accepted)'; break;
+      default: statusText = newStatus;
+    }
+
     if (!confirm(`Are you sure you want to mark this quote as ${statusText}? This action cannot be undone.`)) {
       return;
     }
@@ -3094,9 +3100,12 @@ async function changeQuoteStatus(quoteId, newStatus) {
     AdminAnalytics.trackQuoteAction(`mark_${newStatus}`, quoteId);
 
     // Show success message
-    const successMessage = newStatus === 'closed'
-      ? 'Quote has been marked as closed (client declined)'
-      : `Quote has been marked as ${newStatus}`;
+    let successMessage;
+    switch(newStatus) {
+      case 'expired': successMessage = 'Quote has been marked as declined (client chose not to proceed)'; break;
+      case 'paid': successMessage = 'Quote has been marked as paid (client accepted)'; break;
+      default: successMessage = `Quote has been marked as ${newStatus}`;
+    }
     alert(`${successMessage} successfully!`);
 
     // Refresh the quotes table to reflect the change
