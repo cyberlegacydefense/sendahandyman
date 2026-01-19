@@ -758,18 +758,31 @@
                 border-radius: 8px !important;
             }
 
-            /* Detail description textarea optimization */
+            /* Detail description textarea optimization - MOBILE FIRST */
             #detailDescription {
-                min-height: 180px !important; /* Increased for 144+ characters visibility */
+                min-height: 250px !important; /* Much larger for mobile */
                 font-size: 16px !important; /* Prevents zoom on iOS */
-                padding: 16px !important;
-                line-height: 1.5 !important; /* Better readability */
+                padding: 20px !important; /* More generous padding */
+                line-height: 1.6 !important; /* Better readability */
                 width: 100% !important;
-                max-height: 320px !important; /* Allow more expansion */
+                max-height: 400px !important; /* Allow much more expansion */
                 overflow-y: auto !important;
                 resize: vertical !important; /* Allow manual resizing */
                 word-wrap: break-word !important;
                 white-space: pre-wrap !important; /* Preserve line breaks */
+                box-sizing: border-box !important;
+                display: block !important;
+            }
+
+            /* Extra aggressive mobile sizing for very small screens */
+            @media (max-width: 480px) {
+                #detailDescription {
+                    min-height: 280px !important;
+                    max-height: 450px !important;
+                    padding: 24px !important;
+                    font-size: 17px !important;
+                    line-height: 1.7 !important;
+                }
             }
 
             /* All text inputs optimization */
@@ -1599,11 +1612,11 @@
                             <div class="relative">
                                 <textarea
                                     id="detailDescription"
-                                    class="w-full border border-gray-300 rounded-lg p-3 resize-none"
+                                    class="w-full border border-gray-300 rounded-lg resize-none"
                                     placeholder="${getDescriptionPlaceholder(serviceData.category)}"
                                     onchange="updateServiceData('detailedDescription', this.value)"
                                     oninput="autoResizeTextarea(); updateServiceData('detailedDescription', this.value); updateCharacterCount()"
-                                    style="min-height: 180px; max-height: 320px; overflow-y: auto; word-wrap: break-word; white-space: pre-wrap;"
+                                    style="min-height: 250px; max-height: 400px; overflow-y: auto; word-wrap: break-word; white-space: pre-wrap; padding: 20px; line-height: 1.6; font-size: 16px;"
                                 >${serviceData.description || ''}</textarea>
                                 <div id="characterCount" class="absolute bottom-2 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded hidden md:block">
                                     <span id="charCount">0</span> characters
@@ -1669,17 +1682,40 @@
             if (textarea) {
                 // Reset height to get accurate scrollHeight
                 textarea.style.height = 'auto';
-                // Set new height based on content, with updated min/max constraints for better character visibility
-                const minHeight = window.innerWidth <= 640 ? 180 : 140; // Larger on mobile
-                const maxHeight = window.innerWidth <= 640 ? 320 : 280; // Allow more expansion on mobile
+
+                // Much larger dimensions to ensure 144+ character visibility
+                let minHeight, maxHeight;
+
+                if (window.innerWidth <= 480) {
+                    // Extra small mobile screens
+                    minHeight = 280;
+                    maxHeight = 450;
+                    textarea.style.padding = '24px';
+                    textarea.style.fontSize = '17px';
+                    textarea.style.lineHeight = '1.7';
+                } else if (window.innerWidth <= 640) {
+                    // Mobile screens
+                    minHeight = 250;
+                    maxHeight = 400;
+                    textarea.style.padding = '20px';
+                    textarea.style.fontSize = '16px';
+                    textarea.style.lineHeight = '1.6';
+                } else {
+                    // Desktop screens
+                    minHeight = 200;
+                    maxHeight = 350;
+                    textarea.style.padding = '16px';
+                    textarea.style.fontSize = '16px';
+                    textarea.style.lineHeight = '1.5';
+                }
+
                 const newHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
                 textarea.style.height = newHeight + 'px';
 
-                // Ensure adequate padding for character visibility on mobile
-                if (window.innerWidth <= 640) {
-                    textarea.style.padding = '16px';
-                    textarea.style.lineHeight = '1.5';
-                }
+                // Ensure proper text formatting
+                textarea.style.wordWrap = 'break-word';
+                textarea.style.whiteSpace = 'pre-wrap';
+                textarea.style.boxSizing = 'border-box';
             }
         }
 
