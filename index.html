@@ -94,10 +94,15 @@
             async sendToCustomAnalytics(payload) {
                 try {
                     // Store analytics in Supabase for detailed analysis
-                    if (typeof supabase !== 'undefined') {
-                        await supabase
+                    // Use supabaseClient (the actual client instance, not the library)
+                    if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                        const { error } = await supabaseClient
                             .from('analytics_events')
                             .insert(payload);
+
+                        if (error) {
+                            console.error('Analytics insert error:', error);
+                        }
                     }
                 } catch (error) {
                     console.error('Analytics storage error:', error);
