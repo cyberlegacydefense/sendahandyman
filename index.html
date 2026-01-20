@@ -228,45 +228,46 @@
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="tailwind-textarea-override">
-        /* IMMEDIATE TAILWIND TEXTAREA OVERRIDE - LOADED AFTER TAILWIND */
+        /* MOBILE TEXTAREA FIX - Proper sizing without excessive padding */
         textarea#detailDescription,
         #detailDescription,
         .mobile-textarea-force {
-            min-height: 400px !important;
-            height: 400px !important;
-            font-size: 20px !important;
-            padding: 35px !important;
-            line-height: 2.0 !important;
-            border: 8px solid #059669 !important; /* Green override border */
-            background: #ecfdf5 !important;
-            width: calc(100% - 16px) !important;
+            min-height: 180px !important;
+            height: auto !important;
+            font-size: 16px !important;
+            padding: 16px !important;
+            line-height: 1.6 !important;
+            border: 1px solid #d1d5db !important;
+            background: #ffffff !important;
+            width: 100% !important;
             box-sizing: border-box !important;
             resize: vertical !important;
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
             max-height: none !important;
+            border-radius: 8px !important;
         }
 
-        /* MOBILE/PORTRAIT SPECIFIC OVERRIDES */
+        /* MOBILE SPECIFIC - 16px font prevents iOS zoom */
         @media screen and (max-width: 768px) {
-            textarea#detailDescription {
-                min-height: 450px !important;
-                height: 450px !important;
-                font-size: 24px !important;
-                padding: 40px !important;
-                border: 10px solid #dc2626 !important; /* Red for mobile */
-                background: linear-gradient(45deg, #fef2f2, #fee2e2) !important;
+            textarea#detailDescription,
+            .mobile-textarea-force {
+                min-height: 200px !important;
+                font-size: 16px !important;
+                padding: 14px !important;
+                line-height: 1.5 !important;
+                border: 2px solid #6366f1 !important;
+                border-radius: 12px !important;
             }
         }
 
+        /* PORTRAIT MODE - Taller but same width/padding */
         @media screen and (max-width: 768px) and (orientation: portrait) {
-            textarea#detailDescription {
-                min-height: 500px !important;
-                height: 500px !important;
-                font-size: 26px !important;
-                padding: 45px !important;
-                border: 12px solid #991b1b !important; /* Dark red for portrait */
-                box-shadow: 0 0 25px rgba(220, 38, 38, 0.6) !important;
+            textarea#detailDescription,
+            .mobile-textarea-force {
+                min-height: 220px !important;
+                font-size: 16px !important;
+                padding: 14px !important;
             }
         }
     </style>
@@ -801,141 +802,11 @@
                 border-radius: 8px !important;
             }
 
-            /* MAXIMUM FORCE mobile textarea - override everything */
-            textarea#detailDescription,
-            #detailDescription,
-            textarea[id="detailDescription"] {
-                min-height: 300px !important; /* MASSIVE for mobile */
-                height: 300px !important; /* Force explicit height */
-                font-size: 18px !important; /* Larger font */
-                padding: 24px !important; /* Much more generous padding */
-                line-height: 1.8 !important; /* Better readability */
-                width: 100% !important;
-                max-height: 500px !important; /* Allow massive expansion */
-                overflow-y: auto !important;
-                resize: vertical !important;
-                word-wrap: break-word !important;
-                white-space: pre-wrap !important;
-                box-sizing: border-box !important;
-                display: block !important;
-                border: 2px solid #4f46e5 !important; /* Visual debugging - blue border */
-            }
-
-            /* FORCE mobile sizing - nuclear option */
-            @media screen and (max-width: 768px) {
-                textarea#detailDescription,
-                #detailDescription {
-                    min-height: 320px !important;
-                    height: 320px !important;
-                    max-height: 600px !important;
-                    padding: 28px !important;
-                    font-size: 20px !important;
-                    line-height: 2.0 !important;
-                    border: 3px solid #ef4444 !important; /* Red border for mobile debugging */
-                }
-            }
-
-            /* Extra nuclear option for tiny screens */
-            @media screen and (max-width: 480px) {
-                textarea#detailDescription {
-                    min-height: 350px !important;
-                    height: 350px !important;
-                    font-size: 22px !important;
-                    padding: 32px !important;
-                    border: 4px solid #10b981 !important; /* Green border for tiny screens */
-                }
-            }
-
-            /* ULTRA-NUCLEAR CSS - Highest possible specificity */
-            body #serviceContent textarea#detailDescription[id="detailDescription"],
-            body div textarea#detailDescription,
-            body .w-full#detailDescription,
-            html body textarea[id="detailDescription"] {
-                min-height: 340px !important;
-                height: 340px !important;
-                font-size: 19px !important;
-                padding: 30px !important;
-                line-height: 1.8 !important;
-                width: calc(100% - 0px) !important;
-                max-height: 550px !important;
-                box-sizing: border-box !important;
-                resize: vertical !important;
-                word-wrap: break-word !important;
-                overflow-wrap: break-word !important;
-                white-space: pre-wrap !important;
-                border: 4px solid #f59e0b !important; /* Yellow debug border */
-                background-color: #fef3c7 !important; /* Light yellow background */
-                -webkit-appearance: none !important;
-                appearance: none !important;
-                outline: none !important;
-            }
-
-            /* ADDITIONAL SELECTORS WITH MAXIMUM FORCE */
-            @media only screen and (max-width: 900px) {
-                textarea#detailDescription,
-                #detailDescription,
-                [id="detailDescription"],
-                textarea[id*="detail"],
-                textarea[placeholder*="describe"],
-                .space-y-6 textarea,
-                .relative textarea {
-                    min-height: 360px !important;
-                    height: 360px !important;
-                    font-size: 20px !important;
-                    padding: 32px 24px !important;
-                    line-height: 1.9 !important;
-                    border: 5px solid #dc2626 !important; /* Red border for maximum visibility */
-                    background: linear-gradient(45deg, #fff7ed, #fed7aa) !important;
-                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1) !important;
-                }
-            }
-
-            /* VIEWPORT META OVERRIDE for mobile */
-            @media screen and (max-device-width: 900px) {
-                textarea#detailDescription {
-                    transform: scale(1) !important;
-                    zoom: 1 !important;
-                    min-height: 380px !important;
-                    height: 380px !important;
-                    font-size: 21px !important;
-                    border: 6px dashed #7c3aed !important; /* Purple dashed border */
-                }
-            }
-
-            /* PORTRAIT SPECIFIC TARGETING */
-            @media screen and (orientation: portrait) and (max-width: 768px) {
-                textarea#detailDescription,
-                .mobile-textarea-force {
-                    min-height: 450px !important;
-                    height: 450px !important;
-                    font-size: 24px !important;
-                    padding: 40px !important;
-                    line-height: 2.2 !important;
-                    border: 10px solid #dc2626 !important; /* Thick red border for portrait */
-                    background: linear-gradient(135deg, #fee2e2, #fecaca) !important;
-                    width: calc(100% - 0px) !important;
-                    max-height: none !important;
-                    box-shadow: 0 0 20px rgba(220, 38, 38, 0.5) !important;
-                }
-            }
-
-            /* NUCLEAR PORTRAIT FALLBACK */
-            @media only screen and (max-width: 500px) and (orientation: portrait) {
-                textarea[id="detailDescription"] {
-                    min-height: 500px !important;
-                    height: 500px !important;
-                    font-size: 26px !important;
-                    padding: 45px !important;
-                    border: 12px solid #991b1b !important;
-                    background-color: #fee2e2 !important;
-                }
-            }
-
-            /* All text inputs optimization */
+            /* All text inputs optimization - 16px prevents iOS zoom */
             input[type="text"], input[type="email"], input[type="tel"] {
-                font-size: 16px !important; /* Prevents zoom on iOS */
+                font-size: 16px !important;
                 padding: 12px 16px !important;
-                min-height: 48px !important; /* Touch-friendly */
+                min-height: 48px !important;
                 border-radius: 8px !important;
                 box-sizing: border-box !important;
             }
@@ -2004,117 +1875,14 @@
         function autoResizeTextarea() {
             const textarea = document.getElementById('detailDescription');
             if (textarea) {
-                // COMPREHENSIVE MOBILE DEBUG
-                if (window.innerWidth <= 768) {
-                    console.log('🔍 MOBILE TEXTAREA DEBUG - START');
-                    console.log('  📱 Screen dimensions:', {
-                        innerWidth: window.innerWidth,
-                        innerHeight: window.innerHeight,
-                        devicePixelRatio: window.devicePixelRatio
-                    });
-                    console.log('  📐 Current textarea state:');
-                    const beforeStyles = window.getComputedStyle(textarea);
-                    console.log('    width:', beforeStyles.width, '| offsetWidth:', textarea.offsetWidth);
-                    console.log('    height:', beforeStyles.height, '| offsetHeight:', textarea.offsetHeight);
-                    console.log('    font-size:', beforeStyles.fontSize);
-                    console.log('    padding:', beforeStyles.padding);
-                    console.log('    border:', beforeStyles.border);
-                    console.log('    display:', beforeStyles.display);
-                    console.log('    visibility:', beforeStyles.visibility);
-                    console.log('    position:', beforeStyles.position);
-                    console.log('  📝 Text content:', {
-                        length: textarea.value.length,
-                        preview: textarea.value.substring(0, 50) + '...'
-                    });
+                // Simple auto-resize: let CSS handle styling, only adjust height for content
+                const minHeight = window.innerWidth <= 768 ? 200 : 180;
+                const maxHeight = 400;
 
-                    // Check parent elements for constraints
-                    console.log('  🏗️ Parent container analysis:');
-                    let parent = textarea.parentElement;
-                    let level = 1;
-                    while (parent && level <= 3) {
-                        const parentStyles = window.getComputedStyle(parent);
-                        console.log(`    Level ${level} (${parent.tagName}):`, {
-                            width: parentStyles.width,
-                            maxWidth: parentStyles.maxWidth,
-                            overflow: parentStyles.overflow,
-                            position: parentStyles.position
-                        });
-                        parent = parent.parentElement;
-                        level++;
-                    }
-                }
-
-                // Reset height to get accurate scrollHeight
+                // Temporarily reset to calculate scroll height
                 textarea.style.height = 'auto';
-
-                // Much larger dimensions to ensure 144+ character visibility
-                let minHeight, maxHeight;
-
-                if (window.innerWidth <= 480) {
-                    // Extra small mobile screens
-                    minHeight = 350;  // Increased further
-                    maxHeight = 500;  // Increased further
-                    textarea.style.padding = '32px';  // More padding
-                    textarea.style.fontSize = '20px';  // Larger font
-                    textarea.style.lineHeight = '1.8';
-                } else if (window.innerWidth <= 768) {
-                    // Mobile screens (increased threshold to 768)
-                    minHeight = 320;  // Increased
-                    maxHeight = 450;  // Increased
-                    textarea.style.padding = '28px';  // More padding
-                    textarea.style.fontSize = '18px';  // Larger font
-                    textarea.style.lineHeight = '1.7';
-                } else {
-                    // Desktop screens
-                    minHeight = 200;
-                    maxHeight = 350;
-                    textarea.style.padding = '16px';
-                    textarea.style.fontSize = '16px';
-                    textarea.style.lineHeight = '1.5';
-                }
-
-                // Force mobile styling with !important-like approach
-                if (window.innerWidth <= 768) {
-                    textarea.style.width = '100%';
-                    textarea.style.minHeight = minHeight + 'px';
-                    textarea.style.border = '3px solid #ff6b35';  // Orange border for debugging
-                    textarea.style.backgroundColor = '#fff8f0';  // Light orange background
-                    textarea.style.boxSizing = 'border-box';
-                    textarea.style.resize = 'vertical';
-
-                    console.log('  🔧 Applied mobile styles:', {
-                        minHeight: minHeight + 'px',
-                        fontSize: textarea.style.fontSize,
-                        padding: textarea.style.padding,
-                        border: textarea.style.border
-                    });
-                }
-
                 const newHeight = Math.min(Math.max(textarea.scrollHeight, minHeight), maxHeight);
                 textarea.style.height = newHeight + 'px';
-
-                // Ensure proper text formatting
-                textarea.style.wordWrap = 'break-word';
-                textarea.style.whiteSpace = 'pre-wrap';
-                textarea.style.boxSizing = 'border-box';
-
-                // Final mobile debug
-                if (window.innerWidth <= 768) {
-                    setTimeout(() => {
-                        console.log('  ✅ FINAL TEXTAREA STATE:');
-                        const finalStyles = window.getComputedStyle(textarea);
-                        console.log('    Final dimensions:', {
-                            width: finalStyles.width,
-                            height: finalStyles.height,
-                            offsetWidth: textarea.offsetWidth,
-                            offsetHeight: textarea.offsetHeight,
-                            clientWidth: textarea.clientWidth,
-                            clientHeight: textarea.clientHeight
-                        });
-                        console.log('    Character capacity estimate:', Math.floor(textarea.clientWidth / 10));
-                        console.log('🔍 MOBILE TEXTAREA DEBUG - END');
-                    }, 50);
-                }
             }
         }
 

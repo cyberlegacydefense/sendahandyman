@@ -125,6 +125,22 @@
     .status-inactive { background: #6b7280; color: white; }
     .status-paid { background: #10b981; color: white; }
     .status-expired { background: #ef4444; color: white; }
+
+    /* Mobile textarea optimization */
+    @media screen and (max-width: 768px) {
+      textarea {
+        font-size: 16px !important;
+        min-height: 120px !important;
+        padding: 12px !important;
+        line-height: 1.5 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      input[type="text"], input[type="email"], input[type="tel"], input[type="password"] {
+        font-size: 16px !important;
+        min-height: 48px !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50">

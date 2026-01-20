@@ -27,6 +27,27 @@
     .schedule-cell:hover { background: #e0e7ff; }
     .schedule-cell.selected { background: #4f46e5; color: white; }
     .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+
+    /* Mobile textarea optimization for profile and forms */
+    @media screen and (max-width: 768px) {
+      textarea {
+        font-size: 16px !important; /* Prevents iOS zoom */
+        min-height: 120px !important;
+        padding: 12px !important;
+        line-height: 1.5 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        border-radius: 8px !important;
+      }
+      #profileBio, #profileBioSetup, #additionalEquipment {
+        min-height: 140px !important;
+      }
+      input[type="text"], input[type="email"], input[type="tel"], input[type="password"] {
+        font-size: 16px !important; /* Prevents iOS zoom */
+        padding: 12px !important;
+        min-height: 48px !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-50">

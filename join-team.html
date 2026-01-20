@@ -69,6 +69,20 @@
         .mobile-header-row-2 {
             margin-top: 0.5rem;
         }
+
+        /* Mobile textarea optimization */
+        textarea {
+            font-size: 16px !important; /* Prevents iOS zoom */
+            min-height: 120px !important;
+            padding: 12px !important;
+            line-height: 1.5 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            font-size: 16px !important;
+            min-height: 48px !important;
+        }
     }
   </style>
 </head>
