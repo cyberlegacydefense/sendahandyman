@@ -228,40 +228,39 @@
     <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style id="tailwind-textarea-override">
-        /* Clean textarea styling - larger for better visibility */
+        /* Textarea styling with !important to override Tailwind */
         textarea#detailDescription,
         .mobile-textarea-force {
-            min-height: 200px;
-            height: auto;
-            font-size: 16px;
-            padding: 14px 16px;
-            line-height: 1.6;
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            width: 100%;
-            box-sizing: border-box;
-            resize: vertical;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            border-radius: 12px;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: 280px !important;
+            height: 280px !important;
+            font-size: 16px !important;
+            padding: 16px !important;
+            line-height: 1.6 !important;
+            border: 1px solid #d1d5db !important;
+            background: #ffffff !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            resize: vertical !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            border-radius: 12px !important;
         }
 
         textarea#detailDescription:focus,
         .mobile-textarea-force:focus {
-            outline: none;
-            border-color: #000000;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+            outline: none !important;
+            border-color: #000000 !important;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
         }
 
-        /* Mobile - larger textarea for better text visibility */
+        /* Mobile - even larger textarea */
         @media screen and (max-width: 768px) {
             textarea#detailDescription,
             .mobile-textarea-force {
-                min-height: 220px;
-                font-size: 16px;
-                padding: 14px;
-                line-height: 1.6;
+                min-height: 320px !important;
+                height: 320px !important;
+                font-size: 16px !important;
+                padding: 16px !important;
             }
         }
     </style>
@@ -1690,15 +1689,15 @@
         function autoResizeTextarea() {
             const textarea = document.getElementById('detailDescription');
             if (textarea) {
-                // Auto-resize based on content, with generous minimums for mobile
-                const minHeight = window.innerWidth <= 768 ? 220 : 200;
-                const maxHeight = 500;
+                // Match CSS: 320px mobile, 280px desktop
+                const minHeight = window.innerWidth <= 768 ? 320 : 280;
+                const maxHeight = 600;
 
-                // Calculate needed height based on content
-                textarea.style.height = 'auto';
+                // Let CSS handle initial size, only grow for content
                 const contentHeight = textarea.scrollHeight;
-                const newHeight = Math.min(Math.max(contentHeight, minHeight), maxHeight);
-                textarea.style.height = newHeight + 'px';
+                if (contentHeight > minHeight) {
+                    textarea.style.height = Math.min(contentHeight, maxHeight) + 'px';
+                }
             }
         }
 
