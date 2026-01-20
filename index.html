@@ -334,10 +334,10 @@
             color: var(--uber-black);
             background: var(--uber-white);
             width: 100%;
-            min-height: 100px;
-            padding: 14px 16px;
-            resize: none;
-            line-height: 1.5;
+            min-height: 160px;
+            padding: 16px;
+            resize: vertical;
+            line-height: 1.6;
             box-sizing: border-box;
         }
 
@@ -352,8 +352,9 @@
 
         @media (max-width: 768px) {
             .search-textarea {
-                min-height: 120px;
+                min-height: 200px;
                 font-size: 16px;
+                padding: 16px;
             }
         }
 
@@ -966,7 +967,7 @@
                                 class="search-textarea"
                                 placeholder="Describe your repair or project..."
                                 id="mainSearchInput"
-                                rows="3"
+                                rows="6"
                             ></textarea>
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
