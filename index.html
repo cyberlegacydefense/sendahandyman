@@ -326,6 +326,37 @@
             color: var(--uber-gray-500);
         }
 
+        .search-textarea {
+            border: 1px solid var(--uber-gray-200);
+            border-radius: 12px;
+            outline: none;
+            font-size: 16px;
+            color: var(--uber-black);
+            background: var(--uber-white);
+            width: 100%;
+            min-height: 100px;
+            padding: 14px 16px;
+            resize: none;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+
+        .search-textarea::placeholder {
+            color: var(--uber-gray-500);
+        }
+
+        .search-textarea:focus {
+            border-color: var(--uber-black);
+            box-shadow: 0 0 0 1px var(--uber-black);
+        }
+
+        @media (max-width: 768px) {
+            .search-textarea {
+                min-height: 120px;
+                font-size: 16px;
+            }
+        }
+
         .service-card {
             background: var(--uber-white);
             border: 2px solid var(--uber-gray-200);
@@ -930,25 +961,25 @@
                 <!-- Main Search Box -->
                 <div class="max-w-2xl mx-auto w-full mb-8">
                     <div class="main-search-container p-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-6 h-6 bg-black rounded-full flex-shrink-0"></div>
-                            <input
-                                type="text"
-                                class="search-input"
+                        <div class="flex flex-col gap-3">
+                            <textarea
+                                class="search-textarea"
                                 placeholder="Describe your repair or project..."
                                 id="mainSearchInput"
-                                onkeypress="handleSearchKeyPress(event)"
-                            />
-                            <button onclick="startServiceFlow()" class="btn-primary px-6 py-2">
-                                Search
-                            </button>
-                        </div>
-                        <div class="mt-3 flex items-center gap-2 px-9">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            <span class="location-indicator" id="locationIndicator">Detecting location...</span>
+                                rows="3"
+                            ></textarea>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span class="location-indicator" id="locationIndicator">Detecting location...</span>
+                                </div>
+                                <button onclick="startServiceFlow()" class="btn-primary px-6 py-2">
+                                    Search
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
