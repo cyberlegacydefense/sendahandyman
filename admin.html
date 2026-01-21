@@ -499,9 +499,22 @@
 
     <!-- Analytics Section -->
     <section id="section-analytics" class="admin-section">
-      <div class="mb-6">
-        <h2 class="text-2xl font-bold mb-2">Analytics & Reports</h2>
-        <p class="text-slate-600">Business insights and performance metrics</p>
+      <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold mb-2">Analytics & Reports</h2>
+          <p class="text-slate-600">Business insights and performance metrics</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <select id="analyticsDateFilter" class="border border-slate-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="day">Today</option>
+            <option value="week" selected>Last 7 Days</option>
+            <option value="month">Last 30 Days</option>
+            <option value="year">Last Year</option>
+          </select>
+          <button id="downloadReportBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm flex items-center gap-2">
+            📥 Download Report
+          </button>
+        </div>
       </div>
 
       <!-- Analytics Metrics Cards -->
@@ -2317,6 +2330,35 @@ let funnelChart = null;
 let servicesChart = null;
 let conversionsChart = null;
 
+// Get date range based on filter
+function getDateRange(filter) {
+  const now = new Date();
+  const end = new Date(now);
+  let start = new Date(now);
+
+  switch (filter) {
+    case 'day':
+      start.setHours(0, 0, 0, 0);
+      break;
+    case 'week':
+      start.setDate(start.getDate() - 7);
+      break;
+    case 'month':
+      start.setDate(start.getDate() - 30);
+      break;
+    case 'year':
+      start.setFullYear(start.getFullYear() - 1);
+      break;
+    default:
+      start.setDate(start.getDate() - 7);
+  }
+
+  return { start, end };
+}
+
+// Current analytics filter
+let currentAnalyticsFilter = 'week';
+
 // Load comprehensive analytics data
 async function loadAnalyticsData() {
   console.log('📈 Loading comprehensive analytics data...');
@@ -2337,7 +2379,9 @@ async function loadAnalyticsData() {
       loadFunnelAnalytics(),
       loadServiceAnalytics(),
       loadRecentEvents(),
-      loadRevenueData()
+      loadRevenueData(),
+      loadTopHandymen(),
+      loadPopularServices()
     ]);
 
     console.log('✅ All analytics data loaded successfully');
@@ -2345,6 +2389,212 @@ async function loadAnalyticsData() {
   } catch (error) {
     console.error('❌ Error loading analytics:', error);
   }
+}
+
+// Load top performing handymen from tasks data
+async function loadTopHandymen() {
+  try {
+    const { start, end } = getDateRange(currentAnalyticsFilter);
+
+    // Get completed tasks with handyman info
+    const { data: completedTasks, error } = await supabaseAdmin
+      .from('tasks')
+      .select('*')
+      .eq('status', 'completed')
+      .gte('updated_at', start.toISOString());
+
+    if (error) throw error;
+
+    // Count completions by handyman
+    const handymanStats = {};
+    completedTasks?.forEach(task => {
+      const hId = task.handyman_id;
+      if (hId) {
+        if (!handymanStats[hId]) {
+          handymanStats[hId] = { completed: 0, revenue: 0 };
+        }
+        handymanStats[hId].completed++;
+        handymanStats[hId].revenue += parseFloat(task.total_amount) || 0;
+      }
+    });
+
+    // Get handyman names
+    const handymanIds = Object.keys(handymanStats);
+    let handymenData = [];
+
+    if (handymanIds.length > 0) {
+      const { data: handymen } = await supabaseAdmin
+        .from('handymen')
+        .select('id, name, email')
+        .in('id', handymanIds);
+
+      handymenData = handymen || [];
+    }
+
+    // Build top handymen list
+    const topHandymenDiv = document.getElementById('topHandymen');
+    const sortedHandymen = Object.entries(handymanStats)
+      .sort(([,a], [,b]) => b.completed - a.completed)
+      .slice(0, 5);
+
+    if (sortedHandymen.length > 0) {
+      topHandymenDiv.innerHTML = sortedHandymen.map(([id, stats], index) => {
+        const handyman = handymenData.find(h => h.id === id);
+        const name = handyman?.name || handyman?.email?.split('@')[0] || 'Unknown';
+        return `
+          <div class="flex justify-between items-center py-2 ${index > 0 ? 'border-t border-slate-100' : ''}">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 bg-${index === 0 ? 'yellow' : index === 1 ? 'slate' : 'orange'}-100 rounded-full flex items-center justify-center text-xs font-bold">${index + 1}</span>
+              <span class="text-sm font-medium">${name}</span>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-semibold text-green-600">${stats.completed} jobs</span>
+              <span class="text-xs text-slate-500 block">$${stats.revenue.toFixed(0)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      topHandymenDiv.innerHTML = '<div class="text-center py-4 text-slate-500">No completed jobs in this period</div>';
+    }
+
+  } catch (error) {
+    console.error('Error loading top handymen:', error);
+    document.getElementById('topHandymen').innerHTML = '<div class="text-center py-4 text-slate-500">Unable to load data</div>';
+  }
+}
+
+// Load popular services from tasks data
+async function loadPopularServices() {
+  try {
+    const { start, end } = getDateRange(currentAnalyticsFilter);
+
+    // Get tasks to analyze services
+    const { data: tasks, error } = await supabaseAdmin
+      .from('tasks')
+      .select('*')
+      .gte('created_at', start.toISOString());
+
+    if (error) throw error;
+
+    // Count services
+    const serviceStats = {};
+    tasks?.forEach(task => {
+      const category = task.task_category || task.service_category || task.category || 'Other';
+      if (!serviceStats[category]) {
+        serviceStats[category] = { count: 0, revenue: 0 };
+      }
+      serviceStats[category].count++;
+      serviceStats[category].revenue += parseFloat(task.total_amount) || 0;
+    });
+
+    // Build popular services list
+    const popularServicesDiv = document.getElementById('popularServices');
+    const sortedServices = Object.entries(serviceStats)
+      .sort(([,a], [,b]) => b.count - a.count)
+      .slice(0, 5);
+
+    if (sortedServices.length > 0) {
+      popularServicesDiv.innerHTML = sortedServices.map(([service, stats], index) => {
+        const displayName = service.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const colors = ['blue', 'green', 'purple', 'orange', 'pink'];
+        return `
+          <div class="flex justify-between items-center py-2 ${index > 0 ? 'border-t border-slate-100' : ''}">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-${colors[index % colors.length]}-500 rounded-full"></span>
+              <span class="text-sm">${displayName}</span>
+            </div>
+            <span class="text-sm font-semibold">${stats.count} bookings</span>
+          </div>
+        `;
+      }).join('');
+    } else {
+      popularServicesDiv.innerHTML = '<div class="text-center py-4 text-slate-500">No bookings in this period</div>';
+    }
+
+  } catch (error) {
+    console.error('Error loading popular services:', error);
+    document.getElementById('popularServices').innerHTML = '<div class="text-center py-4 text-slate-500">Unable to load data</div>';
+  }
+}
+
+// Download analytics report as CSV
+function downloadAnalyticsReport() {
+  console.log('📥 Generating analytics report...');
+
+  const dateFilter = document.getElementById('analyticsDateFilter');
+  const filterText = dateFilter?.options[dateFilter.selectedIndex]?.text || 'Last 7 Days';
+
+  // Collect data from the page
+  const report = [];
+  report.push(['SendAHandyman Analytics Report']);
+  report.push(['Generated', new Date().toLocaleString()]);
+  report.push(['Period', filterText]);
+  report.push([]);
+
+  // Metrics
+  report.push(['KEY METRICS']);
+  report.push(['Metric', 'Value']);
+  report.push(['Today\'s Visitors', document.getElementById('todayVisitors')?.textContent || '-']);
+  report.push(['Conversion Rate', document.getElementById('conversionRate')?.textContent || '-']);
+  report.push(['Avg Session Time', document.getElementById('avgSessionTime')?.textContent || '-']);
+  report.push(['Mobile Users', document.getElementById('mobileUsers')?.textContent || '-']);
+  report.push([]);
+
+  // Top Handymen
+  report.push(['TOP PERFORMING HANDYMEN']);
+  const topHandymenDiv = document.getElementById('topHandymen');
+  if (topHandymenDiv) {
+    const handymenRows = topHandymenDiv.querySelectorAll('.flex.justify-between');
+    handymenRows.forEach(row => {
+      const name = row.querySelector('.font-medium')?.textContent || '';
+      const jobs = row.querySelector('.text-green-600')?.textContent || '';
+      const revenue = row.querySelector('.text-slate-500')?.textContent || '';
+      if (name) report.push([name, jobs, revenue]);
+    });
+  }
+  report.push([]);
+
+  // Popular Services
+  report.push(['POPULAR SERVICES']);
+  const popularServicesDiv = document.getElementById('popularServices');
+  if (popularServicesDiv) {
+    const serviceRows = popularServicesDiv.querySelectorAll('.flex.justify-between');
+    serviceRows.forEach(row => {
+      const service = row.querySelector('.text-sm:not(.font-semibold)')?.textContent || '';
+      const count = row.querySelector('.font-semibold')?.textContent || '';
+      if (service) report.push([service, count]);
+    });
+  }
+  report.push([]);
+
+  // Customer Journey
+  report.push(['CUSTOMER JOURNEY']);
+  const funnelTable = document.getElementById('funnelStepsTable');
+  if (funnelTable) {
+    const rows = funnelTable.querySelectorAll('tr');
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      if (cells.length >= 3) {
+        report.push([cells[0].textContent, cells[1].textContent, cells[2].textContent]);
+      }
+    });
+  }
+
+  // Convert to CSV
+  const csvContent = report.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+
+  link.setAttribute('href', url);
+  link.setAttribute('download', `sendahandyman-analytics-${new Date().toISOString().split('T')[0]}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  console.log('✅ Report downloaded');
 }
 
 // Load basic analytics metrics
@@ -2833,6 +3083,26 @@ document.addEventListener('DOMContentLoaded', function() {
           refreshButton.disabled = false;
         }, 2000);
       }
+    });
+  }
+
+  // Date filter change handler
+  const dateFilter = document.getElementById('analyticsDateFilter');
+  if (dateFilter) {
+    dateFilter.addEventListener('change', async function() {
+      currentAnalyticsFilter = this.value;
+      console.log('📅 Date filter changed to:', currentAnalyticsFilter);
+
+      // Reload analytics with new filter
+      await loadAnalyticsData();
+    });
+  }
+
+  // Download report button handler
+  const downloadBtn = document.getElementById('downloadReportBtn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', function() {
+      downloadAnalyticsReport();
     });
   }
 });
