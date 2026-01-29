@@ -1335,7 +1335,7 @@
         const PREMIUM_SATURDAY = 0.30;
         const DISCOUNT_FUTURE = 0.10;
 
-        // Service types with proper pricing
+        // Service types with proper pricing and upcharge questions
         const TASKS = {
             'ceiling-fan': {
                 hours: 2.0,
@@ -1373,25 +1373,108 @@
                 hours: 1.5,
                 label: "Light Plumbing (Faucet/Toilet)",
                 basePrice: 120,
-                questions: []
+                questions: [
+                    {
+                        id: 'fixture_type',
+                        label: 'What are you replacing?',
+                        options: [
+                            { value: 'faucet', label: 'Kitchen/bathroom faucet', addon: 0 },
+                            { value: 'showerhead', label: 'Showerhead', addon: 0 },
+                            { value: 'both', label: 'Both faucet and showerhead', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'plumbing_issues',
+                        label: 'Any plumbing issues?',
+                        options: [
+                            { value: 'none', label: 'No issues', addon: 0 },
+                            { value: 'corrosion', label: 'Some corrosion/leaks', addon: 40 },
+                            { value: 'access', label: 'Need sink removal', addon: 30 }
+                        ]
+                    }
+                ]
             },
             'electrical': {
                 hours: 1.5,
-                label: "Light Electrical (Outlets/Switches)",
+                label: "Light Electrical (Fixtures/Outlets)",
                 basePrice: 120,
-                questions: []
+                questions: [
+                    {
+                        id: 'fixture_type',
+                        label: 'Type of fixture?',
+                        options: [
+                            { value: 'standard', label: 'Standard light fixture', addon: 0 },
+                            { value: 'small_chandelier', label: 'Chandelier (under 25 lbs)', addon: 100 },
+                            { value: 'heavy_chandelier', label: 'Heavy chandelier (over 25 lbs)', addon: 200 }
+                        ]
+                    },
+                    {
+                        id: 'ceiling_height',
+                        label: 'Ceiling height?',
+                        options: [
+                            { value: 'standard', label: 'Under 10 feet', addon: 0 },
+                            { value: 'high', label: 'Over 10 feet', addon: 30 }
+                        ]
+                    }
+                ]
             },
             'tv-mounting': {
                 hours: 2.0,
                 label: "TV Wall Mount (32–65\")",
                 basePrice: 160,
-                questions: []
+                questions: [
+                    {
+                        id: 'tv_size',
+                        label: 'What size is your TV?',
+                        options: [
+                            { value: 'standard', label: '32-65 inches', addon: 0 },
+                            { value: 'large', label: 'Larger than 65 inches', addon: 50 }
+                        ]
+                    },
+                    {
+                        id: 'wall_type',
+                        label: 'What type of wall?',
+                        options: [
+                            { value: 'drywall', label: 'Drywall with studs', addon: 0 },
+                            { value: 'brick', label: 'Brick/concrete', addon: 40 },
+                            { value: 'fireplace', label: 'Above fireplace', addon: 40 }
+                        ]
+                    },
+                    {
+                        id: 'mount_owned',
+                        label: 'Do you have the wall mount?',
+                        options: [
+                            { value: 'yes', label: 'Yes, I have it', addon: 0 },
+                            { value: 'no', label: 'No, need to purchase', addon: 0 }
+                        ]
+                    }
+                ]
             },
             'furniture-assembly': {
                 hours: 2.0,
                 label: "Furniture Assembly (S–M)",
                 basePrice: 160,
-                questions: []
+                questions: [
+                    {
+                        id: 'furniture_type',
+                        label: 'What type of furniture?',
+                        options: [
+                            { value: 'standard', label: 'Dresser/desk/table', addon: 0 },
+                            { value: 'bed', label: 'Bed frame', addon: 30 },
+                            { value: 'wardrobe', label: 'Large wardrobe', addon: 30 },
+                            { value: 'multiple', label: 'Multiple small items', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'quantity',
+                        label: 'How many items?',
+                        options: [
+                            { value: 'single', label: '1 major item', addon: 0 },
+                            { value: 'few', label: '2-3 small items', addon: 0 },
+                            { value: 'many', label: '4+ items', addon: 40 }
+                        ]
+                    }
+                ]
             },
             'painting': {
                 hours: 2.5,
@@ -1400,16 +1483,232 @@
                 questions: []
             },
             'general-repair': {
-                hours: 1.5,
-                label: "General Repair",
-                basePrice: 120,
-                questions: []
+                hours: 3.0,
+                label: "General Handyman (3+ hours)",
+                basePrice: 240,
+                questions: [
+                    {
+                        id: 'task_complexity',
+                        label: 'What type of tasks do you need done?',
+                        options: [
+                            { value: 'basic', label: 'Basic repairs, adjustments, or maintenance', addon: 0 },
+                            { value: 'multiple', label: 'Multiple small tasks or repairs', addon: 0 },
+                            { value: 'complex', label: 'More complex projects requiring planning', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'additional_time',
+                        label: 'Do you need additional time beyond 3 hours?',
+                        options: [
+                            { value: 'none', label: 'No, 3 hours should be sufficient', addon: 0 },
+                            { value: 'one_block', label: 'Yes, add 3 more hours', addon: 180 },
+                            { value: 'two_blocks', label: 'Yes, add 6 more hours', addon: 360 }
+                        ]
+                    },
+                    {
+                        id: 'materials_needed',
+                        label: 'Will materials or parts be needed?',
+                        options: [
+                            { value: 'customer_supplies', label: 'I will provide all materials', addon: 0 },
+                            { value: 'basic_supplies', label: 'May need basic supplies (screws, caulk, etc.)', addon: 0 },
+                            { value: 'unsure', label: 'Not sure what will be needed', addon: 0 }
+                        ]
+                    }
+                ]
             },
             'blinds': {
                 hours: 1.5,
                 label: "Curtain Rod/Blinds Mount",
                 basePrice: 120,
-                questions: []
+                questions: [
+                    {
+                        id: 'item_count',
+                        label: 'How many rods/blinds?',
+                        type: 'quantity',
+                        options: [
+                            { value: '1', label: '1 item', price: 80, hours: 1.0 },
+                            { value: '2', label: '2 items', price: 120, hours: 1.5 },
+                            { value: '3', label: '3 items', price: 160, hours: 2.0 },
+                            { value: '4+', label: '4+ items', price: 200, hours: 2.5 }
+                        ]
+                    },
+                    {
+                        id: 'wall_type',
+                        label: 'What type of wall?',
+                        options: [
+                            { value: 'drywall', label: 'Drywall', addon: 0 },
+                            { value: 'masonry', label: 'Brick/tile/concrete', addon: 40 }
+                        ]
+                    }
+                ]
+            },
+            'smart-doorbell': {
+                hours: 1.25,
+                label: "Smart Doorbell Install",
+                basePrice: 100,
+                questions: [
+                    {
+                        id: 'install_type',
+                        label: 'Installation type?',
+                        options: [
+                            { value: 'replace', label: 'Replacing existing doorbell', addon: 0 },
+                            { value: 'wireless', label: 'New wireless install', addon: 30 }
+                        ]
+                    },
+                    {
+                        id: 'chime_status',
+                        label: 'Current doorbell chime working?',
+                        options: [
+                            { value: 'working', label: 'Yes, works fine', addon: 0 },
+                            { value: 'broken', label: 'No/needs replacement', addon: 40 },
+                            { value: 'no_chime', label: 'Don\'t want chime connected', addon: 0 }
+                        ]
+                    }
+                ]
+            },
+            'floating-shelf': {
+                hours: 1.0,
+                label: "Floating Shelf Install",
+                basePrice: 80,
+                questions: [
+                    {
+                        id: 'shelf_count',
+                        label: 'How many shelves?',
+                        type: 'quantity',
+                        options: [
+                            { value: '1', label: '1 shelf', price: 80, hours: 1.0 },
+                            { value: '2', label: '2 shelves', price: 120, hours: 1.5 },
+                            { value: '3', label: '3 shelves', price: 160, hours: 2.0 },
+                            { value: '4+', label: '4+ shelves', price: 200, hours: 2.5 }
+                        ]
+                    },
+                    {
+                        id: 'weight',
+                        label: 'Shelf weight/size?',
+                        options: [
+                            { value: 'standard', label: 'Standard (under 25 lbs)', addon: 0 },
+                            { value: 'heavy', label: 'Heavy-duty (over 25 lbs)', addon: 30 }
+                        ]
+                    }
+                ]
+            },
+            'appliance-hookup': {
+                hours: 2.0,
+                label: "Appliance Hookup (W/D/DW)",
+                basePrice: 160,
+                questions: [
+                    {
+                        id: 'appliance_type',
+                        label: 'What appliance?',
+                        options: [
+                            { value: 'washer', label: 'Washer', addon: 0 },
+                            { value: 'dryer', label: 'Dryer', addon: 0 },
+                            { value: 'dishwasher', label: 'Dishwasher', addon: 0 },
+                            { value: 'multiple', label: 'Multiple appliances', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'old_removal',
+                        label: 'Replacing an old unit?',
+                        options: [
+                            { value: 'remove', label: 'Yes, remove old', addon: 40 },
+                            { value: 'new', label: 'No, new installation', addon: 0 },
+                            { value: 'disconnect', label: 'Just disconnecting old', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'hookups_ready',
+                        label: 'Are hookups ready?',
+                        options: [
+                            { value: 'ready', label: 'Yes, all connections ready', addon: 0 },
+                            { value: 'new_line', label: 'Need new vent/line', addon: 30 },
+                            { value: 'unsure', label: 'Not sure', addon: 0 }
+                        ]
+                    }
+                ]
+            },
+            'closet-organizer': {
+                hours: 2.5,
+                label: "Closet Organizer Install",
+                basePrice: 200,
+                questions: [
+                    {
+                        id: 'organizer_type',
+                        label: 'Type of organizer?',
+                        options: [
+                            { value: 'standard', label: 'Shelves and rods', addon: 0 },
+                            { value: 'modular', label: 'Modular cube system', addon: 0 },
+                            { value: 'wire', label: 'Wire rack system', addon: 0 },
+                            { value: 'custom', label: 'Custom wood system', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'custom_fitting',
+                        label: 'Need custom cutting?',
+                        options: [
+                            { value: 'no', label: 'No, standard sizes', addon: 0 },
+                            { value: 'yes', label: 'Yes, custom fitting', addon: 50 },
+                            { value: 'unsure', label: 'Not sure', addon: 0 }
+                        ]
+                    },
+                    {
+                        id: 'wall_type',
+                        label: 'What type of wall?',
+                        options: [
+                            { value: 'drywall', label: 'Standard drywall', addon: 0 },
+                            { value: 'masonry', label: 'Concrete/masonry', addon: 40 },
+                            { value: 'unsure', label: 'Not sure', addon: 0 }
+                        ]
+                    }
+                ]
+            },
+            'premium-moveout': {
+                hours: 3.0,
+                label: "Premium Move-out Repairs",
+                basePrice: 240,
+                questions: [
+                    {
+                        id: 'property_size',
+                        label: 'What size is the property?',
+                        options: [
+                            { value: 'studio', label: 'Studio/1 Bedroom', addon: 0 },
+                            { value: '2br', label: '2 Bedroom', addon: 80 },
+                            { value: '3br', label: '3 Bedroom', addon: 160 },
+                            { value: '4br', label: '4+ Bedroom', addon: 240 }
+                        ]
+                    },
+                    {
+                        id: 'damage_level',
+                        label: 'How much damage needs repair?',
+                        options: [
+                            { value: 'light', label: 'Light (few nail holes, minor touch-ups)', addon: 0 },
+                            { value: 'moderate', label: 'Moderate (multiple holes, some paint)', addon: 50 },
+                            { value: 'heavy', label: 'Heavy (major repairs, extensive work)', addon: 120 }
+                        ]
+                    },
+                    {
+                        id: 'additional_services',
+                        label: 'Any additional services needed?',
+                        options: [
+                            { value: 'none', label: 'None needed', addon: 0 },
+                            { value: 'carpet_clean', label: 'Carpet cleaning and deodorizing', addon: 50 },
+                            { value: 'full_paint', label: 'Full room repainting', addon: 75 },
+                            { value: 'kitchen_deep', label: 'Kitchen appliance deep clean', addon: 40 },
+                            { value: 'bathroom_restore', label: 'Bathroom tile & grout restoration', addon: 35 },
+                            { value: 'floor_refinish', label: 'Hardwood floor refinishing', addon: 60 },
+                            { value: 'window_clean', label: 'Window cleaning (interior/exterior)', addon: 25 }
+                        ]
+                    },
+                    {
+                        id: 'timeline',
+                        label: 'When do you need this completed?',
+                        options: [
+                            { value: 'flexible', label: 'Flexible timing', addon: 0 },
+                            { value: 'soon', label: 'Within 1-2 weeks', addon: 0 },
+                            { value: 'urgent', label: 'ASAP (rush job)', addon: 50 }
+                        ]
+                    }
+                ]
             }
         };
 
@@ -1654,6 +1953,11 @@
                     <p class="text-gray-600 mb-6">Tell us more about what you need help with</p>
 
                     <div class="space-y-6">
+                        <!-- Service-specific questions (upcharges) -->
+                        <div id="taskQuestions" class="hidden">
+                            <div id="questionsContainer" class="space-y-4"></div>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-semibold mb-2">Describe the issue or project</label>
                             <div class="relative">
@@ -1708,11 +2012,146 @@
                 autoResizeTextarea();
                 updateCharacterCount();
 
+                // Show task-specific questions if available
+                if (serviceData.category) {
+                    showTaskQuestions(serviceData.category);
+                }
+
                 const textarea = document.getElementById('detailDescription');
                 if (textarea && window.innerWidth > 480) {
                     textarea.focus();
                 }
             }, 100);
+        }
+
+        // Show service-specific questions with upcharge options
+        function showTaskQuestions(taskKey) {
+            const task = TASKS[taskKey];
+            const questionsSection = document.getElementById('taskQuestions');
+            const questionsContainer = document.getElementById('questionsContainer');
+
+            if (!task || !task.questions || task.questions.length === 0) {
+                if (questionsSection) questionsSection.classList.add('hidden');
+                return;
+            }
+
+            questionsContainer.innerHTML = '';
+
+            task.questions.forEach(question => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'space-y-2';
+
+                const label = document.createElement('label');
+                label.className = 'block text-sm font-semibold text-gray-700';
+                label.textContent = question.label;
+
+                const select = document.createElement('select');
+                select.className = 'w-full rounded-lg border border-gray-300 px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
+                select.id = `question_${question.id}`;
+                select.addEventListener('change', updateEstimateWithAddons);
+
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Select an option';
+                select.appendChild(defaultOption);
+
+                question.options.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option.value;
+
+                    // Handle quantity pricing differently
+                    if (question.type === 'quantity' && option.price) {
+                        optionElement.textContent = `${option.label} - $${option.price}`;
+                        optionElement.dataset.price = option.price;
+                        optionElement.dataset.hours = option.hours;
+                    } else {
+                        optionElement.textContent = option.label + (option.addon > 0 ? ` (+$${option.addon})` : '');
+                        optionElement.dataset.addon = option.addon;
+                    }
+
+                    select.appendChild(optionElement);
+                });
+
+                questionDiv.appendChild(label);
+                questionDiv.appendChild(select);
+                questionsContainer.appendChild(questionDiv);
+            });
+
+            questionsSection.classList.remove('hidden');
+        }
+
+        // Calculate total addons from question selections
+        function calculateAddons(taskKey) {
+            const task = TASKS[taskKey];
+            if (!task || !task.questions) return 0;
+
+            let totalAddons = 0;
+            console.log('🔍 Calculating addons for task:', taskKey);
+
+            task.questions.forEach(question => {
+                const select = document.getElementById(`question_${question.id}`);
+                if (select && select.value) {
+                    const selectedOption = select.options[select.selectedIndex];
+
+                    // Handle quantity pricing (replaces base price) vs regular addons
+                    if (question.type === 'quantity' && selectedOption.dataset.price) {
+                        console.log(`📊 Question ${question.id}: quantity pricing "${select.value}" with base price ${selectedOption.dataset.price}`);
+                    } else {
+                        const addon = parseInt(selectedOption.dataset.addon) || 0;
+                        console.log(`📊 Question ${question.id}: selected "${select.value}" with addon ${addon}`);
+                        totalAddons += addon;
+                    }
+                }
+            });
+
+            console.log('💰 Total addons calculated:', totalAddons);
+            serviceData.addons = totalAddons;
+            return totalAddons;
+        }
+
+        // Get quantity-based pricing for per-item services
+        function getQuantityPricing(taskKey) {
+            const task = TASKS[taskKey];
+            if (!task || !task.questions) return null;
+
+            const quantityQuestion = task.questions.find(q => q.type === 'quantity');
+            if (!quantityQuestion) return null;
+
+            const select = document.getElementById(`question_${quantityQuestion.id}`);
+            if (!select || !select.value) return null;
+
+            const selectedOption = select.options[select.selectedIndex];
+            return {
+                price: parseInt(selectedOption.dataset.price) || 0,
+                hours: parseFloat(selectedOption.dataset.hours) || task.hours
+            };
+        }
+
+        // Update estimate when question selections change
+        function updateEstimateWithAddons() {
+            const taskKey = serviceData.category;
+            if (!taskKey) return;
+
+            const addons = calculateAddons(taskKey);
+            console.log('Current add-ons total:', addons);
+
+            // Update price display if visible
+            const task = TASKS[taskKey];
+            if (task) {
+                const quantityPricing = getQuantityPricing(taskKey);
+                let displayPrice = task.basePrice;
+
+                if (quantityPricing && quantityPricing.price > 0) {
+                    displayPrice = quantityPricing.price;
+                }
+
+                displayPrice += addons;
+
+                const priceDisplay = document.getElementById('servicePriceDisplay');
+                if (priceDisplay) {
+                    priceDisplay.textContent = `$${displayPrice}`;
+                }
+            }
         }
 
         function updateServiceData(key, value) {
@@ -1829,6 +2268,26 @@
 
         function showEstimate() {
             updateProgress(4); // Step 4: Final Booking
+
+            // Calculate pricing with addons
+            const task = TASKS[serviceData.category];
+            const addons = calculateAddons(serviceData.category);
+            const quantityPricing = getQuantityPricing(serviceData.category);
+
+            let basePrice = task ? task.basePrice : 160;
+            if (quantityPricing && quantityPricing.price > 0) {
+                basePrice = quantityPricing.price;
+            }
+
+            const standardPrice = basePrice + addons;
+            const premiumPrice = Math.round(standardPrice * 1.35); // 35% premium markup
+            const hours = quantityPricing?.hours || (task ? task.hours : 2);
+
+            // Store in serviceData for later use
+            serviceData.addons = addons;
+            serviceData.calculatedPrice = standardPrice;
+            serviceData.premiumPrice = premiumPrice;
+
             const content = document.getElementById('serviceContent');
             content.innerHTML = `
                 <div class="slide-up">
@@ -1839,10 +2298,10 @@
                             <span class="ai-badge">AI</span>
                             <span class="font-semibold">${serviceData.categoryDisplay || 'Service Request'}</span>
                         </div>
-                        <div class="text-3xl font-bold mb-2" id="servicePriceDisplay">$160</div>
+                        <div class="text-3xl font-bold mb-2" id="servicePriceDisplay">$${standardPrice}</div>
                         <div class="text-lg opacity-90 mb-4">Estimated cost range</div>
                         <div class="text-sm opacity-80">
-                            • 1-2 hours estimated duration<br>
+                            • ${hours}-${hours + 1} hours estimated duration<br>
                             • Final price confirmed after handyman inspection<br>
                             • No hidden fees or surprises
                         </div>
@@ -1855,7 +2314,7 @@
                                     <div class="font-semibold">Standard Service</div>
                                     <div class="text-sm text-gray-600">Basic repair • ⭐⭐⭐⭐ 4.8 avg rating</div>
                                 </div>
-                                <div class="text-xl font-bold" id="tomorrowPricing">$160</div>
+                                <div class="text-xl font-bold" id="tomorrowPricing">$${standardPrice}</div>
                             </div>
                         </div>
 
@@ -1866,7 +2325,7 @@
                                     <div class="text-sm text-gray-600">Expert + warranty • ⭐⭐⭐⭐⭐ 4.9 avg rating</div>
                                     <div class="text-xs text-green-600 mt-1">✅ 90-day guarantee</div>
                                 </div>
-                                <div class="text-xl font-bold" id="premiumPricing">$216</div>
+                                <div class="text-xl font-bold" id="premiumPricing">$${premiumPrice}</div>
                             </div>
                         </div>
                     </div>
