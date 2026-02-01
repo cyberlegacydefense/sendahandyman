@@ -2040,11 +2040,69 @@
             if (searchInput.trim()) {
                 serviceData.description = searchInput.trim();
 
+                // Auto-detect category from description if not already set
+                if (!serviceData.category) {
+                    const detectedCategory = detectCategoryFromDescription(searchInput);
+                    if (detectedCategory) {
+                        serviceData.category = detectedCategory;
+                        serviceData.taskKey = getCategoryTaskKey(detectedCategory);
+                        serviceData.categoryDisplay = getCategoryDisplay(detectedCategory);
+                        console.log('🎯 Auto-detected category from description:', detectedCategory, '→ taskKey:', serviceData.taskKey);
+                    }
+                }
+
                 // Track search started
                 HandymanAnalytics.trackSearchStarted(searchInput.trim());
 
                 showServiceDetails();
             }
+        }
+
+        // Detect service category from description text
+        function detectCategoryFromDescription(description) {
+            const text = description.toLowerCase();
+
+            const categoryPatterns = [
+                // TV Mounting - check first since it's specific
+                { category: 'mounting', patterns: [/\btv\b/, /\btelevision/, /\bmount.*tv/i, /\btv.*mount/i, /\bwall\s*hang.*tv/i, /\bflat\s*screen/, /\binch.*tv/i, /\btv.*inch/i] },
+                // Ceiling Fan - check before electrical
+                { category: 'ceiling-fan', patterns: [/\bceiling\s*fan/, /\bfan\s*install/, /\binstall.*fan/] },
+                // Electrical
+                { category: 'electrical', patterns: [/\belectric/, /\boutlet/, /\bswitch/, /\blight\s*fixture/, /\bchandelier/, /\bwiring/, /\bceiling\s*light/] },
+                // Plumbing
+                { category: 'light-plumbing', patterns: [/\bplumb/, /\bfaucet/, /\btoilet/, /\bsink/, /\bleak/, /\bdrain/, /\bshower\s*head/, /\bgarbage\s*disposal/] },
+                // Furniture Assembly
+                { category: 'furniture', patterns: [/\bfurniture/, /\bassembl/, /\bikea/, /\bbed\s*frame/, /\bdresser/, /\bwardrobe/, /\bdesk\b/, /\bbookshelf/, /\btable\b/] },
+                // Painting
+                { category: 'painting', patterns: [/\bpaint/, /\btouch\s*up/, /\bwall\s*color/] },
+                // Appliances
+                { category: 'appliances', patterns: [/\bwasher/, /\bdryer/, /\bdishwasher/, /\bappliance/, /\brefrigerator/, /\bfridge/, /\boven\b/, /\bstove/] },
+                // Smart Doorbell
+                { category: 'smart-doorbell', patterns: [/\bdoorbell/, /\bring\b/, /\bnest\b.*door/] },
+                // Blinds/Curtains
+                { category: 'curtains-blinds', patterns: [/\bblind/, /\bcurtain/, /\bshade/, /\bdrape/, /\bwindow\s*(cover|treat)/] },
+                // Floating Shelf / Installation
+                { category: 'installation', patterns: [/\bshelf/, /\bshelves/, /\bfloating/, /\bwall\s*mount(?!.*tv)/] },
+                // Closet
+                { category: 'closet-organizer', patterns: [/\bcloset/, /\borganizer/, /\bstorage\s*system/] },
+                // Move-out
+                { category: 'premium-moveout', patterns: [/\bmove\s*out/, /\bmoveout/, /\bmove-out/, /\bsecurity\s*deposit/, /\bapartment\s*repair/] },
+                // General Repair (catch-all for repair-related terms)
+                { category: 'repair', patterns: [/\brepair/, /\bfix\b/, /\bbroken/, /\bdamage/, /\bdoor\b/, /\bwindow\b/, /\bdrywall/, /\bhole/, /\bpatch/] }
+            ];
+
+            for (const { category, patterns } of categoryPatterns) {
+                for (const pattern of patterns) {
+                    if (pattern.test(text)) {
+                        console.log(`🔍 Category "${category}" detected by pattern: ${pattern}`);
+                        return category;
+                    }
+                }
+            }
+
+            // Default to general repair if no specific match
+            console.log('🔍 No specific category detected, defaulting to repair');
+            return 'repair';
         }
 
         // Map UI category names to TASKS object keys
