@@ -51,7 +51,6 @@ export const handler = async (event, context) => {
       estimated_hours: taskData.estimated_hours,
       status: 'pending',
       payment_status: 'authorized', // Payment hold placed
-      payment_intent_id: taskData.payment_intent_id || null, // Stripe payment intent for capture later
       total_amount: taskData.total_amount,
       assigned_handyman_name: null,
       assigned_handyman_phone: null,
@@ -60,7 +59,7 @@ export const handler = async (event, context) => {
       reminder_30min_sent: false,
       reminder_30min_sent_at: null,
       payment_captured_at: null, // Will be set when payment is captured
-      notes: `Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
+      notes: `Payment Intent: ${taskData.payment_intent_id || 'N/A'} | Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
     };
 
     console.log('🔍 Task data to insert:', JSON.stringify(taskInsertData, null, 2));
@@ -112,6 +111,7 @@ export const handler = async (event, context) => {
       .insert([
         {
           task_id: task.id,
+          payment_intent_id: taskData.payment_intent_id || null,
           amount: taskData.total_amount,
           status: 'pending', // Will be updated when payment is captured
           hold_reason: 'Authorization hold - awaiting service completion',
