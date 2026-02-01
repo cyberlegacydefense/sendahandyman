@@ -5740,23 +5740,44 @@
             const taskLabel = jobData.category_display || TASKS[getCategoryTaskKey(jobData.category)]?.label || jobData.category;
             const windowLabel = jobData.window_label || jobData.window || 'Scheduled';
 
+            const totalAmt = jobData.total_amount || 0;
+            const formattedTotal = '$' + (typeof totalAmt === 'number' ? totalAmt.toFixed(2) : totalAmt);
+
             const zapierData = {
                 task_id: jobData.task_id,
+                timestamp: new Date().toISOString(),
+                // Customer info
                 customer_name: jobData.name,
                 customer_phone: jobData.phone,
                 customer_email: jobData.email,
                 customer_zip: jobData.zip,
-                property_address: jobData.property_address,
+                customer_address: jobData.address || jobData.property_address,
+                // Service info - multiple field names for compatibility
+                service: taskLabel,
                 service_category: taskLabel,
                 service_name: taskLabel,
+                // Scheduling
                 time_window: windowLabel,
+                scheduled: windowLabel,
+                // Description
                 description: jobData.description || 'No description provided',
-                access_details: jobData.access_details || 'None',
-                pets_and_special: jobData.pets_and_special || 'None',
-                additional_details: jobData.additional_details || 'None',
-                total_amount: '$' + (jobData.total_amount || 0),
+                estimated_hours: jobData.estimated_hours || 2,
+                // Amounts - multiple field names for compatibility
+                base_amount: jobData.base_amount || 0,
+                total_amount: totalAmt,
+                total_amount_formatted: formattedTotal,
+                total_paid: formattedTotal,
+                amount: formattedTotal,
+                // Property details
+                property_address: jobData.property_address,
+                property: jobData.property_address,
+                contact_phone: jobData.contact_phone || jobData.phone,
+                access_details: jobData.access_details || 'None provided',
+                pets_and_special: jobData.pets_and_special || 'None provided',
+                additional_details: jobData.additional_details || 'None provided',
+                // Payment
                 payment_intent_id: jobData.payment_intent_id,
-                timestamp: new Date().toISOString()
+                notification_email: 'info@sendahandyman.com'
             };
 
             try {
