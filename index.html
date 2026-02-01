@@ -2603,20 +2603,25 @@
             // BUT only calculate if not already stored (to preserve when going back)
             const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
 
-            // Only recalculate if addons not already stored (first time through)
-            // This preserves addons when user goes back to change date
+            // Capture selected options BEFORE DOM is replaced (must happen first!)
+            // Only capture if not already stored (to preserve when going back)
+            if (!serviceData.selectedOptions || serviceData.selectedOptions.length === 0) {
+                const selectedOptions = captureSelectedOptions(taskKey);
+                serviceData.selectedOptions = selectedOptions;
+                console.log('📋 Captured selected options:', selectedOptions);
+            } else {
+                console.log('📋 Using previously stored options:', serviceData.selectedOptions);
+            }
+
+            // Calculate addons if not already stored
             if (serviceData.addons === undefined || serviceData.addons === null) {
                 const addons = calculateAddons(taskKey);
                 const quantityPricing = getQuantityPricing(taskKey);
-                const selectedOptions = captureSelectedOptions(taskKey);
                 serviceData.addons = addons;
                 serviceData.quantityPricing = quantityPricing;
-                serviceData.selectedOptions = selectedOptions;
                 console.log('💾 Calculated and stored addons:', addons, 'quantityPricing:', quantityPricing);
-                console.log('📋 Captured selected options:', selectedOptions);
             } else {
                 console.log('💾 Using previously stored addons:', serviceData.addons);
-                console.log('📋 Using previously stored options:', serviceData.selectedOptions);
             }
 
             // Track details entry
