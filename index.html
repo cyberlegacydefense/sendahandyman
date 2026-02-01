@@ -2586,6 +2586,7 @@
                                 <div>
                                     <div class="font-semibold">Choose Date</div>
                                     <div class="text-sm text-gray-600">Pick from calendar</div>
+                                    <div class="text-xs text-green-600 mt-1">🎉 Book 3+ days out & save 10%</div>
                                 </div>
                                 <div>📅</div>
                             </div>
@@ -2934,7 +2935,8 @@
             console.log('📅 Current date and context:', {
                 now: new Date().toString(),
                 dayOfWeek: new Date().getDay(), // 0=Sunday, 6=Saturday
-                serviceData: serviceData
+                serviceData: serviceData,
+                selectedDate: serviceData.selectedDate
             });
 
             const content = document.getElementById('serviceContent');
@@ -2944,6 +2946,13 @@
 
             // Update progress to step 2 (Time Selection)
             updateProgress(2);
+
+            // Check if user already selected a specific date via calendar
+            if (serviceData.selectedDate) {
+                // User selected a specific date - show time slots for that date only
+                showTimeSlotsForSelectedDate();
+                return;
+            }
 
             // Show loading while generating time slots
             showLoading('Finding available time slots...');
@@ -2997,6 +3006,90 @@
                 // Show sticky bottom bar on mobile
                 showStickyBottomBar('Select Time Slot', 'selectFirstAvailableSlot()');
             }, 800);
+        }
+
+        // Show time slots for a user-selected date (from calendar picker)
+        function showTimeSlotsForSelectedDate() {
+            const content = document.getElementById('serviceContent');
+            const selectedDate = new Date(serviceData.selectedDate + 'T00:00:00');
+            const dayName = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            const isSat = selectedDate.getDay() === 6;
+
+            // Get task and pricing info
+            const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+            const task = TASKS[taskKey];
+            const hours = task ? task.hours : 2;
+            const addons = serviceData.addons || 0;
+
+            // Define time blocks (Saturday only gets morning slot)
+            const timeBlocks = isSat
+                ? [{ key: 'am', label: '8AM-12PM', premium: false }]
+                : [
+                    { key: 'am', label: '8AM-12PM', premium: false },
+                    { key: 'pm', label: '12PM-4PM', premium: false },
+                    { key: 'eve', label: '4PM-8PM', premium: true }
+                ];
+
+            // Generate time slots for the selected date with proper pricing
+            const timeSlots = timeBlocks.map(block => {
+                // Use the stored calculated price which already includes date adjustments
+                const baseWithAddons = (task ? task.basePrice : 160) + addons;
+                let finalPrice = serviceData.calculatedPrice || baseWithAddons;
+
+                // Add evening premium if applicable
+                if (block.premium) {
+                    finalPrice = Math.round(finalPrice * 1.15); // 15% evening premium
+                }
+
+                return {
+                    window: `selected_${block.key}`,
+                    windowLabel: `${dayName} (${block.label})`,
+                    pricing: { total: finalPrice, base: baseWithAddons },
+                    badge: serviceData.dateAdjustmentLabel || (isSat ? 'Saturday Premium' : 'Your Selected Date'),
+                    date: serviceData.selectedDate
+                };
+            });
+
+            availableTimeSlots = timeSlots;
+            console.log('🕒 TIME SLOTS FOR SELECTED DATE:', timeSlots);
+
+            content.innerHTML = `
+                <div class="slide-up">
+                    <h2 class="text-2xl font-bold mb-2">Choose Time Slot</h2>
+                    <p class="text-gray-600 mb-2">Select a time for ${dayName}</p>
+                    ${serviceData.dateAdjustmentLabel ? `
+                        <div class="mb-4 text-sm font-semibold ${serviceData.dateAdjustmentClass}">${serviceData.dateAdjustmentLabel}</div>
+                    ` : ''}
+
+                    <div class="space-y-4 mb-8">
+                        ${timeSlots.map((slot, index) => `
+                            <div class="service-card p-4 cursor-pointer" onclick="selectTimeSlotByIndex(${index})">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <div class="font-semibold">${slot.windowLabel}</div>
+                                        <div class="text-sm text-gray-600">${slot.badge || ''}</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xl font-bold">$${slot.pricing.total}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <button onclick="clearSelectedDateAndGoBack()" class="btn-secondary w-full py-3">
+                        Choose Different Date
+                    </button>
+                </div>
+            `;
+        }
+
+        // Clear selected date and go back to date selection
+        function clearSelectedDateAndGoBack() {
+            serviceData.selectedDate = null;
+            serviceData.dateAdjustmentLabel = '';
+            serviceData.dateAdjustmentClass = '';
+            proceedToScheduling();
         }
 
         function selectTimeSlotByIndex(index) {
