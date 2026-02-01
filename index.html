@@ -166,6 +166,15 @@
                 });
             },
 
+            trackPaymentCompleted(paymentData) {
+                this.trackEvent('payment_completed', {
+                    task_id: paymentData.task_id,
+                    amount: paymentData.amount,
+                    service: serviceData.categoryDisplay,
+                    funnel_step: 6.5
+                });
+            },
+
             trackBookingCompleted(bookingData) {
                 this.trackEvent('booking_completed', {
                     amount: bookingData.total_amount,
