@@ -2473,6 +2473,42 @@
             return totalAddons;
         }
 
+        // Capture selected options with labels for communication
+        function captureSelectedOptions(taskKey) {
+            const task = TASKS[taskKey];
+            if (!task || !task.questions) return [];
+
+            const selectedOptions = [];
+
+            task.questions.forEach(question => {
+                const select = document.getElementById(`question_${question.id}`);
+                if (select && select.value) {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const addon = parseInt(selectedOption.dataset.addon) || 0;
+
+                    selectedOptions.push({
+                        question: question.label,
+                        answer: selectedOption.text,
+                        addon: addon,
+                        addonFormatted: addon > 0 ? `+$${addon}` : (addon < 0 ? `-$${Math.abs(addon)}` : 'included')
+                    });
+                }
+            });
+
+            console.log('📋 Selected options captured:', selectedOptions);
+            serviceData.selectedOptions = selectedOptions;
+            return selectedOptions;
+        }
+
+        // Format selected options for display/email
+        function formatSelectedOptions(options) {
+            if (!options || options.length === 0) return 'Standard service';
+
+            return options.map(opt =>
+                `${opt.question}: ${opt.answer}${opt.addon !== 0 ? ` (${opt.addonFormatted})` : ''}`
+            ).join('\n');
+        }
+
         // Get quantity-based pricing for per-item services
         function getQuantityPricing(taskKey) {
             const task = TASKS[taskKey];
@@ -2572,11 +2608,15 @@
             if (serviceData.addons === undefined || serviceData.addons === null) {
                 const addons = calculateAddons(taskKey);
                 const quantityPricing = getQuantityPricing(taskKey);
+                const selectedOptions = captureSelectedOptions(taskKey);
                 serviceData.addons = addons;
                 serviceData.quantityPricing = quantityPricing;
+                serviceData.selectedOptions = selectedOptions;
                 console.log('💾 Calculated and stored addons:', addons, 'quantityPricing:', quantityPricing);
+                console.log('📋 Captured selected options:', selectedOptions);
             } else {
                 console.log('💾 Using previously stored addons:', serviceData.addons);
+                console.log('📋 Using previously stored options:', serviceData.selectedOptions);
             }
 
             // Track details entry
@@ -5635,6 +5675,9 @@
             const taskLabel = TASKS[taskKey]?.label || serviceData.category;
             const windowLabel = serviceData.selectedTimeSlot?.windowLabel || serviceData.selectedWindowLabel || 'Scheduled';
 
+            // Format selected service options for communication
+            const selectedOptionsFormatted = formatSelectedOptions(serviceData.selectedOptions);
+
             const completeJobData = {
                 task_id: taskId,
                 payment_intent_id: paymentIntentId,
@@ -5657,6 +5700,9 @@
                 total_amount: serviceData.pricing.total,
                 base_amount: serviceData.pricing.base,
                 premiums: serviceData.pricing.premiums || [],
+                // Selected service options (TV size, wall type, etc.)
+                selected_options: serviceData.selectedOptions || [],
+                selected_options_formatted: selectedOptionsFormatted,
                 customer: {
                     name: customerFormData.name,
                     phone: customerFormData.phone,
@@ -5744,6 +5790,9 @@
             const formattedTotal = '$' + (typeof totalAmt === 'number' ? totalAmt.toFixed(2) : totalAmt);
             const premiumsList = (jobData.premiums || []).map(p => p.label || p).join(', ') || 'None';
 
+            // Format selected options for Zapier
+            const selectedOptionsText = jobData.selected_options_formatted || 'Standard service';
+
             const zapierData = {
                 task_id: jobData.task_id,
                 timestamp: new Date().toISOString(),
@@ -5758,6 +5807,9 @@
                 task_category_label: taskLabel,
                 service_category: taskLabel,
                 service_name: taskLabel,
+                // Selected service options (TV size, wall type, etc.)
+                service_options: selectedOptionsText,
+                selected_options: selectedOptionsText,
                 // Scheduling
                 time_window: windowLabel,
                 // Description

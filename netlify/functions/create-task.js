@@ -60,7 +60,7 @@ export const handler = async (event, context) => {
       reminder_30min_sent: false,
       reminder_30min_sent_at: null,
       payment_captured_at: null, // Will be set when payment is captured
-      notes: `Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
+      notes: `SERVICE OPTIONS: ${taskData.selected_options_formatted || 'Standard service'}\n\nAccess: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
     };
 
     console.log('🔍 Task data to insert:', JSON.stringify(taskInsertData, null, 2));
