@@ -1712,6 +1712,169 @@
             }
         };
 
+        // Detection patterns for auto-detecting answers from description text
+        const DETECTION_PATTERNS = {
+            'tv-mounting': {
+                'tv_size': [
+                    { value: 'large', patterns: [/\b(6[6-9]|[7-9]\d|\d{3})\s*(inch|in|"|\'\')/i, /\blarge\s*tv/i, /\bhuge\s*tv/i, /\bbig\s*tv/i] }
+                ],
+                'wall_type': [
+                    { value: 'brick', patterns: [/\bbrick/i, /\bconcrete/i, /\bmasonry/i, /\bstone\s*wall/i] },
+                    { value: 'fireplace', patterns: [/\bfireplace/i, /\babove\s*(the\s*)?fire/i, /\bover\s*(the\s*)?fireplace/i, /\bmantle/i] }
+                ],
+                'mount_owned': [
+                    { value: 'yes', patterns: [/\bhave\s*(a\s*|the\s*)?mount/i, /\bown\s*mount/i, /\bmount\s*already/i, /\bgot\s*(a\s*)?mount/i] },
+                    { value: 'no', patterns: [/\bneed\s*(a\s*|to\s*buy\s*)?mount/i, /\bno\s*mount/i, /\bdon'?t\s*have\s*(a\s*)?mount/i] }
+                ]
+            },
+            'electrical': {
+                'fixture_type': [
+                    { value: 'heavy_chandelier', patterns: [/\bheavy\s*chandelier/i, /\blarge\s*chandelier/i, /\bbig\s*chandelier/i] },
+                    { value: 'small_chandelier', patterns: [/\bchandelier/i, /\bpendant\s*light/i] }
+                ],
+                'ceiling_height': [
+                    { value: 'high', patterns: [/\bhigh\s*ceiling/i, /\btall\s*ceiling/i, /\bvaulted/i, /\b(1[0-9]|2\d)\s*(ft|feet|foot|')/i, /\btwo\s*stor(y|ies)/i] }
+                ]
+            },
+            'light-plumbing': {
+                'fixture_type': [
+                    { value: 'faucet', patterns: [/\bfaucet/i, /\bsink\s*tap/i, /\bkitchen\s*sink/i, /\bbathroom\s*sink/i] },
+                    { value: 'showerhead', patterns: [/\bshower\s*head/i, /\bshowerhead/i] },
+                    { value: 'both', patterns: [/\bfaucet.*shower/i, /\bshower.*faucet/i, /\bboth/i] }
+                ],
+                'plumbing_issues': [
+                    { value: 'corrosion', patterns: [/\bcorrod/i, /\bcorrosion/i, /\brust/i, /\brusty/i, /\bleak/i, /\bleaking/i, /\bold\s*pipes/i] },
+                    { value: 'access', patterns: [/\bremove\s*(the\s*)?sink/i, /\bsink\s*removal/i, /\bhard\s*to\s*(access|reach)/i] }
+                ]
+            },
+            'ceiling-fan': {
+                'replacing': [
+                    { value: 'fan', patterns: [/\breplace.*fan/i, /\bexisting\s*fan/i, /\bold\s*fan/i, /\bremove.*fan/i] },
+                    { value: 'light', patterns: [/\breplace.*light/i, /\bexisting\s*light/i, /\bconvert.*light/i] },
+                    { value: 'new', patterns: [/\bnew\s*install/i, /\bfirst\s*time/i, /\bno\s*existing/i] }
+                ],
+                'ceiling_height': [
+                    { value: 'high', patterns: [/\bhigh\s*ceiling/i, /\btall\s*ceiling/i, /\bvaulted/i, /\b(1[0-9]|2\d)\s*(ft|feet|foot|')/i] }
+                ]
+            },
+            'furniture-assembly': {
+                'furniture_type': [
+                    { value: 'bed', patterns: [/\bbed\s*frame/i, /\bbed\b/i, /\bheadboard/i, /\bfootboard/i] },
+                    { value: 'wardrobe', patterns: [/\bwardrobe/i, /\barmoire/i, /\blarge\s*closet/i, /\bpax/i] },
+                    { value: 'multiple', patterns: [/\bmultiple/i, /\bseveral/i, /\bfew\s*items/i] }
+                ],
+                'quantity': [
+                    { value: 'many', patterns: [/\b([4-9]|\d{2,})\s*(item|piece|thing)/i, /\bmany\s*items/i, /\bmultiple\s*items/i, /\bseveral\s*items/i] },
+                    { value: 'few', patterns: [/\b[2-3]\s*(item|piece|thing)/i, /\bcouple/i, /\bfew/i] }
+                ]
+            },
+            'general-repair': {
+                'additional_time': [
+                    { value: 'two_blocks', patterns: [/\bfull\s*day/i, /\ball\s*day/i, /\b([6-9]|\d{2,})\s*hour/i] },
+                    { value: 'one_block', patterns: [/\bhalf\s*day/i, /\b[4-6]\s*hour/i, /\bextra\s*time/i] }
+                ],
+                'task_complexity': [
+                    { value: 'multiple', patterns: [/\bmultiple\s*(repair|task|thing|job)/i, /\bseveral\s*(repair|task|thing|job)/i, /\blist\s*of/i] },
+                    { value: 'complex', patterns: [/\bcomplex/i, /\bcomplicated/i, /\bdifficult/i, /\bmajor/i] }
+                ]
+            },
+            'blinds': {
+                'item_count': [
+                    { value: '4+', patterns: [/\b([4-9]|\d{2,})\s*(blind|curtain|rod|window)/i, /\bmany\s*(blind|window)/i, /\ball\s*(the\s*)?(blind|window)/i] },
+                    { value: '3', patterns: [/\b3\s*(blind|curtain|rod|window)/i, /\bthree\s*(blind|curtain|rod|window)/i] },
+                    { value: '2', patterns: [/\b2\s*(blind|curtain|rod|window)/i, /\btwo\s*(blind|curtain|rod|window)/i, /\bcouple/i] }
+                ],
+                'wall_type': [
+                    { value: 'masonry', patterns: [/\bbrick/i, /\bconcrete/i, /\btile/i, /\bmasonry/i, /\bstone/i] }
+                ]
+            },
+            'smart-doorbell': {
+                'install_type': [
+                    { value: 'replace', patterns: [/\breplace/i, /\bexisting\s*doorbell/i, /\bupgrade/i, /\bold\s*doorbell/i] },
+                    { value: 'wireless', patterns: [/\bnew\s*install/i, /\bno\s*doorbell/i, /\bfirst\s*time/i, /\bwireless/i, /\bbattery/i] }
+                ],
+                'chime_status': [
+                    { value: 'broken', patterns: [/\bchime.*broken/i, /\bchime.*not\s*work/i, /\bno\s*chime/i, /\bbroken\s*chime/i, /\bneed.*chime/i] }
+                ]
+            },
+            'floating-shelf': {
+                'shelf_count': [
+                    { value: '4+', patterns: [/\b([4-9]|\d{2,})\s*shel(f|ves)/i, /\bmany\s*shel(f|ves)/i, /\bmultiple\s*shel(f|ves)/i] },
+                    { value: '3', patterns: [/\b3\s*shel(f|ves)/i, /\bthree\s*shel(f|ves)/i] },
+                    { value: '2', patterns: [/\b2\s*shel(f|ves)/i, /\btwo\s*shel(f|ves)/i] }
+                ],
+                'weight': [
+                    { value: 'heavy', patterns: [/\bheavy/i, /\bbooks/i, /\blarge\s*items/i, /\bbig\s*items/i, /\bsturdy/i] }
+                ]
+            },
+            'appliance-hookup': {
+                'appliance_type': [
+                    { value: 'washer', patterns: [/\bwash(er|ing)\s*machine/i, /\bwasher\b/i] },
+                    { value: 'dryer', patterns: [/\bdryer/i, /\bdrying\s*machine/i] },
+                    { value: 'dishwasher', patterns: [/\bdishwasher/i, /\bdish\s*washer/i] },
+                    { value: 'multiple', patterns: [/\bwasher.*dryer/i, /\bdryer.*washer/i, /\bboth/i, /\bmultiple/i] }
+                ],
+                'old_removal': [
+                    { value: 'remove', patterns: [/\bremove\s*(old|existing)/i, /\breplace/i, /\bhaul\s*away/i, /\btake\s*away/i, /\bdispose/i] }
+                ],
+                'hookups_ready': [
+                    { value: 'new_line', patterns: [/\bneed.*hookup/i, /\bno\s*hookup/i, /\bnew\s*connection/i, /\bnew\s*line/i, /\bno\s*vent/i] }
+                ]
+            },
+            'closet-organizer': {
+                'organizer_type': [
+                    { value: 'wire', patterns: [/\bwire\s*(rack|system|organizer)/i, /\bmetal\s*rack/i] },
+                    { value: 'custom', patterns: [/\bcustom/i, /\bwood/i, /\bwooden/i, /\bbuilt-?in/i] },
+                    { value: 'modular', patterns: [/\bmodular/i, /\bcube/i, /\bikea/i] }
+                ],
+                'custom_fitting': [
+                    { value: 'yes', patterns: [/\bcustom\s*(cut|fit|size)/i, /\bodd\s*size/i, /\birregular/i, /\bnot\s*standard/i] }
+                ],
+                'wall_type': [
+                    { value: 'masonry', patterns: [/\bbrick/i, /\bconcrete/i, /\bmasonry/i, /\bstone/i] }
+                ]
+            },
+            'premium-moveout': {
+                'property_size': [
+                    { value: '4br', patterns: [/\b(4|5|6)\s*(br|bed|bedroom)/i, /\bfour\s*bed/i, /\blarge\s*(house|home|property)/i] },
+                    { value: '3br', patterns: [/\b3\s*(br|bed|bedroom)/i, /\bthree\s*bed/i] },
+                    { value: '2br', patterns: [/\b2\s*(br|bed|bedroom)/i, /\btwo\s*bed/i] },
+                    { value: 'studio', patterns: [/\bstudio/i, /\b1\s*(br|bed|bedroom)/i, /\bone\s*bed/i] }
+                ],
+                'damage_level': [
+                    { value: 'heavy', patterns: [/\bheavy\s*damage/i, /\blots?\s*of\s*(damage|holes|repairs)/i, /\bmajor\s*damage/i, /\bextensive/i, /\bsevere/i] },
+                    { value: 'moderate', patterns: [/\bmoderate/i, /\bsome\s*damage/i, /\bseveral\s*holes/i, /\bmultiple\s*holes/i] }
+                ],
+                'timeline': [
+                    { value: 'urgent', patterns: [/\burgent/i, /\brush/i, /\basap/i, /\bimmediately/i, /\btomorrow/i, /\bthis\s*week/i, /\bquick(ly)?/i] }
+                ]
+            }
+        };
+
+        // Auto-detect answers from description text
+        function autoDetectAnswers(taskKey, description) {
+            if (!description || !DETECTION_PATTERNS[taskKey]) return {};
+
+            const detected = {};
+            const patterns = DETECTION_PATTERNS[taskKey];
+            const text = description.toLowerCase();
+
+            for (const [questionId, options] of Object.entries(patterns)) {
+                for (const option of options) {
+                    for (const pattern of option.patterns) {
+                        if (pattern.test(description)) {
+                            detected[questionId] = option.value;
+                            console.log(`🔍 Auto-detected: ${questionId} = ${option.value} (matched: ${pattern})`);
+                            break;
+                        }
+                    }
+                    if (detected[questionId]) break; // Stop checking other options for this question
+                }
+            }
+
+            return detected;
+        }
+
         // Pricing calculation function (matching original site logic)
         function calculatePricing(hours, window = 'tomorrow_am', rush = false, addons = 0, selectedDate = null) {
             console.log('💰 calculatePricing called:', { hours, window, rush, addons, selectedDate });
@@ -1997,7 +2160,7 @@
                                     class="w-full border border-gray-300 rounded-lg resize-none mobile-textarea-force"
                                     placeholder="${getDescriptionPlaceholder(serviceData.category)}"
                                     onchange="updateServiceData('detailedDescription', this.value)"
-                                    oninput="autoResizeTextarea(); updateServiceData('detailedDescription', this.value); updateCharacterCount()"
+                                    oninput="autoResizeTextarea(); updateServiceData('detailedDescription', this.value); updateCharacterCount(); debounceAutoDetect()"
                                 >${serviceData.description || ''}</textarea>
                                 <div id="characterCount" class="absolute bottom-2 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded hidden md:block">
                                     <span id="charCount">0</span> characters
@@ -2067,7 +2230,27 @@
                 return;
             }
 
+            // Get description for auto-detection
+            const description = serviceData.description || serviceData.detailedDescription || '';
+            const detectedAnswers = autoDetectAnswers(taskKey, description);
+            const hasDetections = Object.keys(detectedAnswers).length > 0;
+
             questionsContainer.innerHTML = '';
+
+            // Add header if we have auto-detected answers
+            if (hasDetections) {
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4';
+                headerDiv.innerHTML = `
+                    <div class="flex items-center gap-2 text-blue-700 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Options pre-selected based on your description. Please verify.</span>
+                    </div>
+                `;
+                questionsContainer.appendChild(headerDiv);
+            }
 
             task.questions.forEach(question => {
                 const questionDiv = document.createElement('div');
@@ -2077,10 +2260,23 @@
                 label.className = 'block text-sm font-semibold text-gray-700';
                 label.textContent = question.label;
 
+                // Add auto-detected badge if applicable
+                if (detectedAnswers[question.id]) {
+                    const badge = document.createElement('span');
+                    badge.className = 'ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full';
+                    badge.textContent = 'Auto-detected';
+                    label.appendChild(badge);
+                }
+
                 const select = document.createElement('select');
                 select.className = 'w-full rounded-lg border border-gray-300 px-3 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500';
                 select.id = `question_${question.id}`;
-                select.addEventListener('change', updateEstimateWithAddons);
+                select.addEventListener('change', function() {
+                    // Remove auto-detected badge when user manually changes
+                    const badge = this.parentElement.querySelector('.bg-blue-100');
+                    if (badge) badge.remove();
+                    updateEstimateWithAddons();
+                });
 
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
@@ -2101,6 +2297,11 @@
                         optionElement.dataset.addon = option.addon;
                     }
 
+                    // Pre-select if auto-detected
+                    if (detectedAnswers[question.id] === option.value) {
+                        optionElement.selected = true;
+                    }
+
                     select.appendChild(optionElement);
                 });
 
@@ -2110,6 +2311,61 @@
             });
 
             questionsSection.classList.remove('hidden');
+
+            // Trigger initial addon calculation if we have detections
+            if (hasDetections) {
+                updateEstimateWithAddons();
+            }
+        }
+
+        // Debounce timer for auto-detection
+        let autoDetectTimer = null;
+
+        // Debounced auto-detection - runs 500ms after user stops typing
+        function debounceAutoDetect() {
+            if (autoDetectTimer) clearTimeout(autoDetectTimer);
+            autoDetectTimer = setTimeout(() => {
+                if (serviceData.category) {
+                    const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+                    const description = document.getElementById('detailDescription')?.value || '';
+
+                    // Only re-run if we have a description
+                    if (description.length > 10) {
+                        // Store current values before refresh
+                        const currentValues = {};
+                        const task = TASKS[taskKey];
+                        if (task && task.questions) {
+                            task.questions.forEach(q => {
+                                const select = document.getElementById(`question_${q.id}`);
+                                if (select && select.value) {
+                                    currentValues[q.id] = select.value;
+                                }
+                            });
+                        }
+
+                        // Update serviceData with new description
+                        serviceData.detailedDescription = description;
+
+                        // Re-run detection
+                        const detected = autoDetectAnswers(taskKey, description);
+
+                        // Only refresh if we found new detections
+                        const newDetections = Object.keys(detected).filter(k => !currentValues[k]);
+                        if (newDetections.length > 0) {
+                            console.log('🔄 New detections found, refreshing questions:', newDetections);
+                            showTaskQuestions(taskKey);
+
+                            // Restore user's manual selections that weren't just detected
+                            Object.entries(currentValues).forEach(([qId, val]) => {
+                                if (!detected[qId]) {
+                                    const select = document.getElementById(`question_${qId}`);
+                                    if (select) select.value = val;
+                                }
+                            });
+                        }
+                    }
+                }
+            }, 500);
         }
 
         // Calculate total addons from question selections
