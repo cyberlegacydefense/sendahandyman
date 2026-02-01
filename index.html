@@ -3240,10 +3240,14 @@
             console.log('🕒 generateTimeSlots called');
             const now = new Date();
             const timeSlots = [];
-            const task = TASKS[serviceData.category];
-            const hours = task ? task.hours : 2;
 
-            console.log('🕒 Task details:', { category: serviceData.category, hours });
+            // Use mapped taskKey and stored addons
+            const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+            const task = TASKS[taskKey];
+            const hours = task ? task.hours : 2;
+            const addons = serviceData.addons || 0;
+
+            console.log('🕒 Task details:', { taskKey, category: serviceData.category, hours, addons });
 
             // Define time blocks: 8AM-12PM, 12PM-4PM, 4PM-8PM (premium)
             const timeBlocks = [
@@ -3293,11 +3297,11 @@
                 secondAvailable: secondAvailableDay.toDateString()
             });
 
-            // Add first available day slots (no future discount)
+            // Add first available day slots (no future discount, but include addons)
             timeBlocks.forEach(block => {
                 const window = `day1_${block.key}`;
-                // Use tomorrow_ window for next-day premium, but no selectedDate to avoid future discount
-                const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, 0, null);
+                // Use tomorrow_ window for next-day premium, include addons, no selectedDate to avoid future discount
+                const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, addons, null);
                 const dayName = firstAvailableDay.toLocaleDateString('en-US', { weekday: 'long' });
 
                 timeSlots.push({
@@ -3310,11 +3314,11 @@
                 });
             });
 
-            // Add second available day slots (no future discount)
+            // Add second available day slots (no future discount, but include addons)
             timeBlocks.forEach(block => {
                 const window = `day2_${block.key}`;
-                // Use tomorrow_ window for next-day premium, but no selectedDate to avoid future discount
-                const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, 0, null);
+                // Use tomorrow_ window for next-day premium, include addons, no selectedDate to avoid future discount
+                const pricing = calculatePricing(hours, `tomorrow_${block.key}`, false, addons, null);
                 const dayName = secondAvailableDay.toLocaleDateString('en-US', { weekday: 'long' });
 
                 timeSlots.push({
