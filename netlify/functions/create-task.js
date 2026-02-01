@@ -51,6 +51,7 @@ export const handler = async (event, context) => {
       estimated_hours: taskData.estimated_hours,
       status: 'pending',
       payment_status: 'authorized', // Payment hold placed
+      payment_intent_id: taskData.payment_intent_id || null, // Stripe payment intent for capture later
       total_amount: taskData.total_amount,
       assigned_handyman_name: null,
       assigned_handyman_phone: null,

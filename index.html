@@ -1335,6 +1335,15 @@
         const PREMIUM_SATURDAY = 0.30;
         const DISCOUNT_FUTURE = 0.10;
 
+        // Zapier webhook configuration
+        const ZAPIER_CONFIG = {
+            ENABLED: true,
+            WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24412806/uh8lvew/'
+        };
+
+        // Customer form data storage
+        let customerFormData = {};
+
         // Service types with proper pricing and upcharge questions
         const TASKS = {
             'ceiling-fan': {
@@ -3167,34 +3176,83 @@
             updateProgress(4);
 
             // Show mobile sticky bar with final price
-            showStickyBottomBar('Complete Booking', 'completeBooking()', `$${serviceData.pricing.total}`);
+            showStickyBottomBar('Continue to Payment', 'validateCustomerForm()', `$${serviceData.pricing.total}`);
 
             content.innerHTML = `
                 <div class="slide-up">
-                    <h2 class="text-2xl font-bold mb-2">Booking Summary</h2>
-                    <p class="text-gray-600 mb-6">Review your booking details</p>
+                    <h2 class="text-2xl font-bold mb-2">Your Contact Information</h2>
+                    <p class="text-gray-600 mb-6">Please provide your details for the service</p>
 
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
-                        <div class="space-y-3">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+                        <p class="text-sm text-blue-700">
+                            <strong>Your booking:</strong> ${serviceData.categoryDisplay.replace(/<[^>]*>/g, '')} -
+                            ${serviceData.selectedWindowLabel || serviceData.selectedWindow} -
+                            <strong>$${serviceData.pricing.total}</strong>
+                        </p>
+                    </div>
+
+                    <form id="customerInfoForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700">Full Name *</label>
+                                <input type="text" id="customerName" required
+                                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="John Smith" />
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700">Mobile Phone *</label>
+                                <input type="tel" id="customerPhone" required
+                                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="(555) 123-4567" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700">Email *</label>
+                                <input type="email" id="customerEmail" required
+                                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="john@example.com" />
+                            </div>
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700">ZIP Code *</label>
+                                <input type="text" id="customerZip" required
+                                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="33467" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-semibold text-gray-700">Service Address *</label>
+                            <input type="text" id="customerAddress" required
+                                class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="123 Main St, City, FL 33467" />
+                            <p class="text-xs text-gray-500 mt-1">Full address where the handyman should go</p>
+                        </div>
+                    </form>
+
+                    <div class="bg-gray-50 rounded-lg p-4 mt-6 mb-6">
+                        <h4 class="font-semibold text-gray-700 mb-3">Booking Summary</h4>
+                        <div class="space-y-2 text-sm">
                             <div class="flex justify-between">
-                                <span class="font-semibold">Service:</span>
-                                <span>${serviceData.categoryDisplay}</span>
+                                <span>Service:</span>
+                                <span class="font-medium">${serviceData.categoryDisplay.replace(/<[^>]*>/g, '')}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="font-semibold">Time:</span>
-                                <span>${serviceData.selectedWindowLabel || serviceData.selectedWindow}</span>
+                                <span>Time:</span>
+                                <span class="font-medium">${serviceData.selectedWindowLabel || serviceData.selectedWindow}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="font-semibold">Base Price:</span>
+                                <span>Base Price:</span>
                                 <span>$${serviceData.pricing.base}</span>
                             </div>
                             ${serviceData.pricing.premiums.map(premium => `
-                                <div class="flex justify-between text-sm ${premium.amount > 0 ? 'text-red-600' : 'text-green-600'}">
+                                <div class="flex justify-between ${premium.amount > 0 ? 'text-red-600' : 'text-green-600'}">
                                     <span>${premium.label}:</span>
                                     <span>${premium.amount > 0 ? '+' : ''}$${Math.abs(premium.amount)}</span>
                                 </div>
                             `).join('')}
-                            <hr class="border-gray-300">
+                            <hr class="border-gray-300 my-2">
                             <div class="flex justify-between font-bold text-lg">
                                 <span>Total:</span>
                                 <span>$${serviceData.pricing.total}</span>
@@ -3202,8 +3260,8 @@
                         </div>
                     </div>
 
-                    <button onclick="completeBooking()" class="btn-primary w-full py-4 mb-3">
-                        Complete Booking - $${serviceData.pricing.total}
+                    <button onclick="validateCustomerForm()" class="btn-primary w-full py-4 mb-3">
+                        Continue to Payment - $${serviceData.pricing.total}
                     </button>
 
                     <button onclick="showBookingFlow()" class="btn-secondary w-full py-3">
@@ -3211,6 +3269,62 @@
                     </button>
                 </div>
             `;
+        }
+
+        function validateCustomerForm() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+            const zip = document.getElementById('customerZip').value.trim();
+            const address = document.getElementById('customerAddress').value.trim();
+
+            // Validation
+            if (!name || name.length < 2) {
+                showToast('Please enter your full name', 'error');
+                document.getElementById('customerName').focus();
+                return;
+            }
+
+            if (!phone || phone.length < 10) {
+                showToast('Please enter a valid phone number', 'error');
+                document.getElementById('customerPhone').focus();
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+                showToast('Please enter a valid email address', 'error');
+                document.getElementById('customerEmail').focus();
+                return;
+            }
+
+            if (!zip || zip.length < 5) {
+                showToast('Please enter a valid ZIP code', 'error');
+                document.getElementById('customerZip').focus();
+                return;
+            }
+
+            if (!address || address.length < 10) {
+                showToast('Please enter the full service address', 'error');
+                document.getElementById('customerAddress').focus();
+                return;
+            }
+
+            // Store customer data
+            customerFormData = {
+                name: name,
+                phone: phone,
+                email: email,
+                zip: zip,
+                address: address,
+                category: serviceData.category,
+                description: serviceData.detailedDescription || ''
+            };
+
+            console.log('✅ Customer info validated:', customerFormData);
+
+            // Proceed to payment
+            completeBooking();
         }
 
         function completeBooking() {
@@ -5441,71 +5555,218 @@
             try {
                 // Generate task ID
                 const taskId = 'TK-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                window.currentTaskId = taskId;
 
-                // Prepare booking data for dispatch
-                const bookingData = {
+                // Track successful payment
+                HandymanAnalytics.trackPaymentCompleted({
                     task_id: taskId,
-                    service_category: serviceData.category,
-                    service_display: serviceData.categoryDisplay.replace(/<[^>]*>/g, ''), // Remove HTML tags
-                    description: serviceData.detailedDescription,
-                    location: serviceData.location,
-                    time_slot: serviceData.selectedTimeSlot.windowLabel,
-                    payment_intent_id: paymentIntentId,
-                    total_amount: serviceData.pricing.total,
-                    customer_contact: 'TBD', // Will be collected in classic interface
-                    timestamp: new Date().toISOString()
-                };
+                    amount: serviceData.pricing.total
+                });
 
-                // Track successful booking completion
-                HandymanAnalytics.trackBookingCompleted(bookingData);
+                console.log('✅ Payment authorized, showing task info modal');
 
-                // Send booking data to backend
-                console.log('📤 Dispatching booking:', bookingData);
-
-                // TODO: Implement dispatch-handyman function for automated task creation
-                // For now, tasks will be created manually based on console logs
-                try {
-                    await fetch('/.netlify/functions/dispatch-handyman', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(bookingData)
-                    });
-                    console.log('✅ Booking dispatched successfully');
-                } catch (dispatchError) {
-                    console.warn('⚠️ Dispatch function not implemented yet - handle manually:', dispatchError.message);
-                    console.log('📋 MANUAL TASK CREATION NEEDED:', bookingData);
-                    console.log('🔥 =================================');
-                    console.log('🔥 URGENT: MANUAL TASK REQUIRED');
-                    console.log('🔥 Task ID:', bookingData.task_id);
-                    console.log('🔥 Service:', bookingData.service_display);
-                    console.log('🔥 Description:', bookingData.description);
-                    console.log('🔥 Location:', bookingData.location);
-                    console.log('🔥 Time Slot:', bookingData.time_slot);
-                    console.log('🔥 Amount:', `$${bookingData.total_amount}`);
-                    console.log('🔥 Payment ID:', bookingData.payment_intent_id);
-                    console.log('🔥 =================================');
-
-                    // Also show an admin notification if possible
-                    if (typeof showToast === 'function') {
-                        showToast(`Task ${bookingData.task_id} needs manual creation - Check console for details`, 'warning', 10000);
-                    }
-                }
-
-                // Show success modal
+                // Close payment modal and show task info modal
                 closePaymentModal();
-                showSuccessModal(taskId, serviceData.pricing.total, serviceData.categoryDisplay);
+                showTaskInfoModal();
 
             } catch (error) {
                 console.error('❌ Booking completion error:', error);
-                showToast('Booking completed but dispatch failed. Please contact support.', 'warning');
+                showToast('Payment completed but there was an error. Please contact support.', 'warning');
             }
         }
 
-        function showSuccessModal(taskId, amount, service) {
+        function showTaskInfoModal() {
+            const taskId = window.currentTaskId;
+            const paidAmount = serviceData.pricing.total;
+
+            document.getElementById('summaryTaskId').textContent = taskId;
+            document.getElementById('summaryName').textContent = customerFormData.name;
+            document.getElementById('summaryPhone').textContent = customerFormData.phone;
+            document.getElementById('summaryEmail').textContent = customerFormData.email;
+            document.getElementById('summaryTask').textContent = serviceData.categoryDisplay.replace(/<[^>]*>/g, '');
+            document.getElementById('summaryWindow').textContent = serviceData.selectedWindowLabel || serviceData.selectedWindow;
+            document.getElementById('summaryDescription').textContent = serviceData.detailedDescription || 'None provided';
+            document.getElementById('summaryAmount').textContent = '$' + paidAmount.toFixed(0);
+            document.getElementById('contactPhone').value = customerFormData.phone;
+            document.getElementById('propertyAddress').value = customerFormData.address || '';
+
+            document.getElementById('taskInfoModal').classList.remove('hidden');
+        }
+
+        function validatePropertyAddress(address) {
+            if (!address || address.trim().length < 10) {
+                return { valid: false, message: 'Please enter a complete address' };
+            }
+            if (!/\d/.test(address)) {
+                return { valid: false, message: 'Address should include a street number' };
+            }
+            return { valid: true };
+        }
+
+        async function submitTaskInfo(event) {
+            event.preventDefault();
+
+            const propertyAddress = document.getElementById('propertyAddress').value;
+            const addressValidation = validatePropertyAddress(propertyAddress);
+
+            if (!addressValidation.valid) {
+                showToast('Address Error: ' + addressValidation.message, 'error');
+                document.getElementById('propertyAddress').focus();
+                return;
+            }
+
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Dispatching handyman...';
+
+            const taskId = window.currentTaskId;
+
+            // Build complete job data
+            const completeJobData = {
+                task_id: taskId,
+                payment_intent_id: paymentIntentId,
+                category: serviceData.category,
+                window: serviceData.selectedTimeSlot?.window || serviceData.selectedWindow,
+                name: customerFormData.name,
+                phone: customerFormData.phone,
+                email: customerFormData.email,
+                zip: customerFormData.zip,
+                address: customerFormData.address || '',
+                description: serviceData.detailedDescription || '',
+                property_address: propertyAddress,
+                contact_phone: document.getElementById('contactPhone').value,
+                access_details: document.getElementById('accessDetails').value || '',
+                pets_and_special: document.getElementById('petsAndSpecial').value || '',
+                additional_details: document.getElementById('additionalDetails').value || '',
+                estimated_hours: serviceData.estimatedHours || 2,
+                total_amount: serviceData.pricing.total,
+                base_amount: serviceData.pricing.base,
+                premiums: serviceData.pricing.premiums || [],
+                customer: {
+                    name: customerFormData.name,
+                    phone: customerFormData.phone,
+                    email: customerFormData.email,
+                    zip: customerFormData.zip,
+                    address: customerFormData.address || ''
+                },
+                task_info: {
+                    property_address: propertyAddress,
+                    contact_phone: document.getElementById('contactPhone').value,
+                    access_details: document.getElementById('accessDetails').value || '',
+                    pets_and_special: document.getElementById('petsAndSpecial').value || '',
+                    additional_details: document.getElementById('additionalDetails').value || ''
+                },
+                amount: serviceData.pricing.total
+            };
+
+            console.log('📤 Creating task with data:', completeJobData);
+
+            // Step 1: Create task in database
+            try {
+                const taskResponse = await fetch('/.netlify/functions/create-task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(completeJobData)
+                });
+
+                if (!taskResponse.ok) {
+                    const errorData = await taskResponse.json();
+                    throw new Error(`Task creation failed: ${errorData.detail || 'Unknown error'}`);
+                }
+
+                const taskResult = await taskResponse.json();
+                console.log('✅ Task created in database:', taskResult.task_id);
+            } catch (taskError) {
+                console.error('❌ Task creation failed:', taskError);
+                showToast('Failed to create task. Please contact support.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Dispatch Handyman';
+                return;
+            }
+
+            // Step 2: Send Zapier notification
+            try {
+                await sendZapierNotification(completeJobData);
+            } catch (zapierError) {
+                console.error('❌ Zapier notification failed:', zapierError);
+                // Continue anyway - task was created
+            }
+
+            // Step 3: Send notification via Netlify function
+            try {
+                await fetch('/.netlify/functions/send-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(completeJobData)
+                });
+                console.log('✅ Notification sent');
+            } catch (notifyError) {
+                console.error('⚠️ Notification failed:', notifyError);
+            }
+
+            // Track booking completion
+            HandymanAnalytics.trackBookingCompleted(completeJobData);
+
+            // Show success modal
             document.getElementById('finalTaskId').textContent = taskId;
-            document.getElementById('finalAmount').textContent = '$' + amount.toFixed(0);
-            document.getElementById('finalService').textContent = service.replace(/<[^>]*>/g, '');
+            document.getElementById('finalAmount').textContent = '$' + serviceData.pricing.total.toFixed(0);
+            document.getElementById('finalService').textContent = serviceData.categoryDisplay.replace(/<[^>]*>/g, '');
+            document.getElementById('taskInfoModal').classList.add('hidden');
             document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        async function sendZapierNotification(jobData) {
+            if (!ZAPIER_CONFIG.ENABLED || !ZAPIER_CONFIG.WEBHOOK_URL) {
+                console.log('⚠️ Zapier webhook not configured - skipping notification');
+                return { success: false, message: 'Webhook not configured' };
+            }
+
+            const taskLabel = TASKS[getCategoryTaskKey(jobData.category)]?.label || jobData.category;
+            const windowLabel = jobData.window || 'Scheduled';
+
+            const zapierData = {
+                task_id: jobData.task_id,
+                customer_name: jobData.name,
+                customer_phone: jobData.phone,
+                customer_email: jobData.email,
+                customer_zip: jobData.zip,
+                property_address: jobData.property_address,
+                service_category: jobData.category,
+                service_name: taskLabel,
+                time_window: windowLabel,
+                description: jobData.description,
+                access_details: jobData.access_details || '',
+                pets_and_special: jobData.pets_and_special || '',
+                additional_details: jobData.additional_details || '',
+                total_amount: jobData.total_amount,
+                payment_intent_id: jobData.payment_intent_id,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                console.log('📧 Sending notification via Zapier webhook...');
+
+                const params = new URLSearchParams();
+                Object.keys(zapierData).forEach(key => {
+                    params.append(key, zapierData[key]);
+                });
+
+                const response = await fetch(ZAPIER_CONFIG.WEBHOOK_URL, {
+                    method: 'POST',
+                    body: params
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Zapier notification sent successfully:', result);
+                    return { success: true };
+                } else {
+                    throw new Error(`Zapier webhook failed: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('❌ Zapier notification failed:', error);
+                return { success: false, error: error.message };
+            }
         }
 
         function closePaymentModal() {
@@ -5552,16 +5813,82 @@
         </div>
     </div>
 
+    <!-- Task Info Modal (shown after payment to collect property details) -->
+    <div id="taskInfoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-2">✅</div>
+                <h3 class="text-xl font-bold mb-2 text-blue-600">Payment Authorized!</h3>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                    <p class="text-sm text-blue-700">
+                        <strong>Payment method authorized</strong> - Funds are held on your card but you will only be charged after your handyman completes the work.
+                        Please provide additional details below to dispatch your handyman.
+                    </p>
+                </div>
+            </div>
+            <form id="taskInfoForm" onsubmit="submitTaskInfo(event)">
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h4 class="font-semibold mb-3 text-gray-700">Job Summary</h4>
+                    <div class="text-sm space-y-1">
+                        <div><strong>Task ID:</strong> <span id="summaryTaskId" class="font-mono text-blue-600">-</span></div>
+                        <div><strong>Customer:</strong> <span id="summaryName">-</span></div>
+                        <div><strong>Phone:</strong> <span id="summaryPhone">-</span></div>
+                        <div><strong>Email:</strong> <span id="summaryEmail">-</span></div>
+                        <div><strong>Task:</strong> <span id="summaryTask">-</span></div>
+                        <div><strong>Window:</strong> <span id="summaryWindow">-</span></div>
+                        <div><strong>Description:</strong> <span id="summaryDescription">-</span></div>
+                        <div class="pt-2 mt-2 border-t border-gray-200">
+                            <strong>Amount Authorized:</strong> <span id="summaryAmount" class="text-blue-600 font-bold text-lg">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700">Complete Property Address *</label>
+                        <textarea id="propertyAddress" rows="2" placeholder="123 Main St, Unit 2B, Boca Raton, FL 33432" required
+                            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Include street number, name, city, and ZIP code</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700">Best Contact Phone *</label>
+                        <input type="tel" id="contactPhone" required
+                            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700">Property Access Details</label>
+                        <textarea id="accessDetails" rows="2" placeholder="Gate code: 1234, Park in visitor spots, Ring doorbell..."
+                            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700">Pets & Special Considerations</label>
+                        <textarea id="petsAndSpecial" rows="2" placeholder="2 friendly dogs, alarm system, delicate items nearby..."
+                            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-sm font-semibold text-gray-700">Additional Task Details</label>
+                        <textarea id="additionalDetails" rows="2" placeholder="TV model: Samsung 65, wall type: drywall, tools available on site..."
+                            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button type="submit" class="w-full rounded-xl bg-blue-600 text-white px-5 py-3 font-semibold hover:bg-blue-700 transition-all">
+                        Dispatch Handyman
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Success Modal -->
     <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl text-center">
             <div class="text-6xl mb-4">🎉</div>
-            <h3 class="text-xl font-bold mb-2 text-green-600">Payment Confirmed!</h3>
+            <h3 class="text-xl font-bold mb-2 text-green-600">Handyman Dispatched!</h3>
             <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                 <p class="text-sm text-green-700 mb-2">
-                    <strong>✅ Payment authorized</strong><br>
-                    <strong>✅ Handyman dispatched</strong><br>
-                    <strong>✅ You'll receive confirmation shortly</strong>
+                    <strong>✅ Payment authorized (hold placed)</strong><br>
+                    <strong>✅ Job details sent to our team</strong><br>
+                    <strong>✅ Notification sent to handyman dispatch</strong>
                 </p>
                 <div class="mt-3 p-2 bg-white rounded-lg border">
                     <div class="text-xs text-gray-500">Your Task ID</div>
@@ -5569,8 +5896,9 @@
                 </div>
             </div>
             <div class="text-sm text-gray-600 mb-4">
-                <strong>Total paid:</strong> <span id="finalAmount">$0</span><br>
+                <strong>Amount Authorized:</strong> <span id="finalAmount">$0</span><br>
                 <strong>Service:</strong> <span id="finalService">Service details</span>
+                <p class="mt-2 text-gray-500">You'll receive a text message with your technician's details and estimated arrival time within the next 15 minutes.</p>
             </div>
             <button onclick="window.location.reload()" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
                 Book Another Service
