@@ -2486,6 +2486,17 @@
         }
 
         function proceedToScheduling() {
+            // IMPORTANT: Calculate and store addons BEFORE replacing DOM content
+            // The select elements will be destroyed when we update innerHTML
+            const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+            const addons = calculateAddons(taskKey);
+            const quantityPricing = getQuantityPricing(taskKey);
+
+            // Store values for later use in showEstimate()
+            serviceData.addons = addons;
+            serviceData.quantityPricing = quantityPricing;
+            console.log('💾 Stored addons before navigation:', addons, 'quantityPricing:', quantityPricing);
+
             // Track details entry
             HandymanAnalytics.trackDetailsEntered(
                 !!serviceData.detailedDescription,
@@ -2557,11 +2568,15 @@
         function showEstimate() {
             updateProgress(4); // Step 4: Final Booking
 
-            // Calculate pricing with addons using mapped task key
+            // Use stored values from proceedToScheduling() - DOM elements no longer exist
             const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
             const task = TASKS[taskKey];
-            const addons = calculateAddons(taskKey);
-            const quantityPricing = getQuantityPricing(taskKey);
+
+            // Use stored addons (calculated before DOM was replaced)
+            const addons = serviceData.addons || 0;
+            const quantityPricing = serviceData.quantityPricing || null;
+
+            console.log('📊 showEstimate using stored addons:', addons, 'quantityPricing:', quantityPricing);
 
             let basePrice = task ? task.basePrice : 160;
             if (quantityPricing && quantityPricing.price > 0) {
@@ -2572,9 +2587,8 @@
             const premiumPrice = Math.round(standardPrice * 1.35); // 35% premium markup
             const hours = quantityPricing?.hours || (task ? task.hours : 2);
 
-            // Store in serviceData for later use
+            // Store final calculated prices
             serviceData.taskKey = taskKey;
-            serviceData.addons = addons;
             serviceData.calculatedPrice = standardPrice;
             serviceData.premiumPrice = premiumPrice;
 
