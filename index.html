@@ -2664,7 +2664,7 @@
                             <div class="text-sm">
                                 <div class="font-semibold mb-2">📅 Booking Rules:</div>
                                 <div class="space-y-1">
-                                    <div>✅ <strong>Mon-Fri:</strong> All time slots available</div>
+                                    <div>✅ <strong>Mon-Fri:</strong> All time slots + <span class="text-green-600 font-semibold">10% discount!</span></div>
                                     <div>⚠️ <strong>Saturday:</strong> 8AM-12PM only • 30% premium</div>
                                     <div>🚫 <strong>Sunday:</strong> Not available</div>
                                 </div>
@@ -2716,7 +2716,7 @@
                 warningDiv.className = 'p-3 rounded-lg text-sm bg-orange-50 border border-orange-200 text-orange-700';
                 warningDiv.classList.remove('hidden');
             } else {
-                warningDiv.textContent = '✅ Great choice! All time slots available for this weekday.';
+                warningDiv.textContent = '✅ Great choice! All time slots available + 10% discount applied!';
                 warningDiv.className = 'p-3 rounded-lg text-sm bg-green-50 border border-green-200 text-green-700';
                 warningDiv.classList.remove('hidden');
             }
@@ -2752,19 +2752,63 @@
                 basePrice = quantityPricing.price;
             }
 
-            const standardPrice = basePrice + addons;
-            const premiumPrice = Math.round(standardPrice * 1.35); // 35% premium markup
+            let standardPrice = basePrice + addons;
             const hours = quantityPricing?.hours || (task ? task.hours : 2);
+
+            // Apply date-based pricing adjustments (matching classic site)
+            let dateAdjustmentLabel = '';
+            let dateAdjustmentClass = '';
+
+            if (serviceData.selectedDate) {
+                const selectedDate = new Date(serviceData.selectedDate + 'T00:00:00');
+                const dayOfWeek = selectedDate.getDay();
+
+                if (dayOfWeek === 6) {
+                    // Saturday: 30% premium
+                    standardPrice = Math.round(standardPrice * 1.30);
+                    dateAdjustmentLabel = '📅 Saturday +30% premium';
+                    dateAdjustmentClass = 'text-orange-600';
+                    console.log('📅 Saturday premium applied: +30%');
+                } else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+                    // Weekday future booking: 10% discount
+                    standardPrice = Math.round(standardPrice * 0.90);
+                    dateAdjustmentLabel = '🎉 Weekday booking -10% discount!';
+                    dateAdjustmentClass = 'text-green-600';
+                    console.log('📅 Weekday discount applied: -10%');
+                }
+            }
+
+            const premiumPrice = Math.round(standardPrice * 1.35); // 35% premium markup on adjusted price
 
             // Store final calculated prices
             serviceData.taskKey = taskKey;
             serviceData.calculatedPrice = standardPrice;
             serviceData.premiumPrice = premiumPrice;
+            serviceData.dateAdjustmentLabel = dateAdjustmentLabel;
+            serviceData.dateAdjustmentClass = dateAdjustmentClass;
+
+            // Format selected date for display
+            let selectedDateDisplay = '';
+            if (serviceData.selectedDate) {
+                const dateObj = new Date(serviceData.selectedDate + 'T00:00:00');
+                selectedDateDisplay = dateObj.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            }
 
             const content = document.getElementById('serviceContent');
             content.innerHTML = `
                 <div class="slide-up">
                     <h2 class="text-2xl font-bold mb-6">AI Instant Estimate</h2>
+
+                    ${serviceData.selectedDate ? `
+                    <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm">
+                                <span class="font-semibold">📅 Scheduled for:</span> ${selectedDateDisplay}
+                            </div>
+                            ${dateAdjustmentLabel ? `<div class="text-sm font-semibold ${dateAdjustmentClass}">${dateAdjustmentLabel}</div>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
 
                     <div class="estimate-card mb-6">
                         <div class="flex items-center gap-2 mb-4">
