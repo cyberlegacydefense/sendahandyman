@@ -2620,7 +2620,118 @@
                 pricing: serviceData.pricing
             });
 
-            showEstimate();
+            if (schedule === 'choose') {
+                showDatePicker();
+            } else {
+                showEstimate();
+            }
+        }
+
+        function showDatePicker() {
+            const content = document.getElementById('serviceContent');
+
+            // Calculate min date (2 days from now) and max date (14 days from now)
+            const today = new Date();
+            const minDate = new Date(today);
+            minDate.setDate(minDate.getDate() + 2);
+            const maxDate = new Date(today);
+            maxDate.setDate(maxDate.getDate() + 14);
+
+            const minDateStr = minDate.toISOString().split('T')[0];
+            const maxDateStr = maxDate.toISOString().split('T')[0];
+
+            content.innerHTML = `
+                <div class="slide-up">
+                    <h2 class="text-2xl font-bold mb-2">Choose Your Date</h2>
+                    <p class="text-gray-600 mb-6">Select a date for your service (2-14 days out)</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-2">Select Date</label>
+                            <input
+                                type="date"
+                                id="selectedFutureDate"
+                                min="${minDateStr}"
+                                max="${maxDateStr}"
+                                class="w-full border border-gray-300 rounded-lg p-3 text-lg"
+                                onchange="validateSelectedDate(this)"
+                            />
+                        </div>
+
+                        <div id="dateWarning" class="hidden p-3 rounded-lg text-sm"></div>
+
+                        <div class="p-4 bg-blue-50 rounded-lg">
+                            <div class="text-sm">
+                                <div class="font-semibold mb-2">📅 Booking Rules:</div>
+                                <div class="space-y-1">
+                                    <div>✅ <strong>Mon-Fri:</strong> All time slots available</div>
+                                    <div>⚠️ <strong>Saturday:</strong> 8AM-12PM only • 30% premium</div>
+                                    <div>🚫 <strong>Sunday:</strong> Not available</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button onclick="confirmDateSelection()" id="confirmDateBtn" class="btn-primary w-full py-4 text-lg" disabled>
+                                Continue with Selected Date
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <button onclick="proceedToScheduling()" class="text-gray-500 underline text-sm">
+                                ← Go back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function validateSelectedDate(input) {
+            const warningDiv = document.getElementById('dateWarning');
+            const confirmBtn = document.getElementById('confirmDateBtn');
+
+            if (!input.value) {
+                warningDiv.classList.add('hidden');
+                confirmBtn.disabled = true;
+                return;
+            }
+
+            const selectedDate = new Date(input.value + 'T00:00:00');
+            const dayOfWeek = selectedDate.getDay();
+
+            // Sunday check (day 0)
+            if (dayOfWeek === 0) {
+                warningDiv.textContent = '🚫 Sundays are not available. Please select Monday-Saturday.';
+                warningDiv.className = 'p-3 rounded-lg text-sm bg-red-50 border border-red-200 text-red-700';
+                warningDiv.classList.remove('hidden');
+                confirmBtn.disabled = true;
+                input.value = '';
+                return;
+            }
+
+            // Saturday check (day 6)
+            if (dayOfWeek === 6) {
+                warningDiv.textContent = '📅 Saturday selected: Only 8AM-12PM available • 30% premium applies';
+                warningDiv.className = 'p-3 rounded-lg text-sm bg-orange-50 border border-orange-200 text-orange-700';
+                warningDiv.classList.remove('hidden');
+            } else {
+                warningDiv.textContent = '✅ Great choice! All time slots available for this weekday.';
+                warningDiv.className = 'p-3 rounded-lg text-sm bg-green-50 border border-green-200 text-green-700';
+                warningDiv.classList.remove('hidden');
+            }
+
+            confirmBtn.disabled = false;
+        }
+
+        function confirmDateSelection() {
+            const dateInput = document.getElementById('selectedFutureDate');
+            if (dateInput && dateInput.value) {
+                serviceData.selectedDate = dateInput.value;
+                serviceData.schedule = 'future';
+                console.log('📅 Date selected:', serviceData.selectedDate);
+                showEstimate();
+            }
         }
 
         function showEstimate() {
