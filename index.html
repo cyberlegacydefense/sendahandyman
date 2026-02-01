@@ -1780,10 +1780,11 @@
             };
         }
 
-        function updatePricingDisplay(taskKey) {
-            if (!taskKey || !TASKS[taskKey]) return;
+        function updatePricingDisplay(category) {
+            const mappedKey = getCategoryTaskKey(category);
+            if (!mappedKey || !TASKS[mappedKey]) return;
 
-            const task = TASKS[taskKey];
+            const task = TASKS[mappedKey];
             const basePricing = calculatePricing(task.hours, 'tomorrow_am');
             const eveningPricing = calculatePricing(task.hours, 'tomorrow_eve');
 
@@ -1883,8 +1884,38 @@
             }
         }
 
+        // Map UI category names to TASKS object keys
+        function getCategoryTaskKey(category) {
+            const mapping = {
+                'mounting': 'tv-mounting',
+                'furniture': 'furniture-assembly',
+                'repair': 'general-repair',
+                'appliances': 'appliance-hookup',
+                'curtains-blinds': 'blinds',
+                'installation': 'floating-shelf',
+                'outdoor': 'general-repair',
+                'other': 'general-repair',
+                // Direct matches (no mapping needed)
+                'light-plumbing': 'light-plumbing',
+                'electrical': 'electrical',
+                'painting': 'painting',
+                'ceiling-fan': 'ceiling-fan',
+                'tv-mounting': 'tv-mounting',
+                'furniture-assembly': 'furniture-assembly',
+                'general-repair': 'general-repair',
+                'blinds': 'blinds',
+                'smart-doorbell': 'smart-doorbell',
+                'floating-shelf': 'floating-shelf',
+                'appliance-hookup': 'appliance-hookup',
+                'closet-organizer': 'closet-organizer',
+                'premium-moveout': 'premium-moveout'
+            };
+            return mapping[category] || category;
+        }
+
         function selectService(category) {
             serviceData.category = category;
+            serviceData.taskKey = getCategoryTaskKey(category); // Store mapped task key
             serviceData.categoryDisplay = getCategoryDisplay(category);
 
             // Track service selection
@@ -2014,7 +2045,8 @@
 
                 // Show task-specific questions if available
                 if (serviceData.category) {
-                    showTaskQuestions(serviceData.category);
+                    const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+                    showTaskQuestions(taskKey);
                 }
 
                 const textarea = document.getElementById('detailDescription');
@@ -2129,9 +2161,9 @@
 
         // Update estimate when question selections change
         function updateEstimateWithAddons() {
-            const taskKey = serviceData.category;
-            if (!taskKey) return;
+            if (!serviceData.category) return;
 
+            const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
             const addons = calculateAddons(taskKey);
             console.log('Current add-ons total:', addons);
 
@@ -2269,10 +2301,11 @@
         function showEstimate() {
             updateProgress(4); // Step 4: Final Booking
 
-            // Calculate pricing with addons
-            const task = TASKS[serviceData.category];
-            const addons = calculateAddons(serviceData.category);
-            const quantityPricing = getQuantityPricing(serviceData.category);
+            // Calculate pricing with addons using mapped task key
+            const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+            const task = TASKS[taskKey];
+            const addons = calculateAddons(taskKey);
+            const quantityPricing = getQuantityPricing(taskKey);
 
             let basePrice = task ? task.basePrice : 160;
             if (quantityPricing && quantityPricing.price > 0) {
@@ -2284,6 +2317,7 @@
             const hours = quantityPricing?.hours || (task ? task.hours : 2);
 
             // Store in serviceData for later use
+            serviceData.taskKey = taskKey;
             serviceData.addons = addons;
             serviceData.calculatedPrice = standardPrice;
             serviceData.premiumPrice = premiumPrice;
