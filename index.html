@@ -5631,11 +5631,17 @@
             const taskId = window.currentTaskId;
 
             // Build complete job data
+            const taskKey = getCategoryTaskKey(serviceData.category);
+            const taskLabel = TASKS[taskKey]?.label || serviceData.category;
+            const windowLabel = serviceData.selectedTimeSlot?.windowLabel || serviceData.selectedWindowLabel || 'Scheduled';
+
             const completeJobData = {
                 task_id: taskId,
                 payment_intent_id: paymentIntentId,
                 category: serviceData.category,
+                category_display: taskLabel,
                 window: serviceData.selectedTimeSlot?.window || serviceData.selectedWindow,
+                window_label: windowLabel,
                 name: customerFormData.name,
                 phone: customerFormData.phone,
                 email: customerFormData.email,
@@ -5730,8 +5736,9 @@
                 return { success: false, message: 'Webhook not configured' };
             }
 
-            const taskLabel = TASKS[getCategoryTaskKey(jobData.category)]?.label || jobData.category;
-            const windowLabel = jobData.window || 'Scheduled';
+            // Use display labels, fallback to keys
+            const taskLabel = jobData.category_display || TASKS[getCategoryTaskKey(jobData.category)]?.label || jobData.category;
+            const windowLabel = jobData.window_label || jobData.window || 'Scheduled';
 
             const zapierData = {
                 task_id: jobData.task_id,
@@ -5740,14 +5747,14 @@
                 customer_email: jobData.email,
                 customer_zip: jobData.zip,
                 property_address: jobData.property_address,
-                service_category: jobData.category,
+                service_category: taskLabel,
                 service_name: taskLabel,
                 time_window: windowLabel,
-                description: jobData.description,
-                access_details: jobData.access_details || '',
-                pets_and_special: jobData.pets_and_special || '',
-                additional_details: jobData.additional_details || '',
-                total_amount: jobData.total_amount,
+                description: jobData.description || 'No description provided',
+                access_details: jobData.access_details || 'None',
+                pets_and_special: jobData.pets_and_special || 'None',
+                additional_details: jobData.additional_details || 'None',
+                total_amount: '$' + (jobData.total_amount || 0),
                 payment_intent_id: jobData.payment_intent_id,
                 timestamp: new Date().toISOString()
             };

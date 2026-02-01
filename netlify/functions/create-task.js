@@ -43,7 +43,7 @@ export const handler = async (event, context) => {
       customer_phone: taskData.phone,
       customer_email: taskData.email,
       customer_address: taskData.address || taskData.property_address,
-      task_category: taskData.category,
+      task_category: taskData.category_display || taskData.category,
       task_description: taskData.description || '',
       scheduled_date: new Date().toISOString().split('T')[0],
       scheduled_datetime: null,
