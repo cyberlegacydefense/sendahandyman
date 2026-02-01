@@ -2546,14 +2546,20 @@
         function proceedToScheduling() {
             // IMPORTANT: Calculate and store addons BEFORE replacing DOM content
             // The select elements will be destroyed when we update innerHTML
+            // BUT only calculate if not already stored (to preserve when going back)
             const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
-            const addons = calculateAddons(taskKey);
-            const quantityPricing = getQuantityPricing(taskKey);
 
-            // Store values for later use in showEstimate()
-            serviceData.addons = addons;
-            serviceData.quantityPricing = quantityPricing;
-            console.log('💾 Stored addons before navigation:', addons, 'quantityPricing:', quantityPricing);
+            // Only recalculate if addons not already stored (first time through)
+            // This preserves addons when user goes back to change date
+            if (serviceData.addons === undefined || serviceData.addons === null) {
+                const addons = calculateAddons(taskKey);
+                const quantityPricing = getQuantityPricing(taskKey);
+                serviceData.addons = addons;
+                serviceData.quantityPricing = quantityPricing;
+                console.log('💾 Calculated and stored addons:', addons, 'quantityPricing:', quantityPricing);
+            } else {
+                console.log('💾 Using previously stored addons:', serviceData.addons);
+            }
 
             // Track details entry
             HandymanAnalytics.trackDetailsEntered(
@@ -3036,15 +3042,36 @@
                 const baseWithAddons = (task ? task.basePrice : 160) + addons;
                 let finalPrice = serviceData.calculatedPrice || baseWithAddons;
 
+                // Build premiums array for display
+                const premiums = [];
+
+                // Add addon info if present
+                if (addons > 0) {
+                    premiums.push({ label: 'Service options', amount: addons });
+                }
+
+                // Add date adjustment
+                if (serviceData.dateAdjustmentLabel) {
+                    if (serviceData.dateAdjustmentLabel.includes('discount')) {
+                        const discountAmount = Math.round(baseWithAddons * 0.10);
+                        premiums.push({ label: 'Advance booking discount', amount: -discountAmount });
+                    } else if (serviceData.dateAdjustmentLabel.includes('premium')) {
+                        const premiumAmount = Math.round(baseWithAddons * 0.30);
+                        premiums.push({ label: 'Saturday premium', amount: premiumAmount });
+                    }
+                }
+
                 // Add evening premium if applicable
                 if (block.premium) {
-                    finalPrice = Math.round(finalPrice * 1.15); // 15% evening premium
+                    const eveningPremium = Math.round(finalPrice * 0.15);
+                    finalPrice = Math.round(finalPrice * 1.15);
+                    premiums.push({ label: 'Evening slot', amount: eveningPremium });
                 }
 
                 return {
                     window: `selected_${block.key}`,
                     windowLabel: `${dayName} (${block.label})`,
-                    pricing: { total: finalPrice, base: baseWithAddons },
+                    pricing: { total: finalPrice, base: baseWithAddons, premiums: premiums },
                     badge: serviceData.dateAdjustmentLabel || (isSat ? 'Saturday Premium' : 'Your Selected Date'),
                     date: serviceData.selectedDate
                 };
