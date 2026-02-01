@@ -5742,6 +5742,7 @@
 
             const totalAmt = jobData.total_amount || 0;
             const formattedTotal = '$' + (typeof totalAmt === 'number' ? totalAmt.toFixed(2) : totalAmt);
+            const premiumsList = (jobData.premiums || []).map(p => p.label || p).join(', ') || 'None';
 
             const zapierData = {
                 task_id: jobData.task_id,
@@ -5752,25 +5753,28 @@
                 customer_email: jobData.email,
                 customer_zip: jobData.zip,
                 customer_address: jobData.address || jobData.property_address,
-                // Service info - multiple field names for compatibility
-                service: taskLabel,
+                // Service info - exact field names Zapier expects
+                task_category: taskLabel,
+                task_category_label: taskLabel,
                 service_category: taskLabel,
                 service_name: taskLabel,
                 // Scheduling
                 time_window: windowLabel,
-                scheduled: windowLabel,
                 // Description
                 description: jobData.description || 'No description provided',
                 estimated_hours: jobData.estimated_hours || 2,
-                // Amounts - multiple field names for compatibility
+                // Amounts
                 base_amount: jobData.base_amount || 0,
                 total_amount: totalAmt,
                 total_amount_formatted: formattedTotal,
-                total_paid: formattedTotal,
-                amount: formattedTotal,
+                // Premiums and rush
+                premiums_applied: premiumsList,
+                rush_service: jobData.rush || false,
+                // Scope and risks (from AI analysis if available)
+                step_scope: (jobData.step_scope || []).join(' • ') || 'Standard service scope',
+                risk_flags: (jobData.risk_flags || []).join(' • ') || 'No special risks noted',
                 // Property details
                 property_address: jobData.property_address,
-                property: jobData.property_address,
                 contact_phone: jobData.contact_phone || jobData.phone,
                 access_details: jobData.access_details || 'None provided',
                 pets_and_special: jobData.pets_and_special || 'None provided',
