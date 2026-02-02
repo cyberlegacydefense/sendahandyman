@@ -2504,9 +2504,11 @@
         function formatSelectedOptions(options) {
             if (!options || options.length === 0) return 'Standard service';
 
-            return options.map(opt =>
-                `${opt.question}: ${opt.answer}${opt.addon !== 0 ? ` (${opt.addonFormatted})` : ''}`
-            ).join('\n');
+            return options.map(opt => {
+                // Don't add addon again if it's already in the answer text
+                const hasAddonInText = opt.answer.includes('$') || opt.answer.includes('+$');
+                return `${opt.question}: ${opt.answer}${(!hasAddonInText && opt.addon !== 0) ? ` (${opt.addonFormatted})` : ''}`;
+            }).join('\n');
         }
 
         // Get quantity-based pricing for per-item services
@@ -5814,7 +5816,6 @@
                 service_name: taskLabel,
                 // Selected service options (TV size, wall type, etc.)
                 service_options: selectedOptionsText,
-                selected_options: selectedOptionsText,
                 // Scheduling
                 time_window: windowLabel,
                 // Description
