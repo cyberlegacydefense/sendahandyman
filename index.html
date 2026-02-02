@@ -3290,27 +3290,49 @@
                     <div class="bg-gray-50 rounded-lg p-4 mt-6 mb-6">
                         <h4 class="font-semibold text-gray-700 mb-3">Booking Summary</h4>
                         <div class="space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span>Service:</span>
-                                <span class="font-medium">${serviceData.categoryDisplay.replace(/<[^>]*>/g, '')}</span>
+                            <div class="flex justify-between text-gray-600 mb-1">
+                                <span>${serviceData.selectedWindowLabel || serviceData.selectedWindow}</span>
                             </div>
-                            <div class="flex justify-between">
-                                <span>Time:</span>
-                                <span class="font-medium">${serviceData.selectedWindowLabel || serviceData.selectedWindow}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Base Price:</span>
-                                <span>$${serviceData.pricing.base}</span>
-                            </div>
-                            ${serviceData.pricing.premiums.map(premium => `
-                                <div class="flex justify-between ${premium.amount > 0 ? 'text-red-600' : 'text-green-600'}">
-                                    <span>${premium.label}:</span>
-                                    <span>${premium.amount > 0 ? '+' : ''}$${Math.abs(premium.amount)}</span>
-                                </div>
-                            `).join('')}
+                            <hr class="border-gray-200 my-2">
+                            ${(() => {
+                                const taskKey = serviceData.taskKey || getCategoryTaskKey(serviceData.category);
+                                const task = TASKS[taskKey];
+                                const trueBasePrice = task ? task.basePrice : serviceData.pricing.base;
+                                const serviceName = serviceData.categoryDisplay.replace(/<[^>]*>/g, '');
+                                const selectedOptions = serviceData.selectedOptions || [];
+
+                                // Filter out "Task-specific add-ons" from premiums since we itemize them
+                                const otherPremiums = serviceData.pricing.premiums.filter(p =>
+                                    !p.label.toLowerCase().includes('add-on') &&
+                                    !p.label.toLowerCase().includes('task-specific')
+                                );
+
+                                let html = '';
+
+                                // Service with base price
+                                html += '<div class="flex justify-between"><span>' + serviceName + '</span><span>$' + trueBasePrice + '</span></div>';
+
+                                // Selected options (only show if has addon cost)
+                                selectedOptions.forEach(opt => {
+                                    if (opt.addon && opt.addon !== 0) {
+                                        const optLabel = opt.answer.replace(/\s*\(\+?\$?\d+\)\s*/g, '').trim();
+                                        html += '<div class="flex justify-between text-gray-600"><span>+ ' + optLabel + '</span><span>$' + opt.addon + '</span></div>';
+                                    }
+                                });
+
+                                // Other premiums/discounts (evening, Saturday, future discount, etc.)
+                                otherPremiums.forEach(premium => {
+                                    const colorClass = premium.amount > 0 ? 'text-red-600' : 'text-green-600';
+                                    const sign = premium.amount > 0 ? '+' : '-';
+                                    const shortLabel = premium.label.replace(/\s*\([^)]*\)\s*/g, '').trim();
+                                    html += '<div class="flex justify-between ' + colorClass + '"><span>' + shortLabel + '</span><span>' + sign + ' $' + Math.abs(Math.round(premium.amount)) + '</span></div>';
+                                });
+
+                                return html;
+                            })()}
                             <hr class="border-gray-300 my-2">
                             <div class="flex justify-between font-bold text-lg">
-                                <span>Total:</span>
+                                <span>Total</span>
                                 <span>$${serviceData.pricing.total}</span>
                             </div>
                         </div>
