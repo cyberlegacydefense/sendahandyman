@@ -35,6 +35,31 @@ export const handler = async (event, context) => {
       keyStartsWith: supabaseKey?.substring(0, 20) + '...'
     });
 
+    // Build task description from service options and details
+    const descriptionParts = [];
+
+    // Add service options (TV size, wall type, etc.)
+    if (taskData.selected_options_formatted) {
+      descriptionParts.push('SERVICE OPTIONS:');
+      descriptionParts.push(taskData.selected_options_formatted);
+      descriptionParts.push('');
+    }
+
+    // Add access and special instructions
+    if (taskData.access_details) {
+      descriptionParts.push(`ACCESS: ${taskData.access_details}`);
+    }
+    if (taskData.pets_and_special) {
+      descriptionParts.push(`PETS/SPECIAL: ${taskData.pets_and_special}`);
+    }
+    if (taskData.additional_details) {
+      descriptionParts.push(`ADDITIONAL: ${taskData.additional_details}`);
+    }
+
+    const fullDescription = descriptionParts.length > 0
+      ? descriptionParts.join('\n')
+      : taskData.description || 'Standard service - no special requirements';
+
     // Prepare task data for insertion - using exact schema columns
     const taskInsertData = {
       task_id: taskData.task_id,
@@ -44,7 +69,7 @@ export const handler = async (event, context) => {
       customer_email: taskData.email,
       customer_address: taskData.address || taskData.property_address,
       task_category: taskData.category_display || taskData.category,
-      task_description: taskData.description || '',
+      task_description: fullDescription,
       scheduled_date: new Date().toISOString().split('T')[0],
       scheduled_datetime: null,
       time_window: taskData.window,
@@ -60,7 +85,8 @@ export const handler = async (event, context) => {
       reminder_30min_sent: false,
       reminder_30min_sent_at: null,
       payment_captured_at: null, // Will be set when payment is captured
-      notes: `SERVICE OPTIONS: ${taskData.selected_options_formatted || 'Standard service'}\n\nAccess: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
+      created_at: new Date().toISOString(), // Explicit creation timestamp
+      notes: `Access: ${taskData.access_details || 'N/A'} | Pets: ${taskData.pets_and_special || 'N/A'} | Additional: ${taskData.additional_details || 'N/A'}`
     };
 
     console.log('🔍 Task data to insert:', JSON.stringify(taskInsertData, null, 2));
