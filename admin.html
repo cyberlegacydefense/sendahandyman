@@ -484,12 +484,13 @@
                 <th class="text-left py-3 px-4 font-semibold text-sm">Amount</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Assigned To</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Status</th>
+                <th class="text-left py-3 px-4 font-semibold text-sm">Created</th>
                 <th class="text-left py-3 px-4 font-semibold text-sm">Actions</th>
               </tr>
             </thead>
             <tbody id="tasksTableBody">
               <tr>
-                <td colspan="8" class="text-center py-8 text-slate-500">Loading tasks...</td>
+                <td colspan="9" class="text-center py-8 text-slate-500">Loading tasks...</td>
               </tr>
             </tbody>
           </table>
@@ -4799,7 +4800,7 @@ async function loadTasksData() {
   } catch (error) {
     console.error('Error loading tasks:', error);
     document.getElementById('tasksTableBody').innerHTML = `
-      <tr><td colspan="8" class="text-center py-8 text-red-500">Error loading tasks data</td></tr>
+      <tr><td colspan="9" class="text-center py-8 text-red-500">Error loading tasks data</td></tr>
     `;
   }
 }
@@ -4810,7 +4811,7 @@ function renderTasksTable() {
 
   if (!tasksData.length) {
     tbody.innerHTML = `
-      <tr><td colspan="8" class="text-center py-8 text-slate-500">No tasks found</td></tr>
+      <tr><td colspan="9" class="text-center py-8 text-slate-500">No tasks found</td></tr>
     `;
     return;
   }
@@ -4834,6 +4835,7 @@ function renderTasksTable() {
       <td class="px-4 py-3">
         <span class="px-2 py-1 rounded-full text-xs ${getStatusColor(task.status)}">${task.status}</span>
       </td>
+      <td class="px-4 py-3 text-sm text-slate-600">${task.created_at ? new Date(task.created_at).toLocaleDateString() : 'N/A'}</td>
       <td class="px-4 py-3">
         <div class="flex gap-2">
           ${!task.handyman_id ?
@@ -5216,7 +5218,7 @@ async function viewTaskDetails(taskId) {
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700">Description</label>
-          <p class="text-sm text-slate-900">${task.description || 'No description provided'}</p>
+          <p class="text-sm text-slate-900 whitespace-pre-line">${task.task_description || 'No description provided'}</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-slate-700">Customer Address</label>
