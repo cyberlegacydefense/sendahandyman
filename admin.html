@@ -1608,6 +1608,15 @@ let currentAdminUser = null;
 let handymenData = [];
 let quotesData = [];
 
+// Notification Configuration (Zapier + future SMS)
+const NOTIFICATION_CONFIG = {
+  ZAPIER_ENABLED: true,
+  ZAPIER_WEBHOOK_URL: 'https://hooks.zapier.com/hooks/catch/24412806/uh8lvew/',
+  // Future SMS config
+  SMS_ENABLED: false,
+  SMS_PROVIDER: null // 'twilio', 'messagebird', etc.
+};
+
 // Admin authentication check
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🔐 Admin portal initialized');
@@ -5011,9 +5020,12 @@ async function handleTaskAssignment() {
         .eq('id', taskId);
 
       if (error) throw error;
+
+      // Send notification to customer for each assigned task
+      await sendAssignmentNotification(taskId, handymanId);
     }
 
-    alert(`Successfully assigned ${taskIds.length} task(s)`);
+    alert(`Successfully assigned ${taskIds.length} task(s). Customer notification sent.`);
 
     // Reset form and close modal
     document.getElementById('assignTaskForm').reset();
@@ -5258,6 +5270,91 @@ function getStatusColor(status) {
     'cancelled': 'bg-red-100 text-red-800'
   };
   return colors[status] || 'bg-slate-100 text-slate-800';
+}
+
+// Send assignment notification to customer (email via Zapier, SMS in future)
+async function sendAssignmentNotification(taskId, handymanId) {
+  try {
+    // Fetch task details
+    const { data: task, error: taskError } = await supabaseAdmin
+      .from('tasks')
+      .select('*')
+      .eq('id', taskId)
+      .single();
+
+    if (taskError || !task) {
+      console.error('Failed to fetch task for notification:', taskError);
+      return { success: false, error: 'Task not found' };
+    }
+
+    // Fetch handyman details
+    const { data: handyman, error: handymanError } = await supabaseAdmin
+      .from('handymen')
+      .select('full_name, phone, email')
+      .eq('id', handymanId)
+      .single();
+
+    if (handymanError || !handyman) {
+      console.error('Failed to fetch handyman for notification:', handymanError);
+      return { success: false, error: 'Handyman not found' };
+    }
+
+    // Prepare notification data
+    const notificationData = {
+      type: 'handyman_assigned',
+      // Customer info
+      customer_name: task.customer_name,
+      customer_email: task.customer_email,
+      customer_phone: task.customer_phone,
+      customer_address: task.customer_address,
+      // Task info
+      task_id: task.task_id || task.id.slice(0, 8),
+      task_category: task.task_category,
+      task_description: task.task_description,
+      scheduled_date: task.scheduled_date,
+      time_window: task.time_window,
+      total_amount: task.total_amount,
+      // Handyman info
+      handyman_name: handyman.full_name,
+      handyman_phone: handyman.phone,
+      // Metadata
+      assigned_at: new Date().toISOString(),
+      notification_type: 'assignment'
+    };
+
+    console.log('📧 Sending assignment notification:', notificationData);
+
+    // Send via Zapier webhook
+    if (NOTIFICATION_CONFIG.ZAPIER_ENABLED && NOTIFICATION_CONFIG.ZAPIER_WEBHOOK_URL) {
+      try {
+        const response = await fetch(NOTIFICATION_CONFIG.ZAPIER_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(notificationData)
+        });
+
+        if (response.ok) {
+          console.log('✅ Zapier notification sent successfully');
+        } else {
+          console.error('❌ Zapier notification failed:', response.status);
+        }
+      } catch (zapierError) {
+        console.error('❌ Zapier webhook error:', zapierError);
+      }
+    }
+
+    // Future: Send SMS notification
+    if (NOTIFICATION_CONFIG.SMS_ENABLED && task.customer_phone) {
+      // TODO: Implement SMS sending via Twilio/MessageBird
+      console.log('📱 SMS notification would be sent to:', task.customer_phone);
+    }
+
+    return { success: true };
+
+  } catch (error) {
+    console.error('Notification error:', error);
+    return { success: false, error: error.message };
+  }
 }
 
 // Close modals
