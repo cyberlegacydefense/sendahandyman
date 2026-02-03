@@ -5324,13 +5324,18 @@ async function sendAssignmentNotification(taskId, handymanId) {
 
     console.log('📧 Sending assignment notification:', notificationData);
 
-    // Send via Zapier webhook
+    // Send via Zapier webhook (using URLSearchParams to avoid CORS issues)
     if (NOTIFICATION_CONFIG.ZAPIER_ENABLED && NOTIFICATION_CONFIG.ZAPIER_WEBHOOK_URL) {
       try {
+        // Convert to URLSearchParams to avoid CORS preflight
+        const params = new URLSearchParams();
+        Object.entries(notificationData).forEach(([key, value]) => {
+          params.append(key, value !== null && value !== undefined ? String(value) : '');
+        });
+
         const response = await fetch(NOTIFICATION_CONFIG.ZAPIER_WEBHOOK_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(notificationData)
+          body: params
         });
 
         if (response.ok) {
