@@ -7,6 +7,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
+// Zapier webhook for task booking notifications (same as main website)
+const ZAPIER_WEBHOOK_URL = 'https://hooks.zapier.com/hooks/catch/24412806/uh8lvew/';
+
 // Critical debugging: Log which keys are being used
 console.log('🔑 Supabase Configuration Debug:', {
   url: supabaseUrl,
@@ -288,8 +291,17 @@ export const handler = async (event, context) => {
       console.error('❌ Failed to create payment record:', paymentError);
     }
 
-    // Send notifications
-    await sendQuoteBookingNotifications(quote, task, customer_name, customer_phone, customer_email);
+    // Send notifications (including Zapier webhook for client + staff)
+    await sendQuoteBookingNotifications({
+      quote,
+      task,
+      customerName: customer_name,
+      customerPhone: customer_phone,
+      customerEmail: customer_email,
+      customerAddress: customer_address,
+      timingPreference: timing_preference,
+      paymentIntentId: paymentIntent.id
+    });
 
     return {
       statusCode: 200,
@@ -317,12 +329,63 @@ export const handler = async (event, context) => {
   }
 };
 
-// Send booking notifications
-async function sendQuoteBookingNotifications(quote, task, customerName, customerPhone, customerEmail) {
+// Send booking notifications (Zapier + SMS + Email)
+async function sendQuoteBookingNotifications(data) {
+  const { quote, task, customerName, customerPhone, customerEmail, customerAddress, timingPreference, paymentIntentId } = data;
+
   try {
     console.log(`📧 Sending quote booking notifications for ${quote.quote_id}`);
 
-    // Send SMS notification to customer
+    // 1. Send Zapier notification (same as main website - notifies client + staff)
+    try {
+      const zapierData = {
+        task_id: task?.task_id || task?.id,
+        timestamp: new Date().toISOString(),
+        // Customer info
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_email: customerEmail,
+        customer_address: customerAddress || '',
+        // Service info
+        task_category: quote.service_type,
+        task_category_label: quote.service_type,
+        service_category: quote.service_type,
+        service_name: quote.service_type,
+        service_options: quote.description || 'Custom quote',
+        // Scheduling
+        time_window: timingPreference || 'To be scheduled',
+        // Description
+        description: quote.description || 'Custom quote service',
+        // Amounts
+        total_amount: quote.custom_amount,
+        total_amount_formatted: '$' + quote.custom_amount.toFixed(2),
+        // Payment
+        payment_intent_id: paymentIntentId,
+        // Source
+        booking_source: 'admin_quote',
+        notification_email: 'info@sendahandyman.com'
+      };
+
+      const params = new URLSearchParams();
+      Object.entries(zapierData).forEach(([key, value]) => {
+        params.append(key, value !== null && value !== undefined ? String(value) : '');
+      });
+
+      const zapierResponse = await fetch(ZAPIER_WEBHOOK_URL, {
+        method: 'POST',
+        body: params
+      });
+
+      if (zapierResponse.ok) {
+        console.log('✅ Zapier notification sent (client + staff)');
+      } else {
+        console.error('❌ Zapier notification failed:', zapierResponse.status);
+      }
+    } catch (zapierError) {
+      console.error('❌ Zapier notification error:', zapierError);
+    }
+
+    // 2. Send SMS notification to customer
     try {
       const smsResponse = await fetch('/.netlify/functions/send-sms', {
         method: 'POST',
@@ -346,7 +409,7 @@ async function sendQuoteBookingNotifications(quote, task, customerName, customer
       console.error('❌ SMS notification error:', smsError);
     }
 
-    // Send email notification
+    // 3. Send email notification via internal function
     try {
       const emailResponse = await fetch('/.netlify/functions/send-notification', {
         method: 'POST',
