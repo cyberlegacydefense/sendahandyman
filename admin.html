@@ -4875,6 +4875,141 @@ function updateTaskSummary() {
   document.getElementById('completedTasksCount').textContent = completedTasks;
 }
 
+// Filter functions for search
+function filterHandymen(searchTerm) {
+  const tbody = document.getElementById('handymenTableBody');
+  if (!tbody || !handymenData) return;
+
+  const filtered = searchTerm
+    ? handymenData.filter(h =>
+        (h.full_name && h.full_name.toLowerCase().includes(searchTerm)) ||
+        (h.email && h.email.toLowerCase().includes(searchTerm))
+      )
+    : handymenData;
+
+  tbody.innerHTML = filtered.length > 0
+    ? filtered.map(handyman => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="py-3 px-4">
+            <div class="font-medium">${handyman.full_name || 'N/A'}</div>
+            <div class="text-sm text-slate-500">${handyman.email || 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4">
+            <div class="text-sm">${handyman.phone || 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-1 rounded-full text-xs ${handyman.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+              ${handyman.is_active ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            <div class="text-sm">${(handyman.skills || []).slice(0, 3).join(', ') || 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4">
+            <div class="text-sm">${handyman.created_at ? new Date(handyman.created_at).toLocaleDateString() : 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4">
+            <button onclick="editHandyman('${handyman.id}')" class="text-blue-600 hover:text-blue-800 text-sm mr-2">Edit</button>
+            <button onclick="viewHandymanProfile('${handyman.id}')" class="text-slate-600 hover:text-slate-800 text-sm">View</button>
+          </td>
+        </tr>
+      `).join('')
+    : '<tr><td colspan="6" class="text-center py-8 text-slate-500">No handymen found</td></tr>';
+
+  console.log(`🔍 Filtered handymen: ${filtered.length} results`);
+}
+
+function filterQuotes(searchTerm) {
+  const tbody = document.getElementById('quotesTableBody');
+  if (!tbody || !quotesData) return;
+
+  const filtered = searchTerm
+    ? quotesData.filter(q =>
+        (q.customer_name && q.customer_name.toLowerCase().includes(searchTerm)) ||
+        (q.quote_id && q.quote_id.toLowerCase().includes(searchTerm))
+      )
+    : quotesData;
+
+  tbody.innerHTML = filtered.length > 0
+    ? filtered.map(quote => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="py-3 px-4 font-medium">${quote.quote_id || 'N/A'}</td>
+          <td class="py-3 px-4">${quote.customer_name || 'N/A'}</td>
+          <td class="py-3 px-4">${quote.service_type || 'N/A'}</td>
+          <td class="py-3 px-4 font-semibold">$${quote.custom_amount || 0}</td>
+          <td class="py-3 px-4">
+            <span class="px-2 py-1 rounded-full text-xs ${quote.status === 'paid' ? 'bg-green-100 text-green-800' : quote.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-slate-100 text-slate-800'}">
+              ${quote.status || 'pending'}
+            </span>
+          </td>
+          <td class="py-3 px-4">
+            <div class="text-sm">${quote.created_at ? new Date(quote.created_at).toLocaleDateString() : 'N/A'}</div>
+          </td>
+          <td class="py-3 px-4">
+            <a href="quote.html?token=${quote.quote_token}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">View Link</a>
+          </td>
+          <td class="py-3 px-4">
+            <button onclick="copyQuoteLink('${quote.quote_token}')" class="text-slate-600 hover:text-slate-800 text-sm">Copy</button>
+          </td>
+        </tr>
+      `).join('')
+    : '<tr><td colspan="8" class="text-center py-8 text-slate-500">No quotes found</td></tr>';
+
+  console.log(`🔍 Filtered quotes: ${filtered.length} results`);
+}
+
+function filterTasks(searchTerm) {
+  const tbody = document.getElementById('tasksTableBody');
+  if (!tbody || !tasksData) return;
+
+  const filtered = searchTerm
+    ? tasksData.filter(t =>
+        (t.customer_name && t.customer_name.toLowerCase().includes(searchTerm)) ||
+        (t.id && t.id.toLowerCase().includes(searchTerm)) ||
+        (t.task_category && t.task_category.toLowerCase().includes(searchTerm))
+      )
+    : tasksData;
+
+  tbody.innerHTML = filtered.length > 0
+    ? filtered.map(task => `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+          <td class="px-4 py-3">
+            <input type="checkbox" class="task-checkbox" value="${task.id}" onchange="handleTaskSelection(this)">
+          </td>
+          <td class="px-4 py-3 font-medium">#${task.id.slice(0, 8)}</td>
+          <td class="px-4 py-3">${task.customer_name}</td>
+          <td class="px-4 py-3">${task.task_category || 'N/A'}</td>
+          <td class="px-4 py-3 font-semibold">$${task.total_amount || task.estimated_cost || 'N/A'}</td>
+          <td class="px-4 py-3">
+            ${task.handyman_name
+              ? `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${task.handyman_name}</span>`
+              : `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Unassigned</span>`
+            }
+          </td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-1 rounded-full text-xs ${getStatusColor(task.status)}">${task.status}</span>
+          </td>
+          <td class="px-4 py-3 text-sm text-slate-600">${task.created_at ? new Date(task.created_at).toLocaleDateString() : 'N/A'}</td>
+          <td class="px-4 py-3">
+            <div class="flex gap-2">
+              ${!task.handyman_id
+                ? `<button onclick="openAssignModal('${task.id}')" class="text-blue-600 hover:text-blue-800 text-sm">Assign</button>`
+                : `<button onclick="reassignTask('${task.id}')" class="text-orange-600 hover:text-orange-800 text-sm">Reassign</button>`
+              }
+              <button onclick="viewTaskDetails('${task.id}')" class="text-slate-600 hover:text-slate-800 text-sm">View</button>
+              ${task.status !== 'completed' && task.status !== 'cancelled'
+                ? `<button onclick="closeTask('${task.id}')" class="text-green-600 hover:text-green-800 text-sm font-medium">Close</button>`
+                : ''
+              }
+            </div>
+          </td>
+        </tr>
+      `).join('')
+    : '<tr><td colspan="9" class="text-center py-8 text-slate-500">No tasks found</td></tr>';
+
+  console.log(`🔍 Filtered tasks: ${filtered.length} results`);
+}
+
 // Handle task selection for bulk operations
 function handleTaskSelection(checkbox) {
   const taskId = checkbox.value;
@@ -6329,6 +6464,35 @@ function initializeEventListeners() {
       loadTasksData();
     });
     console.log('✅ Refresh tasks button listener attached');
+  }
+
+  // Add search input event listeners
+  const handymanSearchInput = document.getElementById('handymanSearchInput');
+  const quoteSearchInput = document.getElementById('quoteSearchInput');
+  const taskSearchInput = document.getElementById('taskSearchInput');
+
+  if (handymanSearchInput) {
+    handymanSearchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      filterHandymen(searchTerm);
+    });
+    console.log('✅ Handyman search listener attached');
+  }
+
+  if (quoteSearchInput) {
+    quoteSearchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      filterQuotes(searchTerm);
+    });
+    console.log('✅ Quote search listener attached');
+  }
+
+  if (taskSearchInput) {
+    taskSearchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      filterTasks(searchTerm);
+    });
+    console.log('✅ Task search listener attached');
   }
 
   // Auto-refresh task manager every 30 seconds when on tasks tab
