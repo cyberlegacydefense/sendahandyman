@@ -935,7 +935,7 @@
                 </div>
 
                 <nav class="hidden md:flex items-center gap-6">
-                    <a href="concierge.html" class="text-gray-600 hover:text-black transition-colors">Concierge</a>
+                    <a href="managed-properties.html" class="text-gray-600 hover:text-black transition-colors">Managed Properties</a>
                     <a href="join-team.html" class="text-gray-600 hover:text-black transition-colors">Join Our Team</a>
                     <button onclick="showLoginModal()" class="text-gray-600 hover:text-black transition-colors">Sign In</button>
                 </nav>
@@ -951,7 +951,7 @@
         <!-- Mobile Menu -->
         <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-gray-200 shadow-lg">
             <div class="px-4 py-2">
-                <a href="concierge.html" class="block py-3 text-gray-600 hover:text-black transition-colors border-b border-gray-100">Concierge</a>
+                <a href="managed-properties.html" class="block py-3 text-gray-600 hover:text-black transition-colors border-b border-gray-100">Managed Properties</a>
                 <a href="join-team.html" class="block py-3 text-gray-600 hover:text-black transition-colors border-b border-gray-100">Join Our Team</a>
                 <button onclick="showLoginModal()" class="block w-full text-left py-3 text-gray-600 hover:text-black transition-colors">Sign In</button>
             </div>
@@ -1336,12 +1336,12 @@
         console.log('💳 Stripe Key: Will be validated when payment modal loads');
 
         // Pricing constants (from original site)
-        const RATE = 80;
+        const RATE = 90;
         const PREMIUM_CURRENT_BLOCK = 0.30;
         const PREMIUM_NEXT_BLOCK = 0.20;
         const PREMIUM_EVENING_BLOCK = 0.35;
         const PREMIUM_SATURDAY = 0.30;
-        const DISCOUNT_FUTURE = 0.10;
+        const DISCOUNT_FUTURE = 0.05;
 
         // Zapier webhook configuration
         const ZAPIER_CONFIG = {
@@ -1357,7 +1357,7 @@
             'ceiling-fan': {
                 hours: 2.0,
                 label: "Ceiling Fan Install/Replace",
-                basePrice: 160,
+                basePrice: 180,
                 questions: [
                     {
                         id: 'replacing',
@@ -1389,7 +1389,7 @@
             'light-plumbing': {
                 hours: 1.5,
                 label: "Light Plumbing (Faucet/Toilet)",
-                basePrice: 120,
+                basePrice: 135,
                 questions: [
                     {
                         id: 'fixture_type',
@@ -1414,7 +1414,7 @@
             'electrical': {
                 hours: 1.5,
                 label: "Light Electrical (Fixtures/Outlets)",
-                basePrice: 120,
+                basePrice: 135,
                 questions: [
                     {
                         id: 'fixture_type',
@@ -1438,7 +1438,7 @@
             'tv-mounting': {
                 hours: 2.0,
                 label: "TV Wall Mount (32–65\")",
-                basePrice: 160,
+                basePrice: 180,
                 questions: [
                     {
                         id: 'tv_size',
@@ -1470,7 +1470,7 @@
             'furniture-assembly': {
                 hours: 2.0,
                 label: "Furniture Assembly (S–M)",
-                basePrice: 160,
+                basePrice: 180,
                 questions: [
                     {
                         id: 'furniture_type',
@@ -1496,13 +1496,13 @@
             'painting': {
                 hours: 2.5,
                 label: "Small Painting Project",
-                basePrice: 200,
+                basePrice: 220,
                 questions: []
             },
             'general-repair': {
                 hours: 3.0,
                 label: "General Handyman (3+ hours)",
-                basePrice: 240,
+                basePrice: 265,
                 questions: [
                     {
                         id: 'task_complexity',
@@ -1536,17 +1536,17 @@
             'blinds': {
                 hours: 1.5,
                 label: "Curtain Rod/Blinds Mount",
-                basePrice: 120,
+                basePrice: 135,
                 questions: [
                     {
                         id: 'item_count',
                         label: 'How many rods/blinds?',
                         type: 'quantity',
                         options: [
-                            { value: '1', label: '1 item', price: 80, hours: 1.0 },
-                            { value: '2', label: '2 items', price: 120, hours: 1.5 },
-                            { value: '3', label: '3 items', price: 160, hours: 2.0 },
-                            { value: '4+', label: '4+ items', price: 200, hours: 2.5 }
+                            { value: '1', label: '1 item', price: 90, hours: 1.0 },
+                            { value: '2', label: '2 items', price: 135, hours: 1.5 },
+                            { value: '3', label: '3 items', price: 180, hours: 2.0 },
+                            { value: '4+', label: '4+ items', price: 220, hours: 2.5 }
                         ]
                     },
                     {
@@ -1562,7 +1562,7 @@
             'smart-doorbell': {
                 hours: 1.25,
                 label: "Smart Doorbell Install",
-                basePrice: 100,
+                basePrice: 110,
                 questions: [
                     {
                         id: 'install_type',
@@ -1586,17 +1586,17 @@
             'floating-shelf': {
                 hours: 1.0,
                 label: "Floating Shelf Install",
-                basePrice: 80,
+                basePrice: 90,
                 questions: [
                     {
                         id: 'shelf_count',
                         label: 'How many shelves?',
                         type: 'quantity',
                         options: [
-                            { value: '1', label: '1 shelf', price: 80, hours: 1.0 },
-                            { value: '2', label: '2 shelves', price: 120, hours: 1.5 },
-                            { value: '3', label: '3 shelves', price: 160, hours: 2.0 },
-                            { value: '4+', label: '4+ shelves', price: 200, hours: 2.5 }
+                            { value: '1', label: '1 shelf', price: 90, hours: 1.0 },
+                            { value: '2', label: '2 shelves', price: 135, hours: 1.5 },
+                            { value: '3', label: '3 shelves', price: 180, hours: 2.0 },
+                            { value: '4+', label: '4+ shelves', price: 220, hours: 2.5 }
                         ]
                     },
                     {
@@ -1612,7 +1612,7 @@
             'appliance-hookup': {
                 hours: 2.0,
                 label: "Appliance Hookup (W/D/DW)",
-                basePrice: 160,
+                basePrice: 180,
                 questions: [
                     {
                         id: 'appliance_type',
@@ -1647,7 +1647,7 @@
             'closet-organizer': {
                 hours: 2.5,
                 label: "Closet Organizer Install",
-                basePrice: 200,
+                basePrice: 220,
                 questions: [
                     {
                         id: 'organizer_type',
@@ -1682,7 +1682,7 @@
             'premium-moveout': {
                 hours: 3.0,
                 label: "Premium Move-out Repairs",
-                basePrice: 240,
+                basePrice: 265,
                 questions: [
                     {
                         id: 'property_size',
@@ -2656,7 +2656,7 @@
                                 <div>
                                     <div class="font-semibold">Choose Date</div>
                                     <div class="text-sm text-gray-600">Pick from calendar</div>
-                                    <div class="text-xs text-green-600 mt-1">🎉 Book 3+ days out & save 10%</div>
+                                    <div class="text-xs text-green-600 mt-1">🎉 Book 3+ days out & save 5%</div>
                                 </div>
                                 <div>📅</div>
                             </div>
@@ -2736,7 +2736,7 @@
                                 <div class="font-semibold mb-2">📅 Booking Rules:</div>
                                 <div class="space-y-1">
                                     <div>✅ <strong>Mon-Fri:</strong> All time slots available</div>
-                                    <div>🎉 <strong>Advance booking:</strong> <span class="text-green-600 font-semibold">10% discount</span> for dates 3+ days out</div>
+                                    <div>🎉 <strong>Advance booking:</strong> <span class="text-green-600 font-semibold">5% discount</span> for dates 3+ days out</div>
                                     <div>⚠️ <strong>Saturday:</strong> 8AM-12PM only • 30% premium</div>
                                     <div>🚫 <strong>Sunday:</strong> Not available</div>
                                 </div>
@@ -2802,7 +2802,7 @@
                 }
 
                 if (selectedDate > standardWindowEnd) {
-                    warningDiv.textContent = '🎉 Advance booking! All time slots available + 10% discount applied!';
+                    warningDiv.textContent = '🎉 Advance booking! All time slots available + 5% discount applied!';
                     warningDiv.className = 'p-3 rounded-lg text-sm bg-green-50 border border-green-200 text-green-700';
                 } else {
                     warningDiv.textContent = '✅ Standard booking window. All time slots available.';
@@ -2883,11 +2883,11 @@
                     dateAdjustmentClass = 'text-orange-600';
                     console.log('📅 Saturday premium applied: +30%');
                 } else if (dayOfWeek >= 1 && dayOfWeek <= 5 && isBeyondStandardWindow) {
-                    // Weekday AND beyond standard window: 10% discount
-                    standardPrice = Math.round(standardPrice * 0.90);
-                    dateAdjustmentLabel = '🎉 Advance booking -10% discount!';
+                    // Weekday AND beyond standard window: 5% discount
+                    standardPrice = Math.round(standardPrice * 0.95);
+                    dateAdjustmentLabel = '🎉 Advance booking -5% discount!';
                     dateAdjustmentClass = 'text-green-600';
-                    console.log('📅 Advance booking discount applied: -10%');
+                    console.log('📅 Advance booking discount applied: -5%');
                 } else if (dayOfWeek >= 1 && dayOfWeek <= 5) {
                     // Weekday but within standard window: no adjustment
                     dateAdjustmentLabel = '📅 Standard booking window';
@@ -3117,7 +3117,7 @@
                 // Add date adjustment
                 if (serviceData.dateAdjustmentLabel) {
                     if (serviceData.dateAdjustmentLabel.includes('discount')) {
-                        const discountAmount = Math.round(baseWithAddons * 0.10);
+                        const discountAmount = Math.round(baseWithAddons * 0.05);
                         premiums.push({ label: 'Advance booking discount', amount: -discountAmount });
                     } else if (serviceData.dateAdjustmentLabel.includes('premium')) {
                         const premiumAmount = Math.round(baseWithAddons * 0.30);
@@ -3505,7 +3505,7 @@
                     total += satPremium;
                 } else {
                     const discount = base * DISCOUNT_FUTURE;
-                    premiums.push({ label: 'Future booking discount (-10%)', amount: -discount });
+                    premiums.push({ label: 'Future booking discount (-5%)', amount: -discount });
                     total -= discount;
                 }
             } else if (isToday) {

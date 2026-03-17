@@ -52,50 +52,50 @@ exports.handler = async (event, context) => {
     BUSINESS INFO:
     - Company: SendAHandyman
     - Service areas: Palm Beach, Broward, Miami-Dade counties (Boca Raton, Delray Beach, Boynton Beach, Fort Lauderdale, Hollywood, Aventura, Miami, Coral Gables, Kendall)
-    - Rate: $80/hour
+    - Rate: $90/hour
     - Same-day premium: +15%
     - Evening premium (4-8pm): +10%
     - Rush service: +10%
     - Contact: info@sendahandyman.com
 
     SERVICES & PRICING:
-    1. TV Wall Mount (32-65"): $120 base (1.5 hrs)
+    1. TV Wall Mount (32-65"): $180 base (2.0 hrs)
        - +$25: TVs over 65"
        - +$40: Brick/concrete/fireplace mounting
 
-    2. Ceiling Fan Install/Replace: $160 base (2.0 hrs)
+    2. Ceiling Fan Install/Replace: $180 base (2.0 hrs)
        - +$50: Non fan-rated box replacement
        - +$40: Ceilings over 10ft
 
-    3. Light Fixture/Chandelier: $80 base (1.0 hr)
+    3. Light Fixture/Chandelier: $135 base (1.5 hr)
        - +$40: Chandeliers over 25lbs
        - +$30: Ceilings over 10ft
 
-    4. Faucet/Showerhead Replace: $80 base (1.0 hr)
+    4. Faucet/Showerhead Replace: $135 base (1.5 hr)
        - +$40: Corroded plumbing
        - +$30: Sink/vanity removal needed
 
-    5. Smart Doorbell Install: $60 base (0.75 hr)
+    5. Smart Doorbell Install: $110 base (1.25 hr)
        - +$30: No existing wiring
        - +$40: Chime/transformer replacement
 
-    6. Curtain Rods/Blinds: $80 base (1.0 hr)
+    6. Curtain Rods/Blinds: $90 base (1.0 hr)
        - +$20: Each extra rod/blind beyond 2
        - +$40: Brick/tile/concrete mounting
 
-    7. Floating Shelf Install: $80 base (1.0 hr)
+    7. Floating Shelf Install: $90 base (1.0 hr)
        - +$20: Each extra shelf beyond 2
        - +$30: Heavy-duty shelves (25+ lbs)
 
-    8. Appliance Hookup: $120 base (1.5 hrs)
+    8. Appliance Hookup: $180 base (2.0 hrs)
        - +$40: Old appliance removal
        - +$30: New vent/supply line needed
 
-    9. Furniture Assembly: $120 base (1.5 hrs)
+    9. Furniture Assembly: $180 base (2.0 hrs)
        - +$30: Large/complex pieces
        - +$20: Each extra small item
 
-    10. Closet Organizer: $160 base (2.0 hrs)
+    10. Closet Organizer: $220 base (2.5 hrs)
         - +$50: Custom cutting required
         - +$40: Masonry/non-standard walls
 

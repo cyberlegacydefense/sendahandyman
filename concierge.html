@@ -3,12 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SendAHandyman Concierge — AI‑Powered Property Management Lite</title>
-    <meta name="description" content="Save ~50% vs traditional property managers. 24/7 AI tenant concierge + instant maintenance triage + our vetted local handyman network. $99/mo per unit." />
+    <title>Luxury High-Rise Concierge Services — SendAHandyman</title>
+    <meta name="description" content="The preferred handyman service for luxury high-rise living. White-glove home maintenance for concierge-level properties. Partner with us or book a service." />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="SendAHandyman Concierge — AI‑Powered Property Management Lite" />
-    <meta property="og:description" content="Save ~50% vs traditional PM. AI tenant concierge + local handyman dispatch. $99/mo per unit." />
+    <meta property="og:title" content="Luxury High-Rise Concierge Services — SendAHandyman" />
+    <meta property="og:description" content="White-glove home maintenance, built for concierge-level properties. Vetted technicians, building-aware scheduling, seamless resident booking." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://sendahandyman.com/concierge" />
 
@@ -38,295 +38,400 @@
         {
             "@context": "https://schema.org",
             "@type": "Service",
-            "name": "SendAHandyman Concierge",
+            "name": "SendAHandyman Luxury High-Rise Concierge",
             "areaServed": "South Florida",
-            "serviceType": "AI-assisted property management for condo rentals",
+            "serviceType": "Premium handyman services for luxury high-rise residential buildings",
             "provider": {"@type": "Organization", "name": "SendAHandyman"},
-            "offers": {"@type": "Offer", "price": "99", "priceCurrency": "USD", "description": "$99/mo per unit – AI tenant concierge, 24/7 maintenance triage, owner dashboard"}
+            "description": "White-glove home maintenance built for concierge-level properties"
         }
     </script>
 
     <style>
         html { scroll-behavior: smooth; }
         .container { max-width: 1200px; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(0,0,0,.08);
+        }
+        .service-tile {
+            transition: all 0.2s ease;
+        }
+        .service-tile:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
+
 <!-- Header -->
-<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
     <div class="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
         <a href="index.html" class="flex items-center gap-3 font-semibold text-slate-900 hover:opacity-80 transition-opacity">
-            <span class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-brand.light text-brand">🔧</span>
-            <span>SendAHandyman Concierge</span>
+            <img src="/images/helpinghands_logo.png" alt="SendAHandyman Logo" class="h-9 w-auto">
+            <span class="hidden sm:inline">SendAHandyman</span>
         </a>
         <nav class="hidden md:flex items-center gap-6 text-sm">
-            <a href="#how" class="hover:text-brand">How it works</a>
-            <a href="#pricing" class="hover:text-brand">Pricing</a>
-            <a href="#roi" class="hover:text-brand">ROI</a>
-            <a href="#faq" class="hover:text-brand">FAQ</a>
+            <a href="#features" class="hover:text-brand">Why Us</a>
+            <a href="#services" class="hover:text-brand">Services</a>
+            <a href="#partnership" class="hover:text-brand">Partnership</a>
         </nav>
         <div class="flex items-center gap-2">
-            <a href="#cta" class="inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white font-medium hover:bg-brand-dark">Get Started</a>
+            <a href="index.html" class="hidden sm:inline-flex items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium hover:border-brand hover:text-brand">Book a Service</a>
+            <a href="#partnership" class="inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white text-sm font-medium hover:bg-brand-dark">Partner With Us</a>
         </div>
     </div>
 </header>
 
-<!-- Hero -->
-<section id="top" class="relative overflow-hidden">
-    <div class="container mx-auto px-4 sm:px-6 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
-        <div>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900">
-                AI‑Powered Property Management <span class="text-brand">Lite</span> for South Florida Condo Owners
+<!-- Hero Section -->
+<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.03\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+    <div class="container mx-auto px-4 sm:px-6 py-20 lg:py-28 relative">
+        <div class="max-w-3xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-slate-300 mb-6">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                Now serving South Florida luxury properties
+            </div>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
+                The Preferred Handyman Service for <span class="text-brand">Luxury High-Rise Living</span>
             </h1>
-            <p class="mt-4 text-lg text-slate-600">Save ~50% vs traditional managers. 24/7 AI tenant concierge + instant maintenance triage + our vetted local handyman network. Flat <span class="font-semibold">$99/mo per unit</span>.</p>
-            <ul class="mt-6 space-y-2 text-slate-700">
-                <li>✅ 24/7 tenant replies and rent reminders</li>
-                <li>✅ Photo/video triage before dispatch</li>
-                <li>✅ Flat‑rate service calls + clear reports</li>
-            </ul>
-            <div class="mt-8 flex flex-wrap gap-3">
-                <a href="#cta" class="inline-flex items-center rounded-xl bg-brand px-5 py-3 text-white font-semibold hover:bg-brand-dark">Request a Call</a>
-                <a href="#pricing" class="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 font-semibold hover:border-brand hover:text-brand">See Pricing</a>
+            <p class="mt-6 text-xl text-slate-300">
+                White-glove home maintenance, built for concierge-level properties.
+            </p>
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#partnership" class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-brand px-8 py-4 text-white font-semibold hover:bg-brand-dark transition-colors">
+                    Partner With Us
+                </a>
+                <a href="index.html" class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white/10 border border-white/20 px-8 py-4 text-white font-semibold hover:bg-white/20 transition-colors">
+                    Book a Service
+                </a>
             </div>
-            <p class="mt-3 text-xs text-slate-500">Perfect for out‑of‑state owners with 2–3 rental condos.</p>
         </div>
-        <div class="relative">
-            <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
-                <div class="grid grid-cols-2 gap-4 text-center">
-                    <div class="rounded-xl bg-slate-50 p-4">
-                        <div class="text-3xl font-extrabold text-slate-900">$99</div>
-                        <div class="text-sm text-slate-500">/mo per unit</div>
-                    </div>
-                    <div class="rounded-xl bg-slate-50 p-4">
-                        <div class="text-3xl font-extrabold text-emerald-600">~50%</div>
-                        <div class="text-sm text-slate-500">Avg annual savings</div>
-                    </div>
-                    <div class="rounded-xl bg-slate-50 p-4 col-span-2">
-                        <div class="text-sm text-slate-500">Backed by AI + local pros</div>
-                        <div class="text-base font-semibold">Less cost. Less headache.</div>
-                    </div>
+    </div>
+</section>
+
+<!-- Trust/Positioning Section -->
+<section id="features" class="py-16 lg:py-24 bg-white">
+    <div class="container mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">Built for Buildings Like Yours</h2>
+            <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                We understand the unique requirements of luxury high-rise properties and their discerning residents.
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Feature 1 -->
+            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Vetted, Professional Technicians</h3>
+                <p class="text-slate-600 text-sm">Background-checked, uniformed, and discreet. Our technicians represent your building's standards.</p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Concierge-Aware Scheduling</h3>
+                <p class="text-slate-600 text-sm">We follow your building's rules, check-in procedures, and preferred service hours.</p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Resident-Ready Booking</h3>
+                <p class="text-slate-600 text-sm">Residents book in minutes via QR code or your building's custom URL. No apps to download.</p>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Property Manager Dashboard</h3>
+                <p class="text-slate-600 text-sm">Track service requests across your building in real-time. <span class="text-brand font-medium">Coming soon.</span></p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Trust strip -->
-<section class="bg-white border-y border-slate-200">
-    <div class="container mx-auto px-4 sm:px-6 py-6 grid md:grid-cols-3 gap-4 text-center text-sm">
-        <div>⏱️ <span class="font-semibold">Faster response</span> than traditional PMs</div>
-        <div>🛠️ <span class="font-semibold">Local handyman network</span> you can trust</div>
-        <div>📊 <span class="font-semibold">Clear monthly reports</span> for peace of mind</div>
+<!-- Services Section -->
+<section id="services" class="py-16 lg:py-24 bg-slate-50">
+    <div class="container mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">Common Resident Requests</h2>
+            <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+                From quick fixes to installations, we handle the services your residents need most.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">📺</div>
+                <div class="font-semibold text-slate-900">TV Wall Mount</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $180</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">💡</div>
+                <div class="font-semibold text-slate-900">Ceiling Fan Install</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $180</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">✨</div>
+                <div class="font-semibold text-slate-900">Light Fixtures</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $135</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">🚰</div>
+                <div class="font-semibold text-slate-900">Faucet & Plumbing</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $135</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">🔔</div>
+                <div class="font-semibold text-slate-900">Smart Doorbell</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $110</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">🪟</div>
+                <div class="font-semibold text-slate-900">Blinds & Curtains</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $90</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">🪑</div>
+                <div class="font-semibold text-slate-900">Furniture Assembly</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $180</div>
+            </div>
+            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">🔧</div>
+                <div class="font-semibold text-slate-900">General Handyman</div>
+                <div class="text-sm text-slate-500 mt-1">Starting at $265</div>
+            </div>
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="index.html" class="inline-flex items-center gap-2 text-brand font-semibold hover:underline">
+                View all services and book now
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
     </div>
 </section>
 
-<!-- How it works -->
-<section id="how" class="container mx-auto px-4 sm:px-6 py-16">
-    <h2 class="text-2xl sm:text-3xl font-bold">How it works</h2>
-    <div class="mt-8 grid lg:grid-cols-4 gap-6">
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">💬</div>
-            <h3 class="font-semibold mt-3">Tenant contacts AI</h3>
-            <p class="text-sm text-slate-600 mt-2">24/7 concierge answers, gathers photos/videos, and logs details.</p>
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">🧠</div>
-            <h3 class="font-semibold mt-3">Smart triage</h3>
-            <p class="text-sm text-slate-600 mt-2">AI classifies urgency (e.g., AC outage vs. routine drip) and suggests next steps.</p>
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">📅</div>
-            <h3 class="font-semibold mt-3">Auto‑dispatch & scheduling</h3>
-            <p class="text-sm text-slate-600 mt-2">Jobs route to SendAHandyman. Tenant picks a time; owner notified.</p>
-        </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">📈</div>
-            <h3 class="font-semibold mt-3">Completion & reporting</h3>
-            <p class="text-sm text-slate-600 mt-2">Tech notes & photos appear in your monthly report. Track costs & turnaround.</p>
-        </div>
-    </div>
-</section>
-
-<!-- Pricing -->
-<section id="pricing" class="bg-white border-y border-slate-200">
-    <div class="container mx-auto px-4 sm:px-6 py-16">
-        <h2 class="text-2xl sm:text-3xl font-bold">Simple pricing</h2>
-        <div class="mt-8 grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <ul class="space-y-2 text-slate-700 text-sm">
-                    <li>• <b>$99/mo per unit</b> — AI tenant concierge, 24/7 triage, owner dashboard</li>
-                    <li>• <b>$99 flat service call</b> + materials. Optional auto‑approval under $250</li>
-                    <li>• Add‑ons: Tenant placement (½ month rent), Lease renewal $200, Annual inspection $149</li>
+<!-- Partnership Section (B2B) -->
+<section id="partnership" class="py-16 lg:py-24 bg-white">
+    <div class="container mx-auto px-4 sm:px-6">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">
+                    Make Us Your Building's Official Handyman Partner
+                </h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    We create a custom landing page and QR code for your building, branded with your logo. Residents get a seamless booking experience. Property managers get a trusted, vetted vendor on call.
+                </p>
+                <ul class="mt-6 space-y-3">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-slate-700"><strong>Custom branded booking page</strong> with your building's logo and name</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-slate-700"><strong>Printable QR codes</strong> for lobbies, elevators, and resident welcome packets</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-slate-700"><strong>Priority scheduling</strong> for partner buildings</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-slate-700"><strong>No cost to you</strong> — residents pay directly for services</span>
+                    </li>
                 </ul>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p class="text-sm text-slate-500">Typical PM fee at 10% of rent</p>
-                <div class="text-3xl font-extrabold text-slate-900">$200/mo</div>
-                <p class="text-xs text-slate-500 mt-1">at $2,000 rent</p>
-                <div class="mt-3 text-emerald-600 text-sm font-semibold">You keep more of your investment ✔</div>
+
+            <!-- Partnership Form -->
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6 lg:p-8 shadow-sm">
+                <h3 class="text-xl font-semibold text-slate-900 mb-6">Request a Partnership</h3>
+                <form id="partnershipForm" name="concierge-partnership" method="POST" data-netlify="true" class="space-y-4">
+                    <input type="hidden" name="form-name" value="concierge-partnership" />
+
+                    <div>
+                        <label for="contactName" class="block text-sm font-medium text-slate-700 mb-1">Your Name</label>
+                        <input type="text" id="contactName" name="contact_name" required
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            placeholder="Jane Smith">
+                    </div>
+
+                    <div>
+                        <label for="buildingName" class="block text-sm font-medium text-slate-700 mb-1">Building Name</label>
+                        <input type="text" id="buildingName" name="building_name" required
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            placeholder="The Grand at Palm Beach">
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                placeholder="jane@building.com">
+                        </div>
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                            <input type="tel" id="phone" name="phone"
+                                class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                placeholder="(561) 555-1234">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="units" class="block text-sm font-medium text-slate-700 mb-1">Number of Units</label>
+                        <input type="number" id="units" name="units" min="1"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            placeholder="150">
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-slate-700 mb-1">Anything else we should know?</label>
+                        <textarea id="message" name="message" rows="3"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            placeholder="e.g., specific building requirements, preferred service hours..."></textarea>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full rounded-xl bg-brand px-6 py-4 text-white font-semibold hover:bg-brand-dark transition-colors">
+                        Request Partnership
+                    </button>
+
+                    <p id="formMessage" class="text-sm text-slate-500 text-center hidden"></p>
+                </form>
             </div>
         </div>
     </div>
 </section>
 
-<!-- ROI Calculator -->
-<section id="roi" class="container mx-auto px-4 sm:px-6 py-16">
-    <h2 class="text-2xl sm:text-3xl font-bold">ROI calculator</h2>
-    <p class="text-sm text-slate-600 mt-2">Estimate annual savings vs a traditional 10% property manager.</p>
-
-    <div class="mt-6 grid lg:grid-cols-2 gap-8">
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <label for="rent" class="block text-sm font-medium">Monthly rent per unit ($)</label>
-            <input id="rent" type="number" min="500" step="50" value="2000" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
-
-            <label for="units" class="block text-sm font-medium mt-4"># of units</label>
-            <input id="units" type="number" min="1" step="1" value="2" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
-
-            <button id="calcBtn" class="mt-4 inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white font-semibold hover:bg-brand-dark">Calculate</button>
-            <p class="text-xs text-slate-500 mt-2">Assumes $99/mo per unit for SendAHandyman Concierge vs 10% of rent traditional PM.</p>
-        </div>
-
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="grid grid-cols-2 gap-4 text-center">
-                <div class="rounded-xl bg-slate-50 p-4">
-                    <div class="text-sm text-slate-500">Traditional PM</div>
-                    <div id="pmCost" class="text-2xl font-extrabold">$4,800/yr</div>
-                </div>
-                <div class="rounded-xl bg-slate-50 p-4">
-                    <div class="text-sm text-slate-500">Concierge</div>
-                    <div id="ourCost" class="text-2xl font-extrabold">$2,376/yr</div>
-                </div>
-                <div class="rounded-xl bg-emerald-50 p-4 col-span-2">
-                    <div class="text-sm text-emerald-700">Estimated annual savings</div>
-                    <div id="savings" class="text-3xl font-extrabold text-emerald-700">$2,424</div>
-                </div>
+<!-- Trust Strip -->
+<section class="bg-slate-900 text-white py-12">
+    <div class="container mx-auto px-4 sm:px-6">
+        <div class="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+                <div class="text-3xl font-bold text-brand">100%</div>
+                <div class="text-slate-400 mt-1">Background-checked technicians</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-brand">4hr</div>
+                <div class="text-slate-400 mt-1">Average response time</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-brand">$90/hr</div>
+                <div class="text-slate-400 mt-1">Transparent, flat-rate pricing</div>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- FAQ -->
-<section id="faq" class="bg-white border-y border-slate-200">
-    <div class="container mx-auto px-4 sm:px-6 py-16">
-        <h2 class="text-2xl sm:text-3xl font-bold">FAQ</h2>
-        <div class="mt-8 grid lg:grid-cols-2 gap-6">
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" open>
-                <summary class="font-semibold cursor-pointer">What does the $99/mo include?</summary>
-                <p class="text-sm text-slate-600 mt-2">24/7 AI tenant concierge, maintenance triage with photo/video intake, rent reminders, and a monthly owner report.</p>
-            </details>
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary class="font-semibold cursor-pointer">How do service calls work?</summary>
-                <p class="text-sm text-slate-600 mt-2">AI triage routes issues to our dispatch. We charge $99 per visit plus materials. You can auto‑approve jobs under $250 for faster turnaround.</p>
-            </details>
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary class="font-semibold cursor-pointer">Do you replace a full property manager?</summary>
-                <p class="text-sm text-slate-600 mt-2">We're a cost‑effective alternative focused on operations & maintenance. If you need full leasing/eviction services, we can add those as needed.</p>
-            </details>
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary class="font-semibold cursor-pointer">Can you integrate with my existing tools?</summary>
-                <p class="text-sm text-slate-600 mt-2">Yes. We can connect with AI PM platforms for tenant comms and scheduling, and sync your preferred accounting/export options.</p>
-            </details>
-        </div>
-    </div>
-</section>
-
-<!-- CTA / Contact form -->
-<section id="cta" class="container mx-auto px-4 sm:px-6 py-16">
-    <div class="grid lg:grid-cols-2 gap-8 items-center">
-        <div>
-            <h2 class="text-2xl sm:text-3xl font-bold">Ready to keep your investment hands‑off?</h2>
-            <p class="mt-3 text-slate-600">Tell us about your condos and we'll reach out to set up your Concierge plan. We can start with one unit and scale to all of them.</p>
-            <ul class="mt-4 space-y-2 text-slate-700 text-sm">
-                <li>• South Florida coverage</li>
-                <li>• Start in days, not weeks</li>
-                <li>• Cancel anytime</li>
-            </ul>
-        </div>
-
-        <!-- Netlify-ready form (also works with basic POST fallback) -->
-        <form id="leadForm" name="concierge-lead" method="POST" data-netlify="true" class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <input type="hidden" name="form-name" value="concierge-lead" />
-            <div class="grid sm:grid-cols-2 gap-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium">Full name</label>
-                    <input id="name" name="name" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium">Email</label>
-                    <input id="email" name="email" type="email" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
-                </div>
-                <div>
-                    <label for="phone" class="block text-sm font-medium">Phone</label>
-                    <input id="phone" name="phone" type="tel" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
-                </div>
-                <div>
-                    <label for="unitsQ" class="block text-sm font-medium">How many units?</label>
-                    <input id="unitsQ" name="units" type="number" min="1" value="2" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
-                </div>
-            </div>
-            <label for="message" class="block text-sm font-medium mt-4">Anything we should know?</label>
-            <textarea id="message" name="message" rows="4" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" placeholder="e.g., Two condos in Boca & Lake Worth, need AC priority and after‑hours coverage"></textarea>
-
-            <div class="mt-4 flex items-start gap-2 text-sm">
-                <input id="consent" type="checkbox" required class="mt-1" />
-                <label for="consent">I agree to be contacted about SendAHandyman Concierge.</label>
-            </div>
-
-            <button class="mt-6 w-full inline-flex items-center justify-center rounded-xl bg-brand px-5 py-3 text-white font-semibold hover:bg-brand-dark">Request my plan</button>
-            <p id="formMsg" class="mt-3 text-sm text-slate-500" role="status" aria-live="polite"></p>
-        </form>
     </div>
 </section>
 
 <!-- Footer -->
 <footer class="bg-white border-t border-slate-200">
-    <div class="container mx-auto px-4 sm:px-6 py-10 grid md:grid-cols-3 gap-6 text-sm">
-        <div>
-            <div class="font-semibold">SendAHandyman Concierge</div>
-            <p class="text-slate-600 mt-2">Less cost. Less headache. More peace of mind.</p>
+    <div class="container mx-auto px-4 sm:px-6 py-10">
+        <div class="grid md:grid-cols-3 gap-8">
+            <div>
+                <div class="flex items-center gap-2 font-semibold text-slate-900 mb-3">
+                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman Logo" class="h-8 w-auto">
+                    <span>SendAHandyman</span>
+                </div>
+                <p class="text-sm text-slate-600">
+                    The preferred handyman service for luxury high-rise living in South Florida.
+                </p>
+            </div>
+            <div>
+                <h4 class="font-semibold text-slate-900 mb-3">Quick Links</h4>
+                <nav class="space-y-2 text-sm">
+                    <a href="index.html" class="block text-slate-600 hover:text-brand">Book a Service</a>
+                    <a href="#partnership" class="block text-slate-600 hover:text-brand">Partner With Us</a>
+                    <a href="join-team.html" class="block text-slate-600 hover:text-brand">Join Our Team</a>
+                    <a href="faq.html" class="block text-slate-600 hover:text-brand">FAQ</a>
+                </nav>
+            </div>
+            <div>
+                <h4 class="font-semibold text-slate-900 mb-3">Service Areas</h4>
+                <p class="text-sm text-slate-600">
+                    Palm Beach · West Palm Beach · Wellington · Boca Raton · Delray Beach · Fort Lauderdale · Miami · Aventura
+                </p>
+                <p class="text-sm text-slate-500 mt-4">
+                    Questions? <a href="mailto:info@sendahandyman.com" class="text-brand hover:underline">info@sendahandyman.com</a>
+                </p>
+            </div>
         </div>
-        <nav class="space-y-2">
-            <a href="#how" class="block hover:text-brand">How it works</a>
-            <a href="#pricing" class="block hover:text-brand">Pricing</a>
-            <a href="#roi" class="block hover:text-brand">ROI</a>
-            <a href="#faq" class="block hover:text-brand">FAQ</a>
-        </nav>
-        <div>
-            <p class="text-slate-600">Serving South Florida condo owners</p>
-            <p class="text-slate-600 mt-1">Questions? <a href="mailto:info@sendahandyman.com" class="text-brand hover:text-brand-dark">info@sendahandyman.com</a></p>
+        <div class="border-t border-slate-200 mt-8 pt-8 text-center text-sm text-slate-500">
+            &copy; 2024 SendAHandyman. All rights reserved.
         </div>
     </div>
-    <div class="text-center text-xs text-slate-500 pb-6">© <span id="year"></span> SendAHandyman. All rights reserved.</div>
 </footer>
 
 <script>
-    // ROI calculator logic
-    function fmtUSD(n){ return n.toLocaleString(undefined,{ style:'currency', currency:'USD', maximumFractionDigits:0}); }
-    function calc(){
-      const rent = Math.max(0, Number(document.getElementById('rent').value || 0));
-      const units = Math.max(1, Math.floor(Number(document.getElementById('units').value || 1)));
-      const pm = rent * 0.10 * 12 * units; // 10% manager
-      const ours = 99 * 12 * units; // $99/mo per unit
-      const save = Math.max(0, pm - ours);
-      document.getElementById('pmCost').textContent = fmtUSD(pm) + '/yr';
-      document.getElementById('ourCost').textContent = fmtUSD(ours) + '/yr';
-      document.getElementById('savings').textContent = fmtUSD(save);
-    }
-    document.getElementById('calcBtn').addEventListener('click', function(e){ e.preventDefault(); calc(); });
-    calc();
+    // Form submission handling
+    const form = document.getElementById('partnershipForm');
+    const formMessage = document.getElementById('formMessage');
 
-    // Year in footer
-    document.getElementById('year').textContent = new Date().getFullYear();
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    // Progressive enhancement for the form
-    const form = document.getElementById('leadForm');
-    const msg  = document.getElementById('formMsg');
-    form?.addEventListener('submit', async (e) => {
-      // If Netlify handles it, the POST will succeed even without JS; this is for inline feedback
-      msg.textContent = 'Submitting…';
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Submitting...';
+        submitBtn.disabled = true;
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            });
+
+            if (response.ok) {
+                formMessage.textContent = 'Thank you! We\'ll be in touch within 24 hours.';
+                formMessage.className = 'text-sm text-emerald-600 text-center';
+                formMessage.classList.remove('hidden');
+                form.reset();
+            } else {
+                throw new Error('Submission failed');
+            }
+        } catch (error) {
+            formMessage.textContent = 'Something went wrong. Please email us at info@sendahandyman.com';
+            formMessage.className = 'text-sm text-red-600 text-center';
+            formMessage.classList.remove('hidden');
+        }
+
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     });
 </script>
+
 </body>
 </html>

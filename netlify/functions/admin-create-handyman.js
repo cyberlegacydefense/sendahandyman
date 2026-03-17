@@ -94,7 +94,7 @@ export const handler = async (event, context) => {
       full_name: full_name,
       phone: phone || null,
       city: city || null,
-      hourly_rate: 64.00,
+      hourly_rate: 60.00,
       onboarding_completed: false,
       is_active: true
     };

@@ -245,7 +245,7 @@ serve(async (req) => {
         email: email.toLowerCase(),
         full_name: name,
         phone: phone || null,
-        hourly_rate: 64.00,
+        hourly_rate: 60.00,
         onboarding_completed: false,
         is_active: true
       };
@@ -274,7 +274,7 @@ serve(async (req) => {
         email: email.toLowerCase(),
         full_name: name,
         phone: phone || null,
-        hourly_rate: 64.00,
+        hourly_rate: 60.00,
         onboarding_completed: false,
         is_active: true
       };

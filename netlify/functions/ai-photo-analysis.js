@@ -9,18 +9,18 @@ const corsHeaders = {
 
 // Task categories with exact pricing from current website (as of Nov 2024)
 const TASK_CATEGORIES = {
-  'tv_mount': { name: 'TV Wall Mount (32–65")', price: 'Starting at $160', hours: '~2.0 hr base' },
-  'ceiling_fan': { name: 'Ceiling Fan Install/Replace', price: 'Starting at $160', hours: '~2.0 hr base' },
-  'light_fixture': { name: 'Light Fixture / Chandelier Swap', price: 'Starting at $120', hours: '~1.5 hr base' },
-  'faucet_showerhead': { name: 'Faucet / Showerhead Replace', price: 'Starting at $120', hours: '~1.5 hr base' },
-  'smart_doorbell': { name: 'Smart Doorbell Install', price: 'Starting at $100', hours: '~1.25 hr base' },
-  'curtains_blinds': { name: 'Curtain Rods / Blinds', price: 'Starting at $80', hours: '~1 hr per item' },
-  'floating_shelf': { name: 'Floating Shelf Install', price: 'Starting at $80', hours: '~1 hr per item' },
-  'appliance_hookup': { name: 'Appliance Hookup (W/D/DW)', price: 'Starting at $160', hours: '~2.0 hr base' },
-  'furniture_assembly': { name: 'Furniture Assembly (S–M)', price: 'Starting at $160', hours: '~2.0 hr base' },
-  'closet_organizer': { name: 'Closet Organizer Install', price: 'Starting at $200', hours: '~2.5 hr base' },
-  'premium_moveout': { name: 'Premium Move-out Repairs', price: 'Starting at $300', hours: '~3.0 hr base' },
-  'general_handyman': { name: 'General Handyman (3+ hours)', price: 'Starting at $240', hours: '~3 hr minimum' }
+  'tv_mount': { name: 'TV Wall Mount (32–65")', price: 'Starting at $180', hours: '~2.0 hr base' },
+  'ceiling_fan': { name: 'Ceiling Fan Install/Replace', price: 'Starting at $180', hours: '~2.0 hr base' },
+  'light_fixture': { name: 'Light Fixture / Chandelier Swap', price: 'Starting at $135', hours: '~1.5 hr base' },
+  'faucet_showerhead': { name: 'Faucet / Showerhead Replace', price: 'Starting at $135', hours: '~1.5 hr base' },
+  'smart_doorbell': { name: 'Smart Doorbell Install', price: 'Starting at $110', hours: '~1.25 hr base' },
+  'curtains_blinds': { name: 'Curtain Rods / Blinds', price: 'Starting at $90', hours: '~1 hr per item' },
+  'floating_shelf': { name: 'Floating Shelf Install', price: 'Starting at $90', hours: '~1 hr per item' },
+  'appliance_hookup': { name: 'Appliance Hookup (W/D/DW)', price: 'Starting at $180', hours: '~2.0 hr base' },
+  'furniture_assembly': { name: 'Furniture Assembly (S–M)', price: 'Starting at $180', hours: '~2.0 hr base' },
+  'closet_organizer': { name: 'Closet Organizer Install', price: 'Starting at $220', hours: '~2.5 hr base' },
+  'premium_moveout': { name: 'Premium Move-out Repairs', price: 'Starting at $330', hours: '~3.0 hr base' },
+  'general_handyman': { name: 'General Handyman (3+ hours)', price: 'Starting at $265', hours: '~3 hr minimum' }
 };
 
 export const handler = async (event, context) => {
@@ -117,7 +117,7 @@ ANALYSIS REQUIREMENTS:
 8. Include urgency notes for homeowner guidance
 
 SERVICE MATCHING RULES:
-- FENCE/GATE repairs (collapsed, broken, damaged fencing) → ALWAYS use "general_handyman" ($240+ for 3+ hour jobs)
+- FENCE/GATE repairs (collapsed, broken, damaged fencing) → ALWAYS use "general_handyman" ($265+ for 3+ hour jobs)
 - FENCE posts, pickets, privacy fences, wood fencing → "general_handyman"
 - DRYWALL holes/patches → "general_handyman" (we don't offer specific drywall service)
 - PAINTING → "general_handyman" (we don't offer standalone painting)
@@ -182,7 +182,7 @@ GUIDELINES:
       problem_description: `Sorry, ${detectedFormat.toUpperCase()} image format is not supported. Please upload your image in JPEG, PNG, WebP, or GIF format for AI analysis.`,
       recommended_task: "General Repair Consultation",
       task_category: "general_repair",
-      cost_estimate: "$120 - $200",
+      cost_estimate: "$135 - $220",
       risk_level: "moderate",
       urgency_notes: `Please convert your ${detectedFormat.toUpperCase()} image to a supported format (JPEG, PNG, WebP, or GIF) and try again. Alternatively, take a new photo directly with your camera.`,
       confidence_level: "low",
@@ -281,7 +281,7 @@ GUIDELINES:
         problem_description: "Based on your photo, this appears to be a general repair task that would benefit from professional assessment.",
         recommended_task: "General Handyman (3+ hours)",
         task_category: "general_handyman",
-        cost_estimate: "Starting at $240",
+        cost_estimate: "Starting at $265",
         risk_level: "moderate",
         urgency_notes: "For the most accurate assessment and pricing, our handyman will evaluate the specific requirements during the appointment.",
         confidence_level: "medium",
@@ -299,7 +299,7 @@ GUIDELINES:
       problem_description: "Based on your photo, this appears to be a repair task that requires professional evaluation to determine the best approach.",
       recommended_task: "General Handyman (3+ hours)",
       task_category: "general_handyman",
-      cost_estimate: "Starting at $240",
+      cost_estimate: "Starting at $265",
       risk_level: "moderate",
       urgency_notes: "Our handyman will assess the specific requirements and provide accurate pricing during the appointment.",
       confidence_level: "medium"
@@ -380,7 +380,7 @@ function validateAndEnhanceAnalysis(analysis) {
     problem_description: "Home repair issue identified in photo",
     recommended_task: "General Handyman (3+ hours)",
     task_category: "general_handyman",
-    cost_estimate: "Starting at $240",
+    cost_estimate: "Starting at $265",
     risk_level: "moderate",
     urgency_notes: "Professional assessment recommended",
     confidence_level: "medium"
@@ -405,7 +405,7 @@ function validateAndEnhanceAnalysis(analysis) {
     console.warn(`Unknown task category: ${analysis.task_category}, defaulting to general_handyman`);
     analysis.task_category = "general_handyman";
     analysis.recommended_task = "General Handyman (3+ hours)";
-    analysis.cost_estimate = "Starting at $240";
+    analysis.cost_estimate = "Starting at $265";
   }
 
   // Ensure cost estimate matches task category if available
@@ -431,7 +431,7 @@ function createMockAnalysis() {
     problem_description: "Image shows a ceiling fan installation or replacement need. The existing fixture appears ready for professional handyman service.",
     recommended_task: "Ceiling Fan Install/Replace",
     task_category: "ceiling_fan",
-    cost_estimate: "Starting at $160",
+    cost_estimate: "Starting at $180",
     risk_level: "moderate",
     urgency_notes: "This installation should be completed by a licensed professional for safety and proper electrical connection.",
     confidence_level: "high"
