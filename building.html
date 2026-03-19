@@ -237,9 +237,20 @@ const TRUST_CHECKLIST = [
 let currentBuilding = null;
 
 (async function() {
-    // Get slug from URL
+    // Get slug from URL - either from query param (?slug=lumaire) or pathname (/lumaire)
     const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug');
+    let slug = urlParams.get('slug');
+
+    // If no query param, extract from pathname (for Netlify rewrites)
+    if (!slug) {
+        const pathSlug = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
+        // Only use pathname if it's a simple slug (no slashes, not a file)
+        if (pathSlug && !pathSlug.includes('/') && !pathSlug.includes('.')) {
+            slug = pathSlug;
+        }
+    }
+
+    console.log('🏢 Building slug:', slug, 'from:', urlParams.get('slug') ? 'query' : 'pathname');
 
     // DOM elements
     const loadingState = document.getElementById('loadingState');
