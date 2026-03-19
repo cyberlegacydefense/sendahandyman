@@ -838,11 +838,29 @@
           <p class="text-xs text-slate-500 mt-1">Used for CTA buttons on the building's landing page</p>
         </div>
 
+        <!-- Logo -->
         <div>
-          <label class="block text-sm font-semibold mb-1">Logo URL (optional)</label>
-          <input type="url" id="buildingLogoUrl" placeholder="/images/buildings/lumaire-logo.png"
-                 class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
-          <p class="text-xs text-slate-500 mt-1">Upload logo to /images/buildings/ first, then enter path here</p>
+          <label class="block text-sm font-semibold mb-1">Building Logo (optional)</label>
+          <div class="flex items-center gap-3 mb-3">
+            <img id="addLogoPreview" src="" alt="Logo preview"
+                 class="h-16 w-auto max-w-32 object-contain border border-slate-200 rounded bg-slate-50 hidden">
+            <span id="addNoLogoText" class="text-sm text-slate-400">No logo selected</span>
+          </div>
+
+          <!-- Option 1: URL -->
+          <div class="mb-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Logo URL</label>
+            <input type="url" id="buildingLogoUrl" placeholder="https://example.com/logo.png"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <!-- Option 2: Upload -->
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Or upload file</label>
+            <input type="file" id="addLogoFile" accept="image/*"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200">
+            <p class="text-xs text-slate-500 mt-1">PNG or JPG, max 2MB</p>
+          </div>
         </div>
 
         <div class="flex items-center gap-2">
@@ -6908,7 +6926,58 @@ function showAddBuildingModal() {
 function closeAddBuildingModal() {
   document.getElementById('addBuildingModal').classList.add('hidden');
   document.getElementById('addBuildingForm').reset();
+  // Reset logo preview
+  document.getElementById('addLogoPreview').classList.add('hidden');
+  document.getElementById('addLogoPreview').src = '';
+  document.getElementById('addNoLogoText').textContent = 'No logo selected';
 }
+
+// Add Building logo preview - URL input
+document.getElementById('buildingLogoUrl')?.addEventListener('input', function() {
+  const preview = document.getElementById('addLogoPreview');
+  const noLogoText = document.getElementById('addNoLogoText');
+
+  if (this.value.trim()) {
+    preview.src = this.value.trim();
+    preview.classList.remove('hidden');
+    noLogoText.textContent = '';
+    preview.onerror = () => {
+      preview.classList.add('hidden');
+      noLogoText.textContent = 'Invalid image URL';
+    };
+  } else {
+    preview.classList.add('hidden');
+    preview.src = '';
+    noLogoText.textContent = 'No logo selected';
+  }
+});
+
+// Add Building logo preview - File upload
+document.getElementById('addLogoFile')?.addEventListener('change', function() {
+  const preview = document.getElementById('addLogoPreview');
+  const noLogoText = document.getElementById('addNoLogoText');
+
+  if (this.files && this.files[0]) {
+    const file = this.files[0];
+
+    // Validate file size (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File too large. Maximum size is 2MB.');
+      this.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview.src = e.target.result;
+      preview.classList.remove('hidden');
+      noLogoText.textContent = file.name;
+      // Clear URL input since file takes precedence
+      document.getElementById('buildingLogoUrl').value = '';
+    };
+    reader.readAsDataURL(file);
+  }
+});
 
 // Auto-generate slug from building name
 document.getElementById('buildingName')?.addEventListener('input', function() {
@@ -6936,24 +7005,62 @@ document.getElementById('buildingAccentHex')?.addEventListener('input', function
 document.getElementById('addBuildingForm')?.addEventListener('submit', async function(e) {
   e.preventDefault();
 
+  const slug = document.getElementById('buildingSlug').value.trim().toLowerCase();
+
+  // Validate slug
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    alert('Slug must contain only lowercase letters, numbers, and hyphens');
+    return;
+  }
+
+  // Handle logo - file upload takes precedence over URL
+  let logoUrl = document.getElementById('buildingLogoUrl').value.trim() || null;
+  const logoFile = document.getElementById('addLogoFile').files[0];
+
+  if (logoFile) {
+    try {
+      const fileExt = logoFile.name.split('.').pop().toLowerCase();
+      const fileName = `${slug}-logo-${Date.now()}.${fileExt}`;
+      const filePath = `buildings/${fileName}`;
+
+      console.log('📤 Uploading logo to Supabase Storage:', filePath);
+
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('assets')
+        .upload(filePath, logoFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('❌ Logo upload error:', uploadError);
+        alert('Logo upload failed: ' + uploadError.message + '\n\nBuilding will be created without logo.');
+      } else {
+        // Get public URL
+        const { data: urlData } = supabaseAdmin.storage
+          .from('assets')
+          .getPublicUrl(filePath);
+        logoUrl = urlData.publicUrl;
+        console.log('✅ Logo uploaded:', logoUrl);
+      }
+    } catch (uploadErr) {
+      console.error('❌ Logo upload exception:', uploadErr);
+      alert('Logo upload failed. Building will be created without logo.');
+    }
+  }
+
   const buildingData = {
     building_name: document.getElementById('buildingName').value.trim(),
-    slug: document.getElementById('buildingSlug').value.trim().toLowerCase(),
+    slug: slug,
     street: document.getElementById('buildingStreet').value.trim(),
     city: document.getElementById('buildingCity').value.trim(),
     state: document.getElementById('buildingState').value.trim() || 'FL',
     zip: document.getElementById('buildingZip').value.trim(),
     accent_color: document.getElementById('buildingAccentHex').value.trim(),
-    logo_url: document.getElementById('buildingLogoUrl').value.trim() || null,
+    logo_url: logoUrl,
     active: document.getElementById('buildingActive').checked,
     created_at: new Date().toISOString()
   };
-
-  // Validate slug
-  if (!/^[a-z0-9-]+$/.test(buildingData.slug)) {
-    alert('Slug must contain only lowercase letters, numbers, and hyphens');
-    return;
-  }
 
   try {
     const { data, error } = await supabaseAdmin
