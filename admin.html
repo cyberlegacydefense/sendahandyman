@@ -796,7 +796,7 @@
             <div class="flex items-center">
               <span class="text-slate-500 text-sm mr-1">sendahandyman.com/</span>
               <input type="text" id="buildingSlug" required placeholder="lumaire"
-                     pattern="[a-z0-9-]+" title="Lowercase letters, numbers, and hyphens only"
+                     pattern="[-a-z0-9]+" title="Lowercase letters, numbers, and hyphens only"
                      class="flex-1 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
             </div>
             <p class="text-xs text-slate-500 mt-1">Lowercase letters, numbers, and hyphens only</p>
@@ -932,7 +932,7 @@
             <span class="text-slate-500 text-sm mr-1">sendahandyman.com/</span>
             <input type="text" id="editBuildingSlug" required
                    class="flex-1 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   pattern="[a-z0-9-]+" title="Lowercase letters, numbers, and hyphens only">
+                   pattern="[-a-z0-9]+" title="Lowercase letters, numbers, and hyphens only">
           </div>
           <p class="text-xs text-slate-500 mt-1">Changing this will break existing QR codes and links</p>
         </div>
@@ -1286,12 +1286,12 @@
               <input type="tel" id="editPhone" class="w-full border rounded-lg px-3 py-2">
             </div>
             <div>
-              <label for="editCity" class="block text-sm font-medium mb-1">City</label>
-              <input type="text" id="editCity" class="w-full border rounded-lg px-3 py-2">
+              <label for="editHandymanCity" class="block text-sm font-medium mb-1">City</label>
+              <input type="text" id="editHandymanCity" class="w-full border rounded-lg px-3 py-2">
             </div>
             <div>
-              <label for="editZip" class="block text-sm font-medium mb-1">ZIP Code</label>
-              <input type="text" id="editZip" class="w-full border rounded-lg px-3 py-2">
+              <label for="editHandymanZip" class="block text-sm font-medium mb-1">ZIP Code</label>
+              <input type="text" id="editHandymanZip" class="w-full border rounded-lg px-3 py-2">
             </div>
             <div>
               <label for="editServiceState" class="block text-sm font-medium mb-1">Service State</label>
@@ -3870,9 +3870,9 @@ function populateEditForm(handyman) {
 
   // Address fields
   setValue('editStreetAddress', handyman.street_address);
-  setValue('editCity', handyman.city);
+  setValue('editHandymanCity', handyman.city);
   setValue('editState', handyman.state);
-  setValue('editZipCode', handyman.zip_code);
+  setValue('editHandymanZip', handyman.zip_code);
   setValue('editCountry', handyman.country);
 
   // Work & Skills Tab
@@ -4000,9 +4000,9 @@ async function saveHandymanEdits() {
 
       // Address
       street_address: getValue('editStreetAddress'),
-      city: getValue('editCity'),
+      city: getValue('editHandymanCity'),
       state: getValue('editState'),
-      zip_code: getValue('editZipCode'),
+      zip_code: getValue('editHandymanZip'),
       country: getValue('editCountry'),
 
       // Work & Skills
