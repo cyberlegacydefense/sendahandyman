@@ -796,7 +796,7 @@
             <div class="flex items-center">
               <span class="text-slate-500 text-sm mr-1">sendahandyman.com/</span>
               <input type="text" id="buildingSlug" required placeholder="lumaire"
-                     pattern="[-a-z0-9]+" title="Lowercase letters, numbers, and hyphens only"
+                     pattern="[a-z0-9]+(-[a-z0-9]+)*" title="Lowercase letters, numbers, and hyphens only"
                      class="flex-1 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
             </div>
             <p class="text-xs text-slate-500 mt-1">Lowercase letters, numbers, and hyphens only</p>
@@ -932,7 +932,7 @@
             <span class="text-slate-500 text-sm mr-1">sendahandyman.com/</span>
             <input type="text" id="editBuildingSlug" required
                    class="flex-1 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
-                   pattern="[-a-z0-9]+" title="Lowercase letters, numbers, and hyphens only">
+                   pattern="[a-z0-9]+(-[a-z0-9]+)*" title="Lowercase letters, numbers, and hyphens only">
           </div>
           <p class="text-xs text-slate-500 mt-1">Changing this will break existing QR codes and links</p>
         </div>
@@ -7137,23 +7137,36 @@ async function deleteBuilding(id, name) {
 
 // QR Code Modal
 function showQrCode(slug, buildingName) {
+  console.log('📱 Generating QR code for:', slug, buildingName);
   currentQrBuilding = { slug, buildingName };
   const url = `${BUILDING_BASE_URL}/${slug}`;
+  console.log('📱 QR URL:', url);
 
   document.getElementById('qrCodeBuildingName').textContent = buildingName;
   document.getElementById('qrCodeUrl').textContent = url;
   document.getElementById('qrCodeModal').classList.remove('hidden');
 
   // Generate QR code using QRious
-  const canvas = document.getElementById('qrCodeCanvas');
-  new QRious({
-    element: canvas,
-    value: url,
-    size: 200,
-    foreground: '#000000',
-    background: '#ffffff',
-    level: 'M'
-  });
+  try {
+    const canvas = document.getElementById('qrCodeCanvas');
+    if (typeof QRious === 'undefined') {
+      console.error('❌ QRious library not loaded');
+      alert('QR code library not loaded. Please refresh the page.');
+      return;
+    }
+    const qr = new QRious({
+      element: canvas,
+      value: url,
+      size: 200,
+      foreground: '#000000',
+      background: '#ffffff',
+      level: 'M'
+    });
+    console.log('✅ QR code generated successfully');
+  } catch (error) {
+    console.error('❌ QR code generation error:', error);
+    alert('Error generating QR code: ' + error.message);
+  }
 }
 
 function closeQrCodeModal() {
