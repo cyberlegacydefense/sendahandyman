@@ -320,10 +320,21 @@ let currentBuilding = null;
             `Private home maintenance for ${building.building_name} residents. Vetted technicians, transparent pricing.`;
 
         // Building logo (with fallback to building name)
+        const logoImg = document.getElementById('buildingLogo');
+        const fallbackName = document.getElementById('buildingNameFallback');
+
         if (building.logo_url) {
-            document.getElementById('buildingLogo').src = building.logo_url;
+            // Reset display in case onerror fired on empty src
+            logoImg.style.display = '';
+            logoImg.src = building.logo_url;
+            logoImg.alt = building.building_name + ' Logo';
+            fallbackName.classList.add('hidden');
+        } else {
+            // No logo - show building name instead
+            logoImg.style.display = 'none';
+            fallbackName.textContent = building.building_name;
+            fallbackName.classList.remove('hidden');
         }
-        document.getElementById('buildingLogo').alt = building.building_name + ' Logo';
         document.getElementById('buildingNameFallback').textContent = building.building_name;
 
         // Hero content
