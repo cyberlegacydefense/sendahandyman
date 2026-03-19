@@ -7154,15 +7154,22 @@ function showQrCode(slug, buildingName) {
       alert('QR code library not loaded. Please refresh the page.');
       return;
     }
+
+    // Clear canvas before generating new QR code
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     const qr = new QRious({
       element: canvas,
       value: url,
-      size: 200,
+      size: 250,
       foreground: '#000000',
       background: '#ffffff',
-      level: 'M'
+      level: 'H'  // Highest error correction for better scanning
     });
-    console.log('✅ QR code generated successfully');
+    console.log('✅ QR code generated, encoded value:', qr.value);
   } catch (error) {
     console.error('❌ QR code generation error:', error);
     alert('Error generating QR code: ' + error.message);
