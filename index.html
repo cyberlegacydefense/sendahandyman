@@ -5522,6 +5522,19 @@
             document.getElementById('landingScreen').classList.remove('hide');
             document.getElementById('serviceFlow').classList.add('hide');
 
+            // Auto-select service if coming from building page with ?service=X&autostart=1
+            const urlParams = new URLSearchParams(window.location.search);
+            const preSelectedService = urlParams.get('service');
+            const autoStart = urlParams.get('autostart');
+
+            if (preSelectedService && autoStart === '1') {
+                console.log('🚀 Auto-starting booking flow with service:', preSelectedService);
+                // Small delay to ensure page is fully loaded
+                setTimeout(() => {
+                    selectService(preSelectedService);
+                }, 100);
+            }
+
             // Force hide photo modal with multiple methods
             const photoModal = document.getElementById('photoModal');
             if (photoModal) {

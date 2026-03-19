@@ -186,10 +186,12 @@
     <footer class="bg-slate-900 text-white py-10">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div class="flex items-center gap-3">
-                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman" class="h-10 w-auto" style="filter: brightness(0) invert(1);">
-                    <span class="font-semibold">SendAHandyman</span>
-                </div>
+                <a href="/" class="flex items-center gap-3 group">
+                    <div class="bg-white rounded-lg p-1.5">
+                        <img src="/images/helpinghands_logo.png" alt="SendAHandyman" class="h-8 w-8 object-contain">
+                    </div>
+                    <span class="font-semibold group-hover:text-slate-300 transition-colors">SendAHandyman</span>
+                </a>
                 <div class="text-center sm:text-right text-sm text-slate-400">
                     <p>Serving South Florida luxury properties</p>
                     <p class="mt-1">Palm Beach · Boca Raton · Fort Lauderdale · Miami</p>
@@ -379,6 +381,18 @@ let currentBuilding = null;
     }
 })();
 
+// Map building service keys to index.html categories
+const SERVICE_CATEGORY_MAP = {
+    'tv_mount': 'mounting',
+    'ceiling-fan': 'ceiling-fan',
+    'light-fixture': 'electrical',
+    'faucet': 'light-plumbing',
+    'smart-doorbell': 'electrical',
+    'blinds': 'curtains-blinds',
+    'furniture': 'furniture',
+    'handyman': 'repair'
+};
+
 // Build booking URL with building context
 window.buildBookingUrl = function(service) {
     if (!currentBuilding) return '/index.html';
@@ -395,12 +409,13 @@ window.buildBookingUrl = function(service) {
     }
 
     if (service) {
-        params.set('service', service);
+        // Map building service key to index.html category
+        const category = SERVICE_CATEGORY_MAP[service] || service;
+        params.set('service', category);
+        params.set('autostart', '1'); // Signal to auto-start booking flow
     }
 
-    // If selecting a specific service, link to services section; otherwise home page
-    const hash = service ? '#landingScreen' : '';
-    return `/index.html?${params.toString()}${hash}`;
+    return `/index.html?${params.toString()}`;
 };
 </script>
 
