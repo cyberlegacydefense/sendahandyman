@@ -1026,6 +1026,32 @@
           </div>
         </div>
 
+        <!-- Testimonial -->
+        <div class="border-t pt-4 mt-4">
+          <h4 class="font-semibold text-sm text-slate-700 mb-3">Customer Testimonial (optional)</h4>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Review Text</label>
+              <textarea id="editTestimonialText" rows="3" placeholder="Enter customer review..."
+                        class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Reviewer First Name</label>
+                <input type="text" id="editTestimonialAuthor" placeholder="e.g., Matthew"
+                       class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 text-sm">
+              </div>
+              <div class="flex items-end">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="editTestimonialIsResident" class="w-4 h-4 rounded">
+                  <span class="text-sm text-slate-700">Show as "[Building] Resident"</span>
+                </label>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500">If unchecked, shows "Verified Customer" instead of building name</p>
+          </div>
+        </div>
+
         <div class="flex gap-3 pt-4">
           <button type="button" onclick="closeEditBuildingModal()" class="flex-1 border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50">
             Cancel
@@ -7236,6 +7262,11 @@ async function showEditBuildingModal(buildingId) {
   document.getElementById('editPmEmail').value = building.pm_email || '';
   document.getElementById('editPmPhone').value = building.pm_phone || '';
 
+  // Testimonial fields
+  document.getElementById('editTestimonialText').value = building.testimonial_text || '';
+  document.getElementById('editTestimonialAuthor').value = building.testimonial_author || '';
+  document.getElementById('editTestimonialIsResident').checked = building.testimonial_is_resident || false;
+
   // Show logo preview and populate URL field if exists
   const preview = document.getElementById('editLogoPreview');
   const noLogoText = document.getElementById('editNoLogoText');
@@ -7369,7 +7400,10 @@ document.getElementById('editBuildingForm')?.addEventListener('submit', async fu
       pm_name: document.getElementById('editPmName').value.trim() || null,
       pm_email: document.getElementById('editPmEmail').value.trim() || null,
       pm_phone: document.getElementById('editPmPhone').value.trim() || null,
-      logo_url: logoUrl
+      logo_url: logoUrl,
+      testimonial_text: document.getElementById('editTestimonialText').value.trim() || null,
+      testimonial_author: document.getElementById('editTestimonialAuthor').value.trim() || null,
+      testimonial_is_resident: document.getElementById('editTestimonialIsResident').checked
     };
 
     // Warn if slug changed

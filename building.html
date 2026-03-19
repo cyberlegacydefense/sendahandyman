@@ -209,20 +209,20 @@
     </section>
 
     <!-- Testimonial Section -->
-    <section class="py-10 sm:py-14 bg-white">
+    <section id="testimonialSection" class="py-10 sm:py-14 bg-white">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
             <div class="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200">
                 <svg class="w-10 h-10 mx-auto mb-4 text-slate-300" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
                 </svg>
-                <blockquote class="text-lg sm:text-xl text-slate-700 mb-6">
+                <blockquote id="testimonialText" class="text-lg sm:text-xl text-slate-700 mb-6">
                     I was very impressed with the gentleman who was very prompt meeting the appointment time setting. Zachary was very professional and brought all the tools necessary to complete the job, which he did very well.
                 </blockquote>
                 <div class="flex items-center justify-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-semibold">M</div>
+                    <div id="testimonialInitial" class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-semibold">M</div>
                     <div class="text-left">
-                        <div class="font-semibold text-slate-900">Matthew</div>
-                        <div class="text-sm text-slate-500"><span id="testimonialBuildingName">Building</span> Resident</div>
+                        <div id="testimonialAuthor" class="font-semibold text-slate-900">Matthew</div>
+                        <div id="testimonialAttribution" class="text-sm text-slate-500">Verified Customer</div>
                     </div>
                 </div>
                 <div class="flex justify-center gap-1 mt-4">
@@ -430,8 +430,26 @@ let currentBuilding = null;
             badge.classList.remove('hidden');
         }
 
-        // Update testimonial building name
-        document.getElementById('testimonialBuildingName').textContent = building.building_name;
+        // Update testimonial section
+        const defaultTestimonial = {
+            text: "I was very impressed with the gentleman who was very prompt meeting the appointment time setting. Zachary was very professional and brought all the tools necessary to complete the job, which he did very well.",
+            author: "Matthew"
+        };
+
+        const testimonialText = building.testimonial_text || defaultTestimonial.text;
+        const testimonialAuthor = building.testimonial_author || defaultTestimonial.author;
+        const isResident = building.testimonial_is_resident || false;
+
+        document.getElementById('testimonialText').textContent = testimonialText;
+        document.getElementById('testimonialAuthor').textContent = testimonialAuthor;
+        document.getElementById('testimonialInitial').textContent = testimonialAuthor.charAt(0).toUpperCase();
+
+        // Show "[Building] Resident" or "Verified Customer"
+        if (isResident) {
+            document.getElementById('testimonialAttribution').textContent = `${building.building_name} Resident`;
+        } else {
+            document.getElementById('testimonialAttribution').textContent = 'Verified Customer';
+        }
 
         // Services list
         const serviceKeys = building.featured_services || Object.keys(SERVICES);
