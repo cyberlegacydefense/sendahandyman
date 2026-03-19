@@ -1354,6 +1354,32 @@
         // Customer form data storage
         let customerFormData = {};
 
+        // Building reference tracking (from QR codes/building landing pages)
+        let buildingRef = null;
+        let buildingAddress = null;
+
+        // Read URL parameters for building attribution and address pre-fill
+        (function initBuildingContext() {
+            const params = new URLSearchParams(window.location.search);
+            buildingRef = params.get('ref');  // e.g., 'lumaire'
+
+            // If address params provided, store for auto-population
+            if (params.get('street')) {
+                buildingAddress = {
+                    street: params.get('street'),
+                    city: params.get('city') || '',
+                    state: params.get('state') || 'FL',
+                    zip: params.get('zip') || ''
+                };
+                console.log('📍 Building context loaded:', buildingRef, buildingAddress);
+            }
+
+            // Track service pre-selection if provided
+            if (params.get('service')) {
+                console.log('🔧 Pre-selected service:', params.get('service'));
+            }
+        })();
+
         // Service types with proper pricing and upcharge questions
         const TASKS = {
             'ceiling-fan': {
@@ -3348,6 +3374,16 @@
                     </button>
                 </div>
             `;
+
+            // Auto-populate address if coming from building landing page
+            if (buildingAddress) {
+                const fullAddress = `${buildingAddress.street}, ${buildingAddress.city}, ${buildingAddress.state} ${buildingAddress.zip}`;
+                const addressInput = document.getElementById('customerAddress');
+                const zipInput = document.getElementById('customerZip');
+                if (addressInput) addressInput.value = fullAddress;
+                if (zipInput && buildingAddress.zip) zipInput.value = buildingAddress.zip;
+                console.log('📍 Address auto-populated from building context');
+            }
         }
 
         function validateCustomerForm() {
@@ -3397,7 +3433,8 @@
                 zip: zip,
                 address: address,
                 category: serviceData.category,
-                description: serviceData.detailedDescription || ''
+                description: serviceData.detailedDescription || '',
+                building_ref: buildingRef || null  // Track building attribution
             };
 
             console.log('✅ Customer info validated:', customerFormData);
@@ -5747,7 +5784,9 @@
                     pets_and_special: document.getElementById('petsAndSpecial').value || '',
                     additional_details: document.getElementById('additionalDetails').value || ''
                 },
-                amount: serviceData.pricing.total
+                amount: serviceData.pricing.total,
+                // Building attribution (from QR codes/building landing pages)
+                building_ref: buildingRef || null
             };
 
             console.log('📤 Creating task with data:', completeJobData);

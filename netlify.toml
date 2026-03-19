@@ -21,6 +21,18 @@ from = "/dashboard"
 to = "/dashboard-enhanced.html"
 status = 200
 
+# Building-specific landing pages
+# Add new buildings here as they are added to /config/buildings.js
+[[redirects]]
+from = "/lumaire"
+to = "/building.html?slug=lumaire"
+status = 200
+
+[[redirects]]
+from = "/the-bristol"
+to = "/building.html?slug=the-bristol"
+status = 200
+
 # Headers for security
 [[headers]]
 for = "/*"
