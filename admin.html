@@ -888,6 +888,115 @@
   </div>
 </div>
 
+<!-- Edit Building Modal -->
+<div id="editBuildingModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold">Edit Building</h3>
+        <button onclick="closeEditBuildingModal()" class="text-slate-500 hover:text-slate-700 text-2xl">&times;</button>
+      </div>
+
+      <form id="editBuildingForm" class="space-y-4">
+        <input type="hidden" id="editBuildingId">
+
+        <!-- Building Name (read-only) -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Building Name</label>
+          <input type="text" id="editBuildingName" readonly
+                 class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-600">
+        </div>
+
+        <!-- Logo Upload -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Building Logo</label>
+          <div class="flex items-center gap-3 mb-2">
+            <img id="editLogoPreview" src="" alt="Logo preview"
+                 class="h-16 w-auto max-w-32 object-contain border border-slate-200 rounded bg-slate-50 hidden">
+            <span id="editNoLogoText" class="text-sm text-slate-400">No logo uploaded</span>
+          </div>
+          <input type="file" id="editLogoFile" accept="image/*"
+                 class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200">
+          <p class="text-xs text-slate-500 mt-1">PNG or JPG, max 2MB. Recommended height: 100-200px</p>
+        </div>
+
+        <!-- Headline -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Custom Headline</label>
+          <input type="text" id="editHeadline" placeholder="Private Home Maintenance — On Demand"
+                 class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+          <p class="text-xs text-slate-500 mt-1">Leave blank for default headline</p>
+        </div>
+
+        <!-- Subheadline -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Custom Subheadline</label>
+          <input type="text" id="editSubheadline" placeholder="Trusted help for the details that keep your home perfect."
+                 class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Address -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Street Address</label>
+          <input type="text" id="editStreet"
+                 class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold mb-1">City</label>
+            <input type="text" id="editCity"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">State</label>
+            <input type="text" id="editState" maxlength="2"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1">ZIP</label>
+            <input type="text" id="editZip"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <!-- Accent Color -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Accent Color</label>
+          <div class="flex items-center gap-3">
+            <input type="color" id="editAccentColor"
+                   class="w-12 h-10 rounded border border-slate-200 cursor-pointer">
+            <input type="text" id="editAccentHex"
+                   class="flex-1 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <!-- Property Manager -->
+        <div class="border-t pt-4 mt-4">
+          <h4 class="font-semibold text-sm text-slate-700 mb-3">Property Manager Contact (optional)</h4>
+          <div class="grid grid-cols-1 gap-3">
+            <input type="text" id="editPmName" placeholder="Contact Name"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+            <input type="email" id="editPmEmail" placeholder="Email"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+            <input type="tel" id="editPmPhone" placeholder="Phone"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+          </div>
+        </div>
+
+        <div class="flex gap-3 pt-4">
+          <button type="button" onclick="closeEditBuildingModal()" class="flex-1 border border-slate-300 px-4 py-2 rounded-lg hover:bg-slate-50">
+            Cancel
+          </button>
+          <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Modals -->
 
 <!-- Create Quote Modal -->
@@ -6748,6 +6857,10 @@ function renderBuildingsGrid(buildings) {
         </div>
 
         <div class="flex flex-wrap gap-2">
+          <button onclick="showEditBuildingModal('${building.id}')"
+                  class="flex-1 bg-blue-100 text-blue-700 px-3 py-2 rounded-lg text-sm hover:bg-blue-200 flex items-center justify-center gap-1">
+            ✏️ Edit
+          </button>
           <button onclick="showQrCode('${building.slug}', '${building.building_name}')"
                   class="flex-1 bg-indigo-100 text-indigo-700 px-3 py-2 rounded-lg text-sm hover:bg-indigo-200 flex items-center justify-center gap-1">
             📱 QR Code
@@ -6756,10 +6869,12 @@ function renderBuildingsGrid(buildings) {
              class="flex-1 bg-slate-100 text-slate-700 px-3 py-2 rounded-lg text-sm hover:bg-slate-200 flex items-center justify-center gap-1">
             👁️ Preview
           </a>
+        </div>
+        <div class="flex gap-2 mt-2">
           <button onclick="toggleBuildingStatus('${building.id}', ${building.active})"
-                  class="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg text-sm hover:bg-slate-200"
+                  class="flex-1 bg-slate-100 text-slate-700 px-3 py-2 rounded-lg text-sm hover:bg-slate-200"
                   title="${building.active ? 'Deactivate' : 'Activate'}">
-            ${building.active ? '⏸️' : '▶️'}
+            ${building.active ? '⏸️ Deactivate' : '▶️ Activate'}
           </button>
           <button onclick="deleteBuilding('${building.id}', '${building.building_name}')"
                   class="bg-red-100 text-red-700 px-3 py-2 rounded-lg text-sm hover:bg-red-200"
@@ -6934,6 +7049,188 @@ function copyBuildingUrl() {
     console.error('Copy failed:', err);
     prompt('Copy this URL:', url);
   });
+}
+
+// ============================================
+// EDIT BUILDING
+// ============================================
+
+let currentEditBuilding = null;
+let pendingLogoFile = null;
+
+async function showEditBuildingModal(buildingId) {
+  // Find building in cached data
+  const building = buildingsData.find(b => b.id === buildingId);
+  if (!building) {
+    alert('Building not found');
+    return;
+  }
+
+  currentEditBuilding = building;
+
+  // Populate form fields
+  document.getElementById('editBuildingId').value = building.id;
+  document.getElementById('editBuildingName').value = building.building_name;
+  document.getElementById('editHeadline').value = building.headline || '';
+  document.getElementById('editSubheadline').value = building.subheadline || '';
+  document.getElementById('editStreet').value = building.street || '';
+  document.getElementById('editCity').value = building.city || '';
+  document.getElementById('editState').value = building.state || 'FL';
+  document.getElementById('editZip').value = building.zip || '';
+  document.getElementById('editAccentColor').value = building.accent_color || '#0ea5e9';
+  document.getElementById('editAccentHex').value = building.accent_color || '#0ea5e9';
+  document.getElementById('editPmName').value = building.pm_name || '';
+  document.getElementById('editPmEmail').value = building.pm_email || '';
+  document.getElementById('editPmPhone').value = building.pm_phone || '';
+
+  // Show logo preview if exists
+  const preview = document.getElementById('editLogoPreview');
+  const noLogoText = document.getElementById('editNoLogoText');
+  if (building.logo_url) {
+    preview.src = building.logo_url;
+    preview.classList.remove('hidden');
+    noLogoText.classList.add('hidden');
+  } else {
+    preview.classList.add('hidden');
+    noLogoText.classList.remove('hidden');
+  }
+
+  // Reset file input
+  document.getElementById('editLogoFile').value = '';
+  pendingLogoFile = null;
+
+  document.getElementById('editBuildingModal').classList.remove('hidden');
+}
+
+function closeEditBuildingModal() {
+  document.getElementById('editBuildingModal').classList.add('hidden');
+  currentEditBuilding = null;
+  pendingLogoFile = null;
+}
+
+// Handle logo file selection preview
+document.getElementById('editLogoFile')?.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Validate file size (2MB max)
+  if (file.size > 2 * 1024 * 1024) {
+    alert('File too large. Maximum size is 2MB.');
+    this.value = '';
+    return;
+  }
+
+  // Preview the image
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('editLogoPreview');
+    preview.src = e.target.result;
+    preview.classList.remove('hidden');
+    document.getElementById('editNoLogoText').classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+  pendingLogoFile = file;
+});
+
+// Sync edit color picker with hex input
+document.getElementById('editAccentColor')?.addEventListener('input', function() {
+  document.getElementById('editAccentHex').value = this.value;
+});
+
+document.getElementById('editAccentHex')?.addEventListener('input', function() {
+  if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+    document.getElementById('editAccentColor').value = this.value;
+  }
+});
+
+// Handle edit form submission
+document.getElementById('editBuildingForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const buildingId = document.getElementById('editBuildingId').value;
+  const submitBtn = this.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Saving...';
+
+  try {
+    let logoUrl = currentEditBuilding.logo_url;
+
+    // Upload logo if a new file was selected
+    if (pendingLogoFile) {
+      logoUrl = await uploadBuildingLogo(currentEditBuilding.slug, pendingLogoFile);
+    }
+
+    // Build update data
+    const updateData = {
+      headline: document.getElementById('editHeadline').value.trim() || null,
+      subheadline: document.getElementById('editSubheadline').value.trim() || null,
+      street: document.getElementById('editStreet').value.trim(),
+      city: document.getElementById('editCity').value.trim(),
+      state: document.getElementById('editState').value.trim() || 'FL',
+      zip: document.getElementById('editZip').value.trim(),
+      accent_color: document.getElementById('editAccentHex').value.trim(),
+      pm_name: document.getElementById('editPmName').value.trim() || null,
+      pm_email: document.getElementById('editPmEmail').value.trim() || null,
+      pm_phone: document.getElementById('editPmPhone').value.trim() || null,
+      logo_url: logoUrl
+    };
+
+    const { error } = await supabaseAdmin
+      .from('buildings')
+      .update(updateData)
+      .eq('id', buildingId);
+
+    if (error) throw error;
+
+    console.log('✅ Building updated');
+    closeEditBuildingModal();
+    loadBuildingsData();
+    alert('Building updated successfully!');
+
+  } catch (error) {
+    console.error('❌ Error updating building:', error);
+    alert('Error updating building: ' + error.message);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Save Changes';
+  }
+});
+
+// Upload logo to Supabase Storage
+async function uploadBuildingLogo(slug, file) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${slug}-logo.${fileExt}`;
+  const filePath = `buildings/${fileName}`;
+
+  console.log('📤 Uploading logo:', filePath);
+
+  // First, try to delete existing logo if any
+  try {
+    await supabaseAdmin.storage.from('assets').remove([filePath]);
+  } catch (e) {
+    // Ignore if file doesn't exist
+  }
+
+  // Upload new logo
+  const { data, error } = await supabaseAdmin.storage
+    .from('assets')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+  if (error) {
+    console.error('❌ Logo upload error:', error);
+    throw new Error('Failed to upload logo: ' + error.message);
+  }
+
+  // Get public URL
+  const { data: urlData } = supabaseAdmin.storage
+    .from('assets')
+    .getPublicUrl(filePath);
+
+  console.log('✅ Logo uploaded:', urlData.publicUrl);
+  return urlData.publicUrl;
 }
 
 console.log('🏢 Building management loaded');
