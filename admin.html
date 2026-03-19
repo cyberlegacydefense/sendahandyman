@@ -108,7 +108,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -7025,14 +7025,15 @@ function showQrCode(slug, buildingName) {
   document.getElementById('qrCodeUrl').textContent = url;
   document.getElementById('qrCodeModal').classList.remove('hidden');
 
-  // Generate QR code
+  // Generate QR code using QRious
   const canvas = document.getElementById('qrCodeCanvas');
-  QRCode.toCanvas(canvas, url, {
-    width: 200,
-    margin: 2,
-    color: { dark: '#000000', light: '#ffffff' }
-  }, function(error) {
-    if (error) console.error('QR generation error:', error);
+  new QRious({
+    element: canvas,
+    value: url,
+    size: 200,
+    foreground: '#000000',
+    background: '#ffffff',
+    level: 'M'
   });
 }
 
