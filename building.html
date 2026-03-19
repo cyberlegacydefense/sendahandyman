@@ -222,7 +222,7 @@
                     <div class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-slate-600 font-semibold">M</div>
                     <div class="text-left">
                         <div class="font-semibold text-slate-900">Matthew</div>
-                        <div class="text-sm text-slate-500">Building Resident</div>
+                        <div class="text-sm text-slate-500"><span id="testimonialBuildingName">Building</span> Resident</div>
                     </div>
                 </div>
                 <div class="flex justify-center gap-1 mt-4">
@@ -420,6 +420,9 @@ let currentBuilding = null;
             badgeText.textContent = `Approved by ${building.building_name} Management`;
             badge.classList.remove('hidden');
         }
+
+        // Update testimonial building name
+        document.getElementById('testimonialBuildingName').textContent = building.building_name;
 
         // Services list
         const serviceKeys = building.featured_services || Object.keys(SERVICES);
