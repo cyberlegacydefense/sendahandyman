@@ -918,11 +918,23 @@
       <form id="editBuildingForm" class="space-y-4">
         <input type="hidden" id="editBuildingId">
 
-        <!-- Building Name (read-only) -->
+        <!-- Building Name -->
         <div>
           <label class="block text-sm font-semibold mb-1">Building Name</label>
-          <input type="text" id="editBuildingName" readonly
-                 class="w-full border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 text-slate-600">
+          <input type="text" id="editBuildingName" required
+                 class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <!-- Slug -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">URL Slug</label>
+          <div class="flex items-center">
+            <span class="text-slate-500 text-sm mr-1">sendahandyman.com/</span>
+            <input type="text" id="editBuildingSlug" required
+                   class="flex-1 border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500"
+                   pattern="[a-z0-9-]+" title="Lowercase letters, numbers, and hyphens only">
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Changing this will break existing QR codes and links</p>
         </div>
 
         <!-- Logo -->
@@ -7191,6 +7203,7 @@ async function showEditBuildingModal(buildingId) {
   // Populate form fields
   document.getElementById('editBuildingId').value = building.id;
   document.getElementById('editBuildingName').value = building.building_name;
+  document.getElementById('editBuildingSlug').value = building.slug || '';
   document.getElementById('editHeadline').value = building.headline || '';
   document.getElementById('editSubheadline').value = building.subheadline || '';
   document.getElementById('editStreet').value = building.street || '';
@@ -7313,8 +7326,19 @@ document.getElementById('editBuildingForm')?.addEventListener('submit', async fu
       }
     }
 
+    // Validate slug
+    const newSlug = document.getElementById('editBuildingSlug').value.trim().toLowerCase();
+    if (!/^[a-z0-9-]+$/.test(newSlug)) {
+      alert('Slug must contain only lowercase letters, numbers, and hyphens');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Save Changes';
+      return;
+    }
+
     // Build update data
     const updateData = {
+      building_name: document.getElementById('editBuildingName').value.trim(),
+      slug: newSlug,
       headline: document.getElementById('editHeadline').value.trim() || null,
       subheadline: document.getElementById('editSubheadline').value.trim() || null,
       street: document.getElementById('editStreet').value.trim(),
@@ -7327,6 +7351,16 @@ document.getElementById('editBuildingForm')?.addEventListener('submit', async fu
       pm_phone: document.getElementById('editPmPhone').value.trim() || null,
       logo_url: logoUrl
     };
+
+    // Warn if slug changed
+    if (newSlug !== currentEditBuilding.slug) {
+      const confirmed = confirm(`Warning: Changing the slug from "${currentEditBuilding.slug}" to "${newSlug}" will break existing QR codes and links.\n\nYou'll also need to update netlify.toml with the new redirect.\n\nContinue?`);
+      if (!confirmed) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+        return;
+      }
+    }
 
     const { error } = await supabaseAdmin
       .from('buildings')
