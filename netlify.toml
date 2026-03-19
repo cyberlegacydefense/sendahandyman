@@ -27,11 +27,13 @@ status = 200
 from = "/lumaire"
 to = "/building.html?slug=lumaire"
 status = 200
+force = true
 
 [[redirects]]
 from = "/the-bristol"
 to = "/building.html?slug=the-bristol"
 status = 200
+force = true
 
 # Headers for security
 [[headers]]
