@@ -104,8 +104,8 @@
                     </svg>
                     SendAHandyman.com
                 </a>
-                <a href="tel:+15618263519" class="text-sm text-slate-600 hover:text-slate-900">
-                    (561) 826-3519
+                <a href="tel:+16303911348" class="text-sm text-slate-600 hover:text-slate-900">
+                    (630) 391-1348
                 </a>
             </div>
         </div>
@@ -132,9 +132,8 @@
             <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
                 <!-- Photo Column -->
                 <div class="order-2 lg:order-1">
-                    <img src="/images/handyman-working.jpg" alt="Professional handyman at work"
-                         class="rounded-2xl shadow-lg w-full object-cover"
-                         onerror="this.src='https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=400&fit=crop'; this.onerror=null;">
+                    <img src="/images/Mounting_TV.png" alt="Professional TV mounting service"
+                         class="rounded-2xl shadow-lg w-full object-cover">
                     <p class="mt-4 text-sm text-slate-500 text-center">Vetted, background-checked professionals</p>
                 </div>
 
@@ -179,7 +178,7 @@
                class="accent-bg accent-bg-hover inline-flex items-center justify-center gap-2 rounded-xl px-10 py-4 text-white font-semibold text-lg transition-all shadow-lg">
                 Book Now
             </a>
-            <p class="mt-4 text-sm text-slate-500">Questions? Call <a href="tel:+15618263519" class="accent-text hover:underline">(561) 826-3519</a></p>
+            <p class="mt-4 text-sm text-slate-500">Questions? Call <a href="tel:+16303911348" class="accent-text hover:underline">(630) 391-1348</a></p>
         </div>
     </section>
 
@@ -188,7 +187,7 @@
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div class="flex items-center gap-3">
-                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman" class="h-10 w-auto brightness-0 invert">
+                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman" class="h-10 w-auto" style="filter: brightness(0) invert(1);">
                     <span class="font-semibold">SendAHandyman</span>
                 </div>
                 <div class="text-center sm:text-right text-sm text-slate-400">
@@ -399,7 +398,9 @@ window.buildBookingUrl = function(service) {
         params.set('service', service);
     }
 
-    return `/index.html?${params.toString()}`;
+    // If selecting a specific service, link to services section; otherwise home page
+    const hash = service ? '#landingScreen' : '';
+    return `/index.html?${params.toString()}${hash}`;
 };
 </script>
 
