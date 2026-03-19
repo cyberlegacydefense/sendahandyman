@@ -363,16 +363,25 @@ let currentBuilding = null;
             document.documentElement.style.setProperty('--accent-color', building.accent_color);
         }
 
-        // Check if building is active
-        if (!building.active) {
+        // Check if building is active (preview mode bypasses this)
+        const isPreviewMode = urlParams.get('preview') === '1';
+        if (!building.active && !isPreviewMode) {
             document.getElementById('comingSoonTitle').textContent = `${building.building_name} — Coming Soon`;
             showState(comingSoonState);
             return;
         }
 
-        // Render active building page
+        // Render building page
         renderBuilding(building);
         showState(mainContent);
+
+        // Show preview banner if in preview mode and not active
+        if (isPreviewMode && !building.active) {
+            const banner = document.createElement('div');
+            banner.className = 'fixed top-0 left-0 right-0 bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium z-50';
+            banner.innerHTML = '⚠️ Preview Mode — This building is not yet active for public visitors';
+            document.body.prepend(banner);
+        }
 
     } catch (err) {
         console.error('Error loading building:', err);
