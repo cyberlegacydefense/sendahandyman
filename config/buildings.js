@@ -1,88 +1,56 @@
 /**
- * Building Configurations for Custom Landing Pages
+ * Building Configuration Reference
  *
- * Each building gets a unique landing page at /[slug]
- * QR codes point to these pages for resident attribution tracking
+ * NOTE: Buildings are now managed via Supabase database.
+ * Use the Admin Dashboard → Buildings section to add/manage buildings.
  *
- * To add a new building:
- * 1. Add entry to this array
- * 2. Add redirect to netlify.toml: /[slug] -> /building.html?slug=[slug]
- * 3. Generate QR code via /admin/qr-generator.html
- * 4. Upload building logo to /images/buildings/[slug]-logo.png
+ * This file documents the schema and is kept for reference only.
+ *
+ * Supabase Table: buildings
+ *
+ * Schema:
+ * {
+ *   id: UUID (auto-generated)
+ *   building_name: string (required) - Display name, e.g., "Lumaire"
+ *   slug: string (required, unique) - URL path, e.g., "lumaire" for /lumaire
+ *   street: string - Street address for auto-fill
+ *   city: string - City for auto-fill
+ *   state: string - State (default: "FL")
+ *   zip: string - ZIP code for auto-fill
+ *   logo_url: string - Path to building logo image
+ *   accent_color: string - Hex color for CTAs (default: "#0ea5e9")
+ *   headline: string - Custom hero headline (optional)
+ *   subheadline: string - Custom subheadline (optional)
+ *   featured_services: string[] - Array of service keys to show (null = show all)
+ *   pm_name: string - Property manager name (optional)
+ *   pm_email: string - Property manager email (optional)
+ *   pm_phone: string - Property manager phone (optional)
+ *   active: boolean - true = live, false = "Coming Soon"
+ *   created_at: timestamp
+ *   updated_at: timestamp
+ * }
+ *
+ * Workflow:
+ * 1. Add building via Admin Dashboard → Buildings → Add Building
+ * 2. Add redirect to netlify.toml:
+ *    [[redirects]]
+ *    from = "/your-building-slug"
+ *    to = "/building.html?slug=your-building-slug"
+ *    status = 200
+ * 3. Deploy to Netlify
+ * 4. Generate QR code from Admin Dashboard
+ * 5. Add QR code to flyers/lobby displays
+ *
+ * Service Keys (for featured_services):
+ * - tv_mount
+ * - ceiling-fan
+ * - light-fixture
+ * - faucet
+ * - smart-doorbell
+ * - blinds
+ * - furniture
+ * - handyman
  */
 
-const buildings = [
-    {
-        // Required fields
-        slug: 'lumaire',
-        building_name: 'Lumaire',
-        logo_url: '/images/buildings/lumaire-logo.png',
-        active: true,
-
-        // Address for auto-population during checkout
-        address: {
-            street: '2000 S Ocean Blvd',
-            city: 'Boca Raton',
-            state: 'FL',
-            zip: '33432'
-        },
-
-        // Optional customization (defaults shown)
-        headline: 'Private Home Maintenance — On Demand',
-        subheadline: 'Trusted help for the details that keep your home perfect.',
-
-        // null = show all services, or specify array of service keys
-        featured_services: null,
-
-        // Accent color for CTAs and accents (Lumaire gold)
-        accent_color: '#D4AF37',
-
-        // Contact info for this building's property manager (optional)
-        property_manager: {
-            name: null,
-            email: null,
-            phone: null
-        }
-    },
-    // Example inactive building
-    {
-        slug: 'the-bristol',
-        building_name: 'The Bristol',
-        logo_url: '/images/buildings/the-bristol-logo.png',
-        active: false, // Shows "Coming Soon" placeholder
-        address: {
-            street: '1100 S Flagler Dr',
-            city: 'West Palm Beach',
-            state: 'FL',
-            zip: '33401'
-        },
-        accent_color: '#1e3a5f' // Navy blue
-    }
-];
-
-// Service definitions - prices must match index.html TASKS object
-const services = {
-    'tv_mount':       { icon: '📺', label: 'TV Wall Mounting',    price: 180, hours: '~2 hrs' },
-    'ceiling-fan':    { icon: '💡', label: 'Ceiling Fan Install', price: 180, hours: '~2 hrs' },
-    'light-fixture':  { icon: '✨', label: 'Light Fixtures',      price: 135, hours: '~1.5 hrs' },
-    'faucet':         { icon: '🚰', label: 'Faucet & Plumbing',   price: 135, hours: '~1.5 hrs' },
-    'smart-doorbell': { icon: '🔔', label: 'Smart Doorbell',      price: 110, hours: '~1 hr' },
-    'blinds':         { icon: '🪟', label: 'Blinds & Curtains',   price: 90,  hours: '~1 hr' },
-    'furniture':      { icon: '🪑', label: 'Furniture Assembly',  price: 180, hours: '~2 hrs' },
-    'handyman':       { icon: '🔧', label: 'General Repairs',     price: 265, hours: '~3 hrs' }
-};
-
-// Trust checklist items for "Designed for Luxury Living" section
-const trustChecklist = [
-    'Background-checked, vetted technicians',
-    'Uniformed professionals who respect your space',
-    'Building-aware scheduling (we follow your rules)',
-    'Transparent, flat-rate pricing — no surprises',
-    'Photo documentation of completed work',
-    'Direct communication throughout service'
-];
-
-// Export for use in building.html
-if (typeof window !== 'undefined') {
-    window.BUILDING_CONFIG = { buildings, services, trustChecklist };
-}
+// This file is kept for documentation purposes only.
+// Buildings are stored in Supabase and managed via Admin Dashboard.

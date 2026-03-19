@@ -204,11 +204,39 @@
 
 </div>
 
-<!-- Load Building Config -->
-<script src="/config/buildings.js"></script>
+<!-- Supabase Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-(function() {
+// Supabase configuration
+const SUPABASE_URL = 'https://ynbhskdiplwabsksamxa.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYmhza2RpcGx3YWJza3NhbXhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2OTYwMjAsImV4cCI6MjA3NTI3MjAyMH0.PedsTR4JQOioRWD28mVafR4I6wmHApUG5q2-Y7G7ljw';
+
+// Service definitions (prices must match index.html)
+const SERVICES = {
+    'tv_mount':       { icon: '📺', label: 'TV Wall Mounting',    price: 180, hours: '~2 hrs' },
+    'ceiling-fan':    { icon: '💡', label: 'Ceiling Fan Install', price: 180, hours: '~2 hrs' },
+    'light-fixture':  { icon: '✨', label: 'Light Fixtures',      price: 135, hours: '~1.5 hrs' },
+    'faucet':         { icon: '🚰', label: 'Faucet & Plumbing',   price: 135, hours: '~1.5 hrs' },
+    'smart-doorbell': { icon: '🔔', label: 'Smart Doorbell',      price: 110, hours: '~1 hr' },
+    'blinds':         { icon: '🪟', label: 'Blinds & Curtains',   price: 90,  hours: '~1 hr' },
+    'furniture':      { icon: '🪑', label: 'Furniture Assembly',  price: 180, hours: '~2 hrs' },
+    'handyman':       { icon: '🔧', label: 'General Repairs',     price: 265, hours: '~3 hrs' }
+};
+
+// Trust checklist items
+const TRUST_CHECKLIST = [
+    'Background-checked, vetted technicians',
+    'Uniformed professionals who respect your space',
+    'Building-aware scheduling (we follow your rules)',
+    'Transparent, flat-rate pricing — no surprises',
+    'Photo documentation of completed work',
+    'Direct communication throughout service'
+];
+
+let currentBuilding = null;
+
+(async function() {
     // Get slug from URL
     const urlParams = new URLSearchParams(window.location.search);
     const slug = urlParams.get('slug');
@@ -219,7 +247,6 @@
     const notFoundState = document.getElementById('notFoundState');
     const mainContent = document.getElementById('mainContent');
 
-    // Hide loading, show appropriate state
     function showState(state) {
         loadingState.classList.add('hidden');
         comingSoonState.classList.add('hidden');
@@ -228,40 +255,52 @@
         state.classList.remove('hidden');
     }
 
-    // Check if config loaded
-    if (!window.BUILDING_CONFIG) {
-        console.error('Building config not loaded');
+    if (!slug) {
         showState(notFoundState);
         return;
     }
 
-    const { buildings, services, trustChecklist } = window.BUILDING_CONFIG;
+    try {
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Find building by slug
-    const building = buildings.find(b => b.slug === slug);
+        // Fetch building from database
+        const { data: building, error } = await supabase
+            .from('buildings')
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-    if (!building) {
+        if (error || !building) {
+            console.error('Building not found:', error);
+            showState(notFoundState);
+            return;
+        }
+
+        currentBuilding = building;
+
+        // Set accent color
+        if (building.accent_color) {
+            document.documentElement.style.setProperty('--accent-color', building.accent_color);
+        }
+
+        // Check if building is active
+        if (!building.active) {
+            document.getElementById('comingSoonTitle').textContent = `${building.building_name} — Coming Soon`;
+            showState(comingSoonState);
+            return;
+        }
+
+        // Render active building page
+        renderBuilding(building);
+        showState(mainContent);
+
+    } catch (err) {
+        console.error('Error loading building:', err);
         showState(notFoundState);
-        return;
     }
 
-    // Set accent color
-    if (building.accent_color) {
-        document.documentElement.style.setProperty('--accent-color', building.accent_color);
-    }
-
-    // Check if building is active
-    if (!building.active) {
-        document.getElementById('comingSoonTitle').textContent = `${building.building_name} — Coming Soon`;
-        showState(comingSoonState);
-        return;
-    }
-
-    // Render active building page
-    renderBuilding(building, services, trustChecklist);
-    showState(mainContent);
-
-    function renderBuilding(building, services, trustChecklist) {
+    function renderBuilding(building) {
         // Update page title and meta
         const title = `${building.building_name} Home Services — SendAHandyman`;
         document.getElementById('pageTitle').textContent = title;
@@ -270,7 +309,9 @@
             `Private home maintenance for ${building.building_name} residents. Vetted technicians, transparent pricing.`;
 
         // Building logo (with fallback to building name)
-        document.getElementById('buildingLogo').src = building.logo_url;
+        if (building.logo_url) {
+            document.getElementById('buildingLogo').src = building.logo_url;
+        }
         document.getElementById('buildingLogo').alt = building.building_name + ' Logo';
         document.getElementById('buildingNameFallback').textContent = building.building_name;
 
@@ -283,10 +324,10 @@
         }
 
         // Services list
-        const serviceKeys = building.featured_services || Object.keys(services);
+        const serviceKeys = building.featured_services || Object.keys(SERVICES);
         const servicesList = document.getElementById('servicesList');
         servicesList.innerHTML = serviceKeys.map(key => {
-            const svc = services[key];
+            const svc = SERVICES[key];
             if (!svc) return '';
             return `
                 <div class="service-tile flex items-center gap-4 p-4 bg-white rounded-xl border border-slate-200 cursor-pointer"
@@ -306,7 +347,7 @@
 
         // Trust checklist
         const trustList = document.getElementById('trustList');
-        trustList.innerHTML = trustChecklist.map(item => `
+        trustList.innerHTML = TRUST_CHECKLIST.map(item => `
             <div class="check-item flex items-start py-2 text-slate-700">${item}</div>
         `).join('');
 
@@ -315,27 +356,29 @@
         document.getElementById('bookNowBtn').href = bookingUrl;
         document.getElementById('ctaBtn').href = bookingUrl;
     }
-
-    // Build booking URL with building context
-    window.buildBookingUrl = function(service) {
-        const params = new URLSearchParams();
-        params.set('ref', building.slug);
-
-        // Pass address for auto-population
-        if (building.address) {
-            params.set('street', building.address.street);
-            params.set('city', building.address.city);
-            params.set('state', building.address.state);
-            params.set('zip', building.address.zip);
-        }
-
-        if (service) {
-            params.set('service', service);
-        }
-
-        return `/index.html?${params.toString()}`;
-    };
 })();
+
+// Build booking URL with building context
+window.buildBookingUrl = function(service) {
+    if (!currentBuilding) return '/index.html';
+
+    const params = new URLSearchParams();
+    params.set('ref', currentBuilding.slug);
+
+    // Pass address for auto-population
+    if (currentBuilding.street) {
+        params.set('street', currentBuilding.street);
+        params.set('city', currentBuilding.city || '');
+        params.set('state', currentBuilding.state || 'FL');
+        params.set('zip', currentBuilding.zip || '');
+    }
+
+    if (service) {
+        params.set('service', service);
+    }
+
+    return `/index.html?${params.toString()}`;
+};
 </script>
 
 </body>
