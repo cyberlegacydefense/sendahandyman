@@ -22,18 +22,13 @@ to = "/dashboard-enhanced.html"
 status = 200
 
 # Building-specific landing pages
-# Add new buildings here as they are added to /config/buildings.js
+# Catch-all: any single-segment path (like /lumaire, /wynwood-haus) goes to building.html
+# The building.html page checks if the building exists in Supabase
 [[redirects]]
-from = "/lumaire"
-to = "/building.html?slug=lumaire"
+from = "/:slug"
+to = "/building.html?slug=:slug"
 status = 200
-force = true
-
-[[redirects]]
-from = "/the-bristol"
-to = "/building.html?slug=the-bristol"
-status = 200
-force = true
+force = false
 
 # Headers for security
 [[headers]]
