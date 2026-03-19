@@ -7084,7 +7084,7 @@ document.getElementById('addBuildingForm')?.addEventListener('submit', async fun
 
     console.log('✅ Building added:', data);
     closeAddBuildingModal();
-    loadBuildingsData();
+    await loadBuildingsData();
 
     // Show success message
     alert(`Building "${buildingData.building_name}" added successfully!\n\nNext steps:\n1. Add redirect to netlify.toml:\n   from = "/${buildingData.slug}"\n   to = "/building.html?slug=${buildingData.slug}"\n   status = 200\n\n2. Deploy to Netlify\n3. Generate QR code for flyers`);
@@ -7106,7 +7106,7 @@ async function toggleBuildingStatus(id, currentStatus) {
     if (error) throw error;
 
     console.log('✅ Building status toggled');
-    loadBuildingsData();
+    await loadBuildingsData();
   } catch (error) {
     console.error('❌ Error toggling status:', error);
     alert('Error updating building: ' + error.message);
@@ -7128,7 +7128,7 @@ async function deleteBuilding(id, name) {
     if (error) throw error;
 
     console.log('✅ Building deleted');
-    loadBuildingsData();
+    await loadBuildingsData();
   } catch (error) {
     console.error('❌ Error deleting building:', error);
     alert('Error deleting building: ' + error.message);
@@ -7371,7 +7371,7 @@ document.getElementById('editBuildingForm')?.addEventListener('submit', async fu
 
     console.log('✅ Building updated');
     closeEditBuildingModal();
-    loadBuildingsData();
+    await loadBuildingsData();
     alert('Building updated successfully!');
 
   } catch (error) {
