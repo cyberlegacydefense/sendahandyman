@@ -863,6 +863,31 @@
           </div>
         </div>
 
+        <!-- Exterior Image -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Building Exterior Image (optional)</label>
+          <div class="flex items-center gap-3 mb-3">
+            <img id="addExteriorPreview" src="" alt="Exterior preview"
+                 class="h-16 w-auto max-w-32 object-contain border border-slate-200 rounded bg-slate-50 hidden">
+            <span id="addNoExteriorText" class="text-sm text-slate-400">No exterior image selected</span>
+          </div>
+
+          <!-- Option 1: URL -->
+          <div class="mb-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Exterior Image URL</label>
+            <input type="url" id="buildingExteriorUrl" placeholder="https://example.com/exterior.png"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <!-- Option 2: Upload -->
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Or upload file</label>
+            <input type="file" id="addExteriorFile" accept="image/*"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200">
+            <p class="text-xs text-slate-500 mt-1">PNG or JPG, max 2MB</p>
+          </div>
+        </div>
+
         <div class="flex items-center gap-2">
           <input type="checkbox" id="buildingActive" checked class="w-4 h-4 rounded">
           <label for="buildingActive" class="text-sm font-medium">Active (uncheck to show "Coming Soon")</label>
@@ -957,6 +982,31 @@
           <div>
             <label class="block text-xs font-medium text-slate-600 mb-1">Or upload file</label>
             <input type="file" id="editLogoFile" accept="image/*"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200">
+            <p class="text-xs text-slate-500 mt-1">PNG or JPG, max 2MB (requires Supabase Storage bucket)</p>
+          </div>
+        </div>
+
+        <!-- Exterior Image -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">Building Exterior Image</label>
+          <div class="flex items-center gap-3 mb-3">
+            <img id="editExteriorPreview" src="" alt="Exterior preview"
+                 class="h-16 w-auto max-w-32 object-contain border border-slate-200 rounded bg-slate-50 hidden">
+            <span id="editNoExteriorText" class="text-sm text-slate-400">No exterior image set</span>
+          </div>
+
+          <!-- Option 1: URL -->
+          <div class="mb-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Exterior Image URL</label>
+            <input type="url" id="editExteriorUrl" placeholder="https://example.com/exterior.png"
+                   class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500">
+          </div>
+
+          <!-- Option 2: Upload -->
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Or upload file</label>
+            <input type="file" id="editExteriorFile" accept="image/*"
                    class="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-indigo-100 file:text-indigo-700 hover:file:bg-indigo-200">
             <p class="text-xs text-slate-500 mt-1">PNG or JPG, max 2MB (requires Supabase Storage bucket)</p>
           </div>
@@ -6968,6 +7018,10 @@ function closeAddBuildingModal() {
   document.getElementById('addLogoPreview').classList.add('hidden');
   document.getElementById('addLogoPreview').src = '';
   document.getElementById('addNoLogoText').textContent = 'No logo selected';
+  // Reset exterior preview
+  document.getElementById('addExteriorPreview').classList.add('hidden');
+  document.getElementById('addExteriorPreview').src = '';
+  document.getElementById('addNoExteriorText').textContent = 'No exterior image selected';
 }
 
 // Add Building logo preview - URL input
@@ -7012,6 +7066,51 @@ document.getElementById('addLogoFile')?.addEventListener('change', function() {
       noLogoText.textContent = file.name;
       // Clear URL input since file takes precedence
       document.getElementById('buildingLogoUrl').value = '';
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Add Building exterior preview - URL input
+document.getElementById('buildingExteriorUrl')?.addEventListener('input', function() {
+  const preview = document.getElementById('addExteriorPreview');
+  const noText = document.getElementById('addNoExteriorText');
+
+  if (this.value.trim()) {
+    preview.src = this.value.trim();
+    preview.classList.remove('hidden');
+    noText.textContent = '';
+    preview.onerror = () => {
+      preview.classList.add('hidden');
+      noText.textContent = 'Invalid image URL';
+    };
+  } else {
+    preview.classList.add('hidden');
+    preview.src = '';
+    noText.textContent = 'No exterior image selected';
+  }
+});
+
+// Add Building exterior preview - File upload
+document.getElementById('addExteriorFile')?.addEventListener('change', function() {
+  const preview = document.getElementById('addExteriorPreview');
+  const noText = document.getElementById('addNoExteriorText');
+
+  if (this.files && this.files[0]) {
+    const file = this.files[0];
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File too large. Maximum size is 2MB.');
+      this.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview.src = e.target.result;
+      preview.classList.remove('hidden');
+      noText.textContent = file.name;
+      document.getElementById('buildingExteriorUrl').value = '';
     };
     reader.readAsDataURL(file);
   }
@@ -7087,6 +7186,41 @@ document.getElementById('addBuildingForm')?.addEventListener('submit', async fun
     }
   }
 
+  // Handle exterior image - file upload takes precedence over URL
+  let exteriorUrl = document.getElementById('buildingExteriorUrl').value.trim() || null;
+  const exteriorFile = document.getElementById('addExteriorFile').files[0];
+
+  if (exteriorFile) {
+    try {
+      const fileExt = exteriorFile.name.split('.').pop().toLowerCase();
+      const fileName = `${slug}-exterior-${Date.now()}.${fileExt}`;
+      const filePath = `buildings/${fileName}`;
+
+      console.log('📤 Uploading exterior image to Supabase Storage:', filePath);
+
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+        .from('assets')
+        .upload(filePath, exteriorFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('❌ Exterior upload error:', uploadError);
+        alert('Exterior image upload failed: ' + uploadError.message + '\n\nBuilding will be created without exterior image.');
+      } else {
+        const { data: urlData } = supabaseAdmin.storage
+          .from('assets')
+          .getPublicUrl(filePath);
+        exteriorUrl = urlData.publicUrl;
+        console.log('✅ Exterior image uploaded:', exteriorUrl);
+      }
+    } catch (uploadErr) {
+      console.error('❌ Exterior upload exception:', uploadErr);
+      alert('Exterior image upload failed. Building will be created without exterior image.');
+    }
+  }
+
   const buildingData = {
     building_name: document.getElementById('buildingName').value.trim(),
     slug: slug,
@@ -7096,6 +7230,7 @@ document.getElementById('addBuildingForm')?.addEventListener('submit', async fun
     zip: document.getElementById('buildingZip').value.trim(),
     accent_color: document.getElementById('buildingAccentHex').value.trim(),
     logo_url: logoUrl,
+    exterior_image_url: exteriorUrl,
     active: document.getElementById('buildingActive').checked,
     created_at: new Date().toISOString()
   };
@@ -7235,6 +7370,7 @@ function copyBuildingUrl() {
 
 let currentEditBuilding = null;
 let pendingLogoFile = null;
+let pendingExteriorFile = null;
 
 async function showEditBuildingModal(buildingId) {
   // Find building in cached data
@@ -7285,6 +7421,24 @@ async function showEditBuildingModal(buildingId) {
   document.getElementById('editLogoFile').value = '';
   pendingLogoFile = null;
 
+  // Show exterior image preview and populate URL field if exists
+  const exteriorPreview = document.getElementById('editExteriorPreview');
+  const noExteriorText = document.getElementById('editNoExteriorText');
+  document.getElementById('editExteriorUrl').value = building.exterior_image_url || '';
+
+  if (building.exterior_image_url) {
+    exteriorPreview.src = building.exterior_image_url;
+    exteriorPreview.classList.remove('hidden');
+    noExteriorText.classList.add('hidden');
+  } else {
+    exteriorPreview.classList.add('hidden');
+    noExteriorText.classList.remove('hidden');
+  }
+
+  // Reset exterior file input
+  document.getElementById('editExteriorFile').value = '';
+  pendingExteriorFile = null;
+
   document.getElementById('editBuildingModal').classList.remove('hidden');
 }
 
@@ -7292,6 +7446,7 @@ function closeEditBuildingModal() {
   document.getElementById('editBuildingModal').classList.add('hidden');
   currentEditBuilding = null;
   pendingLogoFile = null;
+  pendingExteriorFile = null;
 }
 
 // Handle logo URL input - preview on blur
@@ -7332,6 +7487,43 @@ document.getElementById('editLogoFile')?.addEventListener('change', function(e) 
   };
   reader.readAsDataURL(file);
   pendingLogoFile = file;
+});
+
+// Handle exterior URL input - preview on blur
+document.getElementById('editExteriorUrl')?.addEventListener('blur', function() {
+  const url = this.value.trim();
+  const preview = document.getElementById('editExteriorPreview');
+  const noText = document.getElementById('editNoExteriorText');
+
+  if (url) {
+    preview.src = url;
+    preview.classList.remove('hidden');
+    noText.classList.add('hidden');
+    document.getElementById('editExteriorFile').value = '';
+    pendingExteriorFile = null;
+  }
+});
+
+// Handle exterior file selection preview
+document.getElementById('editExteriorFile')?.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert('File too large. Maximum size is 2MB.');
+    this.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const preview = document.getElementById('editExteriorPreview');
+    preview.src = e.target.result;
+    preview.classList.remove('hidden');
+    document.getElementById('editNoExteriorText').classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+  pendingExteriorFile = file;
 });
 
 // Sync edit color picker with hex input
@@ -7377,6 +7569,49 @@ document.getElementById('editBuildingForm')?.addEventListener('submit', async fu
       }
     }
 
+    // Check for exterior image: file upload takes priority, then URL field
+    let exteriorUrl = currentEditBuilding.exterior_image_url;
+
+    if (pendingExteriorFile) {
+      try {
+        const fileExt = pendingExteriorFile.name.split('.').pop().toLowerCase();
+        const fileName = `${currentEditBuilding.slug}-exterior-${Date.now()}.${fileExt}`;
+        const filePath = `buildings/${fileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+          .from('assets')
+          .upload(filePath, pendingExteriorFile, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (uploadError) {
+          console.error('❌ Exterior upload error:', uploadError);
+          alert('Exterior image upload failed. You can paste a URL instead.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save Changes';
+          return;
+        }
+
+        const { data: urlData } = supabaseAdmin.storage
+          .from('assets')
+          .getPublicUrl(filePath);
+        exteriorUrl = urlData.publicUrl;
+        console.log('✅ Exterior image uploaded:', exteriorUrl);
+      } catch (uploadErr) {
+        console.error('❌ Exterior upload exception:', uploadErr);
+        alert('Exterior image upload failed. You can paste a URL instead.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save Changes';
+        return;
+      }
+    } else {
+      const urlInput = document.getElementById('editExteriorUrl').value.trim();
+      if (urlInput) {
+        exteriorUrl = urlInput;
+      }
+    }
+
     // Validate slug
     const newSlug = document.getElementById('editBuildingSlug').value.trim().toLowerCase();
     if (!/^[a-z0-9-]+$/.test(newSlug)) {
@@ -7401,6 +7636,7 @@ document.getElementById('editBuildingForm')?.addEventListener('submit', async fu
       pm_email: document.getElementById('editPmEmail').value.trim() || null,
       pm_phone: document.getElementById('editPmPhone').value.trim() || null,
       logo_url: logoUrl,
+      exterior_image_url: exteriorUrl,
       testimonial_text: document.getElementById('editTestimonialText').value.trim() || null,
       testimonial_author: document.getElementById('editTestimonialAuthor').value.trim() || null,
       testimonial_is_resident: document.getElementById('editTestimonialIsResident').checked
