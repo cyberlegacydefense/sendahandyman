@@ -13,12 +13,12 @@
   <style>
 
     .benefit-card {
-        transition: all 0.3s ease;
+        transition: all var(--duration-short) var(--ease-brand);
     }
 
     .benefit-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 12px 35px rgba(0,0,0,.1);
+        border-color: var(--color-brass);
     }
 
     .mobile-menu-btn {
@@ -44,9 +44,8 @@
             top: 100%;
             left: 0;
             right: 0;
-            background: white;
-            border-top: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: var(--color-forest-deep);
+            border-top: 1px solid var(--color-brass);
             z-index: 50;
         }
 

@@ -252,8 +252,8 @@
             font-size: 16px !important;
             padding: 16px !important;
             line-height: 1.6 !important;
-            border: 1px solid #d1d5db !important;
-            background: #ffffff !important;
+            border: 1px solid var(--color-forest) !important;
+            background: var(--color-cream) !important;
             width: 100% !important;
             box-sizing: border-box !important;
             resize: vertical !important;
@@ -265,8 +265,7 @@
         textarea#detailDescription:focus,
         .mobile-textarea-force:focus {
             outline: none !important;
-            border-color: #000000 !important;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--color-brass) !important;
         }
 
         /* Mobile - even larger textarea */
@@ -593,12 +592,12 @@
         /* Smooth hover effects for icons */
         .service-card:hover img {
             transform: scale(1.05);
-            transition: transform 0.2s ease-in-out;
+            transition: transform var(--duration-short) var(--ease-brand);
         }
 
         /* Ensure icons maintain aspect ratio */
         .service-card img {
-            transition: transform 0.2s ease-in-out;
+            transition: transform var(--duration-short) var(--ease-brand);
         }
 
         /* Loading shimmer */
@@ -2724,7 +2723,7 @@
                         </div>
                     </div>
 
-                    <button onclick="proceedToBooking()" class="btn-primary w-full py-4 text-lg" style="display: none; opacity: 0; transition: opacity 0.3s ease;">
+                    <button onclick="proceedToBooking()" class="btn-primary w-full py-4 text-lg" style="display: none; opacity: 0; transition: opacity var(--duration-short) var(--ease-brand);">
                         Continue to Booking
                     </button>
                 </div>

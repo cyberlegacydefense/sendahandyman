@@ -16,20 +16,9 @@
     <script src="/styles/tailwind-brand.js"></script>
 
     <style>
-        :root {
-            --uber-black: #000000;
-            --uber-white: #ffffff;
-            --uber-gray-50: #f9fafb;
-            --uber-gray-100: #f3f4f6;
-            --uber-gray-200: #e5e7eb;
-            --uber-gray-600: #4b5563;
-            --uber-blue: #3b82f6;
-            --uber-green: #10b981;
-        }
-
         .faq-item {
-            border-bottom: 1px solid var(--uber-gray-200);
-            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--color-cream-deep);
+            transition: all var(--duration-short) var(--ease-brand);
         }
 
         .faq-question {
@@ -38,19 +27,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 600;
-            color: var(--uber-black);
+            font-weight: 500;
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            color: var(--color-forest);
         }
 
         .faq-question:hover {
-            color: var(--uber-blue);
+            color: var(--color-brass);
         }
 
         .faq-answer {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s ease;
-            color: var(--uber-gray-600);
+            transition: max-height var(--duration-short) var(--ease-brand);
+            color: var(--color-mist);
             line-height: 1.6;
         }
 
@@ -60,7 +51,7 @@
         }
 
         .faq-icon {
-            transition: transform 0.3s ease;
+            transition: transform var(--duration-short) var(--ease-brand);
         }
 
         .faq-icon.rotated {
