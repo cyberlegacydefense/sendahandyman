@@ -37,62 +37,59 @@
         html { scroll-behavior: smooth; }
         .container { max-width: 1200px; }
         .feature-card {
-            transition: all 0.3s ease;
+            transition: all var(--duration-short) var(--ease-brand);
         }
         .feature-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 35px rgba(0,0,0,.08);
+            border-color: var(--color-brass);
         }
         .service-tile {
-            transition: all 0.2s ease;
+            transition: all var(--duration-short) var(--ease-brand);
         }
         .service-tile:hover {
-            border-color: #0ea5e9;
-            background: #f0f9ff;
+            border-color: var(--color-brass);
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
 
 <!-- Header -->
-<header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+<header class="rs-nav sticky top-0 z-40">
     <div class="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-3 font-semibold text-slate-900 hover:opacity-80 transition-opacity">
-            <img src="/images/helpinghands_logo.png" alt="SendAHandyman Logo" class="h-9 w-auto">
-            <span class="hidden sm:inline">SendAHandyman</span>
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="/images/rs-wordmark-cream.svg" alt="Resident Steward" class="h-8 w-auto">
         </a>
         <nav class="hidden md:flex items-center gap-6 text-sm">
-            <a href="#features" class="hover:text-brand">Why Us</a>
-            <a href="#services" class="hover:text-brand">Services</a>
-            <a href="#partnership" class="hover:text-brand">Partnership</a>
+            <a href="#features">Why Us</a>
+            <a href="#services">Services</a>
+            <a href="#partnership">Partnership</a>
         </nav>
         <div class="flex items-center gap-2">
-            <a href="index.html" class="hidden sm:inline-flex items-center rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium hover:border-brand hover:text-brand">Book a Service</a>
-            <a href="#partnership" class="inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white text-sm font-medium hover:bg-brand-dark">Partner With Us</a>
+            <a href="index.html" class="btn-secondary hidden sm:inline-flex rounded-xl px-4 py-2 text-sm !bg-transparent !text-cream !border-cream/40 hover:!border-brass hover:!text-brass">Book a Service</a>
+            <a href="#partnership" class="btn-primary rounded-xl px-4 py-2 text-sm !bg-brass !border-brass !text-forest-deep hover:!bg-brass-soft">Partner With Us</a>
         </div>
     </div>
 </header>
 
 <!-- Hero Section -->
-<section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.03\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+<section class="relative overflow-hidden bg-forest-deep">
     <div class="container mx-auto px-4 sm:px-6 py-20 lg:py-28 relative">
         <div class="max-w-3xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-slate-300 mb-6">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+            <div class="inline-flex items-center gap-2 rounded-full border border-brass/30 px-4 py-1.5 text-sm text-cream/70 mb-6">
+                <span class="inline-block w-2 h-2 rounded-full bg-brass"></span>
                 Now serving South Florida luxury properties
             </div>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
-                The Preferred Handyman Service for <span class="text-brand">Luxury High-Rise Living</span>
+            <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-light leading-tight text-cream">
+                Your residents deserve a steward, <em class="text-brass font-medium">not a contractor.</em>
             </h1>
-            <p class="mt-6 text-xl text-slate-300">
+            <p class="mt-6 text-xl text-cream/70">
                 White-glove home maintenance, built for concierge-level properties.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#partnership" class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-brand px-8 py-4 text-white font-semibold hover:bg-brand-dark transition-colors">
+                <a href="#partnership" class="btn-primary w-full sm:w-auto rounded-xl px-8 py-4 !bg-brass !border-brass !text-forest-deep hover:!bg-brass-soft">
                     Partner With Us
                 </a>
-                <a href="index.html" class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-white/10 border border-white/20 px-8 py-4 text-white font-semibold hover:bg-white/20 transition-colors">
+                <a href="index.html" class="btn-secondary w-full sm:w-auto rounded-xl px-8 py-4 !bg-transparent !text-cream !border-cream/30 hover:!border-brass hover:!text-brass">
                     Book a Service
                 </a>
             </div>
@@ -101,121 +98,119 @@
 </section>
 
 <!-- Trust/Positioning Section -->
-<section id="features" class="py-16 lg:py-24 bg-white">
+<section id="features" class="py-16 lg:py-24">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12">
-            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">Built for Buildings Like Yours</h2>
-            <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            <div class="brass-ornament"></div>
+            <h2 class="rs-section-title">Built for Buildings Like Yours</h2>
+            <p class="mt-4 text-lg text-mist max-w-2xl mx-auto">
                 We understand the unique requirements of luxury high-rise properties and their discerning residents.
             </p>
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Feature 1 -->
-            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
-                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            <div class="feature-card rs-card rounded-2xl">
+                <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brass" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 mb-2">Vetted, Professional Technicians</h3>
-                <p class="text-slate-600 text-sm">Background-checked, uniformed, and discreet. Our technicians represent your building's standards.</p>
+                <h3 class="text-lg font-display font-medium text-forest mb-2">Vetted, Professional Technicians</h3>
+                <p class="text-mist text-sm">Background-checked, uniformed, and discreet. Our technicians represent your building's standards.</p>
             </div>
 
-            <!-- Feature 2 -->
-            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
-                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            <div class="feature-card rs-card rounded-2xl">
+                <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brass" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 mb-2">Concierge-Aware Scheduling</h3>
-                <p class="text-slate-600 text-sm">We follow your building's rules, check-in procedures, and preferred service hours.</p>
+                <h3 class="text-lg font-display font-medium text-forest mb-2">Concierge-Aware Scheduling</h3>
+                <p class="text-mist text-sm">We follow your building's rules, check-in procedures, and preferred service hours.</p>
             </div>
 
-            <!-- Feature 3 -->
-            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
-                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            <div class="feature-card rs-card rounded-2xl">
+                <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brass" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 mb-2">Resident-Ready Booking</h3>
-                <p class="text-slate-600 text-sm">Residents book in minutes via QR code or your building's custom URL. No apps to download.</p>
+                <h3 class="text-lg font-display font-medium text-forest mb-2">Resident-Ready Booking</h3>
+                <p class="text-mist text-sm">Residents book in minutes via QR code or your building's custom URL. No apps to download.</p>
             </div>
 
-            <!-- Feature 4 -->
-            <div class="feature-card rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center text-2xl mb-4">
-                    <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <div class="feature-card rs-card rounded-2xl">
+                <div class="w-12 h-12 rounded-xl bg-forest/10 flex items-center justify-center text-2xl mb-4">
+                    <svg class="w-6 h-6 text-brass" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 mb-2">Monthly PM Reports</h3>
-                <p class="text-slate-600 text-sm">A detailed service summary — jobs completed, response times, and resident ratings — delivered directly to your inbox on the 1st of each month.</p>
+                <h3 class="text-lg font-display font-medium text-forest mb-2">Monthly PM Reports</h3>
+                <p class="text-mist text-sm">A detailed service summary — jobs completed, response times, and resident ratings — delivered directly to your inbox on the 1st of each month.</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Services Section -->
-<section id="services" class="py-16 lg:py-24 bg-slate-50">
+<section id="services" class="py-16 lg:py-24 bg-cream-deep">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12">
-            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">Common Resident Requests</h2>
-            <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+            <div class="brass-ornament"></div>
+            <h2 class="rs-section-title">Common Resident Requests</h2>
+            <p class="mt-4 text-lg text-mist max-w-2xl mx-auto">
                 From quick fixes to installations, we handle the services your residents need most.
             </p>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">📺</div>
-                <div class="font-semibold text-slate-900">TV Wall Mount</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $180</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">TV Wall Mount</div>
+                <div class="text-sm text-mist mt-1">Starting at $180</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">💡</div>
-                <div class="font-semibold text-slate-900">Ceiling Fan Install</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $180</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">Ceiling Fan Install</div>
+                <div class="text-sm text-mist mt-1">Starting at $180</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">✨</div>
-                <div class="font-semibold text-slate-900">Light Fixtures</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $135</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">Light Fixtures</div>
+                <div class="text-sm text-mist mt-1">Starting at $135</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">🚰</div>
-                <div class="font-semibold text-slate-900">Faucet & Plumbing</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $135</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">Faucet & Plumbing</div>
+                <div class="text-sm text-mist mt-1">Starting at $135</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">🔔</div>
-                <div class="font-semibold text-slate-900">Smart Doorbell</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $110</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">Smart Doorbell</div>
+                <div class="text-sm text-mist mt-1">Starting at $110</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">🪟</div>
-                <div class="font-semibold text-slate-900">Blinds & Curtains</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $90</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">Blinds & Curtains</div>
+                <div class="text-sm text-mist mt-1">Starting at $90</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">🪑</div>
-                <div class="font-semibold text-slate-900">Furniture Assembly</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $180</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">Furniture Assembly</div>
+                <div class="text-sm text-mist mt-1">Starting at $180</div>
             </div>
-            <div class="service-tile rounded-xl border border-slate-200 bg-white p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
-                <div class="text-3xl mb-3">🔧</div>
-                <div class="font-semibold text-slate-900">General Handyman</div>
-                <div class="text-sm text-slate-500 mt-1">Starting at $265</div>
+            <div class="service-tile rounded-xl border border-forest bg-cream p-5 text-center cursor-pointer" onclick="window.location.href='index.html'">
+                <div class="text-3xl mb-3">&#9672;</div>
+                <div class="font-display font-medium text-forest">General Repairs</div>
+                <div class="text-sm text-mist mt-1">Starting at $265</div>
             </div>
         </div>
 
         <div class="text-center mt-8">
-            <a href="index.html" class="inline-flex items-center gap-2 text-brand font-semibold hover:underline">
+            <a href="index.html" class="btn-tertiary inline-flex items-center gap-2 text-brass font-semibold">
                 View all services and book now
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
                 </svg>
             </a>
         </div>
@@ -223,52 +218,48 @@
 </section>
 
 <!-- Social Proof Section -->
-<section class="py-16 lg:py-24 bg-white">
+<section class="py-16 lg:py-24">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="text-center mb-12">
-            <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">Trusted by South Florida's Luxury Buildings</h2>
+            <h2 class="rs-section-title">Trusted by South Florida's Luxury Buildings</h2>
         </div>
 
-        <!-- Building Cards -->
         <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
-            <!-- Lumaire -->
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <div class="rs-card rounded-2xl">
                 <div class="flex items-start justify-between mb-3">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Lumaire</h3>
-                        <p class="text-slate-600 text-sm">West Palm Beach</p>
+                        <h3 class="text-lg font-display font-medium text-forest">Lumaire</h3>
+                        <p class="text-mist text-sm">West Palm Beach</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-forest px-3 py-1 text-xs font-medium text-forest">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brass"></span>
                         Active Partner
                     </span>
                 </div>
-                <p class="text-slate-600 text-sm">Custom-branded booking page and QR codes deployed in lobby.</p>
+                <p class="text-mist text-sm">Custom-branded booking page and QR codes deployed in lobby.</p>
             </div>
 
-            <!-- Wynwood Haus -->
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <div class="rs-card rounded-2xl">
                 <div class="flex items-start justify-between mb-3">
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900">Wynwood Haus</h3>
-                        <p class="text-slate-600 text-sm">Miami</p>
+                        <h3 class="text-lg font-display font-medium text-forest">Wynwood Haus</h3>
+                        <p class="text-mist text-sm">Miami</p>
                     </div>
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-forest px-3 py-1 text-xs font-medium text-forest">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brass"></span>
                         Active Partner
                     </span>
                 </div>
-                <p class="text-slate-600 text-sm">First Miami property in our luxury portfolio.</p>
+                <p class="text-mist text-sm">First Miami property in our luxury portfolio.</p>
             </div>
         </div>
 
-        <!-- Testimonial Pull Quote -->
         <div class="max-w-3xl mx-auto">
-            <blockquote class="border-l-4 border-amber-400 pl-6 py-2">
-                <p class="text-lg italic text-slate-700">
-                    "SendAHandyman has been a reliable partner for our residents. The response time and professionalism are exactly what a property like ours requires."
+            <blockquote class="border-l-4 border-brass pl-6 py-2">
+                <p class="text-lg font-display italic text-forest">
+                    "Resident Steward has been a reliable partner for our residents. The response time and professionalism are exactly what a property like ours requires."
                 </p>
-                <footer class="mt-3 text-sm text-slate-500">
+                <footer class="mt-3 text-sm text-mist">
                     — Property Manager, South Florida Luxury High-Rise
                 </footer>
             </blockquote>
@@ -277,99 +268,99 @@
 </section>
 
 <!-- Partnership Section (B2B) -->
-<section id="partnership" class="py-16 lg:py-24 bg-white">
+<section id="partnership" class="py-16 lg:py-24">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-                <h2 class="text-3xl sm:text-4xl font-bold text-slate-900">
-                    Make Us Your Building's Official Handyman Partner
+                <div class="brass-ornament"></div>
+                <h2 class="rs-section-title">
+                    Make Us Your Building's Official Service Partner
                 </h2>
-                <p class="mt-4 text-lg text-slate-600">
+                <p class="mt-4 text-lg text-mist">
                     We create a custom landing page and QR code for your building, branded with your logo. Residents get a seamless booking experience. Property managers get a trusted, vetted vendor on call.
                 </p>
                 <ul class="mt-6 space-y-3">
                     <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        <svg class="w-6 h-6 text-brass flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span class="text-slate-700"><strong>Custom branded booking page</strong> with your building's logo and name</span>
+                        <span class="text-forest"><strong>Custom branded booking page</strong> with your building's logo and name</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        <svg class="w-6 h-6 text-brass flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span class="text-slate-700"><strong>Printable QR codes</strong> for lobbies, elevators, and resident welcome packets</span>
+                        <span class="text-forest"><strong>Printable QR codes</strong> for lobbies, elevators, and resident welcome packets</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        <svg class="w-6 h-6 text-brass flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span class="text-slate-700"><strong>Priority scheduling</strong> for partner buildings</span>
+                        <span class="text-forest"><strong>Priority scheduling</strong> for partner buildings</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        <svg class="w-6 h-6 text-brass flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span class="text-slate-700"><strong>No cost to you</strong> — residents pay directly for services</span>
+                        <span class="text-forest"><strong>No cost to you</strong> — residents pay directly for services</span>
                     </li>
                 </ul>
             </div>
 
             <!-- Partnership Form -->
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6 lg:p-8 shadow-sm">
-                <h3 class="text-xl font-semibold text-slate-900 mb-6">Request a Partnership</h3>
+            <div class="rs-card rounded-2xl p-6 lg:p-8">
+                <h3 class="text-xl font-display font-medium text-forest mb-6">Request a Partnership</h3>
                 <form id="partnershipForm" name="concierge-partnership" method="POST" data-netlify="true" class="space-y-4">
                     <input type="hidden" name="form-name" value="concierge-partnership" />
 
                     <div>
-                        <label for="contactName" class="block text-sm font-medium text-slate-700 mb-1">Your Name</label>
+                        <label for="contactName" class="rs-label">Your Name</label>
                         <input type="text" id="contactName" name="contact_name" required
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            class="rs-input w-full rounded-xl"
                             placeholder="Jane Smith">
                     </div>
 
                     <div>
-                        <label for="buildingName" class="block text-sm font-medium text-slate-700 mb-1">Building Name</label>
+                        <label for="buildingName" class="rs-label">Building Name</label>
                         <input type="text" id="buildingName" name="building_name" required
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            class="rs-input w-full rounded-xl"
                             placeholder="The Grand at Palm Beach">
                     </div>
 
                     <div class="grid sm:grid-cols-2 gap-4">
                         <div>
-                            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <label for="email" class="rs-label">Email</label>
                             <input type="email" id="email" name="email" required
-                                class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                class="rs-input w-full rounded-xl"
                                 placeholder="jane@building.com">
                         </div>
                         <div>
-                            <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                            <label for="phone" class="rs-label">Phone</label>
                             <input type="tel" id="phone" name="phone"
-                                class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                                class="rs-input w-full rounded-xl"
                                 placeholder="(561) 555-1234">
                         </div>
                     </div>
 
                     <div>
-                        <label for="units" class="block text-sm font-medium text-slate-700 mb-1">Number of Units</label>
+                        <label for="units" class="rs-label">Number of Units</label>
                         <input type="number" id="units" name="units" min="1"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            class="rs-input w-full rounded-xl"
                             placeholder="150">
                     </div>
 
                     <div>
-                        <label for="message" class="block text-sm font-medium text-slate-700 mb-1">Anything else we should know?</label>
+                        <label for="message" class="rs-label">Anything else we should know?</label>
                         <textarea id="message" name="message" rows="3"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent"
+                            class="rs-input w-full rounded-xl"
                             placeholder="e.g., specific building requirements, preferred service hours..."></textarea>
                     </div>
 
-                    <button type="submit"
-                        class="w-full rounded-xl bg-brand px-6 py-4 text-white font-semibold hover:bg-brand-dark transition-colors">
+                    <button type="submit" class="btn-primary w-full rounded-xl px-6 py-4">
                         Request Partnership
                     </button>
 
-                    <p id="formMessage" class="text-sm text-slate-500 text-center hidden"></p>
+                    <p id="formMessage" class="text-sm text-mist text-center hidden"></p>
                 </form>
             </div>
         </div>
@@ -377,59 +368,57 @@
 </section>
 
 <!-- Trust Strip -->
-<section class="bg-slate-900 text-white py-12">
+<section class="bg-forest text-cream py-12">
     <div class="container mx-auto px-4 sm:px-6">
         <div class="grid md:grid-cols-3 gap-8 text-center">
             <div>
-                <div class="text-3xl font-bold text-brand">100%</div>
-                <div class="text-slate-400 mt-1">Background-checked technicians</div>
+                <div class="text-3xl font-display font-medium text-brass">100%</div>
+                <div class="text-cream/60 mt-1">Background-checked technicians</div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-brand">Same-Day</div>
-                <div class="text-slate-400 mt-1">Service for partner buildings</div>
+                <div class="text-3xl font-display font-medium text-brass">Same-Day</div>
+                <div class="text-cream/60 mt-1">Service for partner buildings</div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-brand">Flat-Rate</div>
-                <div class="text-slate-400 mt-1">Priced by service, not by the hour</div>
+                <div class="text-3xl font-display font-medium text-brass">Flat-Rate</div>
+                <div class="text-cream/60 mt-1">Priced by service, not by the hour</div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Footer -->
-<footer class="bg-white border-t border-slate-200">
+<footer class="rs-footer">
     <div class="container mx-auto px-4 sm:px-6 py-10">
         <div class="grid md:grid-cols-3 gap-8">
             <div>
-                <div class="flex items-center gap-2 font-semibold text-slate-900 mb-3">
-                    <img src="/images/helpinghands_logo.png" alt="SendAHandyman Logo" class="h-8 w-auto">
-                    <span>SendAHandyman</span>
-                </div>
-                <p class="text-sm text-slate-600">
-                    The preferred handyman service for luxury high-rise living in South Florida.
+                <img src="/images/rs-wordmark-cream.svg" alt="Resident Steward" class="h-7 w-auto mb-3">
+                <p class="text-sm text-cream/60">
+                    The preferred home service partner for luxury high-rise living in South Florida.
                 </p>
             </div>
             <div>
-                <h4 class="font-semibold text-slate-900 mb-3">Quick Links</h4>
+                <h4 class="font-display font-medium text-cream mb-3">Quick Links</h4>
                 <nav class="space-y-2 text-sm">
-                    <a href="index.html" class="block text-slate-600 hover:text-brand">Book a Service</a>
-                    <a href="#partnership" class="block text-slate-600 hover:text-brand">Partner With Us</a>
-                    <a href="join-team.html" class="block text-slate-600 hover:text-brand">Join Our Team</a>
-                    <a href="faq.html" class="block text-slate-600 hover:text-brand">FAQ</a>
+                    <a href="index.html" class="block">Book a Service</a>
+                    <a href="#partnership" class="block">Partner With Us</a>
+                    <a href="join-team.html" class="block">Join Our Team</a>
+                    <a href="faq.html" class="block">FAQ</a>
                 </nav>
             </div>
             <div>
-                <h4 class="font-semibold text-slate-900 mb-3">Service Areas</h4>
-                <p class="text-sm text-slate-600">
+                <h4 class="font-display font-medium text-cream mb-3">Service Areas</h4>
+                <p class="text-sm text-cream/60">
                     Palm Beach · West Palm Beach · Wellington · Boca Raton · Delray Beach · Fort Lauderdale · Miami · Aventura
                 </p>
-                <p class="text-sm text-slate-500 mt-4">
-                    Questions? <a href="mailto:info@sendahandyman.com" class="text-brand hover:underline">info@sendahandyman.com</a>
+                <p class="text-sm text-cream/60 mt-4">
+                    Questions? <a href="mailto:info@residentsteward.com" class="text-brass">info@residentsteward.com</a>
                 </p>
             </div>
         </div>
-        <div class="border-t border-slate-200 mt-8 pt-8 text-center text-sm text-slate-500">
-            &copy; 2026 SendAHandyman. All rights reserved.
+        <hr class="mt-8 mb-8">
+        <div class="text-center text-sm text-cream/40">
+            &copy; 2026 Resident Steward. All rights reserved.
         </div>
     </div>
 </footer>
@@ -457,15 +446,15 @@
 
             if (response.ok) {
                 formMessage.textContent = 'Thank you! We\'ll be in touch within 24 hours.';
-                formMessage.className = 'text-sm text-emerald-600 text-center';
+                formMessage.className = 'text-sm text-forest text-center font-semibold';
                 formMessage.classList.remove('hidden');
                 form.reset();
             } else {
                 throw new Error('Submission failed');
             }
         } catch (error) {
-            formMessage.textContent = 'Something went wrong. Please email us at info@sendahandyman.com';
-            formMessage.className = 'text-sm text-red-600 text-center';
+            formMessage.textContent = 'Something went wrong. Please email us at info@residentsteward.com';
+            formMessage.className = 'text-sm text-red-700 text-center';
             formMessage.classList.remove('hidden');
         }
 
