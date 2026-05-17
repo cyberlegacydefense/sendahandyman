@@ -40,22 +40,21 @@
         input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body>
 <!-- Header -->
-<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
+<header class="rs-nav sticky top-0 z-40">
     <div class="container mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-        <a href="index.html" class="flex items-center gap-3 font-semibold text-slate-900 hover:opacity-80 transition-opacity">
-            <img src="/images/helpinghands_logo.png" alt="SendAHandyman Logo" class="h-9 w-auto">
-            <span class="hidden sm:inline">SendAHandyman</span>
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <img src="/images/rs-wordmark-cream.svg" alt="Resident Steward" class="h-8 w-auto">
         </a>
         <nav class="hidden md:flex items-center gap-6 text-sm">
-            <a href="#how" class="hover:text-brand">How it works</a>
-            <a href="#pricing" class="hover:text-brand">Pricing</a>
-            <a href="#roi" class="hover:text-brand">ROI</a>
-            <a href="#faq" class="hover:text-brand">FAQ</a>
+            <a href="#how">How it works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#roi">ROI</a>
+            <a href="#faq">FAQ</a>
         </nav>
         <div class="flex items-center gap-2">
-            <a href="#cta" class="inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white font-medium hover:bg-brand-dark">Get Started</a>
+            <a href="#cta" class="btn-primary rounded-xl px-4 py-2">Get Started</a>
         </div>
     </div>
 </header>
@@ -64,35 +63,36 @@
 <section id="top" class="relative overflow-hidden">
     <div class="container mx-auto px-4 sm:px-6 py-14 lg:py-20 grid lg:grid-cols-2 gap-10 items-center">
         <div>
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900">
-                AI‑Powered Property Management <span class="text-brand">Lite</span> for South Florida Condo Owners
+            <p class="rs-label-tag text-brass mb-3">Property Management</p>
+            <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl font-medium leading-tight text-forest">
+                AI‑Powered Property Management <em class="text-brass">Lite</em> for South Florida Condo Owners
             </h1>
-            <p class="mt-4 text-lg text-slate-600">Save ~50% vs traditional managers. 24/7 AI tenant concierge + instant maintenance triage + our vetted local handyman network. Flat <span class="font-semibold">$99/mo per unit</span>.</p>
-            <ul class="mt-6 space-y-2 text-slate-700">
-                <li>✅ 24/7 tenant replies and rent reminders</li>
-                <li>✅ Photo/video triage before dispatch</li>
-                <li>✅ Flat‑rate service calls + clear reports</li>
+            <p class="mt-4 text-lg text-mist">Your residents deserve a steward, not a contractor. 24/7 AI tenant concierge + instant maintenance triage + our vetted local network. Flat <span class="font-semibold text-forest">$99/mo per unit</span>.</p>
+            <ul class="mt-6 space-y-2 text-forest">
+                <li>✓ 24/7 tenant replies and rent reminders</li>
+                <li>✓ Photo/video triage before dispatch</li>
+                <li>✓ Flat‑rate service calls + clear reports</li>
             </ul>
             <div class="mt-8 flex flex-wrap gap-3">
-                <a href="#cta" class="inline-flex items-center rounded-xl bg-brand px-5 py-3 text-white font-semibold hover:bg-brand-dark">Request a Call</a>
-                <a href="#pricing" class="inline-flex items-center rounded-xl border border-slate-300 px-5 py-3 font-semibold hover:border-brand hover:text-brand">See Pricing</a>
+                <a href="#cta" class="btn-primary rounded-xl px-5 py-3">Request a Call</a>
+                <a href="#pricing" class="btn-secondary rounded-xl px-5 py-3">See Pricing</a>
             </div>
-            <p class="mt-3 text-xs text-slate-500">Perfect for out‑of‑state owners with 2–3 rental condos.</p>
+            <p class="mt-3 text-xs text-mist">Perfect for out‑of‑state owners with 2–3 rental condos.</p>
         </div>
         <div class="relative">
-            <div class="rounded-2xl border border-slate-200 bg-white shadow-sm p-6">
+            <div class="rs-card rounded-2xl p-6">
                 <div class="grid grid-cols-2 gap-4 text-center">
-                    <div class="rounded-xl bg-slate-50 p-4">
-                        <div class="text-3xl font-extrabold text-slate-900">$99</div>
-                        <div class="text-sm text-slate-500">/mo per unit</div>
+                    <div class="rounded-xl bg-cream p-4">
+                        <div class="text-3xl font-display font-medium text-forest">$99</div>
+                        <div class="text-sm text-mist">/mo per unit</div>
                     </div>
-                    <div class="rounded-xl bg-slate-50 p-4">
-                        <div class="text-3xl font-extrabold text-emerald-600">~50%</div>
-                        <div class="text-sm text-slate-500">Avg annual savings</div>
+                    <div class="rounded-xl bg-cream p-4">
+                        <div class="text-3xl font-display font-medium text-brass">~50%</div>
+                        <div class="text-sm text-mist">Avg annual savings</div>
                     </div>
-                    <div class="rounded-xl bg-slate-50 p-4 col-span-2">
-                        <div class="text-sm text-slate-500">Backed by AI + local pros</div>
-                        <div class="text-base font-semibold">Less cost. Less headache.</div>
+                    <div class="rounded-xl bg-cream p-4 col-span-2">
+                        <div class="text-sm text-mist">Backed by AI + local pros</div>
+                        <div class="text-base font-semibold text-forest">Less cost. Less headache.</div>
                     </div>
                 </div>
             </div>
@@ -101,58 +101,59 @@
 </section>
 
 <!-- Trust strip -->
-<section class="bg-white border-y border-slate-200">
-    <div class="container mx-auto px-4 sm:px-6 py-6 grid md:grid-cols-3 gap-4 text-center text-sm">
-        <div>⏱️ <span class="font-semibold">Faster response</span> than traditional PMs</div>
-        <div>🛠️ <span class="font-semibold">Local handyman network</span> you can trust</div>
-        <div>📊 <span class="font-semibold">Clear monthly reports</span> for peace of mind</div>
+<section class="bg-forest border-y border-brass/30">
+    <div class="container mx-auto px-4 sm:px-6 py-6 grid md:grid-cols-3 gap-4 text-center text-sm text-cream">
+        <div><span class="text-brass font-semibold">Faster response</span> than traditional PMs</div>
+        <div><span class="text-brass font-semibold">Local vetted network</span> you can trust</div>
+        <div><span class="text-brass font-semibold">Clear monthly reports</span> for peace of mind</div>
     </div>
 </section>
 
 <!-- How it works -->
 <section id="how" class="container mx-auto px-4 sm:px-6 py-16">
-    <h2 class="text-2xl sm:text-3xl font-bold">How it works</h2>
+    <div class="brass-ornament"></div>
+    <h2 class="rs-section-title">How it works</h2>
     <div class="mt-8 grid lg:grid-cols-4 gap-6">
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">💬</div>
-            <h3 class="font-semibold mt-3">Tenant contacts AI</h3>
-            <p class="text-sm text-slate-600 mt-2">24/7 concierge answers, gathers photos/videos, and logs details.</p>
+        <div class="rs-card rounded-2xl">
+            <div class="text-2xl text-brass" aria-hidden="true">&#9672;</div>
+            <h3 class="font-display font-medium text-xl mt-3">Tenant contacts AI</h3>
+            <p class="text-sm text-mist mt-2">24/7 concierge answers, gathers photos/videos, and logs details.</p>
         </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">🧠</div>
-            <h3 class="font-semibold mt-3">Smart triage</h3>
-            <p class="text-sm text-slate-600 mt-2">AI classifies urgency (e.g., AC outage vs. routine drip) and suggests next steps.</p>
+        <div class="rs-card rounded-2xl">
+            <div class="text-2xl text-brass" aria-hidden="true">&#9672;</div>
+            <h3 class="font-display font-medium text-xl mt-3">Smart triage</h3>
+            <p class="text-sm text-mist mt-2">AI classifies urgency (e.g., AC outage vs. routine drip) and suggests next steps.</p>
         </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">📅</div>
-            <h3 class="font-semibold mt-3">Auto‑dispatch & scheduling</h3>
-            <p class="text-sm text-slate-600 mt-2">Jobs route to SendAHandyman. Tenant picks a time; owner notified.</p>
+        <div class="rs-card rounded-2xl">
+            <div class="text-2xl text-brass" aria-hidden="true">&#9672;</div>
+            <h3 class="font-display font-medium text-xl mt-3">Auto‑dispatch & scheduling</h3>
+            <p class="text-sm text-mist mt-2">Jobs route to our team. Tenant picks a time; owner notified.</p>
         </div>
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <div class="text-2xl" aria-hidden="true">📈</div>
-            <h3 class="font-semibold mt-3">Completion & reporting</h3>
-            <p class="text-sm text-slate-600 mt-2">Tech notes & photos appear in your monthly report. Track costs & turnaround.</p>
+        <div class="rs-card rounded-2xl">
+            <div class="text-2xl text-brass" aria-hidden="true">&#9672;</div>
+            <h3 class="font-display font-medium text-xl mt-3">Completion & reporting</h3>
+            <p class="text-sm text-mist mt-2">Tech notes & photos appear in your monthly report. Track costs & turnaround.</p>
         </div>
     </div>
 </section>
 
 <!-- Pricing -->
-<section id="pricing" class="bg-white border-y border-slate-200">
+<section id="pricing" class="bg-forest-deep border-y border-brass/30">
     <div class="container mx-auto px-4 sm:px-6 py-16">
-        <h2 class="text-2xl sm:text-3xl font-bold">Simple pricing</h2>
+        <h2 class="rs-section-title text-cream">Simple pricing</h2>
         <div class="mt-8 grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <ul class="space-y-2 text-slate-700 text-sm">
+            <div class="lg:col-span-2 rs-card-dark rounded-2xl">
+                <ul class="space-y-2 text-cream text-sm">
                     <li>• <b>$99/mo per unit</b> — AI tenant concierge, 24/7 triage, owner dashboard</li>
                     <li>• <b>$99 flat service call</b> + materials. Optional auto‑approval under $250</li>
                     <li>• Add‑ons: Tenant placement (½ month rent), Lease renewal $200, Annual inspection $149</li>
                 </ul>
             </div>
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p class="text-sm text-slate-500">Typical PM fee at 10% of rent</p>
-                <div class="text-3xl font-extrabold text-slate-900">$200/mo</div>
-                <p class="text-xs text-slate-500 mt-1">at $2,000 rent</p>
-                <div class="mt-3 text-emerald-600 text-sm font-semibold">You keep more of your investment ✔</div>
+            <div class="rs-card-dark rounded-2xl">
+                <p class="text-sm text-cream/60">Typical PM fee at 10% of rent</p>
+                <div class="text-3xl font-display font-medium text-brass">$200/mo</div>
+                <p class="text-xs text-cream/60 mt-1">at $2,000 rent</p>
+                <div class="mt-3 text-brass text-sm font-semibold">You keep more of your investment ✓</div>
             </div>
         </div>
     </div>
@@ -160,34 +161,35 @@
 
 <!-- ROI Calculator -->
 <section id="roi" class="container mx-auto px-4 sm:px-6 py-16">
-    <h2 class="text-2xl sm:text-3xl font-bold">ROI calculator</h2>
-    <p class="text-sm text-slate-600 mt-2">Estimate annual savings vs a traditional 10% property manager.</p>
+    <div class="brass-ornament"></div>
+    <h2 class="rs-section-title">ROI calculator</h2>
+    <p class="text-sm text-mist mt-2">Estimate annual savings vs a traditional 10% property manager.</p>
 
     <div class="mt-6 grid lg:grid-cols-2 gap-8">
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
-            <label for="rent" class="block text-sm font-medium">Monthly rent per unit ($)</label>
-            <input id="rent" type="number" min="500" step="50" value="2000" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+        <div class="rs-card rounded-2xl">
+            <label for="rent" class="rs-label">Monthly rent per unit ($)</label>
+            <input id="rent" type="number" min="500" step="50" value="2000" class="rs-input mt-2 w-full rounded-xl" />
 
-            <label for="units" class="block text-sm font-medium mt-4"># of units</label>
-            <input id="units" type="number" min="1" step="1" value="2" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+            <label for="units" class="rs-label mt-4"># of units</label>
+            <input id="units" type="number" min="1" step="1" value="2" class="rs-input mt-2 w-full rounded-xl" />
 
-            <button id="calcBtn" class="mt-4 inline-flex items-center rounded-xl bg-brand px-4 py-2 text-white font-semibold hover:bg-brand-dark">Calculate</button>
-            <p class="text-xs text-slate-500 mt-2">Assumes $99/mo per unit for SendAHandyman Managed Properties vs 10% of rent traditional PM.</p>
+            <button id="calcBtn" class="btn-primary mt-4 rounded-xl px-4 py-2">Calculate</button>
+            <p class="text-xs text-mist mt-2">Assumes $99/mo per unit for Resident Steward Managed Properties vs 10% of rent traditional PM.</p>
         </div>
 
-        <div class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+        <div class="rs-card rounded-2xl">
             <div class="grid grid-cols-2 gap-4 text-center">
-                <div class="rounded-xl bg-slate-50 p-4">
-                    <div class="text-sm text-slate-500">Traditional PM</div>
-                    <div id="pmCost" class="text-2xl font-extrabold">$4,800/yr</div>
+                <div class="rounded-xl bg-cream p-4">
+                    <div class="text-sm text-mist">Traditional PM</div>
+                    <div id="pmCost" class="text-2xl font-display font-medium text-forest">$4,800/yr</div>
                 </div>
-                <div class="rounded-xl bg-slate-50 p-4">
-                    <div class="text-sm text-slate-500">Managed Properties</div>
-                    <div id="ourCost" class="text-2xl font-extrabold">$2,376/yr</div>
+                <div class="rounded-xl bg-cream p-4">
+                    <div class="text-sm text-mist">Managed Properties</div>
+                    <div id="ourCost" class="text-2xl font-display font-medium text-forest">$2,376/yr</div>
                 </div>
-                <div class="rounded-xl bg-emerald-50 p-4 col-span-2">
-                    <div class="text-sm text-emerald-700">Estimated annual savings</div>
-                    <div id="savings" class="text-3xl font-extrabold text-emerald-700">$2,424</div>
+                <div class="rounded-xl bg-forest p-4 col-span-2">
+                    <div class="text-sm text-cream/80">Estimated annual savings</div>
+                    <div id="savings" class="text-3xl font-display font-medium text-brass">$2,424</div>
                 </div>
             </div>
         </div>
@@ -195,25 +197,25 @@
 </section>
 
 <!-- FAQ -->
-<section id="faq" class="bg-white border-y border-slate-200">
+<section id="faq" class="bg-cream-deep border-y border-forest/20">
     <div class="container mx-auto px-4 sm:px-6 py-16">
-        <h2 class="text-2xl sm:text-3xl font-bold">FAQ</h2>
+        <h2 class="rs-section-title">FAQ</h2>
         <div class="mt-8 grid lg:grid-cols-2 gap-6">
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" open>
-                <summary class="font-semibold cursor-pointer">What does the $99/mo include?</summary>
-                <p class="text-sm text-slate-600 mt-2">24/7 AI tenant concierge, maintenance triage with photo/video intake, rent reminders, and a monthly owner report.</p>
+            <details class="rs-card rounded-2xl" open>
+                <summary class="font-display font-medium text-lg cursor-pointer text-forest">What does the $99/mo include?</summary>
+                <p class="text-sm text-mist mt-2">24/7 AI tenant concierge, maintenance triage with photo/video intake, rent reminders, and a monthly owner report.</p>
             </details>
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary class="font-semibold cursor-pointer">How do service calls work?</summary>
-                <p class="text-sm text-slate-600 mt-2">AI triage routes issues to our dispatch. We charge $99 per visit plus materials. You can auto‑approve jobs under $250 for faster turnaround.</p>
+            <details class="rs-card rounded-2xl">
+                <summary class="font-display font-medium text-lg cursor-pointer text-forest">How do service calls work?</summary>
+                <p class="text-sm text-mist mt-2">AI triage routes issues to our dispatch. We charge $99 per visit plus materials. You can auto‑approve jobs under $250 for faster turnaround.</p>
             </details>
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary class="font-semibold cursor-pointer">Do you replace a full property manager?</summary>
-                <p class="text-sm text-slate-600 mt-2">We're a cost‑effective alternative focused on operations & maintenance. If you need full leasing/eviction services, we can add those as needed.</p>
+            <details class="rs-card rounded-2xl">
+                <summary class="font-display font-medium text-lg cursor-pointer text-forest">Do you replace a full property manager?</summary>
+                <p class="text-sm text-mist mt-2">We're a cost‑effective alternative focused on operations & maintenance. If you need full leasing/eviction services, we can add those as needed.</p>
             </details>
-            <details class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <summary class="font-semibold cursor-pointer">Can you integrate with my existing tools?</summary>
-                <p class="text-sm text-slate-600 mt-2">Yes. We can connect with AI PM platforms for tenant comms and scheduling, and sync your preferred accounting/export options.</p>
+            <details class="rs-card rounded-2xl">
+                <summary class="font-display font-medium text-lg cursor-pointer text-forest">Can you integrate with my existing tools?</summary>
+                <p class="text-sm text-mist mt-2">Yes. We can connect with AI PM platforms for tenant comms and scheduling, and sync your preferred accounting/export options.</p>
             </details>
         </div>
     </div>
@@ -223,69 +225,70 @@
 <section id="cta" class="container mx-auto px-4 sm:px-6 py-16">
     <div class="grid lg:grid-cols-2 gap-8 items-center">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold">Ready to keep your investment hands‑off?</h2>
-            <p class="mt-3 text-slate-600">Tell us about your condos and we'll reach out to set up your Managed Properties plan. We can start with one unit and scale to all of them.</p>
-            <ul class="mt-4 space-y-2 text-slate-700 text-sm">
+            <div class="brass-ornament"></div>
+            <h2 class="rs-section-title">Ready to keep your investment hands‑off?</h2>
+            <p class="mt-3 text-mist">Tell us about your condos and we'll reach out to set up your Managed Properties plan. We can start with one unit and scale to all of them.</p>
+            <ul class="mt-4 space-y-2 text-forest text-sm">
                 <li>• South Florida coverage</li>
                 <li>• Start in days, not weeks</li>
                 <li>• Cancel anytime</li>
             </ul>
         </div>
 
-        <!-- Netlify-ready form (also works with basic POST fallback) -->
-        <form id="leadForm" name="managed-properties-lead" method="POST" data-netlify="true" class="rounded-2xl bg-white border border-slate-200 p-6 shadow-sm">
+        <form id="leadForm" name="managed-properties-lead" method="POST" data-netlify="true" class="rs-card rounded-2xl">
             <input type="hidden" name="form-name" value="managed-properties-lead" />
             <div class="grid sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="name" class="block text-sm font-medium">Full name</label>
-                    <input id="name" name="name" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                    <label for="name" class="rs-label">Full name</label>
+                    <input id="name" name="name" required class="rs-input mt-2 w-full rounded-xl" />
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium">Email</label>
-                    <input id="email" name="email" type="email" required class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                    <label for="email" class="rs-label">Email</label>
+                    <input id="email" name="email" type="email" required class="rs-input mt-2 w-full rounded-xl" />
                 </div>
                 <div>
-                    <label for="phone" class="block text-sm font-medium">Phone</label>
-                    <input id="phone" name="phone" type="tel" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                    <label for="phone" class="rs-label">Phone</label>
+                    <input id="phone" name="phone" type="tel" class="rs-input mt-2 w-full rounded-xl" />
                 </div>
                 <div>
-                    <label for="unitsQ" class="block text-sm font-medium">How many units?</label>
-                    <input id="unitsQ" name="units" type="number" min="1" value="2" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" />
+                    <label for="unitsQ" class="rs-label">How many units?</label>
+                    <input id="unitsQ" name="units" type="number" min="1" value="2" class="rs-input mt-2 w-full rounded-xl" />
                 </div>
             </div>
-            <label for="message" class="block text-sm font-medium mt-4">Anything we should know?</label>
-            <textarea id="message" name="message" rows="4" class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand" placeholder="e.g., Two condos in Boca & Lake Worth, need AC priority and after‑hours coverage"></textarea>
+            <label for="message" class="rs-label mt-4">Anything we should know?</label>
+            <textarea id="message" name="message" rows="4" class="rs-input mt-2 w-full rounded-xl" placeholder="e.g., Two condos in Boca & Lake Worth, need AC priority and after‑hours coverage"></textarea>
 
             <div class="mt-4 flex items-start gap-2 text-sm">
                 <input id="consent" type="checkbox" required class="mt-1" />
-                <label for="consent">I agree to be contacted about SendAHandyman Managed Properties.</label>
+                <label for="consent">I agree to be contacted about Resident Steward Managed Properties.</label>
             </div>
 
-            <button class="mt-6 w-full inline-flex items-center justify-center rounded-xl bg-brand px-5 py-3 text-white font-semibold hover:bg-brand-dark">Request my plan</button>
-            <p id="formMsg" class="mt-3 text-sm text-slate-500" role="status" aria-live="polite"></p>
+            <button class="btn-primary mt-6 w-full rounded-xl px-5 py-3">Request my plan</button>
+            <p id="formMsg" class="mt-3 text-sm text-mist" role="status" aria-live="polite"></p>
         </form>
     </div>
 </section>
 
 <!-- Footer -->
-<footer class="bg-white border-t border-slate-200">
+<footer class="rs-footer">
+    <hr class="mb-8">
     <div class="container mx-auto px-4 sm:px-6 py-10 grid md:grid-cols-3 gap-6 text-sm">
         <div>
-            <div class="font-semibold">SendAHandyman Managed Properties</div>
-            <p class="text-slate-600 mt-2">Less cost. Less headache. More peace of mind.</p>
+            <img src="/images/rs-wordmark-cream.svg" alt="Resident Steward" class="h-6 w-auto mb-2">
+            <p class="text-cream/60 mt-2">Less cost. Less headache. More peace of mind.</p>
         </div>
         <nav class="space-y-2">
-            <a href="#how" class="block hover:text-brand">How it works</a>
-            <a href="#pricing" class="block hover:text-brand">Pricing</a>
-            <a href="#roi" class="block hover:text-brand">ROI</a>
-            <a href="#faq" class="block hover:text-brand">FAQ</a>
+            <a href="#how" class="block">How it works</a>
+            <a href="#pricing" class="block">Pricing</a>
+            <a href="#roi" class="block">ROI</a>
+            <a href="#faq" class="block">FAQ</a>
         </nav>
         <div>
-            <p class="text-slate-600">Serving South Florida condo owners</p>
-            <p class="text-slate-600 mt-1">Questions? <a href="mailto:info@sendahandyman.com" class="text-brand hover:text-brand-dark">info@sendahandyman.com</a></p>
+            <p class="text-cream/60">Serving South Florida condo owners</p>
+            <p class="text-cream/60 mt-1">Questions? <a href="mailto:info@residentsteward.com" class="text-brass">info@residentsteward.com</a></p>
         </div>
     </div>
-    <div class="text-center text-xs text-slate-500 pb-6">© <span id="year"></span> SendAHandyman. All rights reserved.</div>
+    <div class="text-center text-xs text-cream/40 pb-6">© <span id="year"></span> Resident Steward. All rights reserved.</div>
 </footer>
 
 <script>
