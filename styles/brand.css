@@ -117,6 +117,315 @@ a, button, input, textarea, select {
 .font-display    { font-family: var(--font-display); }
 .font-body       { font-family: var(--font-body); }
 
+/* ============================================================
+   COMPONENT: Buttons
+   ============================================================ */
+
+/* Primary — forest fill, cream text, brass border on hover */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-cta);
+  letter-spacing: 0.03em;
+  border: 1px solid var(--color-forest);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all var(--duration-short) var(--ease-brand);
+}
+.btn-primary:hover {
+  background-color: var(--color-forest-deep);
+  border-color: var(--color-brass);
+}
+.btn-primary:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Secondary — cream fill, forest border, forest text */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--text-cta);
+  letter-spacing: 0.03em;
+  border: 1px solid var(--color-forest);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all var(--duration-short) var(--ease-brand);
+}
+.btn-secondary:hover {
+  background-color: var(--color-cream-deep);
+  border-color: var(--color-brass);
+}
+.btn-secondary:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+/* Tertiary — text-only, brass underline on hover */
+.btn-tertiary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  background: none;
+  color: var(--color-forest);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-cta);
+  border: none;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--duration-short) var(--ease-brand);
+}
+.btn-tertiary:hover {
+  color: var(--color-forest);
+  border-bottom-color: var(--color-brass);
+}
+
+/* ============================================================
+   COMPONENT: Navigation Header
+   ============================================================ */
+
+.rs-nav {
+  background-color: var(--color-forest);
+  border-bottom: 1px solid var(--color-brass);
+}
+.rs-nav a {
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-cta);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all var(--duration-short) var(--ease-brand);
+}
+.rs-nav a:hover {
+  color: var(--color-brass);
+}
+.rs-nav a.active {
+  border-bottom-color: var(--color-brass);
+  color: var(--color-brass);
+}
+
+/* ============================================================
+   COMPONENT: Footer
+   ============================================================ */
+
+.rs-footer {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+}
+.rs-footer a {
+  color: var(--color-cream);
+  transition: color var(--duration-short) var(--ease-brand);
+}
+.rs-footer a:hover {
+  color: var(--color-brass);
+}
+.rs-footer hr {
+  border-color: var(--color-brass);
+  opacity: 0.3;
+}
+
+/* ============================================================
+   COMPONENT: Form Inputs
+   ============================================================ */
+
+.rs-input {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  border: 1px solid var(--color-forest);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: var(--text-body);
+  transition: all var(--duration-short) var(--ease-brand);
+}
+.rs-input:focus {
+  outline: none;
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0 2px rgba(201, 169, 97, 0.25);
+}
+.rs-input::placeholder {
+  color: var(--color-mist);
+}
+
+.rs-label {
+  display: block;
+  color: var(--color-forest);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-cta);
+  margin-bottom: 0.375rem;
+}
+
+.rs-select {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  border: 1px solid var(--color-forest);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: var(--text-body);
+  transition: all var(--duration-short) var(--ease-brand);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%231A3D2E' stroke-width='1.5' d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+.rs-select:focus {
+  outline: none;
+  border-color: var(--color-brass);
+  box-shadow: 0 0 0 2px rgba(201, 169, 97, 0.25);
+}
+
+/* ============================================================
+   COMPONENT: Cards
+   ============================================================ */
+
+.rs-card {
+  background-color: var(--color-cream-deep);
+  border: 1px solid var(--color-forest);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: border-color var(--duration-short) var(--ease-brand);
+}
+.rs-card:hover {
+  border-color: var(--color-brass);
+}
+
+/* Card variant — on forest background */
+.rs-card-dark {
+  background-color: var(--color-forest-deep);
+  border: 1px solid var(--color-brass);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  color: var(--color-cream);
+}
+
+/* ============================================================
+   COMPONENT: Modal / Overlay
+   ============================================================ */
+
+.rs-modal-overlay {
+  background-color: rgba(15, 42, 31, 0.7); /* forest-deep at 70% */
+}
+
+.rs-modal {
+  background-color: var(--color-forest);
+  color: var(--color-cream);
+  border: 1px solid var(--color-brass);
+  border-radius: 0.75rem;
+}
+.rs-modal h2,
+.rs-modal h3 {
+  color: var(--color-brass);
+  font-family: var(--font-display);
+}
+
+/* Modal variant — light (for admin/functional modals) */
+.rs-modal-light {
+  background-color: var(--color-cream);
+  color: var(--color-forest);
+  border: 1px solid var(--color-forest);
+  border-radius: 0.75rem;
+}
+.rs-modal-light h2,
+.rs-modal-light h3 {
+  color: var(--color-forest);
+  font-family: var(--font-display);
+}
+
+/* ============================================================
+   COMPONENT: Typography
+   ============================================================ */
+
+/* Hero — 96px, Cormorant Light */
+.rs-hero {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--color-forest);
+}
+
+/* Section title — 68px, Cormorant Medium Italic */
+.rs-section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.1;
+  color: var(--color-forest);
+}
+
+/* Card headline — 44px, Cormorant Medium */
+.rs-card-title {
+  font-family: var(--font-display);
+  font-size: var(--text-card);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--color-forest);
+}
+
+/* Label — 12px, Jost Medium, uppercase */
+.rs-label-tag {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-mist);
+}
+
+/* Body copy — 17px, Jost Light (default from body reset) */
+
+/* CTA text — 15px, Jost SemiBold */
+.rs-cta-text {
+  font-family: var(--font-body);
+  font-size: var(--text-cta);
+  font-weight: 600;
+}
+
+/* Text on dark backgrounds */
+.rs-hero-cream       { color: var(--color-cream); }
+.rs-section-title-cream { color: var(--color-cream); }
+.rs-section-title-brass { color: var(--color-brass); }
+
+/* Responsive typography */
+@media (max-width: 768px) {
+  .rs-hero         { font-size: 48px; }
+  .rs-section-title { font-size: 36px; }
+  .rs-card-title   { font-size: 28px; }
+}
+@media (max-width: 480px) {
+  .rs-hero         { font-size: 36px; }
+  .rs-section-title { font-size: 28px; }
+  .rs-card-title   { font-size: 24px; }
+}
+
 /* --- Brass Rule (divider) ---------------------------------- */
 .brass-rule {
   border: none;
