@@ -1,5 +1,5 @@
 // netlify/functions/ai-photo-analysis.js
-// AI Photo Triage System for SendAHandyman.com
+// AI Photo Triage System for ResidentSteward.com
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -99,7 +99,7 @@ export const handler = async (event, context) => {
 
 async function analyzeImageWithClaude(base64Image, filename) {
   // Expert home repair triage system prompt
-  const systemPrompt = `You are an expert home repair triage assistant for SendAHandyman.com, a Florida-based 'Uber for handyman' service.
+  const systemPrompt = `You are an expert home repair triage assistant for Resident Steward.com, a Florida-based 'Uber for handyman' service.
 
 TASK CATEGORIES AND PRICING:
 ${Object.entries(TASK_CATEGORIES).map(([key, value]) => `- ${key}: ${value.name} (${value.price})`).join('\n')}

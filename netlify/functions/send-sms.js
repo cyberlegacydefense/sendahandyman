@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
     switch (type) {
       case 'booking_confirmation':
         recipient = data.customer_phone;
-        message = `SendAHandyman Confirmation 📋
+        message = `Resident Steward Confirmation 📋
 Task ID: ${data.task_id}
 Service: ${data.service_name}
 Time: ${data.time_window}
@@ -72,7 +72,7 @@ Please confirm receipt.`;
 
       case 'tech_enroute':
         recipient = data.customer_phone;
-        message = `Your SendAHandyman is on the way! 🚐
+        message = `Your Resident Steward is on the way! 🚐
 Technician: ${data.tech_name}
 Phone: ${data.tech_phone}
 ETA: ${data.eta}
@@ -87,7 +87,7 @@ They'll call if they need to access the property.`;
 Task ID: ${data.task_id}
 Total Charged: $${data.final_amount}
 
-Thanks for choosing SendAHandyman! Please leave us a review and save our number for future needs.`;
+Thanks for choosing Resident Steward! Please leave us a review and save our number for future needs.`;
         break;
 
       default:

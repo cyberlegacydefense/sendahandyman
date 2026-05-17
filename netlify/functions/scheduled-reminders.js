@@ -1,5 +1,5 @@
 // netlify/functions/scheduled-reminders.js
-// Automated pre-arrival notifications for SendAHandyman bookings
+// Automated pre-arrival notifications for Resident Steward bookings
 // Runs every 15 minutes via Netlify scheduled function
 
 import { createClient } from '@supabase/supabase-js';

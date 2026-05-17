@@ -136,7 +136,7 @@ export const handler = async (event, context) => {
       capture_method: 'manual', // 🔐 AUTHORIZATION HOLD - same as main website
       confirmation_method: 'manual',
       confirm: true,
-      return_url: `${event.headers.origin || 'https://sendahandyman.com'}/quote-payment-success?token=${quote_token}`,
+      return_url: `${event.headers.origin || 'https://residentsteward.com'}/quote-payment-success?token=${quote_token}`,
       description: `Quote Payment: ${quote.service_type} for ${customer_name}`,
       metadata: {
         quote_id: quote.quote_id,
@@ -245,7 +245,7 @@ export const handler = async (event, context) => {
     let task;
     try {
       console.log('🔄 Calling proven create-task function...');
-      const taskResponse = await fetch(`${event.headers.origin || 'https://sendahandyman.com'}/.netlify/functions/create-task`, {
+      const taskResponse = await fetch(`${event.headers.origin || 'https://residentsteward.com'}/.netlify/functions/create-task`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(taskCreationData)
@@ -363,7 +363,7 @@ async function sendQuoteBookingNotifications(data) {
         payment_intent_id: paymentIntentId,
         // Source
         booking_source: 'admin_quote',
-        notification_email: 'info@sendahandyman.com'
+        notification_email: 'info@residentsteward.com'
       };
 
       const params = new URLSearchParams();

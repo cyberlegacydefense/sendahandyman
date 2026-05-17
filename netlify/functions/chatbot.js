@@ -47,16 +47,16 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // SendAHandyman knowledge base
+    // Resident Steward knowledge base
     const knowledgeBase = `
     BUSINESS INFO:
-    - Company: SendAHandyman
+    - Company: Resident Steward
     - Service areas: Palm Beach, Broward, Miami-Dade counties (Boca Raton, Delray Beach, Boynton Beach, Fort Lauderdale, Hollywood, Aventura, Miami, Coral Gables, Kendall)
     - Rate: $90/hour
     - Same-day premium: +15%
     - Evening premium (4-8pm): +10%
     - Rush service: +10%
-    - Contact: info@sendahandyman.com
+    - Contact: info@residentsteward.com
 
     SERVICES & PRICING:
     1. TV Wall Mount (32-65"): $180 base (2.0 hrs)
@@ -142,7 +142,7 @@ exports.handler = async (event, context) => {
           role: 'user',
           content: `CRITICAL INSTRUCTION: You are an INFORMATION-ONLY chatbot. You have NO ability to schedule, book, cancel, or confirm any appointments. You MUST NOT claim you can do these things.
 
-You are a customer service chatbot for SendAHandyman. You can ONLY:
+You are a customer service chatbot for Resident Steward. You can ONLY:
 - Answer questions about services and pricing
 - Explain what's included in each service
 - Provide service area information
@@ -189,7 +189,7 @@ A:`
         statusCode: 500,
         headers,
         body: JSON.stringify({
-          error: 'AI service temporarily unavailable. Please try again or contact us directly at info@sendahandyman.com'
+          error: 'AI service temporarily unavailable. Please try again or contact us directly at info@residentsteward.com'
         })
       };
     }
@@ -217,7 +217,7 @@ A:`
       statusCode: 500,
       headers,
       body: JSON.stringify({
-        error: 'Sorry, I encountered an error. Please try again or contact us directly at info@sendahandyman.com',
+        error: 'Sorry, I encountered an error. Please try again or contact us directly at info@residentsteward.com',
         fallback: true
       })
     };
