@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 40" fill="none">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&amp;display=swap');
+    .resident { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 28px; fill: #F5F0E6; letter-spacing: 0.08em; }
+    .steward  { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: 28px; fill: #F5F0E6; font-style: italic; }
+  </style>
+  <text y="30" class="resident">RESIDENT</text>
+  <text x="175" y="30" class="steward">Steward</text>
+</svg>
