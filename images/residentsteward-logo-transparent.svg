@@ -1,0 +1,21 @@
+<svg viewBox="0 0 400 390" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>ResidentSteward logo on transparent background</title>
+<desc>Full vertical lockup with monogram crest above the split wordmark. No background fill, no decorative frame. Forest #1A3D2E and brass #C9A961 render directly on whatever surface the SVG is placed on. Directional concept — not final production logo.</desc>
+
+<g transform="translate(200, 110)">
+<circle cx="0" cy="0" r="82" fill="none" stroke="#C9A961" stroke-width="1.5"/>
+<circle cx="0" cy="0" r="75" fill="none" stroke="#C9A961" stroke-width="0.4" opacity="0.55"/>
+<path d="M 0,-89 L 4.5,-82 L 0,-75 L -4.5,-82 Z" fill="#C9A961"/>
+<path d="M 0,89 L 4.5,82 L 0,75 L -4.5,82 Z" fill="#C9A961"/>
+<text x="-19" y="3" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="94" font-weight="400" fill="#1A3D2E" text-anchor="middle" dominant-baseline="central">R</text>
+<text x="23" y="5" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="78" font-weight="400" font-style="italic" fill="#C9A961" text-anchor="middle" dominant-baseline="central">S</text>
+</g>
+
+<line x1="155" y1="240" x2="245" y2="240" stroke="#C9A961" stroke-width="0.5"/>
+
+<g transform="translate(200, 275)">
+<text x="0" y="0" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="24" fill="#1A3D2E" text-anchor="middle" letter-spacing="7">RESIDENT</text>
+<path d="M 0,28 L 3.5,32 L 0,36 L -3.5,32 Z" fill="#C9A961"/>
+<text x="0" y="82" font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif" font-size="48" font-style="italic" fill="#C9A961" text-anchor="middle">Steward</text>
+</g>
+</svg>
