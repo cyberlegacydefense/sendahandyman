@@ -1818,19 +1818,57 @@
             if (searchInput.trim()) {
                 serviceData.description = searchInput.trim();
 
-                // Always detect category from description text
+                // Instant: regex-based category detection (shows immediately)
                 const detectedCategory = detectCategoryFromDescription(searchInput);
                 if (detectedCategory) {
                     serviceData.category = detectedCategory;
                     serviceData.taskKey = getCategoryTaskKey(detectedCategory);
                     serviceData.categoryDisplay = getCategoryDisplay(detectedCategory);
-                    console.log('🎯 Auto-detected category from description:', detectedCategory, '→ taskKey:', serviceData.taskKey);
+                    console.log('🎯 Regex detected category:', detectedCategory, '→ taskKey:', serviceData.taskKey);
                 }
 
                 // Track search started
                 HandymanAnalytics.trackSearchStarted(searchInput.trim());
 
                 showServiceDetails();
+
+                // Background: LLM classification (upgrades if different)
+                classifyWithLLM(searchInput.trim(), detectedCategory);
+            }
+        }
+
+        async function classifyWithLLM(description, regexCategory) {
+            try {
+                const response = await fetch('/.netlify/functions/classify-task', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description })
+                });
+
+                if (!response.ok) return;
+
+                const result = await response.json();
+
+                if (result.category && result.source === 'llm' && result.category !== regexCategory) {
+                    // LLM disagrees with regex — map and upgrade
+                    const mappedKey = getCategoryTaskKey(result.category);
+                    const display = getCategoryDisplay(result.category);
+
+                    console.log(`🤖 LLM upgraded category: ${regexCategory} → ${result.category} (confidence: ${result.confidence})`);
+
+                    serviceData.category = result.category;
+                    serviceData.taskKey = mappedKey;
+                    serviceData.categoryDisplay = display;
+
+                    // Re-render if user is still on the details step
+                    if (currentStep === 'details') {
+                        renderServiceDetails();
+                    }
+                } else if (result.category && result.source === 'llm') {
+                    console.log(`🤖 LLM confirmed regex category: ${result.category} (confidence: ${result.confidence})`);
+                }
+            } catch (err) {
+                console.log('⚠️ LLM classification unavailable, using regex result');
             }
         }
 
