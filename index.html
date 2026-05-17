@@ -1818,15 +1818,13 @@
             if (searchInput.trim()) {
                 serviceData.description = searchInput.trim();
 
-                // Auto-detect category from description if not already set
-                if (!serviceData.category) {
-                    const detectedCategory = detectCategoryFromDescription(searchInput);
-                    if (detectedCategory) {
-                        serviceData.category = detectedCategory;
-                        serviceData.taskKey = getCategoryTaskKey(detectedCategory);
-                        serviceData.categoryDisplay = getCategoryDisplay(detectedCategory);
-                        console.log('🎯 Auto-detected category from description:', detectedCategory, '→ taskKey:', serviceData.taskKey);
-                    }
+                // Always detect category from description text
+                const detectedCategory = detectCategoryFromDescription(searchInput);
+                if (detectedCategory) {
+                    serviceData.category = detectedCategory;
+                    serviceData.taskKey = getCategoryTaskKey(detectedCategory);
+                    serviceData.categoryDisplay = getCategoryDisplay(detectedCategory);
+                    console.log('🎯 Auto-detected category from description:', detectedCategory, '→ taskKey:', serviceData.taskKey);
                 }
 
                 // Track search started
@@ -3423,11 +3421,18 @@
                 document.getElementById('serviceFlow').classList.add('hide');
                 document.getElementById('landingScreen').classList.remove('hide');
                 currentStep = 'landing';
+                // Reset category so next search re-detects from description
+                serviceData.category = null;
+                serviceData.taskKey = null;
+                serviceData.categoryDisplay = null;
             } else if (currentStep === 'services') {
                 // Going back from "All Services" screen to landing page
                 document.getElementById('serviceFlow').classList.add('hide');
                 document.getElementById('landingScreen').classList.remove('hide');
                 currentStep = 'landing';
+                serviceData.category = null;
+                serviceData.taskKey = null;
+                serviceData.categoryDisplay = null;
             } else if (currentStep === 'booking') {
                 // Going back from booking to service details
                 showServiceDetails();
