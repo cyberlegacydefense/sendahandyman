@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="192" height="192">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="512" height="512">
   <title>Resident Steward</title>
   <g transform="translate(100,100)">
-    <circle cx="0" cy="0" r="82" fill="none" stroke="#C9A961" stroke-width="2.5"/>
-    <circle cx="0" cy="0" r="75" fill="none" stroke="#C9A961" stroke-width="0.8" opacity="0.55"/>
+    <circle cx="0" cy="0" r="82" fill="none" stroke="#C9A961" stroke-width="4"/>
+    <circle cx="0" cy="0" r="75" fill="none" stroke="#C9A961" stroke-width="1.5" opacity="0.55"/>
     <path d="M 0,-89 L 4.5,-82 L 0,-75 L -4.5,-82 Z" fill="#C9A961"/>
     <path d="M 0,89 L 4.5,82 L 0,75 L -4.5,82 Z" fill="#C9A961"/>
     <text x="-19" y="3" font-family="'Cormorant Garamond',Georgia,serif" font-size="94" font-weight="400" fill="#1A3D2E" text-anchor="middle" dominant-baseline="central">R</text>
