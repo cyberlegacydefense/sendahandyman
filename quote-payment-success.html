@@ -9,46 +9,41 @@
     <script src="/styles/tailwind-brand.js"></script>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
 </head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+<body class="min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full mx-4">
-        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
-            <!-- Success Icon -->
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        <div class="rs-card rounded-2xl p-8 text-center">
+            <div class="w-16 h-16 border border-forest bg-cream rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-brass" fill="none" stroke="currentColor" stroke-width="1.25" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
 
-            <!-- Success Message -->
-            <h1 class="text-2xl font-bold text-gray-900 mb-2">Payment Authorized!</h1>
-            <p class="text-gray-600 mb-6">
-                Your payment has been authorized and your handyman service has been booked successfully. Funds are held on your card but you will only be charged after your handyman completes the work.
+            <h1 class="text-2xl font-display font-medium text-forest mb-2">Payment Authorized!</h1>
+            <p class="text-mist mb-6">
+                Your payment has been authorized and your service has been booked successfully. Funds are held on your card but you will only be charged after your service is completed.
             </p>
 
-            <!-- Quote Details -->
-            <div id="quoteDetails" class="bg-gray-50 rounded-lg p-4 mb-6 text-left">
-                <h3 class="font-semibold text-gray-900 mb-2">Booking Details:</h3>
-                <div id="quoteInfo" class="text-sm text-gray-600">
+            <div id="quoteDetails" class="bg-cream rounded-lg p-4 mb-6 text-left border border-forest/20">
+                <h3 class="font-semibold text-forest mb-2">Booking Details:</h3>
+                <div id="quoteInfo" class="text-sm text-mist">
                     <p>Loading your booking details...</p>
                 </div>
             </div>
 
-            <!-- Next Steps -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
-                <h3 class="font-semibold text-blue-800 mb-2">What happens next?</h3>
-                <ul class="text-sm text-blue-700 space-y-2">
+            <div class="bg-cream-deep border border-forest rounded-lg p-4 mb-6 text-left">
+                <h3 class="font-semibold text-forest mb-2">What happens next?</h3>
+                <ul class="text-sm text-forest space-y-2">
                     <li>1. You will receive a <strong>confirmation email</strong> shortly.</li>
-                    <li>2. In most cases within <strong>4 hours</strong>, a handyman will be matched to your service and you will be notified via email.</li>
+                    <li>2. In most cases within <strong>4 hours</strong>, a technician will be matched to your service and you will be notified via email.</li>
                     <li>3. Don't see our email? <strong>Check your junk/spam folder.</strong></li>
                 </ul>
-                <p class="text-sm text-blue-600 mt-3">
-                    Questions? Email us at <a href="mailto:info@sendahandyman.com" class="underline font-semibold">info@sendahandyman.com</a>
+                <p class="text-sm text-mist mt-3">
+                    Questions? Email us at <a href="mailto:info@residentsteward.com" class="underline font-semibold text-brass">info@residentsteward.com</a>
                 </p>
             </div>
 
-            <!-- Action Button -->
             <div class="text-center">
-                <button id="homeBtn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <button id="homeBtn" class="btn-primary px-6 py-2 rounded-lg">
                     Return to Homepage
                 </button>
             </div>

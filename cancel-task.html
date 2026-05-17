@@ -7,29 +7,29 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/styles/tailwind-brand.js"></script>
 </head>
-<body class="bg-gray-50">
+<body>
 <div class="max-w-2xl mx-auto p-8">
-  <div class="bg-white rounded-2xl p-8 shadow-lg">
-    <h1 class="text-3xl font-bold mb-6">Cancel Your Task</h1>
+  <div class="rs-card rounded-2xl p-8">
+    <h1 class="text-3xl font-display font-medium text-forest mb-6">Cancel Your Task</h1>
 
     <form id="cancelForm" class="space-y-4">
       <div>
-        <label class="block font-semibold mb-2">Task ID</label>
+        <label class="rs-label">Task ID</label>
         <input type="text" id="taskId" required
                placeholder="TASK-12345"
-               class="w-full border rounded-lg px-4 py-2">
+               class="rs-input w-full">
       </div>
 
       <div>
-        <label class="block font-semibold mb-2">Email Address</label>
+        <label class="rs-label">Email Address</label>
         <input type="email" id="email" required
                placeholder="your@email.com"
-               class="w-full border rounded-lg px-4 py-2">
+               class="rs-input w-full">
       </div>
 
       <div>
-        <label class="block font-semibold mb-2">Reason for Cancellation</label>
-        <select id="reason" required class="w-full border rounded-lg px-4 py-2">
+        <label class="rs-label">Reason for Cancellation</label>
+        <select id="reason" required class="rs-select w-full">
           <option value="">Select reason...</option>
           <option value="Plans changed">Plans changed</option>
           <option value="Found another service">Found another service</option>
@@ -40,13 +40,13 @@
         </select>
       </div>
 
-      <div id="policyInfo" class="bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
-        <h3 class="font-bold mb-2">Cancellation Policy</h3>
-        <p id="policyText" class="text-sm"></p>
+      <div id="policyInfo" class="bg-cream border border-forest rounded-lg p-4 hidden">
+        <h3 class="font-semibold text-forest mb-2">Cancellation Policy</h3>
+        <p id="policyText" class="text-sm text-mist"></p>
       </div>
 
       <button type="submit"
-              class="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700">
+              class="btn-primary w-full py-3 rounded-lg !bg-red-800 !border-red-800 hover:!bg-red-900">
         Cancel Task
       </button>
     </form>
